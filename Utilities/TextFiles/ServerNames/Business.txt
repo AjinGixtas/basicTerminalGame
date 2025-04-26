@@ -1,0 +1,11 @@
+10
+bitvale     Bitvale Systems  
+novanex     Novanex Labs  
+cryptech    Cryptech Works  
+ionstride   Ionstride Group  
+axonbyte    Axonbyte Solutions  
+keldric     Keldric Tech  
+orbix       Orbix Networking  
+silvaris    Silvaris Ops  
+trinode     Trinode Analytics  
+vektoron    Vektoron Consulting  

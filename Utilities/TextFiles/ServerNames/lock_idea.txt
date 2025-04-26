@@ -1,0 +1,2 @@
+I7: Rand int [0, 7]
+I256: Rand int [0, 256]

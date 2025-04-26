@@ -1,0 +1,11 @@
+10
+alpine         Alpine International  
+kaguo          Kaguo Energy Inc  
+infeido        Infeido Trade & Finance LLC  
+matok          Matok Gloud Works  
+focuron        Focuron Technology Inc.  
+veltri         Veltrionics Global Systems  
+zunexa         Zunexa Capital Partners  
+aure           Aure Photonics Ltd  
+braylith       Braylith Industries Corp  
+grovia         NetGrovia Solutions Inc  

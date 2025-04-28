@@ -17,9 +17,9 @@ public partial class NetworkManager : Node
     }
     public NetworkNode GenerateNetwork() {
         // 6+7+15+5+3+2+4+3+1
-        int[] nodePerDepths = [6, 8, 15, 6, 4, 2, 5, 3, 1];
+        int[] nodePerDepths = [6, 8, 15, 6, 4, 2, 5, 3, 1]; int totalDepth = nodePerDepths.Sum(x => x);
         NetworkNodeData[] scriptedNodeData = ReadScriptedNodeData();
-        NetworkNode network = new PlayerNode("home", "Player Terminal", "192.168.0.1", 0, NetworkNodeType.PLAYER, null);
+        NetworkNode network = new PlayerNode("home", "Player Terminal", "192.168.0.1", 0, 0, NetworkNodeType.PLAYER, null);
         Tuple<NetworkNodeType, string, string>[][] nodeNames = ReadProvidedNodeName();
         HoneypotNode.namePool = nodeNames;
         List<Tuple<NetworkNodeType, string, string>> namePool = []; int poolIndex = 0;
@@ -36,7 +36,7 @@ public partial class NetworkManager : Node
                 // Read the one at the top
                 Tuple<NetworkNodeType, string, string> nodeData = namePool[poolIndex];
                 NetworkNode parentNode = lastLayer[GD.RandRange(0, lastLayer.Count - 1)];
-                NetworkNode node = NetworkNode.GenerateProceduralNode(nodeData.Item1, nodeData.Item2, nodeData.Item3, i+1, parentNode);
+                NetworkNode node = NetworkNode.GenerateProceduralNode(nodeData.Item1, nodeData.Item2, nodeData.Item3, (double)(i+1)/totalDepth, (double)poolIndex/totalDepth, parentNode);
                 curLayer.Add(node);
                 parentNode.ChildNode.Add(node);
                 ++poolIndex;
@@ -55,23 +55,31 @@ public partial class NetworkManager : Node
         }
         return output;
     }
-    readonly string[] fileNames = ["Person.txt", "Business.txt", "Miner.txt", "Honeypot.txt", "Rouge.txt", "Faction.txt", "Corp.txt"];
+    readonly Tuple<string, NetworkNodeType>[] nodeTypeData = [
+        new Tuple<string, NetworkNodeType>("Person.txt", NetworkNodeType.PERSON),
+        new Tuple<string, NetworkNodeType>("Business.txt", NetworkNodeType.BUSINESS),
+        new Tuple<string, NetworkNodeType>("Miner.txt", NetworkNodeType.MINER),
+        new Tuple<string, NetworkNodeType>("Honeypot.txt", NetworkNodeType.HONEYPOT), 
+        new Tuple<string, NetworkNodeType>("Rouge.txt", NetworkNodeType.ROUGE), 
+        new Tuple<string, NetworkNodeType>("Faction.txt", NetworkNodeType.FACTION),
+        new Tuple<string, NetworkNodeType>("Corp.txt", NetworkNodeType.CORP)
+    ];
     readonly string[] prefix = ["p_", "b_", "c_", "f_", "h_", "m_", "r_"];
+
     Tuple<NetworkNodeType, string, string>[][] ReadProvidedNodeName() {
-        Tuple<NetworkNodeType, string, string>[][] output = new Tuple<NetworkNodeType, string, string>[fileNames.Length][];
-        for (int i = 0; i < fileNames.Length; i++) { output[i] = ReadNodeNameOfType(fileNames[i], prefix[i]); }
+        Tuple<NetworkNodeType, string, string>[][] output = new Tuple<NetworkNodeType, string, string>[nodeTypeData.Length][];
+        for (int i = 0; i < nodeTypeData.Length; i++) { output[i] = ReadNodeNameOfType(nodeTypeData[i], prefix[i]); }
         return output;
 
-        Tuple<NetworkNodeType, string, string>[] ReadNodeNameOfType(string fileName, string prefix) {
-            NetworkNodeType enumValue = (NetworkNodeType)(Array.IndexOf(fileNames, fileName) + 1);
+        Tuple<NetworkNodeType, string, string>[] ReadNodeNameOfType(Tuple<string, NetworkNodeType> nodeDataContainerType, string prefix) {
             Tuple<NetworkNodeType, string, string>[] output;
-            using (var fileStream = File.OpenRead(Path.Combine(Directory.GetCurrentDirectory(), "Utilities", "TextFiles", "ServerNames", fileName)))
+            using (var fileStream = File.OpenRead(Path.Combine(Directory.GetCurrentDirectory(), "Utilities", "TextFiles", "ServerNames", nodeDataContainerType.Item1)))
             using (var streamReader = new StreamReader(fileStream, Encoding.UTF8, true, 128)) {
                 output = new Tuple<NetworkNodeType, string, string>[int.Parse(streamReader.ReadLine())];
                 string[] splitted;
                 for (int i = 0; i < output.Length; ++i) {
                     splitted = streamReader.ReadLine().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                    output[i] = new Tuple<NetworkNodeType, string, string>(enumValue, splitted[0], splitted[1..].Join(" "));
+                    output[i] = new Tuple<NetworkNodeType, string, string>(nodeDataContainerType.Item2, splitted[0], splitted[1..].Join(" "));
                 }
             }
             return output;

@@ -1,7 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://ywm7rhxebeh4"]
+[gd_scene load_steps=4 format=3 uid="uid://ywm7rhxebeh4"]
 
 [ext_resource type="Script" uid="uid://mb8mpa63ad2n" path="res://Scripts/CS/Terminal.cs" id="1_q6j3v"]
-[ext_resource type="Script" uid="uid://yv1uaggv637r" path="res://Scripts/GD/InputFieldBehavior.gd" id="2_o5w4h"]
 [ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="2_tjxev"]
 [ext_resource type="Script" uid="uid://de88ixhijljw" path="res://Scripts/CS/NetworkManager.cs" id="4_c8ipk"]
 
@@ -11,6 +10,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 split_offset = 825
 dragging_enabled = false
 dragger_visibility = 2
@@ -24,6 +25,7 @@ theme = ExtResource("2_tjxev")
 bbcode_enabled = true
 scroll_following = true
 threaded = true
+progress_bar_delay = -1
 selection_enabled = true
 
 [node name="TerminalCommandLine" type="HSplitContainer" parent="."]
@@ -44,7 +46,6 @@ size_flags_horizontal = 3
 theme = ExtResource("2_tjxev")
 keep_editing_on_text_submit = true
 caret_blink = true
-script = ExtResource("2_o5w4h")
 
 [node name="TimersContainer" type="Node" parent="."]
 
@@ -52,13 +53,12 @@ script = ExtResource("2_o5w4h")
 one_shot = true
 
 [node name="UpdateProcessGraphicTimer" type="Timer" parent="TimersContainer"]
-wait_time = 0.1
+wait_time = 0.33
 one_shot = true
 
 [node name="NetworkManager" type="Node" parent="."]
 script = ExtResource("4_c8ipk")
 
 [connection signal="text_submitted" from="TerminalCommandLine/CommandField" to="." method="SubmitCommand"]
-[connection signal="text_submitted" from="TerminalCommandLine/CommandField" to="TerminalCommandLine/CommandField" method="OnTextSubmitted"]
 [connection signal="timeout" from="TimersContainer/ProcessTimer" to="." method="ProcessFinished"]
 [connection signal="timeout" from="TimersContainer/UpdateProcessGraphicTimer" to="." method="UpdateProcessingGraphic"]

@@ -54,8 +54,10 @@ public partial class Terminal : VSplitContainer {
         isProcessing = true;
         processTimer.WaitTime = time;
         terminalCommandField.Editable = false;
-        progress = 0; tick = 0;
-        Echo("-n", $"| [lb]{new string('-', 50)}] 0%");
+        progress = GD.RandRange(0, (int)Math.Floor(150.0 / processTimer.WaitTime * updateProcessGraphicTimer.WaitTime));
+        tick = GD.RandRange(0, 3);
+        int filledBar = Mathf.FloorToInt(progress / 100.0 * BarSize);
+        Echo($"{SpinnerChars[tick]} [lb]{new string('|', filledBar)}{new string('-', BarSize - filledBar)}] {progress}%");
         processTimer.Start();
         updateProcessGraphicTimer.Start();
     }
@@ -64,45 +66,27 @@ public partial class Terminal : VSplitContainer {
     public void UpdateProcessingGraphic() {
         if (!isProcessing) return;
 
-        int t = GD.RandRange(0, 1+(int)Math.Floor(100.0 / processTimer.WaitTime * updateProcessGraphicTimer.WaitTime * 2));
-        progress = Mathf.Clamp(progress + t, 0, 99);
-        
+        int t = GD.RandRange(0, 1+(int)Math.Floor(150.0 / processTimer.WaitTime * updateProcessGraphicTimer.WaitTime));
+        progress = Mathf.Clamp(progress + t, 0, 99); tick = (tick + 1) % SpinnerChars.Length;
+
         int filledBar = Mathf.FloorToInt(progress / 100.0 * BarSize);
-        Delete(terminalOutputField.GetParsedText().LastIndexOf('\n')+1);
-        Echo("-n", $"| [lb]{new string('|', filledBar)}{new string('-', BarSize - filledBar)}] {progress}%");
-        //ModifyLastLine($"| [lb]{new string('|', filledBar)}{new string('-', BarSize - filledBar)}] {progress}%");
+        Echo($"{SpinnerChars[tick]} [lb]{new string('|', filledBar)}{new string('-', BarSize - filledBar)}] {progress}%");
         updateProcessGraphicTimer.Start();
     }
     public void ProcessFinished() {
-        isProcessing = false;
-        terminalCommandField.Editable = true;
-        terminalCommandField.Edit();
-        Delete(terminalOutputField.GetParsedText().LastIndexOf('\n')+1);
-        Echo($"| [lb]{new string('|', 50)}] 100%");
-        //ModifyLastLine($"| [lb]{new string('|', 50)}] 100%");
+        isProcessing = false; terminalCommandField.Editable = true; terminalCommandField.Edit();
+        tick = (tick + 1) % SpinnerChars.Length;
+        Echo($"{SpinnerChars[tick]} [lb]{new string('|', 50)}] 100%");
+        progress = 0; tick = 0;
         finishFunction(finishFunctionArgs);
     }
-    void ModifyLastLine(string newLine) {
-        int index = terminalOutputField.GetParsedText().LastIndexOf('\n') + 1;
-        string c = terminalOutputField.GetParsedText();
-        if (index < 0) index = 0;
-        if (c.Length < index) index = c.Length;
-        terminalOutputField.Clear();
-        terminalOutputField.AppendText(c[..index] + newLine);
-    }
-    void Delete(int index) {
-        string c = terminalOutputField.GetParsedText();
-        if (index < 0 || c.Length < index) return;
-        terminalOutputField.Clear();
-        terminalOutputField.AppendText(c[..index]);
-    }
     public void SubmitCommand(string newText) {
+        terminalCommandField.Text = "";
         if (commandHistory.Count == 0 || (commandHistory.Count > 0 && commandHistory[^1] != newText)) { 
             commandHistory.Add(newText); 
             while (commandHistory.Count > MAX_HISTORY) { commandHistory.RemoveAt(0); }
             commandHistoryIndex = commandHistory.Count; 
         }
-
         string[] commands = newText.Split(';', StringSplitOptions.RemoveEmptyEntries);
         Echo($"{terminalCommandPrompt.Text}{newText}");
         for (int i = 0; i < commands.Length; i++) {
@@ -209,7 +193,7 @@ public partial class Terminal : VSplitContainer {
         }
     }
     void Clear(params string[] args) {
-        terminalOutputField.Text = "";
+        terminalOutputField.Clear();
     }
     void MkDir(params string[] args) {
         if (args.Length == 0) { Echo("[color=red]No directory name provided.[/color]"); return; }

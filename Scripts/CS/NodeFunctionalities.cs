@@ -49,10 +49,10 @@ public class HackFarm {
     public double HackPercent { get; private set; }
     public double HackTime { get; private set; }
     public double GrowRate { get; private set; }
-    public HackFarm(int secLvl, int depth) {
+    public HackFarm(int secLvl, double indexRatio, double depthRatio) {
         InitialHackPercent = 11.0 - Math.Pow(Math.E, Math.PI * secLvl * 0.0588235294118);
-        InitialHackTime = (10.0 + 4.32 * secLvl + Math.Pow(1.23374, depth)) * .5;
-        InitialGrowRate = 128.0 - Math.Pow(Math.PI * .97, secLvl * 0.309214594929);
+        InitialHackTime = (10.0 + 4.32 * secLvl + Math.Pow(1.23374, depthRatio)) * .5;
+        InitialGrowRate = 128.0 - Math.Pow(Math.PI * .97, secLvl * 0.309214594929) / indexRatio;
     }
     // Method to calculate the hack time
     public void CalcHackTime() {

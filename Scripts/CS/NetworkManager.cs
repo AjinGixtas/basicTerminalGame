@@ -41,7 +41,6 @@ public partial class NetworkManager : Node
                 parentNode.ChildNode.Add(node);
                 ++poolIndex;
             }
-            lastLayer = curLayer; curLayer = [];
         }
         return network;
     }

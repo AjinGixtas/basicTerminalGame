@@ -10,7 +10,6 @@ public partial class Terminal : VSplitContainer {
     NodeDirectory CurrentDirectory  { get { return currentDirectory; } set { currentDirectory = value; SetCommandPrompt(); } }
     NetworkNode CurrentNode         { get { return currentNode; } set { currentNode = value; currentDirectory = currentNode.NodeDirectory; SetCommandPrompt(); } }
     string userName;
-    const int MAX_HISTORY = 128;
     readonly List<string> commandHistory = []; int commandHistoryIndex = 0; 
     int CommandHistoryIndex { 
         get => commandHistoryIndex; 
@@ -54,10 +53,10 @@ public partial class Terminal : VSplitContainer {
         isProcessing = true;
         processTimer.WaitTime = time;
         terminalCommandField.Editable = false;
-        progress = GD.RandRange(0, (int)Math.Floor(150.0 / processTimer.WaitTime * updateProcessGraphicTimer.WaitTime));
-        tick = GD.RandRange(0, 3);
-        int filledBar = Mathf.FloorToInt(progress / 100.0 * BarSize);
-        Echo($"{SpinnerChars[tick]} [lb]{new string('|', filledBar)}{new string('-', BarSize - filledBar)}] {progress}%");
+        progress = 0;
+        //tick = GD.RandRange(0, 3);
+        //int filledBar = Mathf.FloorToInt(progress / 100.0 * BarSize);
+        Echo("-n", $"Start");
         processTimer.Start();
         updateProcessGraphicTimer.Start();
     }
@@ -69,22 +68,23 @@ public partial class Terminal : VSplitContainer {
         int t = GD.RandRange(0, 1+(int)Math.Floor(150.0 / processTimer.WaitTime * updateProcessGraphicTimer.WaitTime));
         progress = Mathf.Clamp(progress + t, 0, 99); tick = (tick + 1) % SpinnerChars.Length;
 
-        int filledBar = Mathf.FloorToInt(progress / 100.0 * BarSize);
-        Echo($"{SpinnerChars[tick]} [lb]{new string('|', filledBar)}{new string('-', BarSize - filledBar)}] {progress}%");
+        //int filledBar = Mathf.FloorToInt(progress / 100.0 * BarSize);
+        Echo("-n", $"...{progress}%");
         updateProcessGraphicTimer.Start();
     }
     public void ProcessFinished() {
         isProcessing = false; terminalCommandField.Editable = true; terminalCommandField.Edit();
         tick = (tick + 1) % SpinnerChars.Length;
-        Echo($"{SpinnerChars[tick]} [lb]{new string('|', 50)}] 100%");
+        Echo($"...Done!");
         progress = 0; tick = 0;
         finishFunction(finishFunctionArgs);
     }
+    const int MAX_HISTORY_CMD_SIZE = 64;
     public void SubmitCommand(string newText) {
         terminalCommandField.Text = "";
         if (commandHistory.Count == 0 || (commandHistory.Count > 0 && commandHistory[^1] != newText)) { 
             commandHistory.Add(newText); 
-            while (commandHistory.Count > MAX_HISTORY) { commandHistory.RemoveAt(0); }
+            while (commandHistory.Count > MAX_HISTORY_CMD_SIZE) { commandHistory.RemoveAt(0); }
             commandHistoryIndex = commandHistory.Count; 
         }
         string[] commands = newText.Split(';', StringSplitOptions.RemoveEmptyEntries);
@@ -143,13 +143,18 @@ public partial class Terminal : VSplitContainer {
     void Home(params string[] args) {
         CurrentNode = networkManager.network;
     }
+    const int MAX_HISTORY_CHAR_SIZE = 2048, RESET_HISTORY_CHAR_SIZE = 1024;
     void Echo(params string[] args) {
         if (args.Length == 0) { return; }
-        if (args[0] == "-n") { terminalOutputField.AppendText(string.Join(" ", args[1..])); return; }
-        terminalOutputField.AppendText($"{args.Join(" ")}\n");
+        string c = terminalOutputField.GetParsedText();
+        if (c.Length >= MAX_HISTORY_CHAR_SIZE) {
+            terminalOutputField.Clear(); terminalOutputField.AppendText(c[^RESET_HISTORY_CHAR_SIZE..]);
+        }
+        if (args[0] == "-n") terminalOutputField.AppendText(string.Join(" ", args[1..]));
+        else terminalOutputField.AppendText($"{args.Join(" ")}\n");
     }
     void Scan(params string[] args) {
-        StartProcess(1, ScanCallback, args);
+        StartProcess(.1, ScanCallback, args);
         void ScanCallback(params string[] args) {
             Dictionary<string, string> parsedArgs = new() {
                 { "-d", "1" },

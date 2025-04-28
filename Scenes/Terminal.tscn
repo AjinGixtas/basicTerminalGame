@@ -53,7 +53,7 @@ caret_blink = true
 one_shot = true
 
 [node name="UpdateProcessGraphicTimer" type="Timer" parent="TimersContainer"]
-wait_time = 0.33
+wait_time = 0.25
 one_shot = true
 
 [node name="NetworkManager" type="Node" parent="."]

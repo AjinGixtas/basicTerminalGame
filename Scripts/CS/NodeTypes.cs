@@ -100,6 +100,9 @@ public class PlayerNode : NetworkNode {
 public class PersonNode : NetworkNode {
     public PersonNode(string hostName, string displayName, string IP, double indexRatio, double depthRatio, NetworkNodeType NodeType, NetworkNode parentNode)
         : base(hostName, displayName, IP, indexRatio, depthRatio, NodeType, parentNode) {
+        DefLvl = GD.RandRange(2, 6) + (int)(depthRatio * 4) + (int)(indexRatio * 3); // [2-6]+[0-3]+[0-3] = ~2 to 12 clamped later
+        DefLvl = Math.Clamp(DefLvl, 1, 10);
+        SecLvl = GD.RandRange(0, DefLvl);
     }
     public override void Init() {
         base.Init();
@@ -109,6 +112,8 @@ public class BusinessNode : NetworkNode {
     public Stock Stock { get; set; }
     public BusinessNode(string hostName, string displayName, string IP, double indexRatio, double depthRatio, NetworkNodeType NodeType, NetworkNode parentNode)
         : base(hostName, displayName, IP, indexRatio, depthRatio, NodeType, parentNode) {
+        DefLvl = GD.RandRange(5, 8) + (int)(depthRatio * 2) + (int)(indexRatio * 3); // [5-8]+[0-2]+[0-3]
+        SecLvl = GD.RandRange((int)Math.Ceiling(DefLvl * 0.6), DefLvl);
     }
     public override void Init() {
         base.Init();
@@ -119,6 +124,7 @@ public class CorpNode : NetworkNode {
     public Faction Faction { get; set; }
     public CorpNode(string hostName, string displayName, string IP, double indexRatio, double depthRatio, NetworkNodeType NodeType, NetworkNode parentNode)
         : base(hostName, displayName, IP, indexRatio, depthRatio, NodeType, parentNode) {
+        DefLvl = 10; SecLvl = 10;
     }
     public override void Init() {
         base.Init();
@@ -128,18 +134,37 @@ public class FactionNode : NetworkNode {
     public Faction Faction { get; set; }
     public FactionNode(string hostName, string displayName, string IP, double indexRatio, double depthRatio, NetworkNodeType NodeType, NetworkNode parentNode)
         : base(hostName, displayName, IP, indexRatio, depthRatio, NodeType, parentNode) {
+        DefLvl = 10;
+        SecLvl = GD.RandRange(3, 6) + (int)(depthRatio * 2) + (int)(indexRatio * 2); // [5-8]+[0-2]+[0-2]
     }
     public override void Init() {
         base.Init();
     }
 }
 public class HoneypotNode : NetworkNode {
-    double lastEpoch;
+    double lastEpoch = 0;
     public static Tuple<NetworkNodeType, string, string>[][] namePool;
     NetworkNodeType displayNetworkNodeType;
     public HoneypotNode(string hostName, string displayName, string IP, double indexRatio, double depthRatio, NetworkNodeType NodeType, NetworkNode parentNode)
         : base(hostName, displayName, IP, indexRatio, depthRatio, NodeType, parentNode) {
+        DefLvl = GD.RandRange(8, 10);
+        SecLvl = GD.RandRange(2, DefLvl);
+        GenerateFakeData();
+    }
+    public override void Init() {
+        base.Init();
+    }
+    int fakeDefLvl = 0, fakeSecLvl = 0, fakeRetLvl = 0;
+    SecurityType fakeSecType;
+    public void GenerateFakeData() {
+        if (Time.GetUnixTimeFromSystem() - lastEpoch < 15) { return; }
+        int chosenSection = GD.RandRange(0, namePool.GetLength(0) - 1);
+        int chosenElement = GD.RandRange(0, namePool[chosenSection].GetLength(0) - 1);
+        Tuple<NetworkNodeType, string, string> name = namePool[chosenSection][chosenElement];
         lastEpoch = Time.GetUnixTimeFromSystem();
+        HostName = name.Item2; DisplayName = name.Item3;
+        displayNetworkNodeType = name.Item1;
+
         fakeDefLvl = GD.RandRange(2, 10);
         fakeSecLvl = GD.RandRange(1, fakeDefLvl - 1);
         fakeRetLvl = fakeDefLvl - fakeSecLvl;
@@ -151,30 +176,8 @@ public class HoneypotNode : NetworkNode {
             _ => SecurityType.MASEC
         };
     }
-    public override void Init() {
-        base.Init();
-    }
-    int fakeDefLvl = 0, fakeSecLvl = 0, fakeRetLvl = 0;
-    SecurityType fakeSecType;
     public override Dictionary<string, string> Analyze() {
-        if(Time.GetUnixTimeFromSystem() - lastEpoch > 10) {
-            int chosenSection = GD.RandRange(0, namePool.GetLength(0) - 1);
-            int chosenElement = GD.RandRange(0, namePool[chosenSection].GetLength(0) - 1);
-            Tuple<NetworkNodeType, string, string> name = namePool[chosenSection][chosenElement];
-            HostName = name.Item2; DisplayName = name.Item3; 
-            displayNetworkNodeType = name.Item1;
-
-            fakeDefLvl = GD.RandRange(2, 10);
-            fakeSecLvl = GD.RandRange(1, fakeDefLvl-1);
-            fakeRetLvl = fakeDefLvl - fakeSecLvl;
-            fakeSecType = fakeSecLvl switch {
-                < 1 => SecurityType.NOSEC,
-                < 4 => SecurityType.LOSEC,
-                < 7 => SecurityType.MISEC,
-                < 10 => SecurityType.HISEC,
-                _ => SecurityType.MASEC
-            };
-        }
+        GenerateFakeData();
         return new() {
             { "IP", IP },
             { "hostName",  HostName },
@@ -193,7 +196,8 @@ public class MinerNode : NetworkNode {
         : base(hostName, displayName, IP, indexRatio, depthRatio, NodeType, parentNode) {
     }
     public override void Init() {
-        DefLvl = 1; SecLvl = 1; // Increase later on as competitor steal this node
+        DefLvl = GD.RandRange(2, 10); // Wide range
+        SecLvl = GD.RandRange(1, DefLvl - 1); // Always some defense but not full
         base.Init();
     }
 }
@@ -202,6 +206,8 @@ public class RougeNode : NetworkNode {
         : base(hostName, displayName, IP, indexRatio, depthRatio, NodeType, parentNode) {
     }
     public override void Init() {
+        DefLvl = 10; // Rogue = max def
+        SecLvl = GD.RandRange(3, 8); // but not necessarily high sec, because they're chaotic
         base.Init();
     }
 }

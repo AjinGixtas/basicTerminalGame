@@ -1,17 +1,15 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 
 public class LockSystem { 
-    List<Lock> locks; List<Lock> activeLocks;
+    readonly List<Lock> locks, activeLocks = [];
     double startEpoch = 0, endEpoch = 0;
     public LockSystem(List<Lock> locks) {
         this.locks = locks;
     }
     public void ActivateLock(int secLvl) {
-        activeLocks = []; int usedLvl = 0;
+        activeLocks.Clear(); int usedLvl = 0;
         for (int i = 0; i < locks.Count; i++) {
             if (usedLvl + locks[i].Cost <= secLvl && locks[i].MinLvl <= secLvl) {
                 activeLocks.Add(locks[i]); 

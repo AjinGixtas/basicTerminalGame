@@ -25,6 +25,7 @@ public partial class NetworkManager : Node
         List<NetworkNode>[] layers = new List<NetworkNode>[nodePerDepths.Length+1];
         layers[0] = [network];
         for(int i = 0; i < nodePerDepths.Length; ++i) {
+            layers[i + 1] = [];
             if(i < nodeNames.Length) for (int k = 0; k < nodeNames[i].Length; ++k) { namePool.Add(nodeNames[i][k]); }
             for (int k = 0; k < namePool.Count; ++k) { int _k = GD.RandRange(0, namePool.Count - 1); (namePool[k], namePool[_k]) = (namePool[_k], namePool[k]); }
             for(int j = 0; j < nodePerDepths[i]; ++j) {

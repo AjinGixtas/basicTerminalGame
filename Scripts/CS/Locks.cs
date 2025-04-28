@@ -1,5 +1,4 @@
 using Godot;
-using Godot.Collections;
 using System;
 using System.Linq;
 
@@ -15,6 +14,7 @@ public abstract class Lock {
     public string Input => inp;
     public string Question => que;
 }
+
 public class I5 : Lock {
     public override string Flag => "-i5";
     public override int Cost => 1;

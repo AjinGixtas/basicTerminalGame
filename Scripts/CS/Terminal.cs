@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 public partial class Terminal : VSplitContainer {
     RichTextLabel terminalOutputField; Label terminalCommandPrompt; LineEdit terminalCommandField; Timer processTimer, updateProcessGraphicTimer;
@@ -90,10 +91,14 @@ public partial class Terminal : VSplitContainer {
         string[] commands = newText.Split(';', StringSplitOptions.RemoveEmptyEntries);
         Echo($"{terminalCommandPrompt.Text}{newText}");
         for (int i = 0; i < commands.Length; i++) {
-            string[] components = commands[i].Split([' '], StringSplitOptions.RemoveEmptyEntries);
-            if (!ProcessCommand(components[0], components[1..])) {
-                break;
-            }
+            string[] components = ParseArguments(commands[i]);
+            if (components.Length == 0) continue;
+
+            if (!ProcessCommand(components[0], components[1..])) break;
+        }
+        static string[] ParseArguments(string input) {
+            var matches = Regex.Matches(input, @"[\""].+?[\""]|\S+");
+            return [.. matches.Select(m => m.Value.Trim('"'))];
         }
     }
     bool ProcessCommand(string command, string[] args) {
@@ -145,7 +150,7 @@ public partial class Terminal : VSplitContainer {
         Dictionary<string, string> parsedArgs = new() {
                 { "-v", "" }
             }; ParseArgs(parsedArgs, args);
-        string fileName = parsedArgs["-v"] == "-v" ? "helpVerbose.txt" : "helpShort";
+        string fileName = parsedArgs["-v"] == "-v" ? "helpVerbose.txt" : "helpShort.txt";
         FileAccess fileAccess = FileAccess.Open($"res://Utilities/TextFiles/CommandOutput/{fileName}", FileAccess.ModeFlags.Read);
         Echo(fileAccess.GetAsText());
     }
@@ -154,31 +159,51 @@ public partial class Terminal : VSplitContainer {
     }
     const int MAX_HISTORY_CHAR_SIZE = 131072, RESET_HISTORY_CHAR_SIZE = 65536;
     void Echo(params string[] args) {
-        if (args.Length == 0) { return; }
+        if (args.Length == 0) return;
+
         string c = terminalOutputField.GetParsedText();
         if (c.Length >= MAX_HISTORY_CHAR_SIZE) {
-            terminalOutputField.Clear(); terminalOutputField.AppendText(c[^RESET_HISTORY_CHAR_SIZE..]);
+            terminalOutputField.Clear();
+            terminalOutputField.AppendText(c[^RESET_HISTORY_CHAR_SIZE..]);
         }
-        if (args[0] == "-n") terminalOutputField.AppendText(string.Join(" ", args[1..]));
-        else terminalOutputField.AppendText($"{args.Join(" ")}\n");
+
+        bool noNewline = false, interpretEscapes = false;
+        int argStart = 0;
+
+        // Handle optional flags like -n, -e, or -ne
+        if (args[0].StartsWith('-')) {
+            noNewline = args[0].Contains('n');
+            interpretEscapes = args[0].Contains('e');
+            argStart = 1;
+        }
+
+        string text = string.Join(" ", args[argStart..]);
+        if (interpretEscapes) text = Regex.Unescape(text); // handles \n, \t, etc.
+        if (!noNewline) text += "\n";
+        terminalOutputField.AppendText(text);
     }
     void Scan(params string[] args) {
         StartProcess(.1, ScanCallback, args);
         void ScanCallback(params string[] args) {
+            string L = "└────", M = "├────", T = "     ", E = "│    ";
+            Func<bool[], string> getTreePrefix = arr => string.Concat(arr.Select((b, i) => (i == arr.Length - 1 ? (b ? L : M) : (b ? T : E))));
+            Func<bool[], string> getDescPrefix = arr => string.Concat(arr.Select((b, i) => (b ? T : E)));
             Dictionary<string, string> parsedArgs = new() {
                 { "-d", "1" },
                 { "-v", "" }
             }; ParseArgs(parsedArgs, args);
             if (!int.TryParse(parsedArgs["-d"], out int MAX_DEPTH)) { Echo($"[color=red]Directory not found: {parsedArgs["-d"]}[/color]"); return; }
 
-            Stack<(NetworkNode, int)> stack = new([(currentNode, 0)]);
+            Stack<(NetworkNode, int, bool[])> stack = new([(currentNode, 0, [])]);
             List<NetworkNode> visited = [];
             string output = "";
             while (stack.Count > 0) {
-                (NetworkNode node, int depth) = stack.Pop();
+                (NetworkNode node, int depth, bool[] depthMarks) = stack.Pop();
                 if (depth > MAX_DEPTH || visited.Contains(node)) continue;
-                    Dictionary<string, string> analyzeResult = node.Analyze();
-                output += $"{new string('-', depth*5)}+ [color=cyan]{analyzeResult["IP"], -15}[/color] [color=green]{analyzeResult["hostName"]}[/color]\n";
+                Dictionary<string, string> analyzeResult = node.Analyze();
+                GD.Print(node.HostName, ' ', string.Concat(depthMarks.Select((v,i)=> $"{v} ")));
+                output += $"{getTreePrefix(depthMarks)}[color=cyan]{analyzeResult["IP"], -15}[/color] [color=green]{analyzeResult["hostName"]}[/color]\n";
+                
                 if (parsedArgs["-v"] == "-v") {
                     string defColorCode = analyzeResult["defLvl"] switch {
                         "0" or "1" or "2" => "blue",
@@ -192,13 +217,17 @@ public partial class Terminal : VSplitContainer {
                         "HISEC" or "MASEC" => "blue",
                         _ => "red"
                     };
-                    output += $"{new string(' ', depth * 5)}     Display Name:  {analyzeResult["displayName"]};\n";
-                    output += $"{new string(' ', depth * 5)}     Node Type:     [color=purple]{analyzeResult["nodeType"]}[/color];\n";
-                    output += $"{new string(' ', depth * 5)}     Defense Level: [color={defColorCode}]{analyzeResult["defLvl"]}[/color]; Security Type: [color={secColorCode}]{analyzeResult["secType"]}[/color]\n";
+                    string descPrefix = getDescPrefix(depthMarks) + ((depth == MAX_DEPTH ? 0 : ((node.ParentNode != null ? 0 : -1) + node.ChildNode.Count)) > 0 ? '│' : ' ');
+                    output += $"{descPrefix}  Display Name:  {analyzeResult["displayName"]};\n";
+                    output += $"{descPrefix}  Node Type:     [color=purple]{analyzeResult["nodeType"]}[/color];\n";
+                    output += $"{descPrefix}  Defense Level: [color={defColorCode}]{analyzeResult["defLvl"]}[/color]; Security Type: [color={secColorCode}]{analyzeResult["secType"]}[/color]\n";
+                    output += $"{descPrefix}\n";
                 }
                 visited.Add(node);
-                if (node.ParentNode != null) { stack.Push((node.ParentNode, depth + 1)); }
-                foreach(NetworkNode child in node.ChildNode) { stack.Push((child, depth + 1)); }
+                if (node.ParentNode != null) { stack.Push((node.ParentNode, depth + 1, [..depthMarks, node.ChildNode.Count == 0])); }
+                
+                // Use k==1 due to FILO algorithm.
+                int k = 0; foreach(NetworkNode child in node.ChildNode) { ++k; stack.Push((child, depth + 1, [..depthMarks, k == 1])); }
             }
             Echo(output);
         }

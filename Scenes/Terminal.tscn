@@ -1,8 +1,28 @@
-[gd_scene load_steps=4 format=3 uid="uid://ywm7rhxebeh4"]
+[gd_scene load_steps=6 format=3 uid="uid://ywm7rhxebeh4"]
 
 [ext_resource type="Script" uid="uid://mb8mpa63ad2n" path="res://Scripts/CS/Terminal.cs" id="1_q6j3v"]
 [ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="2_tjxev"]
 [ext_resource type="Script" uid="uid://de88ixhijljw" path="res://Scripts/CS/NetworkManager.cs" id="4_c8ipk"]
+
+[sub_resource type="Shader" id="Shader_tjxev"]
+code = "shader_type canvas_item;
+
+void vertex() {
+	// Called for every vertex the material is visible on.
+}
+
+void fragment() {
+	// Called for every pixel the material is visible on.
+}
+
+//void light() {
+//	// Called for every pixel for every light affecting the CanvasItem.
+//	// Uncomment to replace the default light processing function with this one.
+//}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_c8ipk"]
+shader = SubResource("Shader_tjxev")
 
 [node name="Terminal" type="VSplitContainer"]
 anchors_preset = 15
@@ -18,6 +38,8 @@ dragger_visibility = 2
 script = ExtResource("1_q6j3v")
 
 [node name="TerminalOutputArea" type="RichTextLabel" parent="."]
+material = SubResource("ShaderMaterial_c8ipk")
+clip_contents = false
 layout_mode = 2
 size_flags_vertical = 3
 focus_mode = 2

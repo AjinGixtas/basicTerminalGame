@@ -102,6 +102,7 @@ public partial class Terminal : VSplitContainer {
             case "ls": LS(args); break;
             case "cd": CD(args); break;
             case "pwd": Pwd(args); break;
+            case "help": Help(args); break;
             case "home": Home(args); break;
             case "echo": Echo(args); break;
             case "scan": Scan(args); return false;
@@ -140,10 +141,18 @@ public partial class Terminal : VSplitContainer {
     void Pwd(params string[] args) {
         Echo($"{CurrentDirectory.GetPath()}");
     }
+    void Help(params string[] args) {
+        Dictionary<string, string> parsedArgs = new() {
+                { "-v", "" }
+            }; ParseArgs(parsedArgs, args);
+        string fileName = parsedArgs["-v"] == "-v" ? "helpVerbose.txt" : "helpShort";
+        FileAccess fileAccess = FileAccess.Open($"res://Utilities/TextFiles/CommandOutput/{fileName}", FileAccess.ModeFlags.Read);
+        Echo(fileAccess.GetAsText());
+    }
     void Home(params string[] args) {
         CurrentNode = networkManager.network;
     }
-    const int MAX_HISTORY_CHAR_SIZE = 2048, RESET_HISTORY_CHAR_SIZE = 1024;
+    const int MAX_HISTORY_CHAR_SIZE = 131072, RESET_HISTORY_CHAR_SIZE = 65536;
     void Echo(params string[] args) {
         if (args.Length == 0) { return; }
         string c = terminalOutputField.GetParsedText();
@@ -172,18 +181,15 @@ public partial class Terminal : VSplitContainer {
                 output += $"{new string('-', depth*5)}+ [color=cyan]{analyzeResult["IP"], -15}[/color] [color=green]{analyzeResult["hostName"]}[/color]\n";
                 if (parsedArgs["-v"] == "-v") {
                     string defColorCode = analyzeResult["defLvl"] switch {
-                        "0" => "white",
-                        "1" or "2" or "3" => "cyan",
-                        "4" or "5" or "6" => "blue",
-                        "7" or "8" or "9" => "yellow",
-                        "10" => "red",
-                        _ => "white"
+                        "0" or "1" or "2" => "blue",
+                        "3" or "4" or "5" or "6" or "7" => "yellow",
+                        "8" or "9" or "10" => "red",
+                        _ => "cyan"
                     };
                     string secColorCode = analyzeResult["secType"] switch {
-                        "NOSEC" => "white",
-                        "LOSEC" => "cyan",
-                        "MISEC" => "blue",
-                        "HISEC" => "yellow",
+                        "NOSEC" or "LOSEC" => "red",
+                         "MISEC" => "yellow",
+                        "HISEC" or "MASEC" => "blue",
                         _ => "red"
                     };
                     output += $"{new string(' ', depth * 5)}     Display Name:  {analyzeResult["displayName"]};\n";
@@ -251,7 +257,7 @@ public partial class Terminal : VSplitContainer {
     void Connect(params string[] args) {
         if (args.Length == 0) { Echo("[color=red]No hostname provided.[/color]"); return; }
         if (CurrentNode.ParentNode != null && CurrentNode.ParentNode.HostName == args[0]) { CurrentNode = CurrentNode.ParentNode; return; }
-        if (networkManager.DNS.ContainsKey(args[0])) { CurrentNode = networkManager.DNS[args[0]]; return; }
+        if (networkManager.DNS.TryGetValue(args[0], out NetworkNode value)) { CurrentNode = value; return; }
         if (CurrentNode.ChildNode.FindLast(s => s.HostName == args[0]) == null) { Echo($"[color=red]Host not found: {args[0]}[/color]"); return; }
         CurrentNode = CurrentNode.ChildNode.FindLast(s => s.HostName == args[0]);
     }
@@ -269,11 +275,24 @@ public partial class Terminal : VSplitContainer {
             if (CurrentNode.ChildNode.FindLast(s => s.HostName == args[0]) != null) analyzeNode = CurrentNode.ChildNode.FindLast(s => s.HostName == args[0]);
             else if (CurrentNode.ParentNode != null && CurrentNode.ParentNode.HostName == args[0]) analyzeNode = CurrentNode.ParentNode;
             else if (CurrentNode.HostName == args[0]) analyzeNode = CurrentNode;
-            Echo($"Display name:   {analyzeNode.DisplayName}");
+            string defColorCode = analyzeNode.DefLvl switch {
+                < 3 => "blue",
+                < 8 => "yellow",
+                < 10 => "red",
+                _ => "red"
+            };
+            string secColorCode = analyzeNode.SecType switch {
+                SecurityType.NOSEC or SecurityType.LOSEC => "red",
+                SecurityType.MISEC => "yellow",
+                SecurityType.HISEC or SecurityType.MASEC => "blue",
+                _ => "red"
+            };
+            Echo($"Display name:   [color=green]{analyzeNode.DisplayName}[/color]");
+            Echo($"IP:             [color=cyan]{analyzeNode.IP}[/color]");
             Echo($"Host name:      {analyzeNode.HostName}");
-            Echo($"Host type:      {analyzeNode.NodeType}");
-            Echo($"Defense level:  {analyzeNode.DefLvl}");
-            Echo($"Security level: {analyzeNode.SecType}");
+            Echo($"Host type:      [color=purple]{analyzeNode.NodeType}[/color]");
+            Echo($"Defense level:  [color={defColorCode}]{analyzeNode.DefLvl}[/color]");
+            Echo($"Security level: [color={secColorCode}]{analyzeNode.SecType}[/color]");
         }
     }
     void ParseArgs(Dictionary<string, string> defaultArg, params string[] args) {

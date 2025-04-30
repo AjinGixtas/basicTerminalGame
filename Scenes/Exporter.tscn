@@ -1,8 +1,5 @@
-[gd_scene load_steps=2 format=3 uid="uid://cqwqshbmrubhj"]
-
-[ext_resource type="Script" uid="uid://10i6kscg12oj" path="res://Scripts/CS/Exporters/CorpData.cs" id="1_n36v1"]
+[gd_scene format=3 uid="uid://cqwqshbmrubhj"]
 
 [node name="Node2D" type="Node2D"]
 
 [node name="Node" type="Node" parent="."]
-script = ExtResource("1_n36v1")

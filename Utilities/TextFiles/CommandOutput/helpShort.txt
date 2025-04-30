@@ -1,0 +1,56 @@
+[color=cyan]LS[/color] [args...]
+    [color=green]List[/color] contents of the current or specified directory.
+    Arguments: [color=yellow]args[0][/color] - Subdirectory (optional).
+    Errors: [color=red]Directory not found[/color].
+
+[color=cyan]CD[/color] [args...]
+    [color=green]Change[/color] current directory.
+    Arguments: [color=yellow]args[0][/color] - Subdirectory.
+    Errors: [color=red]Directory not found[/color].
+
+[color=cyan]Pwd[/color] [args...]
+    [color=green]Print[/color] the current working directory.
+
+[color=cyan]Home[/color] [args...]
+    [color=green]Return[/color] to the network root node.
+
+[color=cyan]Echo[/color] [args...]
+    [color=green]Output[/color] text to terminal.
+    Arguments: [color=yellow]args[0][/color] - Optional flags (e.g., [color=yellow]-n[/color]).
+
+[color=cyan]Scan[/color] [args...]
+    [color=green]Scan[/color] nodes up to a specified depth.
+    Arguments: [color=yellow]-d[/color] (depth), [color=yellow]-v[/color] (verbose).
+    Errors: [color=red]Invalid depth[/color].
+
+[color=cyan]Clear[/color] [args...]
+    [color=green]Clear[/color] terminal output.
+
+[color=cyan]MkDir[/color] [args...]
+    [color=green]Create[/color] directories at current location or specified path.
+    Arguments: [color=yellow]args[0][/color] - Full path or subdirectory.
+    Errors: [color=red]Parent directory not found[/color] or [color=red]already exists[/color].
+
+[color=cyan]RmDir[/color] [args...]
+    [color=green]Remove[/color] directories from current directory.
+    Arguments: [color=yellow]args[0][/color] - Subdirectory.
+    Errors: [color=red]Directory not found[/color] or [color=red]root directory protection[/color].
+
+[color=cyan]Crack[/color] [args...]
+    [color=green]Begin[/color] or submit a crack attempt on the node's lock system.
+    Arguments: [color=yellow]init[/color] - Start cracking process.
+    Errors: [color=red]Already cracking[/color] or [color=red]incorrect key[/color].
+
+[color=cyan]Connect[/color] [args...]
+    [color=green]Connect[/color] to node by hostname or IP.
+    Arguments: [color=yellow]args[0][/color] - Hostname or IP.
+    Errors: [color=red]Node not found[/color].
+
+[color=cyan]Analyze[/color] [args...]
+    [color=green]Display[/color] node info ([color=yellow]security[/color], [color=yellow]system[/color]).
+    Arguments: [color=yellow]args[0][/color] - Hostname or IP (optional).
+    Errors: [color=red]Node not found[/color].
+
+[color=cyan]ParseArgs[/color] [defaultArg, args...]
+    [color=green]Parse[/color] and update arguments into a dictionary.
+    Arguments: [color=yellow]defaultArg[/color] - Dictionary for parsed args, [color=yellow]args[0][/color] - Arguments.

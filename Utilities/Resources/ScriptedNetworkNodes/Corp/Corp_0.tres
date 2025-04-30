@@ -1,0 +1,13 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://b6u8kq84hqlmw"]
+
+[ext_resource type="Script" uid="uid://b1fneuk2cdogg" path="res://Utilities/Resources/ScriptedNetworkNodes/ResourceScript/CorpData.cs" id="1_38w0u"]
+
+[resource]
+script = ExtResource("1_38w0u")
+hostName = "alpine"
+displayName = "Alpine International"
+stockSymbol = "ALP"
+stockDrift = 0.0
+stockVolatility = 0.0
+minDepth = 3
+maxDepth = 6

@@ -1,0 +1,146 @@
+[color=cyan]LS[/color] [args...]
+	[color=green]List[/color] the contents of the current directory, or a specified one.
+
+	[color=yellow]Arguments[/color]:
+		[color=yellow]args[0][/color]   - (optional) Subdirectory to list.
+	
+	[color=yellow]Description[/color]:
+		If no arguments are provided, lists the contents of the current directory. 
+		Subdirectories are displayed in blue, and files in cyan.
+
+	[color=yellow]Errors[/color]:
+		- If the specified directory is not found, an error message will be displayed.
+
+---
+
+[color=cyan]CD[/color] [args...]
+	[color=green]Change[/color] the current working directory.
+
+	[color=yellow]Arguments[/color]:
+		[color=yellow]args[0][/color]   - Subdirectory to change into.
+	
+	[color=yellow]Description[/color]:
+		Changes the current working directory to the specified subdirectory.
+
+	[color=yellow]Errors[/color]:
+		- If no directory is provided or if the directory doesn't exist, an error message will be displayed.
+
+---
+
+[color=cyan]Pwd[/color] [args...]
+	[color=green]Print[/color] the current working directory.
+
+	[color=yellow]Description[/color]:
+		Displays the full path of the current working directory.
+
+---
+
+[color=cyan]Home[/color] [args...]
+	[color=green]Return[/color] to the network root node.
+
+	[color=yellow]Description[/color]:
+		Resets the current node to the network root node.
+
+---
+
+[color=cyan]Echo[/color] [args...]
+	[color=green]Output[/color] text to the terminal.
+
+	[color=yellow]Arguments[/color]:
+		[color=yellow]args[0][/color]   - (optional) Flag for additional behavior (e.g., [color=yellow]-n[/color] for no newline).
+	
+	[color=yellow]Description[/color]:
+		Prints the text to the terminal, maintaining history size and applying color formatting where applicable.
+
+---
+
+[color=cyan]Scan[/color] [args...]
+	[color=green]Scan[/color] connected nodes up to a specified depth.
+
+	[color=yellow]Arguments[/color]:
+		[color=yellow]-d[/color]        - Depth to scan (optional, default is 1).
+		[color=yellow]-v[/color]        - Verbose output (optional).
+	
+	[color=yellow]Description[/color]:
+		Scans nodes connected to the current node up to a specified depth. Displays information about each node, including IP, hostname, and security level, with color-coded output.
+
+	[color=yellow]Errors[/color]:
+		- If the depth is not specified or is invalid, an error message will be displayed.
+
+---
+
+[color=cyan]Clear[/color] [args...]
+	[color=green]Clear[/color] the terminal output.
+
+	[color=yellow]Description[/color]:
+		Clears all output in the terminal.
+
+---
+
+[color=cyan]MkDir[/color] [args...]
+	[color=green]Create[/color] directories at the current location or a specified path.
+
+	[color=yellow]Arguments[/color]:
+		[color=yellow]args[0][/color]   - Full path or subdirectory to create.
+	
+	[color=yellow]Description[/color]:
+		Creates the specified directory(ies) at the given path, creating any necessary parent directories.
+
+	[color=yellow]Errors[/color]:
+		- If the parent directory doesn't exist or if the directory already exists, an error message will be displayed.
+
+---
+
+[color=cyan]RmDir[/color] [args...]
+	[color=green]Remove[/color] directories from the current working directory.
+
+	[color=yellow]Arguments[/color]:
+		[color=yellow]args[0][/color]   - Subdirectory to remove.
+	
+	[color=yellow]Description[/color]:
+		Removes the specified directory from the current directory.
+
+	[color=yellow]Errors[/color]:
+		- If the directory doesn't exist or if it is the root directory, an error message will be displayed.
+
+---
+
+[color=cyan]Crack[/color] [args...]
+	[color=green]Attempt[/color] to begin cracking and execute an unlock attempt on a node's lock system.
+
+	[color=yellow]Arguments[/color]:
+		[color=yellow]init[/color]      - Begin the cracking process.
+	
+	[color=yellow]Description[/color]:
+		Initializes the cracking attempt on the node’s lock system if the [color=yellow]init[/color] argument is provided. Otherwise, it attempts to submit keys to unlock the system.
+
+	[color=yellow]Errors[/color]:
+		- If the lock system is already being cracked or if the attempt fails, an error message will be displayed.
+
+---
+
+[color=cyan]Connect[/color] [args...]
+	[color=green]Connect[/color] to a node via hostname or IP.
+
+	[color=yellow]Arguments[/color]:
+		[color=yellow]args[0][/color]   - Hostname or IP address to connect to.
+	
+	[color=yellow]Description[/color]:
+		Connects to the specified node by its hostname, or directly by its IP address. If using a hostname, only neighboring nodes can be accessed.
+
+	[color=yellow]Errors[/color]:
+		- If the specified node is not found, an error message will be displayed.
+
+---
+
+[color=cyan]Analyze[/color] [args...]
+	[color=green]Analyze[/color] and display detailed information about a node.
+
+	[color=yellow]Arguments[/color]:
+		[color=yellow]args[0][/color]   - (optional) Hostname or IP to analyze.
+
+	[color=yellow]Description[/color]:
+		Displays detailed security and system information about the specified node, including defense level, security type, IP, and other relevant details.
+
+	[color=yellow]Errors[/color]:
+		- If the node does not exist, an error message will be displayed.

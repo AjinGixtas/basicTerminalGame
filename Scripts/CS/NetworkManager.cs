@@ -8,18 +8,22 @@ using System.Text;
 public partial class NetworkManager : Node
 {
     [Export] string userName = "AjinGixtas";
+    [Export] 
     public string UserName { get => userName; private set => userName = value; }
     public NetworkNode network;
     public Dictionary<string, NetworkNode> DNS;
     public override void _Ready() {
-        network = GenerateNetwork() as PlayerNode;
-        DNS = GenerateDNS(network);
+        while (DNS == null) {
+            network = GenerateNetwork() as PlayerNode;
+            DNS = GenerateDNS(network);
+        }
     }
     public NetworkNode GenerateNetwork() {
-        int[] nodePerDepths = [5, 6, 14, 6, 7, 3, 5, 3, 1]; int totalDepth = nodePerDepths.Sum(x => x);
+        int[] nodePerDepths = [5, 7, 12, 8, 9, 5, 4, 3, 2, 1]; int totalDepth = nodePerDepths.Sum(x => x);
         NetworkNodeData[] scriptedNodeData = ReadScriptedNodeData();
         NetworkNode network = new PlayerNode("home", "Player Terminal", "192.168.0.1", 0, 0, NetworkNodeType.PLAYER, null);
         Tuple<NetworkNodeType, string, string>[][] nodeNames = ReadProvidedNodeName();
+        GD.Print(nodePerDepths.Sum(x => x), ' ', nodeNames.Sum(arr => arr.Length));
         HoneypotNode.namePool = nodeNames;
         List<Tuple<NetworkNodeType, string, string>> namePool = []; int poolIndex = 0;
         List<NetworkNode>[] layers = new List<NetworkNode>[nodePerDepths.Length+1];
@@ -50,6 +54,7 @@ public partial class NetworkManager : Node
         Queue<NetworkNode> queue = new([root]);
         while(queue.Count > 0) {
             NetworkNode node = queue.Dequeue();
+            if(output.ContainsKey(node.IP)) { return null; }
             output.Add(node.IP, node);
             foreach(NetworkNode child in node.ChildNode) { queue.Enqueue(child); }
         }
@@ -57,10 +62,10 @@ public partial class NetworkManager : Node
     }
     readonly Tuple<string, NetworkNodeType>[] nodeTypeData = [
         new Tuple<string, NetworkNodeType>("Person.txt", NetworkNodeType.PERSON),
-        new Tuple<string, NetworkNodeType>("Business.txt", NetworkNodeType.BUSINESS),
         new Tuple<string, NetworkNodeType>("Rouge.txt", NetworkNodeType.ROUGE),
         new Tuple<string, NetworkNodeType>("Honeypot.txt", NetworkNodeType.HONEYPOT),
         new Tuple<string, NetworkNodeType>("Miner.txt", NetworkNodeType.MINER),
+        //new Tuple<string, NetworkNodeType>("Business.txt", NetworkNodeType.BUSINESS),
         //new Tuple<string, NetworkNodeType>("Faction.txt", NetworkNodeType.FACTION),
         //new Tuple<string, NetworkNodeType>("Corp.txt", NetworkNodeType.CORP)
     ];
@@ -85,29 +90,26 @@ public partial class NetworkManager : Node
             return output;
         }
     }
+    static readonly string[] CATEGORY = ["Corp", "Faction", "Business"];
+    const string INTIAL_SCRIPTED_NODE_FILEPATH = "res://Utilities/Resources/ScriptedNetworkNodes/";
     static NetworkNodeData[] ReadScriptedNodeData() {
-        NetworkNodeData[] output;
-        using (var fileStream = File.OpenRead(Directory.GetCurrentDirectory() + "\\Utilities\\TextFiles\\ServerNames\\ScriptedNodeData.txt")) {
-            string line; string[] splitted;
-            using var streamReader = new StreamReader(fileStream, Encoding.UTF8, true, 128);
-            output = new NetworkNodeData[int.Parse(streamReader.ReadLine())];
-            for (int i = 0; i < output.Length; ++i) {
-                line = streamReader.ReadLine(); splitted = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                string hostName = splitted[0], displayName = splitted[1..].Join(" ");
-                line = streamReader.ReadLine(); splitted = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                int defLvl = int.Parse(splitted[0]), secLvl = int.Parse(splitted[1]);
-                line = streamReader.ReadLine(); splitted = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                int minDepth = int.Parse(splitted[0]), maxDepth = int.Parse(splitted[1]);
-                line = streamReader.ReadLine(); splitted = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                NetworkNodeType nodeType = (NetworkNodeType)Enum.Parse(typeof(NetworkNodeType), splitted[0].ToUpper());
-                Type type = Type.GetType(splitted[0] + "Node");
-                //output[i] = new NetworkNodeData(minDepth, maxDepth, new type(hostName, displayName, $"{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}", defLvl, secLvl, nodeType, null));
+        List<NetworkNodeData> output = [];
+        for(int i = 0; i < CATEGORY.Length; ++i) {
+            string folderPath = Path.Combine(INTIAL_SCRIPTED_NODE_FILEPATH, CATEGORY[i]);
+            DirAccess folder =  DirAccess.Open(folderPath);
+            string[] fileNames = folder.GetFiles();
+            for(int j = 0; j < fileNames.Length; ++j) {
+                //output.Append(LoadNodeData(Load))
+                Resource result = ResourceLoader.Load(Path.Combine(folderPath, fileNames[i]));
+                GD.Print(result);
             }
         }
-        return output;
+        return [.. output];
+        //static NetworkNode LoadNodeData(string filePath) {
+        //}
     }
 }
 public struct NetworkNodeData (int minDepth, int maxDepth, NetworkNode network) {
-    public int minDepth = minDepth, maxDepth = maxDepth; // [min, max]
+    public int minDepth = minDepth, maxDepth = maxDepth;
     public NetworkNode networkNode = network;
 }

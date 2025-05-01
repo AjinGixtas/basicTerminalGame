@@ -27,10 +27,9 @@ public class LockSystem {
         return 0;
     }
     public Tuple<bool, string> CrackAttempt(Dictionary<string, string> ans) {
-        //if (Time.GetUnixTimeFromSystem() > endEpoch) { return new(false, ""); }
         for (int i = 0; i < activeLocks.Count; i++) {
             if (ans.TryGetValue(activeLocks[i].Flag, out string key)) {
-                if (!locks[i].UnlockAttempt(key)) return new(false, $"{locks[i].Flag} is incorrect. {locks[i].Question}");
+                if (!activeLocks[i].UnlockAttempt(key)) return new(false, $"{locks[i].Flag} is incorrect. {locks[i].Question}");
             } else { return new(false, $"{activeLocks[i].Flag} is missing. {locks[i].Question}"); }
         }
         return new(true, "Success.");

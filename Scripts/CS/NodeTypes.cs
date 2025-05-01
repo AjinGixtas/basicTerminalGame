@@ -49,7 +49,6 @@ public abstract class NetworkNode {
         LockSystem = new([new I5(), new P9(), new I13(), new P16(), new C0(), new C1(), new C3(), new M2(), new M3()]);
     }
     public virtual void Init() {
-        GD.Print(IP, ' ', DefLvl, ' ', SecLvl, ' ', SecType, ' ', _retLvl, ' ', NodeType);
     }
     public int GetDepth() {
         int output = 0;
@@ -101,8 +100,8 @@ public class PersonNode : NetworkNode {
     public PersonNode(string hostName, string displayName, string IP, double indexRatio, double depthRatio, NetworkNodeType NodeType, NetworkNode parentNode)
         : base(hostName, displayName, IP, indexRatio, depthRatio, NodeType, parentNode) {
         // Kind of just stupid in general...
-        DefLvl = GD.RandRange(2, 5) + (int)Math.Ceiling(depthRatio * 4) + (int)Math.Ceiling(indexRatio * 7);
-        SecLvl = GD.RandRange(2, DefLvl) - (int)Math.Ceiling(depthRatio * 2) + (int)Math.Ceiling(indexRatio * 10);
+        DefLvl = GD.RandRange(0, 3) + (int)Math.Ceiling(depthRatio * 4) + (int)Math.Ceiling(indexRatio * 7);
+        SecLvl = GD.RandRange(1, DefLvl) - (int)Math.Ceiling(depthRatio * 10) + (int)Math.Ceiling(indexRatio * 4);
     }
     public override void Init() {
         base.Init();
@@ -160,8 +159,8 @@ public class HoneypotNode : NetworkNode {
     public override void Init() {
         base.Init();
     }
-    string fakeHostName, fakeDisplayName;
-    int fakeDefLvl = 0, fakeSecLvl = 0, fakeRetLvl = 0;
+    public string fakeHostName, fakeDisplayName;
+    public int fakeDefLvl = 0, fakeSecLvl = 0, fakeRetLvl = 0;
     SecurityType fakeSecType; NetworkNodeType fakeDisplayNetworkNodeType;
     public void GenerateFakeData() {
         if (Time.GetUnixTimeFromSystem() - lastEpoch < 15) { return; }

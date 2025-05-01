@@ -7,7 +7,7 @@ public abstract class Lock {
     public abstract string Flag { get; }
     public abstract int Cost { get; }
     public abstract int MinLvl { get; }
-    public abstract void Intialize();
+    public virtual void Intialize() { GD.Print(ans); }
     public virtual bool UnlockAttempt(string input) => input.Equals(ans);
     public string Ans => ans;
     public string Help => cmd;
@@ -27,6 +27,7 @@ public class I5 : Lock {
 
     public override void Intialize() {
         ans = $"{GD.RandRange(1, 5)}";
+        base.Intialize();
     }
 }
 
@@ -44,6 +45,7 @@ public class P9 : Lock {
 
     public override void Intialize() {
         ans = $"{ansPool[GD.RandRange(0, 8)]}";
+        base.Intialize();
     }
 }
 
@@ -59,6 +61,7 @@ public class I13 : Lock {
 
     public override void Intialize() {
         ans = $"{GD.RandRange(1, 13)}";
+        base.Intialize();
     }
 }
 
@@ -76,6 +79,7 @@ public class P16 : Lock {
 
     public override void Intialize() {
         ans = $"{ansPool[GD.RandRange(0, 16)]}";
+        base.Intialize();
     }
 }
 
@@ -96,6 +100,7 @@ public class C0 : Lock {
         ans = colorOpPairs[pairIndex, elementIndex];
         inp = colorOpPairs[pairIndex, 1 - elementIndex];
         que = $"\n{inp}";
+        base.Intialize();
     }
 }
 
@@ -130,6 +135,7 @@ public class C1 : Lock {
         group = Utilitiy.Shuffle(group.ToArray());
         inp = group.Join(" ");
         que = $"\n{inp}";
+        base.Intialize();
     }
 }
 
@@ -167,6 +173,7 @@ public class C3 : Lock {
         group = Utilitiy.Shuffle(group.ToArray());
         inp = group.Join(" ");
         que = $"\n{inp}";
+        base.Intialize();
     }
 }
 
@@ -185,6 +192,7 @@ public class M2 : Lock {
         ans = $"{root * root}";
         inp = $"{upperBound}";
         que = $"\n{inp}";
+        base.Intialize();
     }
 }
 
@@ -203,5 +211,6 @@ public class M3 : Lock {
         ans = $"{root * root * root}";
         inp = $"{upperBound}";
         que = $"\n{inp}";
+        base.Intialize();
     }
 }

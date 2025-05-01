@@ -44,6 +44,61 @@ size_flags_vertical = 3
 focus_mode = 2
 theme = ExtResource("2_tjxev")
 bbcode_enabled = true
+text = " │     │           │     └─── [color=cyan]86.36.77.165   [/color] [color=green]h4ck3rX[/color]
+ │     │           │              Display Name:  Hacker X;
+ │     │           │              Node Type:     [color=purple]ROUGE[/color];
+ │     │           │              Defense Level: [color=blue]2[/color]; Security Type: [color=red]LOSEC[/color]
+ │     │           │            
+ │     │           ├─── [color=cyan]28.251.22.255  [/color] [color=green]calvin[/color]
+ │     │           │     │  Display Name:  Calvin;
+ │     │           │     │  Node Type:     [color=purple]PERSON[/color];
+ │     │           │     │  Defense Level: [color=blue]2[/color]; Security Type: [color=red]LOSEC[/color]
+ │     │           │     │
+ │     │           │     └─── [color=cyan]62.227.227.40  [/color] [color=green]milo[/color]
+ │     │           │              Display Name:  Milo;
+ │     │           │              Node Type:     [color=purple]PERSON[/color];
+ │     │           │              Defense Level: [color=yellow]5[/color]; Security Type: [color=red]NOSEC[/color]
+ │     │           │            
+ │     │           └─── [color=cyan]167.54.238.102 [/color] [color=green]gideon[/color]
+ │     │                    Display Name:  Gideon;
+ │     │                    Node Type:     [color=purple]PERSON[/color];
+ │     │                    Defense Level: [color=yellow]5[/color]; Security Type: [color=red]NOSEC[/color]
+ │     │                  
+ │     ├─── [color=cyan]120.88.132.186 [/color] [color=green]Gh0stN0de[/color]
+ │     │        Display Name:  Ghost Node;
+ │     │        Node Type:     [color=purple]ROUGE[/color];
+ │     │        Defense Level: [color=yellow]7[/color]; Security Type: [color=red]LOSEC[/color]
+ │     │      
+ │     └─── [color=cyan]81.93.84.201   [/color] [color=green]soren[/color]
+ │              Display Name:  Soren;
+ │              Node Type:     [color=purple]PERSON[/color];
+ │              Defense Level: [color=blue]2[/color]; Security Type: [color=red]NOSEC[/color]
+ │            
+ ├─── [color=cyan]65.120.109.11  [/color] [color=green]daphne[/color]
+ │     │  Display Name:  Daphne;
+ │     │  Node Type:     [color=purple]PERSON[/color];
+ │     │  Defense Level: [color=yellow]5[/color]; Security Type: [color=yellow]MISEC[/color]
+ │     │
+ │     └─── [color=cyan]153.168.13.55  [/color] [color=green]N3tw0rm[/color]
+ │           │  Display Name:  Networm;
+ │           │  Node Type:     [color=purple]ROUGE[/color];
+ │           │  Defense Level: [color=red]10[/color]; Security Type: [color=red]LOSEC[/color]
+ │           │
+ │           └─── [color=cyan]183.139.248.239[/color] [color=green]soren[/color]
+ │                    Display Name:  Soren;
+ │                    Node Type:     [color=purple]PERSON[/color];
+ │                    Defense Level: [color=yellow]6[/color]; Security Type: [color=red]NOSEC[/color]
+ │                  
+ ├─── [color=cyan]115.134.96.226 [/color] [color=green]fiona[/color]
+ │        Display Name:  Fiona;
+ │        Node Type:     [color=purple]PERSON[/color];
+ │        Defense Level: [color=yellow]5[/color]; Security Type: [color=yellow]MISEC[/color]
+ │      
+ └─── [color=cyan]192.72.104.152 [/color] [color=green]silas[/color]
+          Display Name:  Silas;
+          Node Type:     [color=purple]PERSON[/color];
+          Defense Level: [color=blue]1[/color]; Security Type: [color=red]LOSEC[/color]
+"
 scroll_following = true
 threaded = true
 progress_bar_delay = -1

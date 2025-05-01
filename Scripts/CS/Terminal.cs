@@ -69,7 +69,6 @@ public partial class Terminal : VSplitContainer {
         int t = GD.RandRange(0, 1+(int)Math.Floor(150.0 / processTimer.WaitTime * updateProcessGraphicTimer.WaitTime));
         progress = Mathf.Clamp(progress + t, 0, 99); tick = (tick + 1) % SpinnerChars.Length;
 
-        //int filledBar = Mathf.FloorToInt(progress / 100.0 * BarSize);
         Echo("-n", $"...{progress}%");
         updateProcessGraphicTimer.Start();
     }
@@ -132,8 +131,8 @@ public partial class Terminal : VSplitContainer {
         if (targetDir.Childrens.Count == 0) { Echo(""); return; }
         string output = "";
         foreach (NodeSystemItem item in targetDir.Childrens) {
-            if (item is NodeDirectory) { output += $"[color=blue]/{item.Name}[/color] "; } 
-            else { output += $"[color=cyan]{item.Name}[/color] "; }
+            if (item is NodeDirectory) { output += $"[color=cyan]/{item.Name}[/color] "; } 
+            else { output += $"[color=green]{item.Name}[/color] "; }
         }
         Echo(output);
     }
@@ -157,7 +156,7 @@ public partial class Terminal : VSplitContainer {
     void Home(params string[] args) {
         CurrentNode = networkManager.network;
     }
-    const int MAX_HISTORY_CHAR_SIZE = 131072, RESET_HISTORY_CHAR_SIZE = 65536;
+    const int MAX_HISTORY_CHAR_SIZE = 65536, RESET_HISTORY_CHAR_SIZE = 16384;
     void Echo(params string[] args) {
         if (args.Length == 0) return;
 
@@ -180,12 +179,13 @@ public partial class Terminal : VSplitContainer {
         string text = string.Join(" ", args[argStart..]);
         if (interpretEscapes) text = Regex.Unescape(text); // handles \n, \t, etc.
         if (!noNewline) text += "\n";
+        GD.Print(text);
         terminalOutputField.AppendText(text);
     }
     void Scan(params string[] args) {
         StartProcess(.1, ScanCallback, args);
         void ScanCallback(params string[] args) {
-            string L = "└────", M = "├────", T = "     ", E = "│    ";
+            string L = " └─── ", M = " ├─── ", T = "      ", E = " │    ";
             Func<bool[], string> getTreePrefix = arr => string.Concat(arr.Select((b, i) => (i == arr.Length - 1 ? (b ? L : M) : (b ? T : E))));
             Func<bool[], string> getDescPrefix = arr => string.Concat(arr.Select((b, i) => (b ? T : E)));
             Dictionary<string, string> parsedArgs = new() {
@@ -201,7 +201,6 @@ public partial class Terminal : VSplitContainer {
                 (NetworkNode node, int depth, bool[] depthMarks) = stack.Pop();
                 if (depth > MAX_DEPTH || visited.Contains(node)) continue;
                 Dictionary<string, string> analyzeResult = node.Analyze();
-                GD.Print(node.HostName, ' ', string.Concat(depthMarks.Select((v,i)=> $"{v} ")));
                 output += $"{getTreePrefix(depthMarks)}[color=cyan]{analyzeResult["IP"], -15}[/color] [color=green]{analyzeResult["hostName"]}[/color]\n";
                 
                 if (parsedArgs["-v"] == "-v") {
@@ -217,17 +216,25 @@ public partial class Terminal : VSplitContainer {
                         "HISEC" or "MASEC" => "blue",
                         _ => "red"
                     };
-                    string descPrefix = getDescPrefix(depthMarks) + ((depth == MAX_DEPTH ? 0 : ((node.ParentNode != null ? 0 : -1) + node.ChildNode.Count)) > 0 ? '│' : ' ');
+                    string descPrefix = getDescPrefix(depthMarks) + ((depth == MAX_DEPTH ? 0 : ((node.ParentNode != null ? 0 : -1) + node.ChildNode.Count)) > 0 ? " │" : "  ");
                     output += $"{descPrefix}  Display Name:  {analyzeResult["displayName"]};\n";
                     output += $"{descPrefix}  Node Type:     [color=purple]{analyzeResult["nodeType"]}[/color];\n";
                     output += $"{descPrefix}  Defense Level: [color={defColorCode}]{analyzeResult["defLvl"]}[/color]; Security Type: [color={secColorCode}]{analyzeResult["secType"]}[/color]\n";
                     output += $"{descPrefix}\n";
                 }
                 visited.Add(node);
-                if (node.ParentNode != null) { stack.Push((node.ParentNode, depth + 1, [..depthMarks, node.ChildNode.Count == 0])); }
-                
+
                 // Use k==1 due to FILO algorithm.
-                int k = 0; foreach(NetworkNode child in node.ChildNode) { ++k; stack.Push((child, depth + 1, [..depthMarks, k == 1])); }
+                List<NetworkNode> nextOfQueue = [];
+                if (node.ParentNode != null && !visited.Contains(node.ParentNode) && depth <= MAX_DEPTH) nextOfQueue.Add(node.ParentNode);
+                foreach(NetworkNode child in node.ChildNode) {
+                    if (visited.Contains(child) || depth > MAX_DEPTH) continue;
+                    nextOfQueue.Add(child);
+                }
+
+                int k = 0; foreach(NetworkNode child in nextOfQueue) { 
+                    ++k; stack.Push((child, depth + 1, [..depthMarks, k == 1]));
+                }
             }
             Echo(output);
         }
@@ -281,14 +288,20 @@ public partial class Terminal : VSplitContainer {
             else if (beginResult == 1) { Echo("Cracking already in process."); }
         }
         Tuple<bool, string> crackResult = node.LockSystem.CrackAttempt(parsedArgs);
+        GD.Print($"{crackResult.Item1} {crackResult.Item2}");
         Echo($"{crackResult.Item2}");
     }
     void Connect(params string[] args) {
         if (args.Length == 0) { Echo("[color=red]No hostname provided.[/color]"); return; }
-        if (CurrentNode.ParentNode != null && CurrentNode.ParentNode.HostName == args[0]) { CurrentNode = CurrentNode.ParentNode; return; }
         if (networkManager.DNS.TryGetValue(args[0], out NetworkNode value)) { CurrentNode = value; return; }
-        if (CurrentNode.ChildNode.FindLast(s => s.HostName == args[0]) == null) { Echo($"[color=red]Host not found: {args[0]}[/color]"); return; }
-        CurrentNode = CurrentNode.ChildNode.FindLast(s => s.HostName == args[0]);
+        if (CurrentNode.ParentNode != null && CurrentNode.ParentNode.HostName == args[0] || 
+            (CurrentNode.ParentNode is HoneypotNode && (CurrentNode.ParentNode as HoneypotNode).fakeHostName == args[0])) 
+            { CurrentNode = CurrentNode.ParentNode; return; }
+        
+        NetworkNode node = CurrentNode.ChildNode.FindLast(s => s.HostName == args[0]);
+        NetworkNode fnode = CurrentNode.ChildNode.FindLast(s => s is HoneypotNode && (s as HoneypotNode).fakeHostName == args[0]);
+        if (node == null && fnode == null) { Echo($"[color=red]Host not found: {args[0]}[/color]"); return; }
+        CurrentNode = (node ?? fnode);
     }
     void Analyze(params string[] args) {
         if (args.Length == 0) { args = [CurrentNode.HostName]; }

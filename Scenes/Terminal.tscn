@@ -42,7 +42,6 @@ size_flags_vertical = 3
 focus_mode = 2
 theme = ExtResource("2_tjxev")
 bbcode_enabled = true
-text = "https://lichess.org/@/AjinGixtas"
 scroll_following = true
 threaded = true
 progress_bar_delay = -1

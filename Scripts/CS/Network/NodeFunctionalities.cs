@@ -38,60 +38,56 @@ public class LockSystem {
     }
 }
 public class HackFarm {
-    int _hackLvl = 1, _timeLvl = 1, _growLvl = 1;
-    double InitialHackPercent { get; init; }
-    double InitialHackTime { get; init; }
-    double InitialGrowRate { get; init; }
-    public int HackLevel { get => _hackLvl; private set => _hackLvl = value; }
-    public int TimeLevel { get => _timeLvl; private set => _timeLvl = value; }
-    public int GrowLevel { get => _growLvl; private set => _growLvl = value; }
-    public double HackPercent { get; private set; }
-    public double HackTime { get; private set; }
-    public double GrowRate { get; private set; }
-    public HackFarm(int secLvl, double indexRatio, double depthRatio) {
-        InitialHackPercent = 11.0 - Math.Pow(Math.E, Math.PI * secLvl * 0.0588235294118);
-        InitialHackTime = (10.0 + 4.32 * secLvl + Math.Pow(1.23374, depthRatio)) * .5;
-        InitialGrowRate = 128.0 - Math.Pow(Math.PI * .97, secLvl * 0.309214594929) / indexRatio;
+    // First is the base value, second is the cost of the upgrade
+    int _hackLvl = 1; double CurHack; double BaseHack { get; init; } double BaseCostHack { get; init; }
+    int _timeLvl = 1; double CurTime; double BaseTime { get; init; } double BaseCostTime { get; init; }
+    int _growLvl = 1; double CurGrow; double BaseGrow { get; init; } double BaseCostGrow { get; init; }
+    public int HackLevel {
+        get => _hackLvl; private set {
+            if (_hackLvl == value) return;
+            _hackLvl = value;
+            CurHack = BaseHack * Math.Pow(1.02, _hackLvl);
+        }
     }
-    // Method to calculate the hack time
-    public void CalcHackTime() {
-        // Example formula for hack time: time decreases as level increases
-        HackTime = 100 - (10 * _timeLvl);  // Hack time reduces by 10 for each level
-        if (HackTime < 20) HackTime = 20; // Minimum hack time is capped at 20
+    public int TimeLevel {
+        get => _timeLvl; private set {
+            if (_timeLvl == value) return;
+            _timeLvl = value;
+            CurTime = BaseTime * Math.Pow(.98, _timeLvl);
+        }
     }
-
-    // Method to calculate the hack percent
-    public void CalcHackPercent() {
-        // Example formula for hack percent: increase by 5% per level
-        HackPercent = 10 + (5 * _hackLvl);  // Hack percent starts at 10% and increases by 5% per level
+    public int GrowLevel {
+        get => _growLvl; private set {
+            if (_growLvl == value) return;
+            _growLvl = value;
+            CurGrow = BaseGrow * Math.Pow(1.07, _growLvl);
+        }
     }
-
-    // Method to calculate the growth rate
-    public void CalcGrowRate() {
-        // Example formula for grow rate: growth increases by 2% per level
-        GrowRate = 1 + (0.02 * _growLvl);  // Starting at 1, and increases by 2% per level
+    public HackFarm(int secLvl, double indexRatio, double depthRatio, int HackLevel=1, int TimeLevel=1, int GrowLevel=1) {
+        BaseHack = .01;
+        BaseTime = 20;
+        BaseGrow = 3;
+        BaseCostHack = 30;
+        BaseCostTime = 30;
+        BaseCostGrow = 30;
+        this.HackLevel = HackLevel; this.TimeLevel = TimeLevel; this.GrowLevel = GrowLevel;
     }
-
-    // Method to calculate the cost for upgrading hack time
-    public void CalcHackTimeUpgradeCost() {
-        // Example formula for hack time upgrade cost (exponential growth for cost)
-        double upgradeCost = 50 * Math.Pow(1.2, _timeLvl);  // Example: 50 * (1.2 ^ level)
-        Console.WriteLine($"Upgrade Cost for Hack Time: {upgradeCost}");
+    double currencyPile = 0, timeRemain = 0;
+    public double Update(double delta) {
+        // Time related mechanism
+        timeRemain -= delta; currencyPile += CurGrow * delta;
+        // Hack related mechanism
+        if (timeRemain > 0) return 0;
+        double hackAmount = CurHack * currencyPile;
+        currencyPile -= hackAmount;
+        return hackAmount; // Return the amount of money hacked
     }
-
-    // Method to calculate the cost for upgrading hack percent
-    public void CalcHackPercentUpgradeCost() {
-        // Example formula for hack percent upgrade cost
-        double upgradeCost = 100 * Math.Pow(1.3, _hackLvl);  // Example: 100 * (1.3 ^ level)
-        Console.WriteLine($"Upgrade Cost for Hack Percent: {upgradeCost}");
-    }
-
-    // Method to calculate the cost for upgrading grow rate
-    public void CalcGrowRateUpgradeCost() {
-        // Example formula for grow rate upgrade cost
-        double upgradeCost = 80 * Math.Pow(1.25, _growLvl);  // Example: 80 * (1.25 ^ level)
-        Console.WriteLine($"Upgrade Cost for Grow Rate: {upgradeCost}");
-    }
+    public void UpgradeHackLevel() { ++HackLevel; }
+    public void UpgradeTimeLevel() { ++TimeLevel; }
+    public void UpgradeGrowLevel() { ++GrowLevel; }
+    public double GetHackCost(int level) { return BaseCostHack * Math.Pow(1.02, level); }
+    public double GetTimeCost(int level) { return BaseCostTime * Math.Pow(1.02, level); }
+    public double GetGrowCost(int level) { return BaseCostGrow * Math.Pow(1.02, level); }
 }
 public class Stock {
     public string Name { get; init; }
@@ -99,8 +95,8 @@ public class Stock {
     public double PastPrice { get; private set; }
     public double Drift { get; private set; }
     public double Volatility { get; private set; }
-    public Stock(string Name, double Price, double Drift, double Volatility) {
-        this.Name = Name; this.Price = Price; this.Drift = Drift; this.Volatility = Volatility;
+    public Stock(string Name, double Price, double Drift, double Volatility, double PastPrice) {
+        this.Name = Name; this.Price = Price; this.Drift = Drift; this.Volatility = Volatility; this.PastPrice = PastPrice;
     }
     public void UpdateStock(double delta) {
         PastPrice = Price;
@@ -117,8 +113,8 @@ public class Faction {
     public string Desc { get; init; }
     public int Favor { get; private set; }
     public int Reputation { get; init; }
-    public Faction(string Name, string Desc) {
+    public Faction(string Name, string Desc, int Favor, int Reputation) {
         this.Name = Name; this.Desc = Desc;
-        this.Favor = 0; this.Reputation = 0;
+        this.Favor = Favor; this.Reputation = Reputation;
     }
 }

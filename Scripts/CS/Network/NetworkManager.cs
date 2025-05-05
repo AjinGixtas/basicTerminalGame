@@ -20,7 +20,7 @@ public partial class NetworkManager : Node
     public NetworkNode GenerateNetwork() {
         int[] nodePerDepths = [5, 7, 12, 8, 9, 5, 4, 3, 2, 1]; int totalDepth = nodePerDepths.Sum(x => x);
         NetworkNodeData[] scriptedNodeData = ReadScriptedNodeData();
-        NetworkNode network = new PlayerNode("home", "Player Terminal", "192.168.0.1", 0, 0, NetworkNodeType.PLAYER, null);
+        NetworkNode network = new PlayerNode("home", "Player Terminal", "192.168.0.1", null);
         Tuple<NetworkNodeType, string, string>[][] nodeNames = ReadProvidedNodeName();
         HoneypotNode.namePool = nodeNames;
         List<Tuple<NetworkNodeType, string, string>> namePool = []; int poolIndex = 0;

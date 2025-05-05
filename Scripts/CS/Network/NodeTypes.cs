@@ -41,14 +41,16 @@ public abstract class NetworkNode {
             _defLvl = value;
         }
     }
-    public NetworkNode(string hostName, string displayName, string IP, double indexRatio, double depthRatio, NetworkNodeType NodeType, NetworkNode parentNode) {
+    public NetworkNode(string hostName, string displayName, string IP, NetworkNodeType NodeType, NetworkNode parentNode) {
         HostName = hostName; DisplayName = displayName; this.IP = IP; this.NodeType = NodeType;
-        ParentNode = parentNode;
-        ChildNode = [];
-        NodeDirectory = new("~"); HackFarm = new(SecLvl, indexRatio, depthRatio);
-        LockSystem = new([new I5(), new C0(), new P9(), new I13(), new P16(), new C1(), new C3(), new M2(), new M3()]);
+        ParentNode = parentNode; ChildNode = [];
+        NodeDirectory = new("~");
     }
-    public virtual void Init() {
+    public virtual void Init(int SecLvl, int DefLvl, HackFarm HackFarm) {
+        this.SecLvl = SecLvl; this.DefLvl = DefLvl; this.HackFarm = HackFarm;
+    }
+    public virtual (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {
+        return (0, 0);
     }
     public int GetDepth() {
         int output = 0;
@@ -73,91 +75,80 @@ public abstract class NetworkNode {
     }
     public static NetworkNode GenerateProceduralNode(NetworkNodeType nodeType, string hostName, string displayName, double indexRatio, double depthRatio, NetworkNode parentNode) {
         string IP = $"{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}";
-        NetworkNode output = nodeType switch {
+        NetworkNode node = nodeType switch {
             NetworkNodeType.PLAYER => throw new Exception("WHY ARE YOU GENERATING THE PLAYER NODE AGAIN?!!?!"),
-            NetworkNodeType.PERSON =>     new PersonNode(hostName, displayName, IP, indexRatio, depthRatio, nodeType, parentNode),
-            NetworkNodeType.BUSINESS => new BusinessNode(hostName, displayName, IP, indexRatio, depthRatio, nodeType, parentNode),
-            NetworkNodeType.CORP =>         new CorpNode(hostName, displayName, IP, indexRatio, depthRatio, nodeType, parentNode),
-            NetworkNodeType.FACTION =>   new FactionNode(hostName, displayName, IP, indexRatio, depthRatio, nodeType, parentNode),
-            NetworkNodeType.HONEYPOT => new HoneypotNode(hostName, displayName, IP, indexRatio, depthRatio, nodeType, parentNode),
-            NetworkNodeType.MINER =>       new MinerNode(hostName, displayName, IP, indexRatio, depthRatio, nodeType, parentNode),
-            NetworkNodeType.ROUGE =>       new MinerNode(hostName, displayName, IP, indexRatio, depthRatio, nodeType, parentNode),
+            NetworkNodeType.PERSON =>     new PersonNode(hostName, displayName, IP, parentNode),
+            NetworkNodeType.BUSINESS => new BusinessNode(hostName, displayName, IP, parentNode),
+            NetworkNodeType.CORP =>         new CorpNode(hostName, displayName, IP, parentNode),
+            NetworkNodeType.FACTION =>   new FactionNode(hostName, displayName, IP, parentNode),
+            NetworkNodeType.HONEYPOT => new HoneypotNode(hostName, displayName, IP, parentNode),
+            NetworkNodeType.MINER =>       new MinerNode(hostName, displayName, IP, parentNode),
+            NetworkNodeType.ROUGE =>       new RougeNode(hostName, displayName, IP, parentNode),
             _ => throw new Exception("Unknown node value")
         };
-        output.Init();
-        return output;
+        (int secLvl, int defLvl) = node.GenerateSecAndDef(indexRatio, depthRatio);
+        HackFarm hackFarm = new(secLvl, indexRatio, depthRatio);
+        node.Init(secLvl, defLvl, hackFarm);
+        return node;
     }
 }
 public class PlayerNode : NetworkNode {
-    public PlayerNode(string hostName, string displayName, string IP, double indexRatio, double depthRatio, NetworkNodeType NodeType, NetworkNode parentNode)
-        : base(hostName, displayName, IP, indexRatio, depthRatio, NodeType, parentNode) {
-    }
-    public override void Init() { 
-        base.Init();
+    public PlayerNode(string hostName, string displayName, string IP, NetworkNode parentNode)
+        : base(hostName, displayName, IP, NetworkNodeType.PLAYER, parentNode) {
     }
 }
 public class PersonNode : NetworkNode {
-    public PersonNode(string hostName, string displayName, string IP, double indexRatio, double depthRatio, NetworkNodeType NodeType, NetworkNode parentNode)
-        : base(hostName, displayName, IP, indexRatio, depthRatio, NodeType, parentNode) {
+    public PersonNode(string hostName, string displayName, string IP, NetworkNode parentNode)
+        : base(hostName, displayName, IP, NetworkNodeType.PERSON, parentNode) {
         // Kind of just stupid in general...
-        DefLvl = GD.RandRange(1, 3) + (int)Math.Ceiling(depthRatio * 4) + (int)Math.Ceiling(indexRatio * 30);
-        SecLvl = GD.RandRange(1, DefLvl) + (int)Math.Ceiling(depthRatio * 10) + (int)Math.Ceiling(indexRatio * 4);
     }
-    public override void Init() {
-        base.Init();
+    public override (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {
+        return (GD.RandRange(1, 3) + (int)Math.Ceiling(depthRatio * 4) + (int)Math.Ceiling(indexRatio * 30), 
+            GD.RandRange(1, DefLvl) + (int)Math.Ceiling(depthRatio * 10) + (int)Math.Ceiling(indexRatio * 4));
     }
 }
 public class BusinessNode : NetworkNode {
     public Stock _stock;
     public Stock Stock { get => _stock; set { _stock ??= value; } }
-    public BusinessNode(string hostName, string displayName, string IP, double indexRatio, double depthRatio, NetworkNodeType NodeType, NetworkNode parentNode)
-        : base(hostName, displayName, IP, indexRatio, depthRatio, NodeType, parentNode) {
-        // They're in it for the money, not to keep it
-        DefLvl = GD.RandRange(5, 9) + (int)(depthRatio * 2) + (int)(indexRatio * 3); // [5-8]+[0-2]+[0-3]
-        SecLvl = GD.RandRange((int)Math.Floor(DefLvl * 0.6), DefLvl);
+    public BusinessNode(string hostName, string displayName, string IP, NetworkNode parentNode)
+        : base(hostName, displayName, IP, NetworkNodeType.BUSINESS, parentNode) {
     }
-    public override void Init() {
-        base.Init();
+    // They're in it for the money, not to keep it
+    public override (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {
+        return (GD.RandRange(5, 9) + (int)(depthRatio * 2) + (int)(indexRatio * 3), 
+            GD.RandRange((int)Math.Floor(DefLvl * 0.6), DefLvl)); 
     }
 }
 public class CorpNode : NetworkNode {
     Faction _faction; Stock _stock;
     public Stock Stock { get => _stock; set { _stock ??= value; } }
     public Faction Faction { get => _faction; set { _faction ??= value; } }
-    public CorpNode(string hostName, string displayName, string IP, double indexRatio, double depthRatio, NetworkNodeType NodeType, NetworkNode parentNode)
-        : base(hostName, displayName, IP, indexRatio, depthRatio, NodeType, parentNode) {
-        // No shit, no giggle
-        DefLvl = 10; SecLvl = 10;
+    public CorpNode(string hostName, string displayName, string IP, NetworkNode parentNode)
+        : base(hostName, displayName, IP, NetworkNodeType.CORP, parentNode) {
     }
-    public override void Init() {
-        base.Init();
+    public override (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {
+        return (10, 10);
     }
 }
 public class FactionNode : NetworkNode {
     Faction _faction;
     public Faction Faction { get => _faction; set { _faction ??= value; } }
-    public FactionNode(string hostName, string displayName, string IP, double indexRatio, double depthRatio, NetworkNodeType NodeType, NetworkNode parentNode)
-        : base(hostName, displayName, IP, indexRatio, depthRatio, NodeType, parentNode) {
-        // Their little blip on the map for recon, sec is just to filter garbage out.
-        DefLvl = 10;
-        SecLvl = GD.RandRange(3, 6) + (int)(depthRatio * 2) + (int)(indexRatio * 2); // [5-8]+[0-2]+[0-2]
+    public FactionNode(string hostName, string displayName, string IP, NetworkNode parentNode)
+        : base(hostName, displayName, IP, NetworkNodeType.FACTION, parentNode) {
     }
-    public override void Init() {
-        base.Init();
+    public override (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {
+        return (10, GD.RandRange(3, 6) + (int)(depthRatio * 2) + (int)(indexRatio * 2));
     }
 }
 public class HoneypotNode : NetworkNode {
     double lastEpoch = 0;
     public static Tuple<NetworkNodeType, string, string>[][] namePool;
-    NetworkNodeType displayNetworkNodeType;
-    public HoneypotNode(string hostName, string displayName, string IP, double indexRatio, double depthRatio, NetworkNodeType NodeType, NetworkNode parentNode)
-        : base(hostName, displayName, IP, indexRatio, depthRatio, NodeType, parentNode) {
-        // They're gonna make sure you regret ever touched them.
-        DefLvl = 10; SecLvl = 0;
+    public HoneypotNode(string hostName, string displayName, string IP, NetworkNode parentNode)
+        : base(hostName, displayName, IP, NetworkNodeType.HONEYPOT, parentNode) {
         GenerateFakeData();
     }
-    public override void Init() {
-        base.Init();
+    public override (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {
+        return (10, 0);
     }
     public string fakeHostName, fakeDisplayName;
     public int fakeDefLvl = 0, fakeSecLvl = 0, fakeRetLvl = 0;
@@ -205,22 +196,19 @@ public class HoneypotNode : NetworkNode {
 
 }
 public class MinerNode : NetworkNode {
-    public MinerNode(string hostName, string displayName, string IP, double indexRatio, double depthRatio, NetworkNodeType NodeType, NetworkNode parentNode)
-        : base(hostName, displayName, IP, indexRatio, depthRatio, NodeType, parentNode) {
-        // Kind of whatever, they're for production anyway.
-        DefLvl = GD.RandRange(2, 10); SecLvl = GD.RandRange(1, DefLvl - 1);
+    public MinerNode(string hostName, string displayName, string IP, NetworkNode parentNode)
+        : base(hostName, displayName, IP, NetworkNodeType.MINER, parentNode) {
     }
-    public override void Init() {
-        base.Init();
+    // Kind of whatever, they're for production anyway.
+    public override (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {
+        return (GD.RandRange(2, 10), GD.RandRange(1, DefLvl - 1));
     }
 }
 public class RougeNode : NetworkNode {
-    public RougeNode(string hostName, string displayName, string IP, double indexRatio, double depthRatio, NetworkNodeType NodeType, NetworkNode parentNode)
-        : base(hostName, displayName, IP, indexRatio, depthRatio, NodeType, parentNode) {
-        // Adaptive AI ready to kick your shit in.
-        DefLvl = 10; SecLvl = GD.RandRange(3, 8);
+    public RougeNode(string hostName, string displayName, string IP, NetworkNode parentNode)
+        : base(hostName, displayName, IP, NetworkNodeType.ROUGE, parentNode) {
     }
-    public override void Init() {
-        base.Init();
+    public override (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {
+        return (10, GD.RandRange(3, 8));
     }
 }

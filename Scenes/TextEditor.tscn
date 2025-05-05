@@ -1,17 +1,27 @@
-[gd_scene format=3 uid="uid://dsqh3owg3cspi"]
+[gd_scene load_steps=2 format=3 uid="uid://dsqh3owg3cspi"]
 
-[node name="Control" type="Control"]
-layout_mode = 3
+[ext_resource type="Script" uid="uid://mp4u0q4eb6nf" path="res://Scripts/CS/Editor/TextEditor.cs" id="1_nbc5l"]
+
+[node name="TextEditor" type="MarginContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_nbc5l")
 
-[node name="CodeEdit" type="CodeEdit" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="VSplitContainer" type="VSplitContainer" parent="."]
+layout_mode = 2
+dragging_enabled = false
+dragger_visibility = 2
+
+[node name="TabBar" type="TabBar" parent="VSplitContainer"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_vertical = 0
+drag_to_rearrange_enabled = true
+deselect_enabled = true
+
+[node name="TabContainer" type="TabContainer" parent="VSplitContainer"]
+layout_mode = 2
+tabs_visible = false

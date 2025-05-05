@@ -59,4 +59,20 @@ public class NodeDirectory : NodeSystemItem {
         }
         return curDir;
     }
+    public NodeFile GetFile(string name) {
+        string[] components = name.Split(['/'], StringSplitOptions.RemoveEmptyEntries);
+        NodeDirectory curDir = this;
+        string[] pathComponents = components[..^1]; string fileName = components[^1];
+        foreach (string component in pathComponents) {
+            if (component == "..") {
+                if (curDir.Parent == null) return null; // Root dir is characterized by a lack of parent.
+                curDir = curDir.Parent;
+                continue;
+            }
+            curDir = (NodeDirectory)(curDir?.Childrens.Find(item => (item.GetType() == typeof(NodeDirectory) && item.Name == component)));
+            if (curDir == null || curDir.Name != component) return null;
+            continue;
+        }
+        return (NodeFile)(curDir?.Childrens.Find(item => (item.GetType() == typeof(NodeFile) && item.Name == fileName)));
+    }
 }

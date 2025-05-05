@@ -8,7 +8,7 @@ public abstract class Lock {
     public abstract int Cost { get; }
     public abstract int MinLvl { get; }
     public virtual void Intialize() { GD.Print(ans); }
-    public virtual bool UnlockAttempt(string input) => input.Equals(ans);
+    public virtual bool UnlockAttempt(string input) { GD.Print(Ans, ' ', input, ' ', input.Equals(ans), ' ', input == ans); return input.Equals(ans); }
     public string Ans => ans;
     public string Help => cmd;
     public string Input => inp;
@@ -99,7 +99,7 @@ public class C0 : Lock {
         int pairIndex = GD.RandRange(0, 3), elementIndex = GD.RandRange(0, 1);
         ans = colorOpPairs[pairIndex, elementIndex];
         inp = colorOpPairs[pairIndex, 1 - elementIndex];
-        que = $"\n{inp}";
+        que = $"{inp}";
         base.Intialize();
     }
 }
@@ -134,7 +134,7 @@ public class C1 : Lock {
 
         group = Utilitiy.Shuffle(group.ToArray());
         inp = group.Join(" ");
-        que = $"\n{inp}";
+        que = $"{inp}";
         base.Intialize();
     }
 }
@@ -172,7 +172,7 @@ public class C3 : Lock {
 
         group = Utilitiy.Shuffle(group.ToArray());
         inp = group.Join(" ");
-        que = $"\n{inp}";
+        que = $"{inp}";
         base.Intialize();
     }
 }
@@ -191,7 +191,7 @@ public class M2 : Lock {
         int root = Math.Sqrt(upperBound) == Math.Floor(Math.Sqrt(upperBound)) ? (int)Math.Sqrt(upperBound) - 1 : (int)Math.Floor(Math.Sqrt(upperBound));
         ans = $"{root * root}";
         inp = $"{upperBound}";
-        que = $"\n{inp}";
+        que = $"{inp}";
         base.Intialize();
     }
 }
@@ -210,7 +210,7 @@ public class M3 : Lock {
         int root = Math.Cbrt(upperBound) == Math.Floor(Math.Cbrt(upperBound)) ? (int)Math.Cbrt(upperBound) + 1 : (int)Math.Ceiling(Math.Cbrt(upperBound));
         ans = $"{root * root * root}";
         inp = $"{upperBound}";
-        que = $"\n{inp}";
+        que = $"{inp}";
         base.Intialize();
     }
 }

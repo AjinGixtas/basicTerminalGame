@@ -29,10 +29,12 @@ public class LockSystem {
     public Tuple<bool, string> CrackAttempt(Dictionary<string, string> ans) {
         for (int i = 0; i < activeLocks.Count; i++) {
             if (ans.TryGetValue(activeLocks[i].Flag, out string key)) {
-                if (!activeLocks[i].UnlockAttempt(key)) return new(false, $"{locks[i].Flag} is incorrect. {locks[i].Question}");
-            } else { return new(false, $"{activeLocks[i].Flag} is missing. {locks[i].Question}"); }
+                if (key == activeLocks[i].Flag) return new(false, $"[color=red]Missing key {activeLocks[i].Flag}. {activeLocks[i].Question}[/color]");
+                if (!activeLocks[i].UnlockAttempt(key)) return new(false, $"[color=red]Incorrect key {activeLocks[i].Flag}. {activeLocks[i].Question}[/color]");
+                continue;
+            } else { return new(false, $"[color=red]Missing flag {activeLocks[i].Flag}.[/color]"); }
         }
-        return new(true, "Success.");
+        return new(true, "[color=green]Success.[/color]");
     }
 }
 public class HackFarm {

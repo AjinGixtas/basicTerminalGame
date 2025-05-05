@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-public partial class Terminal : VSplitContainer {
-    RichTextLabel terminalOutputField; Label terminalCommandPrompt; LineEdit terminalCommandField; Timer processTimer, updateProcessGraphicTimer;
+public partial class Terminal : MarginContainer {
+    public Overseer overseer;
+    RichTextLabel terminalOutputField; RichTextLabel terminalCommandPrompt; LineEdit terminalCommandField; Timer processTimer, updateProcessGraphicTimer;
     NetworkManager networkManager;
     NetworkNode currentNode = null; NodeDirectory currentDirectory = null;
     NodeDirectory CurrentDirectory  { get { return currentDirectory; } set { currentDirectory = value; SetCommandPrompt(); } }
@@ -34,12 +35,12 @@ public partial class Terminal : VSplitContainer {
         terminalCommandField.Edit();
     }
     void IntializeOnReadyVar() {
-        terminalOutputField = GetNode<RichTextLabel>("TerminalOutputArea");
-        terminalCommandField = GetNode<LineEdit>("TerminalCommandLine/CommandField");
-        terminalCommandPrompt = GetNode<Label>("TerminalCommandLine/CommandPrompt");
-        processTimer = GetNode<Timer>("TimersContainer/ProcessTimer");
-        updateProcessGraphicTimer = GetNode<Timer>("TimersContainer/UpdateProcessGraphicTimer");
-        networkManager = GetNode<NetworkManager>("NetworkManager");
+        terminalOutputField = GetNode<RichTextLabel>("Splitter/TerminalOutputArea");
+        terminalCommandField = GetNode<LineEdit>("Splitter/TerminalCommandLine/CommandField");
+        terminalCommandPrompt = GetNode<RichTextLabel>("Splitter/TerminalCommandLine/CommandPrompt");
+        processTimer = GetNode<Timer>("Splitter/TimersContainer/ProcessTimer");
+        updateProcessGraphicTimer = GetNode<Timer>("Splitter/TimersContainer/UpdateProcessGraphicTimer");
+        networkManager = GetNode<NetworkManager>("Splitter/NetworkManager");
     }
 
     public override void _Process(double delta) {
@@ -57,7 +58,7 @@ public partial class Terminal : VSplitContainer {
         progress = 0;
         //tick = GD.RandRange(0, 3);
         //int filledBar = Mathf.FloorToInt(progress / 100.0 * BarSize);
-        Echo("-n", $"Start");
+        Say("-n", $"Start");
         processTimer.Start();
         updateProcessGraphicTimer.Start();
     }
@@ -69,13 +70,13 @@ public partial class Terminal : VSplitContainer {
         int t = GD.RandRange(0, 1+(int)Math.Floor(150.0 / processTimer.WaitTime * updateProcessGraphicTimer.WaitTime));
         progress = Mathf.Clamp(progress + t, 0, 99); tick = (tick + 1) % SpinnerChars.Length;
 
-        Echo("-n", $"...{progress}%");
+        Say("-n", $"...{progress}%");
         updateProcessGraphicTimer.Start();
     }
     public void ProcessFinished() {
         isProcessing = false; terminalCommandField.Editable = true; terminalCommandField.Edit();
         tick = (tick + 1) % SpinnerChars.Length;
-        Echo($"...Done!");
+        Say($"...Done!");
         progress = 0; tick = 0;
         finishFunction(finishFunctionArgs);
     }
@@ -88,7 +89,7 @@ public partial class Terminal : VSplitContainer {
             commandHistoryIndex = commandHistory.Count; 
         }
         string[] commands = newText.Split(';', StringSplitOptions.RemoveEmptyEntries);
-        Echo($"{terminalCommandPrompt.Text}{newText}");
+        Say($"{terminalCommandPrompt.Text}{newText}");
         for (int i = 0; i < commands.Length; i++) {
             string[] components = ParseArguments(commands[i]);
             if (components.Length == 0) continue;
@@ -106,9 +107,11 @@ public partial class Terminal : VSplitContainer {
             case "ls": LS(args); break;
             case "cd": CD(args); break;
             case "pwd": Pwd(args); break;
+            case "say": Say(args); break;
             case "help": Help(args); break;
             case "home": Home(args); break;
-            case "echo": Echo(args); break;
+            case "edit": Edit(args); break;
+            case "newf": Newf(args); break;
             case "scan": Scan(args); return false;
             case "clear": Clear(args); break;
             case "mkdir": MkDir(args); break;
@@ -116,7 +119,7 @@ public partial class Terminal : VSplitContainer {
             case "crack": Crack(args); break;
             case "connect": Connect(args); break;
             case "analyze": Analyze(args); return false;
-            default: Echo($"{command} is not a valid command."); break;
+            default: Say($"{command} is not a valid command."); break;
         }
         return true;
     }
@@ -125,39 +128,27 @@ public partial class Terminal : VSplitContainer {
         NodeDirectory targetDir = CurrentDirectory;
         if (args.Length != 0) {
             targetDir = CurrentDirectory.GetDirectory(args[0]);
-            if (targetDir == null) { Echo($"[color=red]Directory not found: {args[0]}[/color]"); return; }
+            if (targetDir == null) { Say($"[color=red]Directory not found: {args[0]}[/color]"); return; }
         }
 
-        if (targetDir.Childrens.Count == 0) { Echo(""); return; }
+        if (targetDir.Childrens.Count == 0) { Say(""); return; }
         string output = "";
         foreach (NodeSystemItem item in targetDir.Childrens) {
             if (item is NodeDirectory) { output += $"[color=cyan]/{item.Name}[/color] "; } 
             else { output += $"[color=green]{item.Name}[/color] "; }
         }
-        Echo(output);
+        Say(output);
     }
     void CD(params string[] args) {
-        if (args.Length == 0) { Echo("[color=red]No directory provided.[/color]"); return; }
+        if (args.Length == 0) { Say("[color=red]No directory provided.[/color]"); return; }
         NodeDirectory targetDir = CurrentDirectory.GetDirectory(args[0]);
-        if (targetDir == null) { Echo($"[color=red]Directory not found: {args[0]}[/color]"); return; }
+        if (targetDir == null) { Say($"[color=red]Directory not found: {args[0]}[/color]"); return; }
         CurrentDirectory = targetDir;
     }
     void Pwd(params string[] args) {
-        Echo($"{CurrentDirectory.GetPath()}");
+        Say($"{CurrentDirectory.GetPath()}");
     }
-    void Help(params string[] args) {
-        Dictionary<string, string> parsedArgs = new() {
-                { "-v", "" }
-            }; ParseArgs(parsedArgs, args);
-        string fileName = parsedArgs["-v"] == "-v" ? "helpVerbose.txt" : "helpShort.txt";
-        FileAccess fileAccess = FileAccess.Open($"res://Utilities/TextFiles/CommandOutput/{fileName}", FileAccess.ModeFlags.Read);
-        Echo(fileAccess.GetAsText());
-    }
-    void Home(params string[] args) {
-        CurrentNode = networkManager.network;
-    }
-    const int MAX_HISTORY_CHAR_SIZE = 65536, RESET_HISTORY_CHAR_SIZE = 16384;
-    void Echo(params string[] args) {
+    void Say(params string[] args) {
         if (args.Length == 0) return;
 
         string c = terminalOutputField.GetParsedText();
@@ -179,8 +170,51 @@ public partial class Terminal : VSplitContainer {
         string text = string.Join(" ", args[argStart..]);
         if (interpretEscapes) text = Regex.Unescape(text); // handles \n, \t, etc.
         if (!noNewline) text += "\n";
-        GD.Print(text);
         terminalOutputField.AppendText(text);
+    }
+    void Help(params string[] args) {
+        Dictionary<string, string> parsedArgs = new() {
+                { "-v", "" }
+            }; ParseArgs(parsedArgs, args);
+        string fileName = parsedArgs["-v"] == "-v" ? "helpVerbose.txt" : "helpShort.txt";
+        FileAccess fileAccess = FileAccess.Open($"res://Utilities/TextFiles/CommandOutput/{fileName}", FileAccess.ModeFlags.Read);
+        Say(fileAccess.GetAsText());
+    }
+    void Home(params string[] args) {
+        CurrentNode = networkManager.network;
+    }
+    const int MAX_HISTORY_CHAR_SIZE = 65536, RESET_HISTORY_CHAR_SIZE = 16384;
+    void Edit(params string[] args) {
+        if (args.Length == 0) { Say("[color=red]No file name provided.[/color]"); return; }
+        for (int i = 0; i < args.Length; i++) {
+            NodeFile file = currentDirectory.GetFile(args[i]);
+            if (file == null) {
+                Say($"[color=red]File not found: {args[i]}[/color]");
+                return;
+            }
+            GD.Print(overseer);
+            GD.Print(overseer.textEditor);
+            GD.Print(CurrentNode.HostName);
+            GD.Print(file);
+            overseer.textEditor.OpenNewFile(CurrentNode.HostName, file);
+        }
+    }
+    void Newf(params string[] args) {
+        if (args.Length == 0) { Say("[color=red]No file name provided.[/color]"); return; }
+        NodeDirectory parentDirectory;
+        for (int i = 0; i < args.Length; i++) {
+            string[] components = args[i].Split('/', StringSplitOptions.RemoveEmptyEntries);
+            string fileName = components[^1], parentPath = string.Join('/', components[..^1]);
+
+            parentDirectory = CurrentDirectory.GetDirectory(parentPath);
+            if (parentDirectory == null) { Say($"[color=red]Directory not found: {parentPath}[/color]"); return; }
+            int result = parentDirectory.Add(new NodeFile(fileName));
+            switch (result) {
+                case 0: break;
+                case 1: Say($"{args[i]} already exists. Skipped."); break;
+                default: Say($"[color=red]{args[i]} creation failed. Error code: ${result}[/color]"); break;
+            }
+        }
     }
     void Scan(params string[] args) {
         StartProcess(.1, ScanCallback, args);
@@ -192,7 +226,7 @@ public partial class Terminal : VSplitContainer {
                 { "-d", "1" },
                 { "-v", "" }
             }; ParseArgs(parsedArgs, args);
-            if (!int.TryParse(parsedArgs["-d"], out int MAX_DEPTH)) { Echo($"[color=red]Directory not found: {parsedArgs["-d"]}[/color]"); return; }
+            if (!int.TryParse(parsedArgs["-d"], out int MAX_DEPTH)) { Say($"[color=red]Directory not found: {parsedArgs["-d"]}[/color]"); return; }
 
             Stack<(NetworkNode, int, bool[])> stack = new([(currentNode, 0, [])]);
             List<NetworkNode> visited = [];
@@ -217,9 +251,10 @@ public partial class Terminal : VSplitContainer {
                         _ => "red"
                     };
                     string descPrefix = getDescPrefix(depthMarks) + ((depth == MAX_DEPTH ? 0 : ((node.ParentNode != null ? 0 : -1) + node.ChildNode.Count)) > 0 ? " │" : "  ");
-                    output += $"{descPrefix}  Display Name:  {analyzeResult["displayName"]};\n";
-                    output += $"{descPrefix}  Node Type:     [color=purple]{analyzeResult["nodeType"]}[/color];\n";
-                    output += $"{descPrefix}  Defense Level: [color={defColorCode}]{analyzeResult["defLvl"]}[/color]; Security Type: [color={secColorCode}]{analyzeResult["secType"]}[/color]\n";
+                    output += $"{descPrefix}  Display Name:   [color=salmon]{analyzeResult["displayName"]}[/color];\n";
+                    output += $"{descPrefix}  Node Type:      [color=purple]{analyzeResult["nodeType"]}[/color];\n";
+                    output += $"{descPrefix}  Defense:        [color={defColorCode}]{analyzeResult["defLvl"]}[/color]  "
+                            + $"Security: [color={secColorCode}]{analyzeResult["secType"]}[/color]\n";
                     output += $"{descPrefix}\n";
                 }
                 visited.Add(node);
@@ -236,45 +271,45 @@ public partial class Terminal : VSplitContainer {
                     ++k; stack.Push((child, depth + 1, [..depthMarks, k == 1]));
                 }
             }
-            Echo(output);
+            Say(output);
         }
     }
     void Clear(params string[] args) {
         terminalOutputField.Clear();
     }
     void MkDir(params string[] args) {
-        if (args.Length == 0) { Echo("[color=red]No directory name provided.[/color]"); return; }
+        if (args.Length == 0) { Say("[color=red]No directory name provided.[/color]"); return; }
         NodeDirectory parentDirectory;
         for (int i = 0; i < args.Length; i++) {
             string[] components = args[i].Split('/', StringSplitOptions.RemoveEmptyEntries);
             string dirName = components[^1], parentPath = string.Join('/', components[..^1]);
 
             parentDirectory = CurrentDirectory.GetDirectory(parentPath);
-            if (parentDirectory == null) { Echo($"[color=red]Directory not found: {parentPath}[/color]"); return; }
+            if (parentDirectory == null) { Say($"[color=red]Directory not found: {parentPath}[/color]"); return; }
             int result = parentDirectory.Add(new NodeDirectory(dirName));
             switch (result) {
                 case 0: break;
-                case 1: Echo($"{args[i]} already exists. Skipped."); break;
-                default: Echo($"[color=red]{args[i]} creation failed. Error code: ${result}[/color]"); break;
+                case 1: Say($"{args[i]} already exists. Skipped."); break;
+                default: Say($"[color=red]{args[i]} creation failed. Error code: ${result}[/color]"); break;
             }
         }
     }   
     void RmDir(params string[] args) {
         if (args.Length == 0) {
-            Echo("[color=red]No folder name provided.[/color]");
+            Say("[color=red]No folder name provided.[/color]");
             return;
         }
         NodeDirectory parentDirectory;
         for (int i = 0; i < args.Length; i++) {
             parentDirectory = CurrentDirectory.GetDirectory(args[i]);
-            if (parentDirectory == null) { Echo($"[color=red]Directory not found: {args[0]}[/color]"); return; }
-            if (parentDirectory.Parent == null) { Echo($"[color=red]Can not remove root.[/color]"); return; }
+            if (parentDirectory == null) { Say($"[color=red]Directory not found: {args[0]}[/color]"); return; }
+            if (parentDirectory.Parent == null) { Say($"[color=red]Can not remove root.[/color]"); return; }
             parentDirectory = parentDirectory.Parent;
             int result = parentDirectory.Remove(args[i]);
             switch(result) {
                 case 0: break;
-                case 1: Echo($"[color=red]{args[i]} was not found.[/color]"); break;
-                default: Echo($"[color=red]{args[i]} removal failed. Error code: {result}[/color]"); break;
+                case 1: Say($"[color=red]{args[i]} was not found.[/color]"); break;
+                default: Say($"[color=red]{args[i]} removal failed. Error code: {result}[/color]"); break;
             }
         }
     }
@@ -282,17 +317,15 @@ public partial class Terminal : VSplitContainer {
         Dictionary<string, string> parsedArgs = new(){ {"init", "" } }; ParseArgs(parsedArgs, args);
         NetworkNode node = CurrentNode;
         if (parsedArgs["init"] == "init") {
-            GD.Print(node.LockSystem == null);
             int beginResult = node.LockSystem.BeginCrack(); 
-            if (beginResult == 0) { Echo("Cracking begin."); }
-            else if (beginResult == 1) { Echo("Cracking already in process."); }
+            if (beginResult == 0) { Say("Cracking begin."); }
+            else if (beginResult == 1) { Say("Cracking already in process."); }
         }
         Tuple<bool, string> crackResult = node.LockSystem.CrackAttempt(parsedArgs);
-        GD.Print($"{crackResult.Item1} {crackResult.Item2}");
-        Echo($"{crackResult.Item2}");
+        Say($"{crackResult.Item2}");
     }
     void Connect(params string[] args) {
-        if (args.Length == 0) { Echo("[color=red]No hostname provided.[/color]"); return; }
+        if (args.Length == 0) { Say("[color=red]No hostname provided.[/color]"); return; }
         if (networkManager.DNS.TryGetValue(args[0], out NetworkNode value)) { CurrentNode = value; return; }
         if (CurrentNode.ParentNode != null && CurrentNode.ParentNode.HostName == args[0] || 
             (CurrentNode.ParentNode is HoneypotNode && (CurrentNode.ParentNode as HoneypotNode).fakeHostName == args[0])) 
@@ -300,7 +333,7 @@ public partial class Terminal : VSplitContainer {
         
         NetworkNode node = CurrentNode.ChildNode.FindLast(s => s.HostName == args[0]);
         NetworkNode fnode = CurrentNode.ChildNode.FindLast(s => s is HoneypotNode && (s as HoneypotNode).fakeHostName == args[0]);
-        if (node == null && fnode == null) { Echo($"[color=red]Host not found: {args[0]}[/color]"); return; }
+        if (node == null && fnode == null) { Say($"[color=red]Host not found: {args[0]}[/color]"); return; }
         CurrentNode = (node ?? fnode);
     }
     void Analyze(params string[] args) {
@@ -308,7 +341,7 @@ public partial class Terminal : VSplitContainer {
         if (CurrentNode.ChildNode.FindLast(s => s.HostName == args[0]) == null 
             && (CurrentNode.ParentNode != null && CurrentNode.ParentNode.HostName != args[0])
             && CurrentNode.HostName != args[0]) {
-            Echo($"[color=red]Host not found: {args[0]}[/color]");
+            Say($"[color=red]Host not found: {args[0]}[/color]");
             return;
         }
         StartProcess(.5 + GD.Randf() * .5, AnalyzeCallback, args);
@@ -329,12 +362,15 @@ public partial class Terminal : VSplitContainer {
                 SecurityType.HISEC or SecurityType.MASEC => "blue",
                 _ => "red"
             };
-            Echo($"Display name:   [color=green]{analyzeNode.DisplayName}[/color]");
-            Echo($"IP:             [color=cyan]{analyzeNode.IP}[/color]");
-            Echo($"Host name:      {analyzeNode.HostName}");
-            Echo($"Host type:      [color=purple]{analyzeNode.NodeType}[/color]");
-            Echo($"Defense level:  [color={defColorCode}]{analyzeNode.DefLvl}[/color]");
-            Echo($"Security level: [color={secColorCode}]{analyzeNode.SecType}[/color]");
+            Say($"[color=orange]▶ Node Info[/color]");
+            Say($"Host name:      [color=green]{analyzeNode.HostName}[/color]");
+            Say($"IP address:     [color=cyan]{analyzeNode.IP}[/color]");
+            Say($"Display name:   [color=orange]{analyzeNode.DisplayName}[/color]");
+
+            Say($"[color=orange]▶ Classification[/color]");
+            Say($"Node type:      [color=purple]{analyzeNode.NodeType}[/color]");
+            Say($"Defense level:  [color={defColorCode}]{analyzeNode.DefLvl}[/color]");
+            Say($"Security level: [color={secColorCode}]{analyzeNode.SecType}[/color]");
         }
     }
     void ParseArgs(Dictionary<string, string> defaultArg, params string[] args) {
@@ -348,6 +384,6 @@ public partial class Terminal : VSplitContainer {
             }
         }
     }
-    void SetCommandPrompt() { terminalCommandPrompt.Text = $"{networkManager.UserName}@{CurrentNode.HostName}:{CurrentDirectory.GetPath()}>"; }
+    void SetCommandPrompt() { terminalCommandPrompt.Text = $"[color=purple]{networkManager.UserName}[/color]@[color=green]{CurrentNode.HostName}[/color]:{CurrentDirectory.GetPath()}>"; }
     string EscapeBBCode(string code) { return code.Replace("[", "[lb]"); }
 }

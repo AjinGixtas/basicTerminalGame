@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 public partial class NetworkManager : Node
 {
@@ -100,7 +99,6 @@ public partial class NetworkManager : Node
             for(int j = 0; j < fileNames.Length; ++j) {
                 //output.Append(LoadNodeData(Load))
                 Resource result = ResourceLoader.Load(Path.Combine(folderPath, fileNames[i]));
-                GD.Print(result);
             }
         }
         return [.. output];

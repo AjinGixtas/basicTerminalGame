@@ -1,30 +1,17 @@
 [gd_scene load_steps=6 format=3 uid="uid://ywm7rhxebeh4"]
 
-[ext_resource type="Script" uid="uid://mb8mpa63ad2n" path="res://Scripts/CS/Terminal.cs" id="1_q6j3v"]
+[ext_resource type="Script" uid="uid://mb8mpa63ad2n" path="res://Scripts/CS/Network/Terminal.cs" id="1_q6j3v"]
 [ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="2_tjxev"]
-[ext_resource type="Script" uid="uid://de88ixhijljw" path="res://Scripts/CS/NetworkManager.cs" id="4_c8ipk"]
+[ext_resource type="Script" uid="uid://de88ixhijljw" path="res://Scripts/CS/Network/NetworkManager.cs" id="4_c8ipk"]
 
-[sub_resource type="Shader" id="Shader_tjxev"]
-code = "shader_type canvas_item;
-
-void vertex() {
-	// Called for every vertex the material is visible on.
-}
-
-void fragment() {
-	// Called for every pixel the material is visible on.
-}
-
-//void light() {
-//	// Called for every pixel for every light affecting the CanvasItem.
-//	// Uncomment to replace the default light processing function with this one.
-//}
-"
+[sub_resource type="Environment" id="Environment_tjxev"]
+background_mode = 3
+glow_enabled = true
+glow_bloom = 0.1
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_c8ipk"]
-shader = SubResource("Shader_tjxev")
 
-[node name="Terminal" type="VSplitContainer"]
+[node name="Terminal" type="MarginContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -32,109 +19,72 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+theme = ExtResource("2_tjxev")
+script = ExtResource("1_q6j3v")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_tjxev")
+
+[node name="Splitter" type="VSplitContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 split_offset = 825
 dragging_enabled = false
 dragger_visibility = 2
-script = ExtResource("1_q6j3v")
 
-[node name="TerminalOutputArea" type="RichTextLabel" parent="."]
+[node name="TerminalOutputArea" type="RichTextLabel" parent="Splitter"]
+self_modulate = Color(16, 16, 16, 0.2)
 material = SubResource("ShaderMaterial_c8ipk")
+clip_contents = false
 layout_mode = 2
 size_flags_vertical = 3
 focus_mode = 2
 theme = ExtResource("2_tjxev")
 bbcode_enabled = true
-text = " │     │           │     └─── [color=cyan]86.36.77.165   [/color] [color=green]h4ck3rX[/color]
- │     │           │              Display Name:  Hacker X;
- │     │           │              Node Type:     [color=purple]ROUGE[/color];
- │     │           │              Defense Level: [color=blue]2[/color]; Security Type: [color=red]LOSEC[/color]
- │     │           │            
- │     │           ├─── [color=cyan]28.251.22.255  [/color] [color=green]calvin[/color]
- │     │           │     │  Display Name:  Calvin;
- │     │           │     │  Node Type:     [color=purple]PERSON[/color];
- │     │           │     │  Defense Level: [color=blue]2[/color]; Security Type: [color=red]LOSEC[/color]
- │     │           │     │
- │     │           │     └─── [color=cyan]62.227.227.40  [/color] [color=green]milo[/color]
- │     │           │              Display Name:  Milo;
- │     │           │              Node Type:     [color=purple]PERSON[/color];
- │     │           │              Defense Level: [color=yellow]5[/color]; Security Type: [color=red]NOSEC[/color]
- │     │           │            
- │     │           └─── [color=cyan]167.54.238.102 [/color] [color=green]gideon[/color]
- │     │                    Display Name:  Gideon;
- │     │                    Node Type:     [color=purple]PERSON[/color];
- │     │                    Defense Level: [color=yellow]5[/color]; Security Type: [color=red]NOSEC[/color]
- │     │                  
- │     ├─── [color=cyan]120.88.132.186 [/color] [color=green]Gh0stN0de[/color]
- │     │        Display Name:  Ghost Node;
- │     │        Node Type:     [color=purple]ROUGE[/color];
- │     │        Defense Level: [color=yellow]7[/color]; Security Type: [color=red]LOSEC[/color]
- │     │      
- │     └─── [color=cyan]81.93.84.201   [/color] [color=green]soren[/color]
- │              Display Name:  Soren;
- │              Node Type:     [color=purple]PERSON[/color];
- │              Defense Level: [color=blue]2[/color]; Security Type: [color=red]NOSEC[/color]
- │            
- ├─── [color=cyan]65.120.109.11  [/color] [color=green]daphne[/color]
- │     │  Display Name:  Daphne;
- │     │  Node Type:     [color=purple]PERSON[/color];
- │     │  Defense Level: [color=yellow]5[/color]; Security Type: [color=yellow]MISEC[/color]
- │     │
- │     └─── [color=cyan]153.168.13.55  [/color] [color=green]N3tw0rm[/color]
- │           │  Display Name:  Networm;
- │           │  Node Type:     [color=purple]ROUGE[/color];
- │           │  Defense Level: [color=red]10[/color]; Security Type: [color=red]LOSEC[/color]
- │           │
- │           └─── [color=cyan]183.139.248.239[/color] [color=green]soren[/color]
- │                    Display Name:  Soren;
- │                    Node Type:     [color=purple]PERSON[/color];
- │                    Defense Level: [color=yellow]6[/color]; Security Type: [color=red]NOSEC[/color]
- │                  
- ├─── [color=cyan]115.134.96.226 [/color] [color=green]fiona[/color]
- │        Display Name:  Fiona;
- │        Node Type:     [color=purple]PERSON[/color];
- │        Defense Level: [color=yellow]5[/color]; Security Type: [color=yellow]MISEC[/color]
- │      
- └─── [color=cyan]192.72.104.152 [/color] [color=green]silas[/color]
-          Display Name:  Silas;
-          Node Type:     [color=purple]PERSON[/color];
-          Defense Level: [color=blue]1[/color]; Security Type: [color=red]LOSEC[/color]
-"
+text = "https://lichess.org/@/AjinGixtas"
 scroll_following = true
 threaded = true
 progress_bar_delay = -1
 selection_enabled = true
 
-[node name="TerminalCommandLine" type="HSplitContainer" parent="."]
+[node name="TerminalCommandLine" type="HSplitContainer" parent="Splitter"]
 layout_direction = 2
 layout_mode = 2
 dragging_enabled = false
 dragger_visibility = 2
 
-[node name="CommandPrompt" type="Label" parent="TerminalCommandLine"]
+[node name="CommandPrompt" type="RichTextLabel" parent="Splitter/TerminalCommandLine"]
+self_modulate = Color(16, 16, 16, 0.25)
 layout_mode = 2
 size_flags_horizontal = 4
 theme = ExtResource("2_tjxev")
-text = "AjinGixtas@Home:~/> "
+bbcode_enabled = true
+text = "[color=purple]AjinGixtas[/color]@[color=green]home[/color]:~/>
+"
+fit_content = true
+autowrap_mode = 0
 
-[node name="CommandField" type="LineEdit" parent="TerminalCommandLine"]
+[node name="CommandField" type="LineEdit" parent="Splitter/TerminalCommandLine"]
+self_modulate = Color(16, 16, 16, 0.25)
 layout_mode = 2
 size_flags_horizontal = 3
 theme = ExtResource("2_tjxev")
 keep_editing_on_text_submit = true
 caret_blink = true
 
-[node name="TimersContainer" type="Node" parent="."]
+[node name="TimersContainer" type="Node" parent="Splitter"]
 
-[node name="ProcessTimer" type="Timer" parent="TimersContainer"]
+[node name="ProcessTimer" type="Timer" parent="Splitter/TimersContainer"]
 one_shot = true
 
-[node name="UpdateProcessGraphicTimer" type="Timer" parent="TimersContainer"]
+[node name="UpdateProcessGraphicTimer" type="Timer" parent="Splitter/TimersContainer"]
 wait_time = 0.25
 one_shot = true
 
-[node name="NetworkManager" type="Node" parent="."]
+[node name="NetworkManager" type="Node" parent="Splitter"]
 script = ExtResource("4_c8ipk")
 
-[connection signal="text_submitted" from="TerminalCommandLine/CommandField" to="." method="SubmitCommand"]
-[connection signal="timeout" from="TimersContainer/ProcessTimer" to="." method="ProcessFinished"]
-[connection signal="timeout" from="TimersContainer/UpdateProcessGraphicTimer" to="." method="UpdateProcessingGraphic"]
+[connection signal="text_submitted" from="Splitter/TerminalCommandLine/CommandField" to="." method="SubmitCommand"]
+[connection signal="timeout" from="Splitter/TimersContainer/ProcessTimer" to="." method="ProcessFinished"]
+[connection signal="timeout" from="Splitter/TimersContainer/UpdateProcessGraphicTimer" to="." method="UpdateProcessingGraphic"]

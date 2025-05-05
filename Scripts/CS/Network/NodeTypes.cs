@@ -46,7 +46,7 @@ public abstract class NetworkNode {
         ParentNode = parentNode;
         ChildNode = [];
         NodeDirectory = new("~"); HackFarm = new(SecLvl, indexRatio, depthRatio);
-        LockSystem = new([new I5(), new P9(), new I13(), new P16(), new C0(), new C1(), new C3(), new M2(), new M3()]);
+        LockSystem = new([new I5(), new C0(), new P9(), new I13(), new P16(), new C1(), new C3(), new M2(), new M3()]);
     }
     public virtual void Init() {
     }
@@ -100,8 +100,8 @@ public class PersonNode : NetworkNode {
     public PersonNode(string hostName, string displayName, string IP, double indexRatio, double depthRatio, NetworkNodeType NodeType, NetworkNode parentNode)
         : base(hostName, displayName, IP, indexRatio, depthRatio, NodeType, parentNode) {
         // Kind of just stupid in general...
-        DefLvl = GD.RandRange(0, 3) + (int)Math.Ceiling(depthRatio * 4) + (int)Math.Ceiling(indexRatio * 7);
-        SecLvl = GD.RandRange(1, DefLvl) - (int)Math.Ceiling(depthRatio * 10) + (int)Math.Ceiling(indexRatio * 4);
+        DefLvl = GD.RandRange(1, 3) + (int)Math.Ceiling(depthRatio * 4) + (int)Math.Ceiling(indexRatio * 30);
+        SecLvl = GD.RandRange(1, DefLvl) + (int)Math.Ceiling(depthRatio * 10) + (int)Math.Ceiling(indexRatio * 4);
     }
     public override void Init() {
         base.Init();
@@ -167,6 +167,13 @@ public class HoneypotNode : NetworkNode {
         int chosenSection = GD.RandRange(0, namePool.GetLength(0) - 1);
         int chosenElement = GD.RandRange(0, namePool[chosenSection].GetLength(0) - 1);
         Tuple<NetworkNodeType, string, string> name = namePool[chosenSection][chosenElement];
+        for (int i = 0; i < 10; ++i) {
+            if (name.Item1 == NetworkNodeType.HONEYPOT) {
+                chosenSection = GD.RandRange(0, namePool.GetLength(0) - 1);
+                chosenElement = GD.RandRange(0, namePool[chosenSection].GetLength(0) - 1);
+                name = namePool[chosenSection][chosenElement];
+            } else { break; }
+        }
         lastEpoch = Time.GetUnixTimeFromSystem();
         fakeHostName = name.Item2; fakeDisplayName = name.Item3;
         fakeDisplayNetworkNodeType = name.Item1;

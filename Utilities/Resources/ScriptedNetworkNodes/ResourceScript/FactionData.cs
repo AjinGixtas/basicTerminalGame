@@ -1,7 +1,6 @@
 using Godot;
 
-public partial class FactionData : Resource {
-    [Export] string hostName, displayName;
-    [Export] int minDepth, maxDepth;
-    [Export] string factionName;
+public partial class FactionData : NodeData {
+    [Export] public string f_name;
+    [Export] public string f_desc;
 }

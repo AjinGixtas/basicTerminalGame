@@ -8,7 +8,7 @@ public abstract class Lock {
     public abstract int Cost { get; }
     public abstract int MinLvl { get; }
     public virtual void Intialize() { GD.Print(ans); }
-    public virtual bool UnlockAttempt(string input) { GD.Print(Ans, ' ', input, ' ', input.Equals(ans), ' ', input == ans); return input.Equals(ans); }
+    public virtual bool UnlockAttempt(string input) { return input.Equals(ans); }
     public string Ans => ans;
     public string Help => cmd;
     public string Input => inp;
@@ -30,7 +30,6 @@ public class I5 : Lock {
         base.Intialize();
     }
 }
-
 public class P9 : Lock {
     public override string Flag => "-p9";
     public override int Cost => 1;
@@ -48,7 +47,6 @@ public class P9 : Lock {
         base.Intialize();
     }
 }
-
 public class I13 : Lock {
     public override string Flag => "-i13";
     public override int Cost => 1;
@@ -64,7 +62,6 @@ public class I13 : Lock {
         base.Intialize();
     }
 }
-
 public class P16 : Lock {
     public override string Flag => "-p16";
     public override int Cost => 1;
@@ -82,7 +79,6 @@ public class P16 : Lock {
         base.Intialize();
     }
 }
-
 public class C0 : Lock {
     public override string Flag => "-c0";
     public override int Cost => 1;
@@ -103,7 +99,6 @@ public class C0 : Lock {
         base.Intialize();
     }
 }
-
 public class C1 : Lock {
     public override string Flag => "-c1";
     public override int Cost => 1;
@@ -138,7 +133,6 @@ public class C1 : Lock {
         base.Intialize();
     }
 }
-
 public class C3 : Lock {
     public override string Flag => "-c3";
     public override int Cost => 1;
@@ -176,7 +170,6 @@ public class C3 : Lock {
         base.Intialize();
     }
 }
-
 public class M2 : Lock {
     public override string Flag => "-m2";
     public override int Cost => 1;
@@ -195,7 +188,6 @@ public class M2 : Lock {
         base.Intialize();
     }
 }
-
 public class M3 : Lock {
     public override string Flag => "-m3";
     public override int Cost => 1;

@@ -10,6 +10,5 @@ public partial class Overseer : Control {
         textEditor = GetNode<TextEditor>("HSplitContainer/TabContainer/TextEditor");
         terminal.overseer = this;
         textEditor.overseer = this;
-        GD.Print(terminal, ' ', textEditor, ' ', terminal.overseer, ' ', textEditor.overseer);
     }
 }

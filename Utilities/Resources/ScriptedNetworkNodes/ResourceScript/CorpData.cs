@@ -1,9 +1,8 @@
 using Godot;
 
-public partial class CorpData : Resource {
-    [Export] string hostName, displayName;
-    [Export] int minDepth, maxDepth;
-    [Export] string stockSymbol;
-    [Export] double stockDrift, stockVolatility;
-    [Export] string factionName;
+public partial class CorpData : NodeData {
+    [Export] public string s_symbol;
+    [Export] public double s_price, s_drift, s_volatility;
+    [Export] public string f_name;
+    [Export] public string f_desc;
 }

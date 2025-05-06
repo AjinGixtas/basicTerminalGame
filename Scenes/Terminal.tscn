@@ -36,7 +36,6 @@ dragger_visibility = 2
 [node name="TerminalOutputArea" type="RichTextLabel" parent="Splitter"]
 self_modulate = Color(16, 16, 16, 0.2)
 material = SubResource("ShaderMaterial_c8ipk")
-clip_contents = false
 layout_mode = 2
 size_flags_vertical = 3
 focus_mode = 2

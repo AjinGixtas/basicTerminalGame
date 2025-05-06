@@ -2,23 +2,27 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class LockSystem { 
-    readonly List<Lock> locks, activeLocks = [];
+public class LockSystem {
+    List<Lock> activeLocks = [];
+    List<Lock> lockPool = [new I5(), new P9(), new I13(), new P16(), new C0(), new C1(), new C3(), new M2(), new M3()];
     double startEpoch = 0, endEpoch = 0;
-    public LockSystem(List<Lock> locks) {
-        this.locks = locks;
-    }
-    public void ActivateLock(int secLvl) {
-        activeLocks.Clear(); int usedLvl = 0;
-        for (int i = 0; i < locks.Count; i++) {
-            if (usedLvl + locks[i].Cost <= secLvl && locks[i].MinLvl <= secLvl) {
-                activeLocks.Add(locks[i]); 
-                usedLvl += locks[i].Cost;
+    public LockSystem(int secLvl) {
+        LockIntialization(secLvl);
+        int LockIntialization(int secLvl) {
+            activeLocks.Clear(); int usedLvl = 0;
+            lockPool = Utilitiy.Shuffle<Lock>(lockPool);
+            for (int i = 0; i < lockPool.Count; i++) {
+                if (usedLvl + lockPool[i].Cost <= secLvl && lockPool[i].MinLvl <= secLvl) {
+                    activeLocks.Add(lockPool[i]);
+                    usedLvl += lockPool[i].Cost;
+                }
             }
+            return 0;
         }
     }
+
     public int BeginCrack() {
-        if (Time.GetUnixTimeFromSystem() < endEpoch) { return 1; }
+        if (Time.GetUnixTimeFromSystem() < endEpoch) return 1; // Cracking already in process
         startEpoch = Time.GetUnixTimeFromSystem();
         endEpoch = startEpoch + 90;
         for (int i = 0; i < activeLocks.Count; i++) {
@@ -26,22 +30,27 @@ public class LockSystem {
         }
         return 0;
     }
-    public Tuple<bool, string> CrackAttempt(Dictionary<string, string> ans) {
+    // 0 - Success; 1 - Missing flag; 2 - Incorrect key; 3 - Missing key
+    public (int, string) CrackAttempt(Dictionary<string, string> ans) {
         for (int i = 0; i < activeLocks.Count; i++) {
             if (ans.TryGetValue(activeLocks[i].Flag, out string key)) {
-                if (key == activeLocks[i].Flag) return new(false, $"[color=red]Missing key {activeLocks[i].Flag}. {activeLocks[i].Question}[/color]");
-                if (!activeLocks[i].UnlockAttempt(key)) return new(false, $"[color=red]Incorrect key {activeLocks[i].Flag}. {activeLocks[i].Question}[/color]");
+                if (key == activeLocks[i].Flag) return (2, activeLocks[i].Flag); // Missing key
+                if (!activeLocks[i].UnlockAttempt(key)) return (3, activeLocks[i].Flag); // Incorrect key
                 continue;
-            } else { return new(false, $"[color=red]Missing flag {activeLocks[i].Flag}.[/color]"); }
+            } else return (1, activeLocks[i].Flag); // Missing flag
         }
-        return new(true, "[color=green]Success.[/color]");
+        lockPool = []; activeLocks = []; // Destroy all security system
+        return (0, ""); // Success
     }
 }
 public class HackFarm {
     // First is the base value, second is the cost of the upgrade
-    int _hackLvl = 1; double CurHack; double BaseHack { get; init; } double BaseCostHack { get; init; }
-    int _timeLvl = 1; double CurTime; double BaseTime { get; init; } double BaseCostTime { get; init; }
-    int _growLvl = 1; double CurGrow; double BaseGrow { get; init; } double BaseCostGrow { get; init; }
+    double BaseHack { get; init; } double BaseCostHack { get; init; }
+    double BaseTime { get; init; } double BaseCostTime { get; init; }
+    double BaseGrow { get; init; } double BaseCostGrow { get; init; }
+    int _hackLvl = 1; double _curHack; public double CurHack { get => _curHack; set => _curHack = value; } 
+    int _timeLvl = 1; double _curTime; public double CurTime { get => _curTime; set => _curTime = value; } 
+    int _growLvl = 1; double _curGrow; public double CurGrow { get => _curGrow; set => _curGrow = value; } 
     public int HackLevel {
         get => _hackLvl; private set {
             if (_hackLvl == value) return;
@@ -64,13 +73,11 @@ public class HackFarm {
         }
     }
     public HackFarm(int secLvl, double indexRatio, double depthRatio, int HackLevel=1, int TimeLevel=1, int GrowLevel=1) {
-        BaseHack = .01;
-        BaseTime = 20;
-        BaseGrow = 3;
-        BaseCostHack = 30;
-        BaseCostTime = 30;
-        BaseCostGrow = 30;
-        this.HackLevel = HackLevel; this.TimeLevel = TimeLevel; this.GrowLevel = GrowLevel;
+        BaseHack = 8; BaseCostHack = 30;
+        BaseTime = 20; BaseCostTime = 30;
+        BaseGrow = 3; BaseCostGrow = 30;
+        this.HackLevel = GD.RandRange(1, 100); this.TimeLevel = GD.RandRange(1, 100); this.GrowLevel = GD.RandRange(1, 100);
+        //this.HackLevel = HackLevel; this.TimeLevel = TimeLevel; this.GrowLevel = GrowLevel;
     }
     double currencyPile = 0, timeRemain = 0;
     public double Update(double delta) {
@@ -78,9 +85,14 @@ public class HackFarm {
         timeRemain -= delta; currencyPile += CurGrow * delta;
         // Hack related mechanism
         if (timeRemain > 0) return 0;
-        double hackAmount = CurHack * currencyPile;
-        currencyPile -= hackAmount;
-        return hackAmount; // Return the amount of money hacked
+        double totalHackAmount = 0;
+        while (timeRemain < 0) {
+            double hackedAmount = currencyPile * CurHack;
+            currencyPile -= hackedAmount;
+            totalHackAmount += hackedAmount;
+            timeRemain += CurTime;
+        }
+        return totalHackAmount; // Return the amount of money hacked
     }
     public void UpgradeHackLevel() { ++HackLevel; }
     public void UpgradeTimeLevel() { ++TimeLevel; }

@@ -62,8 +62,7 @@ public partial class Terminal : MarginContainer {
         processTimer.Start();
         updateProcessGraphicTimer.Start();
     }
-    static readonly string[] SpinnerChars = ["|", "/", "-", "\\"];
-    const int BarSize = 50; int tick = 0, progress = 0;
+    static readonly string[] SpinnerChars = ["|", "/", "-", "\\"]; int tick = 0, progress = 0;
     public void UpdateProcessingGraphic() {
         if (!isProcessing) return;
 
@@ -192,10 +191,6 @@ public partial class Terminal : MarginContainer {
                 Say($"[color=red]File not found: {args[i]}[/color]");
                 return;
             }
-            GD.Print(overseer);
-            GD.Print(overseer.textEditor);
-            GD.Print(CurrentNode.HostName);
-            GD.Print(file);
             overseer.textEditor.OpenNewFile(CurrentNode.HostName, file);
         }
     }
@@ -313,16 +308,27 @@ public partial class Terminal : MarginContainer {
             }
         }
     }
+    readonly string[] MSG_FORMAT = [
+        "[color=red]Unknown error[/color]",
+        "[color=red]Missing flag ${}[/color]", 
+        "[color=red]Missing key ${}[/color]",
+        "[color=red]Incorrect key ${}[/color]"
+    ];
     void Crack(params string[] args) {
         Dictionary<string, string> parsedArgs = new(){ {"init", "" } }; ParseArgs(parsedArgs, args);
         NetworkNode node = CurrentNode;
         if (parsedArgs["init"] == "init") {
-            int beginResult = node.LockSystem.BeginCrack(); 
+            int beginResult = node.BeginCrackNode(); 
             if (beginResult == 0) { Say("Cracking begin."); }
             else if (beginResult == 1) { Say("Cracking already in process."); }
         }
-        Tuple<bool, string> crackResult = node.LockSystem.CrackAttempt(parsedArgs);
-        Say($"{crackResult.Item2}");
+        (int result, string msg) = node.AttempCrackNode(parsedArgs);
+        
+        if (result != 0) { Say(string.Format(MSG_FORMAT[result], msg)); }
+        else {
+            Say($"[color=green]Node defense cracked.[/color] All security system [color=green]disabled[/color].");
+            Say($"Run [color=cyan]analyze[/color] for all new information.");
+        }
     }
     void Connect(params string[] args) {
         if (args.Length == 0) { Say("[color=red]No hostname provided.[/color]"); return; }
@@ -371,6 +377,32 @@ public partial class Terminal : MarginContainer {
             Say($"Node type:      [color=purple]{analyzeNode.NodeType}[/color]");
             Say($"Defense level:  [color={defColorCode}]{analyzeNode.DefLvl}[/color]");
             Say($"Security level: [color={secColorCode}]{analyzeNode.SecType}[/color]");
+
+            //if (analyzeNode.CurrentOwner != networkManager.network) return; // Not yours yet, no more detail!
+
+            Say($"[color=orange]▶ GC miner detail[/color]");
+            Say($"Transfer batch: [color=cyan]{analyzeNode.HackFarm.HackLevel}[/color] [color=gray]({analyzeNode.HackFarm.CurHack:F2}GC)[/color]");
+            Say($"Transfer speed: [color=cyan]{analyzeNode.HackFarm.TimeLevel}[/color] [color=gray]({analyzeNode.HackFarm.CurTime:F2}s)[/color]");
+            Say($"Mining speed:   [color=cyan]{analyzeNode.HackFarm.GrowLevel}[/color] [color=gray]({analyzeNode.HackFarm.CurHack:F2}GC/s)[/color]");
+
+            if (analyzeNode is FactionNode) {
+                Say($"[color=orange]▶ Faction detail[/color]");
+                Say($"Name:           [color=brown]{(analyzeNode as FactionNode).Faction.Name}[/color]");
+                Say($"Description:    [color=yellow]{(analyzeNode as FactionNode).Faction.Desc}[/color]");
+            }
+            if (analyzeNode is BusinessNode) {
+                Say($"[color=orange]▶ Business detail[/color]");
+                Say($"Stock:          [color=purple]{(analyzeNode as BusinessNode).Stock.Name}[/color]");
+                Say($"Value:          [color=cyan]{(analyzeNode as BusinessNode).Stock.Price}[/color]");
+            }
+            if (analyzeNode is CorpNode) {
+                Say($"[color=orange]▶ Faction detail[/color]");
+                Say($"Name:           [color=brown]{(analyzeNode as CorpNode).Faction.Name}[/color]");
+                Say($"Description:    [color=yellow]{(analyzeNode as CorpNode).Faction.Desc}[/color]");
+                Say($"[color=orange]▶ Business detail[/color]");
+                Say($"Stock:          [color=purple]{(analyzeNode as CorpNode).Stock.Name}[/color]");
+                Say($"Value:          [color=cyan]{(analyzeNode as CorpNode).Stock.Price}[/color]");
+            }
         }
     }
     void ParseArgs(Dictionary<string, string> defaultArg, params string[] args) {

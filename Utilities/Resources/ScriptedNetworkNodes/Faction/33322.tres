@@ -1,0 +1,13 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://bxdwatr0gnk2x"]
+
+[ext_resource type="Script" uid="uid://cn02no7yt4gla" path="res://Utilities/Resources/ScriptedNetworkNodes/ResourceScript/FactionData.cs" id="1_fp6op"]
+
+[resource]
+script = ExtResource("1_fp6op")
+f_name = "Reclaimers of the Flame"
+f_desc = "One Flame. One Sanctum. All must return."
+hostName = "33322"
+displayName = "Dual Sanctum"
+minDepth = 3
+maxDepth = 5
+enum_NodeType = 4

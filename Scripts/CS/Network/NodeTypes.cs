@@ -17,12 +17,14 @@ public abstract class NetworkNode {
     public HackFarm HackFarm { get => _hackFarm; set { _hackFarm ??= value; } }
     public List<NetworkNode> ChildNode { get; init; }
     public NodeDirectory NodeDirectory { get; init; }
-    public LockSystem LockSystem { get; init; }
+    public LockSystem LockSystem { get; private set; }
     public int SecLvl {
         get => _secLvl;
         protected set {
-            _secLvl = Math.Clamp(value, 0, _defLvl);
-            LockSystem.ActivateLock(_secLvl);
+            value = Math.Clamp(value, 0, _defLvl);
+            if (_secLvl == value) return;
+            _secLvl = value;
+            LockSystem = new(_secLvl);
             _retLvl = _defLvl - _secLvl;
             SecType = _secLvl switch {
                 < 1 => SecurityType.NOSEC,
@@ -90,6 +92,26 @@ public abstract class NetworkNode {
         HackFarm hackFarm = new(secLvl, indexRatio, depthRatio);
         node.Init(secLvl, defLvl, hackFarm);
         return node;
+    }
+    public int BeginCrackNode() {
+        if (LockSystem == null) return 2; // No lockSys found
+        // 0 - Success; 1 - Already cracking
+        return LockSystem.BeginCrack();
+    }
+    NetworkNode _currentOwner = null; 
+    public NetworkNode CurrentOwner { 
+        get => _currentOwner; 
+        private set => _currentOwner = value; 
+    }
+    bool _isSecure = true; bool IsSecure { get => _isSecure; set => _isSecure = value; }
+    public (int, string) AttempCrackNode(Dictionary<string, string> ans) {
+        (int, string) result = LockSystem.CrackAttempt(ans);
+        if (result.Item1 == 0) IsSecure = false;
+        return result;
+    }
+    public int TransferOwnership(NetworkNode node) {
+        if (IsSecure) return 1; // Node secured, transfer impossible
+        CurrentOwner = node; return 0; // Transfer successful
     }
 }
 public class PlayerNode : NetworkNode {

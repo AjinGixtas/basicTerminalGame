@@ -21,3 +21,14 @@ public enum NetworkNodeType {
 public enum SecurityType {
     NOSEC = 0, LOSEC = 1, MISEC = 2, HISEC = 3, MASEC = 4
 }
+public enum Cc {
+    // Short codes
+    R = 0, G = 1, B = 2, C = 3, M = 4, Y = 5, ___ = 6, RGB = 7,
+    // Named colors
+    ORANGE = 10, PINK = 11, LIME = 12, AQUA = 13,
+    VIOLET = 14, PURPLE = 15, TEAL = 16, INDIGO = 17,
+    GOLD = 18, BROWN = 19, GRAY = 20, NAVY = 21,
+    SKY = 22,
+    // Fun extras
+    HOTPINK = 30, LAVENDER = 31, MINT = 32
+}

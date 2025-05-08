@@ -116,8 +116,8 @@ public class C1 : Lock {
     }
 
     public override void Intialize() {
-        string[] groupPile = Utilitiy.Shuffle(colorGroups[GD.RandRange(0, 2)].ToArray());
-        string[] colorPile = Utilitiy.Shuffle(colors.ToArray());
+        string[] groupPile = Util.Shuffle(colorGroups[GD.RandRange(0, 2)].ToArray());
+        string[] colorPile = Util.Shuffle(colors.ToArray());
         string[] group = [groupPile[0], groupPile[1], "null"];
 
         for (int i = 0; i < colorPile.Length; ++i) {
@@ -127,7 +127,7 @@ public class C1 : Lock {
             break;
         }
 
-        group = Utilitiy.Shuffle(group.ToArray());
+        group = Util.Shuffle(group.ToArray());
         inp = group.Join(" ");
         que = $"{inp}";
         base.Intialize();
@@ -154,8 +154,8 @@ public class C3 : Lock {
         int index = GD.RandRange(0, 2);
         ans = groupNames[index];
 
-        string[] groupPile = Utilitiy.Shuffle(colorGroups[index].ToArray());
-        string[] colorPile = Utilitiy.Shuffle(colors.ToArray());
+        string[] groupPile = Util.Shuffle(colorGroups[index].ToArray());
+        string[] colorPile = Util.Shuffle(colors.ToArray());
         string[] group = [groupPile[0], groupPile[1], "null"];
 
         for (int i = 0; i < colorPile.Length; ++i) {
@@ -164,7 +164,7 @@ public class C3 : Lock {
             break;
         }
 
-        group = Utilitiy.Shuffle(group.ToArray());
+        group = Util.Shuffle(group.ToArray());
         inp = group.Join(" ");
         que = $"{inp}";
         base.Intialize();

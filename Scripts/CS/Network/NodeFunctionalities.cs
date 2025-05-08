@@ -10,7 +10,7 @@ public class LockSystem {
         LockIntialization(secLvl);
         int LockIntialization(int secLvl) {
             activeLocks.Clear(); int usedLvl = 0;
-            lockPool = Utilitiy.Shuffle<Lock>(lockPool);
+            lockPool = Util.Shuffle<Lock>(lockPool);
             for (int i = 0; i < lockPool.Count; i++) {
                 if (usedLvl + lockPool[i].Cost <= secLvl && lockPool[i].MinLvl <= secLvl) {
                     activeLocks.Add(lockPool[i]);

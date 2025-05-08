@@ -45,11 +45,11 @@ public abstract class NetworkNode {
     }
     public NetworkNode(string hostName, string displayName, string IP, NetworkNodeType NodeType, NetworkNode parentNode) {
         HostName = hostName; DisplayName = displayName; this.IP = IP; this.NodeType = NodeType;
-        ParentNode = parentNode; ChildNode = [];
+        CurrentOwner = this; ParentNode = parentNode; ChildNode = [];
         NodeDirectory = new("~");
     }
     public virtual void Init(int SecLvl, int DefLvl, HackFarm HackFarm) {
-        this.SecLvl = SecLvl; this.DefLvl = DefLvl; this.HackFarm = HackFarm;
+        this.DefLvl = DefLvl; this.SecLvl = SecLvl; this.HackFarm = HackFarm;
     }
     public virtual (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {
         return (0, 0);

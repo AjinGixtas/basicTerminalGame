@@ -1,19 +1,35 @@
+[color=cyan]mkf[/color] [color=yellow][file_name][/color] – Create a new file.
+    [color=yellow][file_name][/color] – Name of the file to create. Supports paths.
+[color=cyan]rmf[/color] [color=yellow][file_name][/color] – Remove a file.
+    [color=yellow][file_name][/color] – Name of the file to remove. Supports paths.
 [color=cyan]ls[/color] [color=yellow][directory][/color] – List files and directories.
+    [color=yellow][directory][/color] – Target directory (optional). Defaults to the current directory.
 [color=cyan]cd[/color] [color=yellow][directory][/color] – Change to the specified directory.
-[color=cyan]pwd[/color] – Print current directory.
-[color=cyan]echo[/color] [color=yellow][message][/color] [color=yellow][-n][/color] [color=yellow][-e][/color]
+    [color=yellow][directory][/color] – Target directory to navigate to.
+[color=cyan]pwd[/color] – Print the current directory.
+[color=cyan]say[/color] [color=yellow][message][/color] [color=yellow][-n][/color] [color=yellow][-e][/color] [color=yellow][-r][/color]
+    [color=yellow][message][/color] – Message to display.
     [color=yellow]-n[/color] – Suppress trailing newline.
     [color=yellow]-e[/color] – Enable escape sequences (e.g., `\n`).
-[color=cyan]clear[/color] – Clear terminal screen.
-[color=cyan]mkdir[/color] [color=yellow][directory_name][/color] – Create a new directory.
-[color=cyan]rmdir[/color] [color=yellow][directory_name][/color] – Remove an empty directory.
-
+    [color=yellow]-r[/color] – Display the message in red.
+[color=cyan]help[/color] [color=yellow][-v][/color] – Display help information.
+    [color=yellow]-v[/color] – Show verbose help.
+[color=cyan]home[/color] – Return to the home directory.
+[color=cyan]edit[/color] [color=yellow][file_name][/color] – Open a file in the text editor.
+    [color=yellow][file_name][/color] – Name of the file to edit. Supports paths.
 [color=cyan]scan[/color] [color=yellow][-d [depth_val]][/color] [color=yellow][-v][/color]
     [color=yellow]-d [depth_val][/color] – Scan depth (optional).
     [color=yellow]-v[/color] – Verbose output.
-[color=cyan]crack[/color] [color=yellow][init][/color] OR [color=yellow][flags][/color]
+[color=cyan]clear[/color] – Clear the terminal screen.
+[color=cyan]mkdir[/color] [color=yellow][directory_name][/color] – Create a new directory.
+    [color=yellow][directory_name][/color] – Name of the directory to create. Supports paths.
+[color=cyan]rmdir[/color] [color=yellow][directory_name][/color] – Remove an empty directory.
+    [color=yellow][directory_name][/color] – Name of the directory to remove. Supports paths.
+[color=cyan]crack[/color] [color=yellow]--init[/color] OR [color=yellow][flags][/color]
     [color=green]Crack[/color] locks with specified values.
+[color=cyan]inspect[/color] – Reserved for future functionality.
 [color=cyan]connect[/color] [color=yellow][ip_or_hostname][/color] – Connect to a remote host.
+    [color=yellow][ip_or_hostname][/color] – Target IP or hostname.
 [color=cyan]analyze[/color] [color=yellow][ip_or_hostname][/color]
     [color=green]Analyze[/color] target host or current system.
     [color=yellow][ip_or_hostname][/color] – Target IP/hostname (optional).

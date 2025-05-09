@@ -23,9 +23,19 @@ public class NodeDirectory : NodeSystemItem {
 
     public NodeDirectory(string name) : base(name) { }
     // 0-Success; 1-None found
-    public int Remove(string name) {
+    public int RemoveFile(string name) {
         foreach (NodeSystemItem item in Childrens) {
-            if (item.Name == name) {
+            if (item.GetType() == typeof(NodeFile) && item.Name == name) {
+                Childrens.Remove(item);
+                return 0;
+            }
+        }
+        return 1;
+    }
+    // 0-Success; 1-None found
+    public int RemoveDir(string name) {
+        foreach (NodeSystemItem item in Childrens) {
+            if (item.GetType() == typeof(NodeDirectory) && item.Name == name) {
                 Childrens.Remove(item);
                 return 0;
             }
@@ -35,12 +45,26 @@ public class NodeDirectory : NodeSystemItem {
     // 0-Success; 1-Duplicate name found
     public int Add(NodeSystemItem item) {
         foreach (NodeSystemItem children in Childrens) {
-            if (item.Name == children.Name) {
-                return 1;
-            }
+            if (item.Name == children.Name) { return 1; }
         }
         item.Parent = this;
         Childrens.Add(item);
+        return 0;
+    }
+    public int AddFile(string name) {
+        foreach (NodeSystemItem children in Childrens) {
+            if (children.GetType() == typeof(NodeFile) && name == children.Name) { return 1; }
+        }
+        NodeFile file = new(name) { Parent = this };
+        Childrens.Add(file);
+        return 0;
+    }
+    public int AddDir(string name) {
+        foreach (NodeSystemItem children in Childrens) {
+            if (children.GetType() == typeof(NodeDirectory) && name == children.Name) { return 1; }
+        }
+        NodeDirectory dir = new(name) { Parent = this };
+        Childrens.Add(dir);
         return 0;
     }
     // TerminalDirectory-Directory found; null-Directory not found

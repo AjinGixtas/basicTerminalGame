@@ -22,13 +22,20 @@ public enum SecurityType {
     NOSEC = 0, LOSEC = 1, MISEC = 2, HISEC = 3, MASEC = 4
 }
 public enum Cc {
-    // Short codes
-    R = 0, G = 1, B = 2, C = 3, M = 4, Y = 5, ___ = 6, RGB = 7,
-    // Named colors
-    ORANGE = 10, PINK = 11, LIME = 12, AQUA = 13,
-    VIOLET = 14, PURPLE = 15, TEAL = 16, INDIGO = 17,
-    GOLD = 18, BROWN = 19, GRAY = 20, NAVY = 21,
-    SKY = 22,
-    // Fun extras
-    HOTPINK = 30, LAVENDER = 31, MINT = 32
+    R = 2,  G = 3,  B = 4,
+    r = 5,  g = 6,  b = 7,
+    c = 8,  m = 9,  y = 10,
+    C = 17, M = 18, Y = 19,
+    gB = 11, rB = 12, rG = 13,
+    bG = 14, bR = 15, gR = 16,
+
+    ___ = 0,
+    rgb = 20,
+    LB = 21,
+    LG = 22,
+    LC = 23,
+    LR = 24,
+    LM = 25,
+    LY = 26,
+    RGB = 1,
 }

@@ -30,7 +30,7 @@ public partial class Terminal : MarginContainer {
         IntializeOnReadyVar();
         currentNode = networkManager.network;
         CurrentDirectory = currentNode.NodeDirectory;
-        CurrentDirectory.Add(new NodeFile("pootis.txt"));
+        CurrentDirectory.AddFile("pootis.txt");
         SetCommandPrompt();
         terminalCommandField.Edit();
     }
@@ -48,10 +48,10 @@ public partial class Terminal : MarginContainer {
         if (Input.IsActionJustPressed("moveUpHistory")) CommandHistoryIndex -= 1;
     }
 
-    Action<string[]> finishFunction; string[] finishFunctionArgs;
-    void StartProcess(double time, Action<string[]> func, string[] args) {
+    Action<Dictionary<string, string>, string[]> finishFunction; (Dictionary<string, string>, string[]) finishFunctionArgs;
+    void StartProcess(double time, Action<Dictionary<string, string>, string[]> func, Dictionary<string, string> parseArgs, string[] positionalArgs) {
         if (isProcessing) return;
-        finishFunction = func; finishFunctionArgs = args;
+        finishFunction = func; finishFunctionArgs = (parseArgs, positionalArgs);
         isProcessing = true;
         processTimer.WaitTime = time;
         terminalCommandField.Editable = false;
@@ -77,7 +77,7 @@ public partial class Terminal : MarginContainer {
         tick = (tick + 1) % SpinnerChars.Length;
         Say($"...Done!");
         progress = 0; tick = 0;
-        finishFunction(finishFunctionArgs);
+        finishFunction(finishFunctionArgs.Item1, finishFunctionArgs.Item2);
     }
     const int MAX_HISTORY_CMD_SIZE = 64;
     public void SubmitCommand(string newText) {
@@ -96,39 +96,66 @@ public partial class Terminal : MarginContainer {
             if (!ProcessCommand(components[0], components[1..])) break;
         }
         static string[] ParseArguments(string input) {
-            var matches = Regex.Matches(input, @"[\""].+?[\""]|\S+");
-            return [.. matches.Select(m => m.Value.Trim('"'))];
+            var matches = Regex.Matches(input, @"(?:[\""].+?[\""]|\S+)(?=\s*=\s*)|\S+");
+            var result = matches.Select(m => m.Value.Trim('"')).ToArray();
+            return [.. result.Select(arg =>
+            {
+                if (!arg.Contains('\"')) {
+                    var split = arg.Split(['='], 2);
+                    return split.Length > 1 ? split : [split[0]];
+                }
+                return [arg];
+            })
+            .SelectMany(x => x)];
         }
     }
     bool ProcessCommand(string command, string[] args) {
         command = command.ToLower();
+        (Dictionary<string, string> parsedArgs, string[] positionalArgs) = ParseArgs(args);
         switch (command) {
-            case "ls": LS(args); break;
-            case "cd": CD(args); break;
-            case "pwd": Pwd(args); break;
-            case "say": Say(args); break;
-            case "help": Help(args); break;
-            case "home": Home(args); break;
-            case "edit": Edit(args); break;
-            case "newf": Newf(args); break;
-            case "scan": Scan(args); return false;
-            case "clear": Clear(args); break;
-            case "mkdir": MkDir(args); break;
-            case "rmdir": RmDir(args); break;
-            case "crack": Crack(args); break;
-            case "inspect": Inspect(args); break;
-            case "connect": Connect(args); break;
-            case "analyze": Analyze(args); return false;
+            case "mkf": MkF(parsedArgs, positionalArgs); break;
+            case "rmf": RmF(parsedArgs, positionalArgs); break;
+            case "ls": LS(parsedArgs, positionalArgs); break;
+            case "cd": CD(parsedArgs, positionalArgs); break;
+            case "pwd": Pwd(parsedArgs, positionalArgs); break;
+            case "say": Say(parsedArgs, positionalArgs); break;
+            case "help": Help(parsedArgs, positionalArgs); break;
+            case "home": Home(parsedArgs, positionalArgs); break;
+            case "edit": Edit(parsedArgs, positionalArgs); break;
+            case "scan": Scan(parsedArgs, positionalArgs); return false;
+            case "clear": Clear(parsedArgs, positionalArgs); break;
+            case "mkdir": MkDir(parsedArgs, positionalArgs); break;
+            case "rmdir": RmDir(parsedArgs, positionalArgs); break;
+            case "crack": Crack(parsedArgs, positionalArgs); break;
+            case "inspect": Inspect(parsedArgs, positionalArgs); break;
+            case "connect": Connect(parsedArgs, positionalArgs); break;
+            case "analyze": Analyze(parsedArgs, positionalArgs); return false;
             default: Say("-r", $"{command} is not a valid command."); break;
         }
         return true;
     }
 
-    void LS(params string[] args) {
+    void RmF(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+        if (positionalArgs.Length == 0) { Say("-r", $"No file name provided."); return; }
+        NodeDirectory parentDirectory;
+        for (int i = 0; i < positionalArgs.Length; i++) {
+            string[] components = positionalArgs[i].Split('/', StringSplitOptions.RemoveEmptyEntries);
+            string fileName = components[^1], parentPath = string.Join('/', components[..^1]);
+            parentDirectory = CurrentDirectory.GetDirectory(parentPath);
+            if (parentDirectory == null) { Say("-r", $"File not found: {parentPath}"); return; }
+            int result = parentDirectory.RemoveFile(positionalArgs[i]);
+            switch (result) {
+                case 0: break;
+                case 1: Say($"{positionalArgs[i]} was not found."); break;
+                default: Say("-r", $"{positionalArgs[i]} removal failed. Error code: {result}"); break;
+            }
+        }
+    }
+    void LS(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         NodeDirectory targetDir = CurrentDirectory;
-        if (args.Length != 0) {
-            targetDir = CurrentDirectory.GetDirectory(args[0]);
-            if (targetDir == null) { Say("-r", $"Directory not found: {args[0]}"); return; }
+        if (positionalArgs.Length != 0) {
+            targetDir = CurrentDirectory.GetDirectory(positionalArgs[0]);
+            if (targetDir == null) { Say("-r", $"Directory not found: {positionalArgs[0]}"); return; }
         }
 
         if (targetDir.Childrens.Count == 0) { Say(""); return; }
@@ -139,17 +166,32 @@ public partial class Terminal : MarginContainer {
         }
         Say(output);
     }
-    void CD(params string[] args) {
-        if (args.Length == 0) { Say("-r", "No directory provided."); return; }
-        NodeDirectory targetDir = CurrentDirectory.GetDirectory(args[0]);
-        if (targetDir == null) { Say("-r", $"Directory not found: {args[0]}"); return; }
+    void CD(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+        if (positionalArgs.Length == 0) { Say("-r", "No directory provided."); return; }
+        NodeDirectory targetDir = CurrentDirectory.GetDirectory(positionalArgs[0]);
+        if (targetDir == null) { Say("-r", $"Directory not found: {positionalArgs[0]}"); return; }
         CurrentDirectory = targetDir;
     }
-    void Pwd(params string[] args) {
+    void Pwd(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         Say($"{CurrentDirectory.GetPath()}");
     }
+    // It gets 2 since this one is REALLY close to standard, but since it's also called independently a lot, allow for seperate shorthand flag is way better.
+    void Say(Dictionary<string, string> parseArgs, string[] positionalArgs) {
+        if (positionalArgs.Length == 0) { Say(""); return; }
+        string c = terminalOutputField.GetParsedText();
+        if (c.Length >= MAX_HISTORY_CHAR_SIZE) {
+            terminalOutputField.Clear();
+            terminalOutputField.AppendText(c[^RESET_HISTORY_CHAR_SIZE..]);
+        }
+        string text = string.Join(" ", positionalArgs);
+        if (parseArgs.ContainsKey("-e")) text = Regex.Unescape(text); // handles \n, \t, etc.
+        if (!parseArgs.ContainsKey("-n")) text += "\n";
+        if (parseArgs.ContainsKey("-r")) text = $"[color={Util.CC(Cc.R)}]{text}[/color]";
+        if (parseArgs.ContainsKey("-t") && text.EndsWith('\n')) text = text[..^1]; // Trim only one trailing newline
+        terminalOutputField.AppendText(text);
+    }
     void Say(params string[] args) {
-        if (args.Length == 0) return;
+        if (args.Length == 0) { Say(""); return; }
 
         string c = terminalOutputField.GetParsedText();
         if (c.Length >= MAX_HISTORY_CHAR_SIZE) {
@@ -157,74 +199,72 @@ public partial class Terminal : MarginContainer {
             terminalOutputField.AppendText(c[^RESET_HISTORY_CHAR_SIZE..]);
         }
 
-        bool noNewline = false, interpretEscapes = false, makeRed = false;
+        bool noNewline = false, interpretEscapes = false, makeRed = false, trimTrailingNewline = false;
         int argStart = 0;
 
-        // Handle optional flags like -n, -e, or -ne
+        // Handle optional flags like -n, -e, -r, -t
         if (args[0].StartsWith('-')) {
-            noNewline = args[0].Contains('n');
-            interpretEscapes = args[0].Contains('e');
-            makeRed = args[0].Contains('r');
+            string flags = args[0];
+            noNewline = flags.Contains('n');
+            interpretEscapes = flags.Contains('e');
+            makeRed = flags.Contains('r');
+            trimTrailingNewline = flags.Contains('t');
             argStart = 1;
         }
 
         string text = string.Join(" ", args[argStart..]);
         if (interpretEscapes) text = Regex.Unescape(text); // handles \n, \t, etc.
+        if (trimTrailingNewline && text.EndsWith('\n')) text = text[..^1]; // Trim only one trailing newline
         if (!noNewline) text += "\n";
         if (makeRed) text = $"[color={Util.CC(Cc.R)}]{text}[/color]";
+
         terminalOutputField.AppendText(text);
     }
-    void Help(params string[] args) {
-        Dictionary<string, string> parsedArgs = new() {
-                { "-v", "" }
-            }; ParseArgs(parsedArgs, args);
-        string fileName = parsedArgs["-v"] == "-v" ? "helpVerbose.txt" : "helpShort.txt";
+    void Help(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+        string fileName = parsedArgs.ContainsKey("-v") ? "helpVerbose.txt" : "helpShort.txt";
         FileAccess fileAccess = FileAccess.Open($"res://Utilities/TextFiles/CommandOutput/{fileName}", FileAccess.ModeFlags.Read);
         Say(fileAccess.GetAsText());
     }
-    void Home(params string[] args) {
+    void Home(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         CurrentNode = networkManager.network;
     }
     const int MAX_HISTORY_CHAR_SIZE = 65536, RESET_HISTORY_CHAR_SIZE = 16384;
-    void Edit(params string[] args) {
-        if (args.Length == 0) { Say("-r", "No file name provided."); return; }
-        for (int i = 0; i < args.Length; i++) {
-            NodeFile file = currentDirectory.GetFile(args[i]);
+    void Edit(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+        if (positionalArgs.Length == 0) { Say("-r", "No file name provided."); return; }
+        for (int i = 0; i < positionalArgs.Length; i++) {
+            NodeFile file = currentDirectory.GetFile(positionalArgs[i]);
             if (file == null) {
-                Say("-r", $"File not found: {args[i]}");
+                Say("-r", $"File not found: {positionalArgs[i]}");
                 return;
             }
             overseer.textEditor.OpenNewFile(CurrentNode.HostName, file);
         }
     }
-    void Newf(params string[] args) {
-        if (args.Length == 0) { Say("-r", $"No file name provided."); return; }
+    void MkF(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+        if (positionalArgs.Length == 0) { Say("-r", $"No file name provided."); return; }
         NodeDirectory parentDirectory;
-        for (int i = 0; i < args.Length; i++) {
-            string[] components = args[i].Split('/', StringSplitOptions.RemoveEmptyEntries);
+        for (int i = 0; i < positionalArgs.Length; i++) {
+            string[] components = positionalArgs[i].Split('/', StringSplitOptions.RemoveEmptyEntries);
             string fileName = components[^1], parentPath = string.Join('/', components[..^1]);
 
             parentDirectory = CurrentDirectory.GetDirectory(parentPath);
             if (parentDirectory == null) { Say("-r", $"Directory not found: {parentPath}"); return; }
-            int result = parentDirectory.Add(new NodeFile(fileName));
+            int result = parentDirectory.AddFile(fileName);
             switch (result) {
                 case 0: break;
-                case 1: Say($"{args[i]} already exists. Skipped."); break;
-                default: Say("-r", $"{args[i]} creation failed. Error code: ${result}"); break;
+                case 1: Say($"{positionalArgs[i]} already exists. Skipped."); break;
+                default: Say("-r", $"{positionalArgs[i]} creation failed. Error code: ${result}"); break;
             }
         }
     }
-    void Scan(params string[] args) {
-        StartProcess(.1, ScanCallback, args);
-        void ScanCallback(params string[] args) {
+    void Scan(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+        StartProcess(.1, ScanCallback, parsedArgs, positionalArgs);
+        void ScanCallback(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
             string L = " └─── ", M = " ├─── ", T = "      ", E = " │    ";
             Func<bool[], string> getTreePrefix = arr => string.Concat(arr.Select((b, i) => (i == arr.Length - 1 ? (b ? L : M) : (b ? T : E))));
             Func<bool[], string> getDescPrefix = arr => string.Concat(arr.Select((b, i) => (b ? T : E)));
-            Dictionary<string, string> parsedArgs = new() {
-                { "-d", "1" },
-                { "-v", "" }
-            }; ParseArgs(parsedArgs, args);
-            if (!int.TryParse(parsedArgs["-d"], out int MAX_DEPTH)) { Say("-r", $"Directory not found: {parsedArgs["-d"]}"); return; }
+            if (!parsedArgs.TryGetValue("-d", out string value)) { value = "1"; parsedArgs["-d"] = value; }
+            if (!int.TryParse(value, out int MAX_DEPTH)) { Say("-r", $"Invalid depth: {value}"); return; }
 
             Stack<(NetworkNode, int, bool[])> stack = new([(currentNode, 0, [])]);
             List<NetworkNode> visited = [];
@@ -233,9 +273,9 @@ public partial class Terminal : MarginContainer {
                 (NetworkNode node, int depth, bool[] depthMarks) = stack.Pop();
                 if (depth > MAX_DEPTH || visited.Contains(node)) continue;
                 Dictionary<string, string> analyzeResult = node.Analyze();
-                output += $"{getTreePrefix(depthMarks)}[color={Util.CC(Cc.C)}]{analyzeResult["IP"], -15}[/color] [color=green]{analyzeResult["hostName"]}[/color]\n";
+                output += $"[color={Util.CC(Cc.rgb)}]{getTreePrefix(depthMarks)}[/color][color={Util.CC(Cc.C)}]{analyzeResult["IP"], -15}[/color] [color=green]{analyzeResult["hostName"]}[/color]\n";
                 
-                if (parsedArgs["-v"] == "-v") {
+                if (parsedArgs.ContainsKey("-v")) {
                     string defColorCode = analyzeResult["defLvl"] switch {
                         "0" or "1" or "2" => Util.CC(Cc.B),
                         "3" or "4" or "5" or "6" or "7" => Util.CC(Cc.Y),
@@ -249,11 +289,11 @@ public partial class Terminal : MarginContainer {
                         _ => Util.CC(Cc.R)
                     };
                     string descPrefix = getDescPrefix(depthMarks) + ((depth == MAX_DEPTH ? 0 : ((node.ParentNode != null ? 0 : -1) + node.ChildNode.Count)) > 0 ? " │" : "  ");
-                    output += $"{descPrefix}  Display Name: [color={Util.CC(Cc.ORANGE)}]{analyzeResult["displayName"]}[/color];\n";
-                    output += $"{descPrefix}  Node Type:    [color={Util.CC(Cc.PURPLE)}]{analyzeResult["nodeType"]}[/color];\n";
-                    output += $"{descPrefix}  Defense:      [color={defColorCode}]{analyzeResult["defLvl"]}[/color]  "
+                    output += $"[color={Util.CC(Cc.rgb)}]{descPrefix}[/color]  Display Name: [color={Util.CC(Cc.gR)}]{analyzeResult["displayName"]}[/color];\n";
+                    output += $"[color={Util.CC(Cc.rgb)}]{descPrefix}[/color]  Node Type:    [color={Util.CC(Cc.m)}]{analyzeResult["nodeType"]}[/color];\n";
+                    output += $"[color={Util.CC(Cc.rgb)}]{descPrefix}[/color]  Defense:      [color={defColorCode}]{analyzeResult["defLvl"]}[/color]  "
                             + $"Security: [color={secColorCode}]{analyzeResult["secType"]}[/color]\n";
-                    output += $"{descPrefix}\n";
+                    output += $"[color={Util.CC(Cc.rgb)}]{descPrefix}[/color]\n";
                 }
                 visited.Add(node);
 
@@ -272,57 +312,49 @@ public partial class Terminal : MarginContainer {
             Say(output);
         }
     }
-    void Clear(params string[] args) {
+    void Clear(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         terminalOutputField.Clear();
     }
-    void MkDir(params string[] args) {
-        if (args.Length == 0) { Say("-r", $"No directory name provided."); return; }
+    void MkDir(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+        if (positionalArgs.Length == 0) { Say("-r", $"No directory name provided."); return; }
         NodeDirectory parentDirectory;
-        for (int i = 0; i < args.Length; i++) {
-            string[] components = args[i].Split('/', StringSplitOptions.RemoveEmptyEntries);
+        for (int i = 0; i < positionalArgs.Length; i++) {
+            string[] components = positionalArgs[i].Split('/', StringSplitOptions.RemoveEmptyEntries);
             string dirName = components[^1], parentPath = string.Join('/', components[..^1]);
 
             parentDirectory = CurrentDirectory.GetDirectory(parentPath);
             if (parentDirectory == null) { Say("-r", $"Directory not found: {parentPath}"); return; }
-            int result = parentDirectory.Add(new NodeDirectory(dirName));
+            int result = parentDirectory.AddDir(dirName);
             switch (result) {
                 case 0: break;
-                case 1: Say($"{args[i]} already exists. Skipped."); break;
-                default: Say("-r", $"{args[i]} creation failed. Error code: ${result}"); break;
+                case 1: Say($"{positionalArgs[i]} already exists. Skipped."); break;
+                default: Say("-r", $"{positionalArgs[i]} creation failed. Error code: ${result}"); break;
             }
         }
     }   
-    void RmDir(params string[] args) {
-        if (args.Length == 0) {
+    void RmDir(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+        if (positionalArgs.Length == 0) {
             Say("-r", "-No directory name provided.");
             return;
         }
         NodeDirectory parentDirectory;
-        for (int i = 0; i < args.Length; i++) {
-            parentDirectory = CurrentDirectory.GetDirectory(args[i]);
-            if (parentDirectory == null) { Say("-r", $"Directory not found: {args[0]}"); return; }
+        for (int i = 0; i < positionalArgs.Length; i++) {
+            parentDirectory = CurrentDirectory.GetDirectory(positionalArgs[i]);
+            if (parentDirectory == null) { Say("-r", $"Directory not found: {positionalArgs[0]}"); return; }
             if (parentDirectory.Parent == null) { Say("-r", $"Can not remove root."); return; }
             parentDirectory = parentDirectory.Parent;
-            int result = parentDirectory.Remove(args[i]);
+            int result = parentDirectory.RemoveDir(positionalArgs[i]);
             switch(result) {
                 case 0: break;
-                case 1: Say("-r", $"{args[i]} was not found."); break;
-                default: Say("-r", $"{args[i]} removal failed. Error code: {result}"); break;
+                case 1: Say("-r", $"{positionalArgs[i]} was not found."); break;
+                default: Say("-r", $"{positionalArgs[i]} removal failed. Error code: {result}"); break;
             }
         }
     }
-    readonly string[] MSG_FORMAT = [
-        "Unknown error",
-        "Missing flag {0}", 
-        "Missing key {0}",
-        "Incorrect key {0}"
-    ];
-    void Crack(params string[] args) {
-        Dictionary<string, string> parsedArgs = new(){ {"init", "" } }; ParseArgs(parsedArgs, args);
+    void Crack(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         NetworkNode node = CurrentNode;
-        GD.Print(string.Join(' ', args));
-        GD.Print(parsedArgs["init"]);
-        if (parsedArgs["init"] == "init") {
+        for(int i = 0; i < positionalArgs.Length; ++i) { GD.Print(positionalArgs[i]); }
+        if (parsedArgs.ContainsKey("--init")) {
             int beginResult = node.BeginCrackNode(); 
             if (beginResult == 0) { Say("Cracking begin."); }
             else if (beginResult == 1) { Say("Cracking already in process."); }
@@ -331,42 +363,42 @@ public partial class Terminal : MarginContainer {
             return;
         }
         (int result, string msg) = node.AttempCrackNode(parsedArgs);
-        if (result != 0) { Say("-r", string.Format(MSG_FORMAT[result], msg)); }
-        else {
-            Say($"[color={Util.CC(Cc.G)}]Node defense cracked.[/color] All security system [color={Util.CC(Cc.G)}]destroyed[/color].");
+        Say("-t", msg);
+        if (result == 0) {
+            Say($"[color={Util.CC(Cc.G)}]Node defense cracked.[/color] All security system [color={Util.CC(Cc.gR)}]destroyed[/color].");
             Say($"Run [color={Util.CC(Cc.C)}]analyze[/color] for all new information.");
+            node.TransferOwnership(networkManager.network);
         }
     }
-    void Inspect(params string[] args) {
-        Dictionary<string, string> parsedArgs = new() { { "-q", "" } }; ParseArgs(parsedArgs, args);
+    void Inspect(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         
     }
-    void Connect(params string[] args) {
-        if (args.Length == 0) { Say("-r", $"No hostname provided."); return; }
-        if (networkManager.DNS.TryGetValue(args[0], out NetworkNode value)) { CurrentNode = value; return; }
-        if (CurrentNode.ParentNode != null && CurrentNode.ParentNode.HostName == args[0] || 
-            (CurrentNode.ParentNode is HoneypotNode && (CurrentNode.ParentNode as HoneypotNode).fakeHostName == args[0])) 
+    void Connect(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+        if (positionalArgs.Length == 0) { Say("-r", $"No hostname provided."); return; }
+        if (networkManager.DNS.TryGetValue(positionalArgs[0], out NetworkNode value)) { CurrentNode = value; return; }
+        if (CurrentNode.ParentNode != null && CurrentNode.ParentNode.HostName == positionalArgs[0] || 
+            (CurrentNode.ParentNode is HoneypotNode && (CurrentNode.ParentNode as HoneypotNode).fakeHostName == positionalArgs[0])) 
             { CurrentNode = CurrentNode.ParentNode; return; }
         
-        NetworkNode node = CurrentNode.ChildNode.FindLast(s => s.HostName == args[0]);
-        NetworkNode fnode = CurrentNode.ChildNode.FindLast(s => s is HoneypotNode && (s as HoneypotNode).fakeHostName == args[0]);
-        if (node == null && fnode == null) { Say("-r", $"Host not found: {args[0]}"); return; }
+        NetworkNode node = CurrentNode.ChildNode.FindLast(s => s.HostName == positionalArgs[0]);
+        NetworkNode fnode = CurrentNode.ChildNode.FindLast(s => s is HoneypotNode && (s as HoneypotNode).fakeHostName == positionalArgs[0]);
+        if (node == null && fnode == null) { Say("-r", $"Host not found: {positionalArgs[0]}"); return; }
         CurrentNode = (node ?? fnode);
     }
-    void Analyze(params string[] args) {
-        if (args.Length == 0) { args = [CurrentNode.HostName]; }
-        if (CurrentNode.ChildNode.FindLast(s => s.HostName == args[0]) == null 
-            && (CurrentNode.ParentNode != null && CurrentNode.ParentNode.HostName != args[0])
-            && CurrentNode.HostName != args[0]) {
-            Say("-r", $"Host not found: {args[0]}");
+    void Analyze(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+        if (positionalArgs.Length == 0) { positionalArgs = [CurrentNode.HostName]; }
+        if (CurrentNode.ChildNode.FindLast(s => s.HostName == positionalArgs[0]) == null 
+            && (CurrentNode.ParentNode != null && CurrentNode.ParentNode.HostName != positionalArgs[0])
+            && CurrentNode.HostName != positionalArgs[0]) {
+            Say("-r", $"Host not found: {positionalArgs[0]}");
             return;
         }
-        StartProcess(.5 + GD.Randf() * .5, AnalyzeCallback, args);
-        void AnalyzeCallback(params string[] args) {
+        StartProcess(.5 + GD.Randf() * .5, AnalyzeCallback, parsedArgs, positionalArgs);
+        void AnalyzeCallback(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
             NetworkNode analyzeNode = null;
-            if (CurrentNode.ChildNode.FindLast(s => s.HostName == args[0]) != null) analyzeNode = CurrentNode.ChildNode.FindLast(s => s.HostName == args[0]);
-            else if (CurrentNode.ParentNode != null && CurrentNode.ParentNode.HostName == args[0]) analyzeNode = CurrentNode.ParentNode;
-            else if (CurrentNode.HostName == args[0]) analyzeNode = CurrentNode;
+            if (CurrentNode.ChildNode.FindLast(s => s.HostName == positionalArgs[0]) != null) analyzeNode = CurrentNode.ChildNode.FindLast(s => s.HostName == positionalArgs[0]);
+            else if (CurrentNode.ParentNode != null && CurrentNode.ParentNode.HostName == positionalArgs[0]) analyzeNode = CurrentNode.ParentNode;
+            else if (CurrentNode.HostName == positionalArgs[0]) analyzeNode = CurrentNode;
             string defColorCode = analyzeNode.DefLvl switch {
                 < 3 => Util.CC(Cc.B),
                 < 8 => Util.CC(Cc.Y),
@@ -379,56 +411,64 @@ public partial class Terminal : MarginContainer {
                 SecurityType.HISEC or SecurityType.MASEC => Util.CC(Cc.B),
                 _ => Util.CC(Cc.R)
             };
-            Say($"[color={Util.CC(Cc.ORANGE)}]▶ Node Info[/color]");
-            Say($"Host name:      [color={Util.CC(Cc.G)}]{analyzeNode.HostName}[/color]");
-            Say($"IP address:     [color={Util.CC(Cc.C)}]{analyzeNode.IP}[/color]");
-            Say($"Display name:   [color={Util.CC(Cc.BROWN)}]{analyzeNode.DisplayName}[/color]");
+            Say($"[color={Util.CC(Cc.gR)}]▶ Node Info[/color]");
+            Say($"[color={Util.CC(Cc.rgb)}]Host name:[/color]      [color={Util.CC(Cc.G)}]{analyzeNode.HostName}[/color]");
+            Say($"[color={Util.CC(Cc.rgb)}]IP address:[/color]     [color={Util.CC(Cc.C)}]{analyzeNode.IP}[/color]");
+            Say($"[color={Util.CC(Cc.rgb)}]Display name:[/color]   [color={Util.CC(Cc.y)}]{analyzeNode.DisplayName}[/color]");
 
-            Say($"[color={Util.CC(Cc.ORANGE)}]▶ Classification[/color]");
-            Say($"Node type:      [color={Util.CC(Cc.PURPLE)}]{analyzeNode.NodeType}[/color]");
-            Say($"Defense level:  [color={defColorCode}]{analyzeNode.DefLvl}[/color]");
-            Say($"Security level: [color={secColorCode}]{analyzeNode.SecType}[/color]");
+            Say($"[color={Util.CC(Cc.gR)}]▶ Classification[/color]");
+            Say($"[color={Util.CC(Cc.rgb)}]Node type:[/color]      [color={Util.CC(Cc.m)}]{analyzeNode.NodeType}[/color]");
+            Say($"[color={Util.CC(Cc.rgb)}]Defense level:[/color]  [color={defColorCode}]{analyzeNode.DefLvl}[/color]");
+            Say($"[color={Util.CC(Cc.rgb)}]Security level:[/color] [color={secColorCode}]{analyzeNode.SecType}[/color]");
 
             if (analyzeNode.CurrentOwner != networkManager.network) {
                 Say($"Crack this node security system to get further access.");
                 return; // Not yours yet, no more detail!
             }
-            Say($"[color={Util.CC(Cc.ORANGE)}]▶ GC miner detail[/color]");
-            Say($"Transfer batch: [color={Util.CC(Cc.C)}]{analyzeNode.HackFarm.HackLevel}[/color] ([color={Util.CC(Cc.C)}]{analyzeNode.HackFarm.CurHack:F2}[/color] [color={Util.CC(Cc.Y)}]GC[/color])");
-            Say($"Transfer speed: [color={Util.CC(Cc.C)}]{analyzeNode.HackFarm.TimeLevel}[/color] ([color={Util.CC(Cc.C)}]{analyzeNode.HackFarm.CurTime:F2}[/color] [color={Util.CC(Cc.Y)}]s[/color])");
-            Say($"Mining speed:   [color={Util.CC(Cc.C)}]{analyzeNode.HackFarm.GrowLevel}[/color] ([color={Util.CC(Cc.C)}]{analyzeNode.HackFarm.CurGrow:F2}[/color] [color={Util.CC(Cc.Y)}]GC/s[/color])");
+            Say($"[color={Util.CC(Cc.gR)}]▶ GC miner detail[/color]");
+            Say($"[color={Util.CC(Cc.rgb)}]Transfer batch:[/color] [color={Util.CC(Cc.c)}]{analyzeNode.HackFarm.HackLevel}[/color] ([color={Util.CC(Cc.c)}]{analyzeNode.HackFarm.CurHack:F2}[/color] [color={Util.CC(Cc.rgb)}]GC[/color])");
+            Say($"[color={Util.CC(Cc.rgb)}]Transfer speed:[/color] [color={Util.CC(Cc.c)}]{analyzeNode.HackFarm.TimeLevel}[/color] ([color={Util.CC(Cc.c)}]{analyzeNode.HackFarm.CurTime:F2}[/color] [color={Util.CC(Cc.rgb)}]s[/color])");
+            Say($"[color={Util.CC(Cc.rgb)}]Mining speed:[/color]   [color={Util.CC(Cc.c)}]{analyzeNode.HackFarm.GrowLevel}[/color] ([color={Util.CC(Cc.c)}]{analyzeNode.HackFarm.CurGrow:F2}[/color] [color={Util.CC(Cc.rgb)}]GC/s[/color])");
+            GD.Print(Util.CC(Cc.c));
 
             if (analyzeNode is FactionNode) {
-                Say($"[color={Util.CC(Cc.ORANGE)}]▶ Faction detail[/color]");
-                Say($"Name:           [color={Util.CC(Cc.BROWN)}]{(analyzeNode as FactionNode).Faction.Name}[/color]");
-                Say($"Description:    [color={Util.CC(Cc.Y)}]{(analyzeNode as FactionNode).Faction.Desc}[/color]");
+                Say($"[color={Util.CC(Cc.gR)}]▶ Faction detail[/color]");
+                Say($"[color={Util.CC(Cc.rgb)}]Name:[/color]           [color={Util.CC(Cc.y)}]{Util.Obfuscate((analyzeNode as FactionNode).Faction.Name)}[/color]");
+                Say($"[color={Util.CC(Cc.rgb)}]Description:[/color]    [color={Util.CC(Cc.Y)}]{Util.Obfuscate((analyzeNode as FactionNode).Faction.Desc)}[/color]");
             }
             if (analyzeNode is BusinessNode) {
-                Say($"[color={Util.CC(Cc.ORANGE)}]▶ Business detail[/color]");
-                Say($"Stock:          [color={Util.CC(Cc.BROWN)}]{(analyzeNode as BusinessNode).Stock.Name}[/color]");
-                Say($"Value:          [color={Util.CC(Cc.C)}]{(analyzeNode as BusinessNode).Stock.Price}[/color]");
+                Say($"[color={Util.CC(Cc.gR)}]▶ Business detail[/color]");
+                Say($"[color={Util.CC(Cc.rgb)}]Stock:[/color]          [color={Util.CC(Cc.y)}]{(analyzeNode as BusinessNode).Stock.Name}[/color]");
+                Say($"[color={Util.CC(Cc.rgb)}]Value:[/color]          [color={Util.CC(Cc.C)}]{(analyzeNode as BusinessNode).Stock.Price}[/color]");
             }
             if (analyzeNode is CorpNode) {
-                Say($"[color={Util.CC(Cc.ORANGE)}]▶ Faction detail[/color]");
-                Say($"Name:           [color={Util.CC(Cc.BROWN)}]{(analyzeNode as CorpNode).Faction.Name}[/color]");
-                Say($"Description:    [color={Util.CC(Cc.Y)}]{(analyzeNode as CorpNode).Faction.Desc}[/color]");
-                Say($"[color={Util.CC(Cc.ORANGE)}]▶ Business detail[/color]");
-                Say($"Stock:          [color={Util.CC(Cc.BROWN)}]{(analyzeNode as CorpNode).Stock.Name}[/color]");
-                Say($"Value:          [color={Util.CC(Cc.C)}]{(analyzeNode as CorpNode).Stock.Price}[/color] [color={Util.CC(Cc.Y)}]GC[/color]");
+                Say($"[color={Util.CC(Cc.gR)}]▶ Faction detail[/color]");
+                Say($"[color={Util.CC(Cc.rgb)}]Name:[/color]           [color={Util.CC(Cc.y)}]{Util.Obfuscate((analyzeNode as CorpNode).Faction.Name)}[/color]");
+                Say($"[color={Util.CC(Cc.rgb)}]Description:[/color]    [color={Util.CC(Cc.Y)}]{Util.Obfuscate((analyzeNode as CorpNode).Faction.Desc)}[/color]");
+                Say($"[color={Util.CC(Cc.gR)}]▶ Business detail[/color]");
+                Say($"[color={Util.CC(Cc.rgb)}]Stock:[/color]          [color={Util.CC(Cc.y)}]{(analyzeNode as CorpNode).Stock.Name}[/color]");
+                Say($"[color={Util.CC(Cc.rgb)}]Value:[/color]          [color={Util.CC(Cc.C)}]{(analyzeNode as CorpNode).Stock.Price}[/color] [color={Util.CC(Cc.Y)}]GC[/color]");
             }
         }
     }
-    void ParseArgs(Dictionary<string, string> defaultArg, params string[] args) {
-        for (int i = 0; i < args.Length; i++) {
-            if (defaultArg.ContainsKey(args[i])) {
-                if (defaultArg[args[i]] == "") defaultArg[args[i]] = args[i];
-                else if (i < args.Length - 1) defaultArg[args[i]] = args[i + 1];
-            } else if (args[i][0] == '-') {
-                if (i < args.Length - 1) defaultArg[args[i]] = args[i + 1];
-                else defaultArg[args[i]] = args[i];
-            }
+    static (Dictionary<string, string>, string[]) ParseArgs(string[] args) {
+        Dictionary<string, string> parsedArgs = [];
+        List<string> positionalArgs = [];
+        for (int i = 0; i < args.Length; ++i) {
+            if (args[i].StartsWith("--")) {
+                if (i + 1 < args.Length && !args[i + 1].StartsWith('-') && !args[i + 1].StartsWith("--")) {
+                    parsedArgs[args[i]] = args[i + 1]; ++i;
+                } else parsedArgs[args[i]] = "";
+            } else if (args[i].StartsWith('-')) {
+                if (args[i].Length == 2) {
+                    if (i + 1 < args.Length && !args[i + 1].StartsWith('-') && !args[i + 1].StartsWith("--")) {
+                        parsedArgs[args[i]] = args[i + 1]; ++i;
+                    } else parsedArgs[args[i]] = "";
+                } else for (int j = 1; j < args[i].Length; ++j) { parsedArgs['-' + args[i][j].ToString()] = ""; }
+            } else { positionalArgs.Add(args[i]); }
         }
+        return (parsedArgs, positionalArgs.ToArray());
     }
-    void SetCommandPrompt() { terminalCommandPrompt.Text = $"[color={Util.CC(Cc.PURPLE)}]{networkManager.UserName}[/color]@[color={Util.CC(Cc.G)}]{CurrentNode.HostName}[/color]:{CurrentDirectory.GetPath()}>"; }
+    void SetCommandPrompt() { terminalCommandPrompt.Text = $"[color={Util.CC(Cc.m)}]{networkManager.UserName}[/color]@[color={Util.CC(Cc.G)}]{CurrentNode.HostName}[/color]:{CurrentDirectory.GetPath()}>"; }
     string EscapeBBCode(string code) { return code.Replace("[", "[lb]"); }
 }

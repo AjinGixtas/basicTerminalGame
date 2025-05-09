@@ -1,50 +1,125 @@
-[color=cyan]ls[/color] [color=yellow][directory][/color] – List all files and directories in the current directory.
+[color=cyan]mkf[/color] [color=yellow][file_name][/color]
+    [color=green]Creates[/color] a new file in the current or specified directory.
+    [color=yellow]Arguments:[/color]
+      [color=yellow][file_name][/color] – The name of the file to create. Supports paths.
+    [color=green]Example:[/color]
+      [color=yellow]mkf example.txt[/color] – Creates a file named `example.txt` in the current directory.
+      [color=yellow]mkf folder/example.txt[/color] – Creates a file named `example.txt` in the `folder` directory.
 
-[color=cyan]cd[/color] [color=yellow][directory][/color] – Change to the specified directory.
+[color=cyan]rmf[/color] [color=yellow][file_name][/color]
+    [color=green]Removes[/color] a file from the current or specified directory.
+    [color=yellow]Arguments:[/color]
+      [color=yellow][file_name][/color] – The name of the file to remove. Supports paths.
+    [color=green]Example:[/color]
+      [color=yellow]rmf example.txt[/color] – Removes the file `example.txt` from the current directory.
+      [color=yellow]rmf folder/example.txt[/color] – Removes the file `example.txt` from the `folder` directory.
 
-[color=cyan]pwd[/color] – Print the current working directory.
+[color=cyan]ls[/color] [color=yellow][directory][/color]
+    [color=green]Lists[/color] all files and directories in the specified or current directory.
+    [color=yellow]Arguments:[/color]
+      [color=yellow][directory][/color] – Optional. The directory to list. Defaults to the current directory.
+    [color=green]Example:[/color]
+      [color=yellow]ls[/color] – Lists the contents of the current directory.
+      [color=yellow]ls folder[/color] – Lists the contents of the `folder` directory.
 
-[color=cyan]echo[/color] [color=yellow][message][/color] [color=yellow][-n][/color] [color=yellow][-e][/color]
-	[color=green]Outputs[/color] the specified [color=yellow][message][/color] to the terminal.
-	[color=yellow]Arguments:[/color]
-	  [color=yellow]-n[/color] – Optional. Suppress the trailing newline (e.g., `echo -n "Hello"` prints `Hello` without a newline).
-	  [color=yellow]-e[/color] – Optional. Enable escape sequences like `\n` (newline), `\t` (tab), etc.
+[color=cyan]cd[/color] [color=yellow][directory][/color]
+    [color=green]Changes[/color] the current working directory to the specified directory.
+    [color=yellow]Arguments:[/color]
+      [color=yellow][directory][/color] – The target directory to navigate to.
+    [color=green]Example:[/color]
+      [color=yellow]cd folder[/color] – Changes the current directory to `folder`.
 
-[color=cyan]clear[/color] – Clear the terminal screen.
+[color=cyan]pwd[/color]
+    [color=green]Prints[/color] the current working directory.
+    [color=green]Example:[/color]
+      [color=yellow]pwd[/color] – Displays the full path of the current directory.
 
-[color=cyan]mkdir[/color] [color=yellow][directory_name][/color] – Create a new directory with the specified name.
+[color=cyan]say[/color] [color=yellow][message][/color] [color=yellow][-n][/color] [color=yellow][-e][/color] [color=yellow][-r][/color]
+    [color=green]Outputs[/color] the specified message to the terminal.
+    [color=yellow]Arguments:[/color]
+      [color=yellow][message][/color] – The message to display.
+      [color=yellow]-n[/color] – Optional. Suppress the trailing newline.
+      [color=yellow]-e[/color] – Optional. Enable escape sequences (e.g., `\n` for newline).
+      [color=yellow]-r[/color] – Optional. Display the message in red.
+    [color=green]Example:[/color]
+      [color=yellow]say Hello, World![/color] – Displays `Hello, World!` in the terminal.
+      [color=yellow]say -n "Hello"`[/color] – Displays `Hello` without a newline.
 
-[color=cyan]rmdir[/color] [color=yellow][directory_name][/color] – Remove an empty directory.
+[color=cyan]help[/color] [color=yellow][-v][/color]
+    [color=green]Displays[/color] help information for available commands.
+    [color=yellow]Arguments:[/color]
+      [color=yellow]-v[/color] – Optional. Show verbose help.
+    [color=green]Example:[/color]
+      [color=yellow]help[/color] – Displays a brief overview of commands.
+      [color=yellow]help -v[/color] – Displays detailed help for all commands.
+
+[color=cyan]home[/color]
+    [color=green]Returns[/color] to the home directory.
+    [color=green]Example:[/color]
+      [color=yellow]home[/color] – Navigates back to the home directory.
+
+[color=cyan]edit[/color] [color=yellow][file_name][/color]
+    [color=green]Opens[/color] a file in the text editor.
+    [color=yellow]Arguments:[/color]
+      [color=yellow][file_name][/color] – The name of the file to edit. Supports paths.
+    [color=green]Example:[/color]
+      [color=yellow]edit example.txt[/color] – Opens `example.txt` in the text editor.
 
 [color=cyan]scan[/color] [color=yellow][-d [depth_val]][/color] [color=yellow][-v][/color]
-	[color=green]Scans[/color] for vulnerabilities or network connections.
-	[color=yellow]Arguments:[/color]
-	  [color=yellow]-d [depth_val][/color] – Optional. Set the scan depth (number of levels to scan).
-	  [color=yellow]-v[/color] – Optional. Enable verbose output (shows detailed information).
+    [color=green]Scans[/color] the network for vulnerabilities or connections.
+    [color=yellow]Arguments:[/color]
+      [color=yellow]-d [depth_val][/color] – Optional. Set the scan depth (number of levels to scan).
+      [color=yellow]-v[/color] – Optional. Enable verbose output.
+    [color=green]Example:[/color]
+      [color=yellow]scan[/color] – Scans the network with default depth.
+      [color=yellow]scan -d 3 -v[/color] – Scans the network up to 3 levels deep with verbose output.
 
-[color=cyan]crack[/color] [color=yellow][init][/color] [color=yellow][hostname_or_ip][/color] OR [color=yellow][flags [lock_value]][/color]
-	[color=green]Crack[/color] different types of security locks on a specified system or service.
-	[color=yellow]Usage:[/color]
-	  [color=yellow]crack init [hostname_or_ip][/color] – Begin the cracking process by specifying a hostname or IP address. This initializes the cracking attempt for the target system.
-	  [color=yellow]crack -[lock_flag] [lock_value][/color] – Specify the type of lock (e.g., [color=yellow]i5[/color], [color=yellow]p9[/color]) and provide the value to attempt cracking the lock.
-	[color=green]Example:[/color]
-	  [color=yellow]crack init 192.168.1.1[/color] – This initializes the cracking attempt on the system at `192.168.1.1`.
-	  [color=yellow]crack -i5 3 -p9 7[/color] – This attempts to crack an [color=yellow]i5[/color] lock with value [color=yellow]3[/color] and a [color=yellow]p9[/color] lock with value [color=yellow]7[/color] on the same system.
+[color=cyan]clear[/color]
+    [color=green]Clears[/color] the terminal screen.
+    [color=green]Example:[/color]
+      [color=yellow]clear[/color] – Clears all text from the terminal.
 
-[color=cyan]connect[/color] [color=yellow][ip_or_hostname][/color] – Connect to a remote host. Use a neighboring [color=yellow]hostname[/color], or any [color=yellow]IP address[/color].
-	[color=green]Example:[/color]
-	  [color=yellow]connect 192.168.1.1[/color] – Connect to the host at IP address `192.168.1.1`.
-	  [color=yellow]connect neighborhost[/color] – Connect to a neighboring host directly using its hostname.
+[color=cyan]mkdir[/color] [color=yellow][directory_name][/color]
+    [color=green]Creates[/color] a new directory with the specified name.
+    [color=yellow]Arguments:[/color]
+      [color=yellow][directory_name][/color] – The name of the directory to create. Supports paths.
+    [color=green]Example:[/color]
+      [color=yellow]mkdir folder[/color] – Creates a directory named `folder`.
 
+[color=cyan]rmdir[/color] [color=yellow][directory_name][/color]
+    [color=green]Removes[/color] an empty directory.
+    [color=yellow]Arguments:[/color]
+      [color=yellow][directory_name][/color] – The name of the directory to remove. Supports paths.
+    [color=green]Example:[/color]
+      [color=yellow]rmdir folder[/color] – Removes the directory named `folder`.
+
+[color=cyan]crack[/color] [color=yellow]--init[/color] OR [color=yellow][flags][/color]
+    [color=green]Cracks[/color] locks with specified values.
+    [color=yellow]Arguments:[/color]
+      [color=yellow]--init[/color] – Initializes the cracking process.
+      [color=yellow][flags][/color] – Specify lock types and values (e.g., `-i5 3`).
+    [color=green]Example:[/color]
+      [color=yellow]crack init[/color] – Starts the cracking process.
+      [color=yellow]crack -i5 3 -p9 7[/color] – Attempts to crack locks with the specified values.
+
+[color=cyan]inspect[/color]
+    [color=green]Reserved[/color] for future functionality.
+
+[color=cyan]connect[/color] [color=yellow][ip_or_hostname][/color]
+    [color=green]Connects[/color] to a remote host.
+    [color=yellow]Arguments:[/color]
+      [color=yellow][ip_or_hostname][/color] – The target IP address or hostname.
+    [color=green]Example:[/color]
+      [color=yellow]connect 192.168.1.1[/color] – Connects to the host at `192.168.1.1`.
 
 [color=cyan]analyze[/color] [color=yellow][ip_or_hostname][/color]
-	[color=green]Analyzes[/color] the target host or the current system for information such as its security features.
-	[color=yellow]Arguments:[/color]
-	  [color=yellow][ip_or_hostname][/color] – Optional. The target IP address or neighboring hostname. If omitted, the current system will be analyzed.
-	[color=green]Output:[/color]
-	  Displays information about the system, such as:
-		- IP address
-		- Hostname
-		- Host type (e.g., [color=purple]PERSON[/color], [color=purple]BUSINESS[/color])
-		- Defense value
-		- Security type
+    [color=green]Analyzes[/color] the target host or current system for information.
+    [color=yellow]Arguments:[/color]
+      [color=yellow][ip_or_hostname][/color] – Optional. The target IP address or hostname.
+    [color=green]Output:[/color]
+      Displays information about the system, such as:
+        - IP address
+        - Hostname
+        - Host type (e.g., [color=purple]PERSON[/color], [color=purple]BUSINESS[/color])
+        - Defense value
+        - Security type

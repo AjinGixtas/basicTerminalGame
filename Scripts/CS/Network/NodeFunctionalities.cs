@@ -31,16 +31,46 @@ public class LockSystem {
         return 0;
     }
     // 0 - Success; 1 - Missing flag; 2 - Incorrect key; 3 - Missing key
+    readonly string[] PREFORMAT_STRING = [
+        $"[[color={Util.CC(Cc.C)}]UNLOCKED[/color]] Bypassed [color={Util.CC(Cc.gR)}]{{0}}[/color]\n",
+        $"[[color={Util.CC(Cc.R)}]DENIED[/color]] Missing parameter [color={Util.CC(Cc.gR)}]{{0}}[/color]\n",
+        $"[[color={Util.CC(Cc.R)}]DENIED[/color]] Missing key for parameter [color={Util.CC(Cc.gR)}]{{0}}[/color]\n",
+        $"[[color={Util.CC(Cc.R)}]DENIED[/color]] Incorrect key for parameter [color={Util.CC(Cc.gR)}]{{0}}[/color]\n{{1}}\n"
+    ];
     public (int, string) CrackAttempt(Dictionary<string, string> ans) {
+        string output = "";
+        foreach (KeyValuePair<string, string> val in ans) {
+            GD.Print(val.Key, ' ', val.Value);
+        }
         for (int i = 0; i < activeLocks.Count; i++) {
-            if (ans.TryGetValue(activeLocks[i].Flag, out string key)) {
-                if (key == activeLocks[i].Flag) return (2, activeLocks[i].Flag); // Missing key
-                if (!activeLocks[i].UnlockAttempt(key)) return (3, activeLocks[i].Flag); // Incorrect key
-                continue;
-            } else return (1, activeLocks[i].Flag); // Missing flag
+            string[] flags = activeLocks[i].Flag;
+            for (int j = 0; j < flags.Length; ++j) {
+                int unlockCode = -1; // Invalid value get flagged
+
+                if (ans.TryGetValue(flags[j], out string key)) {
+                    if (key == flags[j]) {
+                        unlockCode = 2; // Missing key 
+                        output += string.Format(PREFORMAT_STRING[unlockCode], flags[j]);
+                    } else if (!activeLocks[i].UnlockAttempt(key, j)) {
+                        unlockCode = 3; // Incorrect key
+                        output += string.Format(PREFORMAT_STRING[unlockCode], flags[j], activeLocks[i].Inp);
+                    } else {
+                        unlockCode = 0; // Unlocked this lock
+                    }
+                } else {
+                    unlockCode = 1; // Missing flag
+                    GD.Print(PREFORMAT_STRING[unlockCode]);
+                    output += string.Format(PREFORMAT_STRING[unlockCode], flags[j]);
+                }
+
+                if (unlockCode != 0) { // Return if any lock is not unlocked
+                    return (unlockCode, output); 
+                }
+            }
+            output += string.Format(PREFORMAT_STRING[0], activeLocks[i].Name);
         }
         lockPool = []; activeLocks = []; // Destroy all security system
-        return (0, ""); // Success
+        return (0, output); // Success
     }
 }
 public class HackFarm {

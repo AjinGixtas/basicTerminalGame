@@ -19,39 +19,39 @@ public static class Util {
     // Cc also stands for Color Code, shortened and have the second 'C' to lowercase for distinguish them apart.
     public static string CC(Cc color) {
         return color switch {
-            Cc.___ => "#000000",   // Black (no intensity)
-            Cc.rgb => "#282828",   // Dim gray, more distinct from white
-            Cc.RGB => "#ffffff",   // Full white
+            Cc.___ => "#000000",   // Black
+            Cc.rgb => "#282828",   // Dark gray
+            Cc.RGB => "#ffffff",   // White
 
-            Cc.R => "#ff0000",     // Red (unchanged)
-            Cc.G => "#00ff00",     // Green (unchanged)
-            Cc.B => "#0000ff",     // Blue (unchanged)
-            Cc.C => "#00ffff",     // Cyan (unchanged)
-            Cc.M => "#ff00ff",     // Magenta (unchanged)
-            Cc.Y => "#ffff00",     // Yellow (unchanged)
+            Cc.R => "#ff0000",     // Bright red
+            Cc.G => "#00ff00",     // Bright green
+            Cc.B => "#0000ff",     // Bright blue
+            Cc.C => "#00ffff",     // Bright cyan
+            Cc.M => "#ff00ff",     // Bright magenta
+            Cc.Y => "#ffff00",     // Bright yellow
 
-            Cc.r => "#cc0000",     // Brighter half red
-            Cc.g => "#00cc00",     // Brighter half green
-            Cc.b => "#0000cc",     // Brighter half blue
-            Cc.c => "#005C5C",     // Brighter cyan (half green + half blue)
-            Cc.m => "#cc00cc",     // Brighter magenta (half red + half blue)
-            Cc.y => "#cccc00",     // Brighter yellow (half red + half green)
+            Cc.r => "#cc0000",     // Deep red
+            Cc.g => "#00cc00",     // Deep green
+            Cc.b => "#0000cc",     // Deep blue
+            Cc.c => "#005C5C",     // Dark teal
+            Cc.m => "#cc00cc",     // Deep magenta
+            Cc.y => "#cccc00",     // Olive yellow
 
-            Cc.gB => "#00aaff",    // Strong green-blue (cyan-leaning)
-            Cc.rB => "#aa00ff",    // Strong red-blue (violet-leaning)
-            Cc.rG => "#aaff00",    // Strong red-green (lime-leaning)
-            Cc.bG => "#00ffaa",    // Strong green with touch of blue
-            Cc.bR => "#ff00aa",    // Strong red with touch of blue
-            Cc.gR => "#ffaa00",    // Strong orange (red + green)
+            Cc.gB => "#00aaff",    // Aqua blue
+            Cc.rB => "#aa00ff",    // Violet
+            Cc.rG => "#aaff00",    // Lime green
+            Cc.bG => "#00ffaa",    // Mint green
+            Cc.bR => "#ff00aa",    // Hot pink
+            Cc.gR => "#ffaa00",    // Amber
 
-            Cc.LB => "#6666ff",    // Softer but clear blue tint
-            Cc.LG => "#66ff66",    // Softer green tint
-            Cc.LC => "#66ffff",    // Softer cyan tint
-            Cc.LR => "#ff6666",    // Softer red tint
-            Cc.LM => "#ff66ff",    // Softer magenta tint
-            Cc.LY => "#ffff66",    // Softer yellow tint
+            Cc.LB => "#6666ff",    // Periwinkle
+            Cc.LG => "#66ff66",    // Light green
+            Cc.LC => "#66ffff",    // Light cyan
+            Cc.LR => "#ff6666",    // Light coral
+            Cc.LM => "#ff66ff",    // Light magenta
+            Cc.LY => "#ffff66",    // Light yellow
 
-            _ => "#ffffff",        // Default: white
+            _ => "#ffffff",        // Default white
         };
     }
     public static string Obfuscate(string input) {

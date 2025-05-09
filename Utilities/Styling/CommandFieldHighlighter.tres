@@ -1,0 +1,10 @@
+[gd_resource type="CodeHighlighter" load_steps=2 format=3 uid="uid://dfl78raux0p25"]
+
+[ext_resource type="Script" uid="uid://ttap2xfhqi2m" path="res://Utilities/Styling/CommandFieldHighlighterScript.gd" id="1_200ci"]
+
+[resource]
+number_color = Color(1, 0, 1, 1)
+symbol_color = Color(1, 0, 1, 1)
+function_color = Color(1, 0, 1, 1)
+member_variable_color = Color(1, 0, 1, 1)
+script = ExtResource("1_200ci")

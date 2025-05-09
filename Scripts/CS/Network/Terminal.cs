@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 public partial class Terminal : MarginContainer {
     public Overseer overseer;
-    RichTextLabel terminalOutputField; RichTextLabel terminalCommandPrompt; LineEdit terminalCommandField; Timer processTimer, updateProcessGraphicTimer;
+    RichTextLabel terminalOutputField; RichTextLabel terminalCommandPrompt; TextEdit terminalCommandField; Timer processTimer, updateProcessGraphicTimer;
     NetworkManager networkManager;
     NetworkNode currentNode = null; NodeDirectory currentDirectory = null;
     NodeDirectory CurrentDirectory  { get { return currentDirectory; } set { currentDirectory = value; SetCommandPrompt(); } }
@@ -20,7 +20,7 @@ public partial class Terminal : MarginContainer {
             commandHistoryIndex = Math.Clamp(value, 0, commandHistory.Count-1);
             if (commandHistoryIndex < commandHistory.Count) {
                 terminalCommandField.Text = commandHistory[commandHistoryIndex];
-                terminalCommandField.CaretColumn = commandHistory[commandHistoryIndex].Length;
+                terminalCommandField.SetCaretColumn(commandHistory[commandHistoryIndex].Length);
             }
         } 
     }
@@ -32,11 +32,11 @@ public partial class Terminal : MarginContainer {
         CurrentDirectory = currentNode.NodeDirectory;
         CurrentDirectory.AddFile("pootis.txt");
         SetCommandPrompt();
-        terminalCommandField.Edit();
+        terminalCommandField.GrabFocus();
     }
     void IntializeOnReadyVar() {
         terminalOutputField = GetNode<RichTextLabel>("Splitter/TerminalOutputArea");
-        terminalCommandField = GetNode<LineEdit>("Splitter/TerminalCommandLine/CommandField");
+        terminalCommandField = GetNode<CodeEdit>("Splitter/TerminalCommandLine/CommandField");
         terminalCommandPrompt = GetNode<RichTextLabel>("Splitter/TerminalCommandLine/CommandPrompt");
         processTimer = GetNode<Timer>("Splitter/TimersContainer/ProcessTimer");
         updateProcessGraphicTimer = GetNode<Timer>("Splitter/TimersContainer/UpdateProcessGraphicTimer");
@@ -46,6 +46,12 @@ public partial class Terminal : MarginContainer {
     public override void _Process(double delta) {
         if (Input.IsActionJustPressed("moveDownHistory")) CommandHistoryIndex += 1;
         if (Input.IsActionJustPressed("moveUpHistory")) CommandHistoryIndex -= 1;
+        if (Input.IsActionJustPressed("submitCommand")) {
+            GD.Print("Submit!"); GD.Print(terminalCommandField.Text);
+            if (terminalCommandField.Text.Length == 0) { terminalCommandField.GrabFocus(); return; }
+            SubmitCommand(terminalCommandField.Text);
+            terminalCommandField.GrabFocus();
+        }
     }
 
     Action<Dictionary<string, string>, string[]> finishFunction; (Dictionary<string, string>, string[]) finishFunctionArgs;
@@ -73,22 +79,23 @@ public partial class Terminal : MarginContainer {
         updateProcessGraphicTimer.Start();
     }
     public void ProcessFinished() {
-        isProcessing = false; terminalCommandField.Editable = true; terminalCommandField.Edit();
+        isProcessing = false; terminalCommandField.Editable = true; terminalCommandField.GrabFocus();
         tick = (tick + 1) % SpinnerChars.Length;
         Say($"...Done!");
         progress = 0; tick = 0;
         finishFunction(finishFunctionArgs.Item1, finishFunctionArgs.Item2);
     }
     const int MAX_HISTORY_CMD_SIZE = 64;
-    public void SubmitCommand(string newText) {
+    public void SubmitCommand(string newCommand) {
         terminalCommandField.Text = "";
-        if (commandHistory.Count == 0 || (commandHistory.Count > 0 && commandHistory[^1] != newText)) { 
-            commandHistory.Add(newText); 
+        newCommand = newCommand.Trim('\r', '\n');
+        if (commandHistory.Count == 0 || (commandHistory.Count > 0 && commandHistory[^1] != newCommand)) { 
+            commandHistory.Add(newCommand); 
             while (commandHistory.Count > MAX_HISTORY_CMD_SIZE) { commandHistory.RemoveAt(0); }
             commandHistoryIndex = commandHistory.Count; 
         }
-        string[] commands = newText.Split(';', StringSplitOptions.RemoveEmptyEntries);
-        Say($"{terminalCommandPrompt.Text}{newText}");
+        string[] commands = newCommand.Split(';', StringSplitOptions.RemoveEmptyEntries);
+        Say($"{terminalCommandPrompt.Text}{StyleCommand(newCommand)}");
         for (int i = 0; i < commands.Length; i++) {
             string[] components = ParseArguments(commands[i]);
             if (components.Length == 0) continue;
@@ -107,6 +114,26 @@ public partial class Terminal : MarginContainer {
                 return [arg];
             })
             .SelectMany(x => x)];
+        }
+        static string StyleCommand(string command) {
+            string output = "";
+            string[] commands = command.Split(';');
+            for(int i = 0; i < commands.Length; i++) {
+                if (i > 0) { output += ';'; }
+                if (commands[i].Length == 0) { continue; }
+
+                string[] tokens = commands[i].Split(' '); bool firstToken = true;
+                for(int j = 0; j < tokens.Length; ++j) {
+                    if (j > 0) { output += ' '; }
+                    if (tokens[j].Length == 0) { continue; }
+
+                    if (firstToken) { output += $"[color={Util.CC(Cc.C)}]{tokens[j]}[/color]"; firstToken = false; } 
+                    else if (tokens[j].StartsWith('-')) { output += $"[color={Util.CC(Cc.gR)}]{tokens[j]}[/color]"; }
+                    else { output += $"[color={Util.CC(Cc.rgb)}]{tokens[j]}[/color]"; }
+                }
+            }
+            GD.Print(output);
+            return output;
         }
     }
     bool ProcessCommand(string command, string[] args) {
@@ -199,22 +226,25 @@ public partial class Terminal : MarginContainer {
             terminalOutputField.AppendText(c[^RESET_HISTORY_CHAR_SIZE..]);
         }
 
-        bool noNewline = false, interpretEscapes = false, makeRed = false, trimTrailingNewline = false;
+        bool noNewline = false, interpretEscapes = false, makeRed = false;
+        bool trimTrailingNewline = false, trimLeadingNewline = false;
         int argStart = 0;
 
-        // Handle optional flags like -n, -e, -r, -t
+        // Handle optional flags like -n, -e, -r, -t, -l
         if (args[0].StartsWith('-')) {
             string flags = args[0];
             noNewline = flags.Contains('n');
             interpretEscapes = flags.Contains('e');
             makeRed = flags.Contains('r');
             trimTrailingNewline = flags.Contains('t');
+            trimLeadingNewline = flags.Contains('l');
             argStart = 1;
         }
 
         string text = string.Join(" ", args[argStart..]);
         if (interpretEscapes) text = Regex.Unescape(text); // handles \n, \t, etc.
-        if (trimTrailingNewline && text.EndsWith('\n')) text = text[..^1]; // Trim only one trailing newline
+        if (trimLeadingNewline) text = text.TrimStart('\n', '\r');
+        if (trimTrailingNewline) text = text.TrimEnd('\n', '\r');
         if (!noNewline) text += "\n";
         if (makeRed) text = $"[color={Util.CC(Cc.R)}]{text}[/color]";
 
@@ -411,43 +441,51 @@ public partial class Terminal : MarginContainer {
                 SecurityType.HISEC or SecurityType.MASEC => Util.CC(Cc.B),
                 _ => Util.CC(Cc.R)
             };
-            Say($"[color={Util.CC(Cc.gR)}]▶ Node Info[/color]");
-            Say($"[color={Util.CC(Cc.rgb)}]Host name:[/color]      [color={Util.CC(Cc.G)}]{analyzeNode.HostName}[/color]");
-            Say($"[color={Util.CC(Cc.rgb)}]IP address:[/color]     [color={Util.CC(Cc.C)}]{analyzeNode.IP}[/color]");
-            Say($"[color={Util.CC(Cc.rgb)}]Display name:[/color]   [color={Util.CC(Cc.y)}]{analyzeNode.DisplayName}[/color]");
+            Say("-tl", $@"
+[color={Util.CC(Cc.gR)}]▶ Node Info[/color]
+[color={Util.CC(Cc.rgb)}]Host name:[/color]      [color={Util.CC(Cc.G)}]{analyzeNode.HostName}[/color]
+[color={Util.CC(Cc.rgb)}]IP address:[/color]     [color={Util.CC(Cc.C)}]{analyzeNode.IP}[/color]
+[color={Util.CC(Cc.rgb)}]Display name:[/color]   [color={Util.CC(Cc.y)}]{analyzeNode.DisplayName}[/color]
+[color={Util.CC(Cc.gR)}]▶ Classification[/color]
+[color={Util.CC(Cc.rgb)}]Node type:[/color]      [color={Util.CC(Cc.m)}]{analyzeNode.NodeType}[/color]
+[color={Util.CC(Cc.rgb)}]Defense level:[/color]  [color={defColorCode}]{analyzeNode.DefLvl}[/color]
+[color={Util.CC(Cc.rgb)}]Security level:[/color] [color={secColorCode}]{analyzeNode.SecType}[/color]
+");
 
-            Say($"[color={Util.CC(Cc.gR)}]▶ Classification[/color]");
-            Say($"[color={Util.CC(Cc.rgb)}]Node type:[/color]      [color={Util.CC(Cc.m)}]{analyzeNode.NodeType}[/color]");
-            Say($"[color={Util.CC(Cc.rgb)}]Defense level:[/color]  [color={defColorCode}]{analyzeNode.DefLvl}[/color]");
-            Say($"[color={Util.CC(Cc.rgb)}]Security level:[/color] [color={secColorCode}]{analyzeNode.SecType}[/color]");
-
-            if (analyzeNode.CurrentOwner != networkManager.network) {
+            // Honeypot node don't dare to impersonate actual organization or corporation.
+            if (analyzeNode.CurrentOwner != networkManager.network || analyzeNode.GetType() == typeof(HoneypotNode)) {
                 Say($"Crack this node security system to get further access.");
-                return; // Not yours yet, no more detail!
+                return;
             }
-            Say($"[color={Util.CC(Cc.gR)}]▶ GC miner detail[/color]");
-            Say($"[color={Util.CC(Cc.rgb)}]Transfer batch:[/color] [color={Util.CC(Cc.c)}]{analyzeNode.HackFarm.HackLevel}[/color] ([color={Util.CC(Cc.c)}]{analyzeNode.HackFarm.CurHack:F2}[/color] [color={Util.CC(Cc.rgb)}]GC[/color])");
-            Say($"[color={Util.CC(Cc.rgb)}]Transfer speed:[/color] [color={Util.CC(Cc.c)}]{analyzeNode.HackFarm.TimeLevel}[/color] ([color={Util.CC(Cc.c)}]{analyzeNode.HackFarm.CurTime:F2}[/color] [color={Util.CC(Cc.rgb)}]s[/color])");
-            Say($"[color={Util.CC(Cc.rgb)}]Mining speed:[/color]   [color={Util.CC(Cc.c)}]{analyzeNode.HackFarm.GrowLevel}[/color] ([color={Util.CC(Cc.c)}]{analyzeNode.HackFarm.CurGrow:F2}[/color] [color={Util.CC(Cc.rgb)}]GC/s[/color])");
-            GD.Print(Util.CC(Cc.c));
-
+            Say("-tl", $@"
+[color={Util.CC(Cc.gR)}]▶ GC miner detail[/color]
+[color={Util.CC(Cc.rgb)}]Transfer batch:[/color] [color={Util.CC(Cc.c)}]{analyzeNode.HackFarm.HackLevel}[/color] ([color={Util.CC(Cc.c)}]{analyzeNode.HackFarm.CurHack:F2}[/color] [color={Util.CC(Cc.rgb)}]GC[/color])
+[color={Util.CC(Cc.rgb)}]Transfer speed:[/color] [color={Util.CC(Cc.c)}]{analyzeNode.HackFarm.TimeLevel}[/color] ([color={Util.CC(Cc.c)}]{analyzeNode.HackFarm.CurTime:F2}[/color] [color={Util.CC(Cc.rgb)}]s[/color])
+[color={Util.CC(Cc.rgb)}]Mining speed:[/color]   [color={Util.CC(Cc.c)}]{analyzeNode.HackFarm.GrowLevel}[/color] ([color={Util.CC(Cc.c)}]{analyzeNode.HackFarm.CurGrow:F2}[/color] [color={Util.CC(Cc.rgb)}]GC/s[/color])
+");
             if (analyzeNode is FactionNode) {
-                Say($"[color={Util.CC(Cc.gR)}]▶ Faction detail[/color]");
-                Say($"[color={Util.CC(Cc.rgb)}]Name:[/color]           [color={Util.CC(Cc.y)}]{Util.Obfuscate((analyzeNode as FactionNode).Faction.Name)}[/color]");
-                Say($"[color={Util.CC(Cc.rgb)}]Description:[/color]    [color={Util.CC(Cc.Y)}]{Util.Obfuscate((analyzeNode as FactionNode).Faction.Desc)}[/color]");
+                Say("-tl", $@"
+[color={Util.CC(Cc.gR)}]▶ Faction detail[/color]
+[color={Util.CC(Cc.rgb)}]Name:[/color]           [color={Util.CC(Cc.y)}]{Util.Obfuscate((analyzeNode as FactionNode).Faction.Name)}[/color]
+[color={Util.CC(Cc.rgb)}]Description:[/color]    [color={Util.CC(Cc.g)}]{Util.Obfuscate((analyzeNode as FactionNode).Faction.Desc)}[/color]
+");
             }
             if (analyzeNode is BusinessNode) {
-                Say($"[color={Util.CC(Cc.gR)}]▶ Business detail[/color]");
-                Say($"[color={Util.CC(Cc.rgb)}]Stock:[/color]          [color={Util.CC(Cc.y)}]{(analyzeNode as BusinessNode).Stock.Name}[/color]");
-                Say($"[color={Util.CC(Cc.rgb)}]Value:[/color]          [color={Util.CC(Cc.C)}]{(analyzeNode as BusinessNode).Stock.Price}[/color]");
+                Say("-tl", $@"
+[color={Util.CC(Cc.gR)}]▶ Business detail[/color]
+[color={Util.CC(Cc.rgb)}]Stock:[/color]          [color={Util.CC(Cc.m)}]{(analyzeNode as BusinessNode).Stock.Name}[/color]
+[color={Util.CC(Cc.rgb)}]Value:[/color]          [color={Util.CC(Cc.c)}]{(analyzeNode as BusinessNode).Stock.Price}[/color]
+");
             }
             if (analyzeNode is CorpNode) {
-                Say($"[color={Util.CC(Cc.gR)}]▶ Faction detail[/color]");
-                Say($"[color={Util.CC(Cc.rgb)}]Name:[/color]           [color={Util.CC(Cc.y)}]{Util.Obfuscate((analyzeNode as CorpNode).Faction.Name)}[/color]");
-                Say($"[color={Util.CC(Cc.rgb)}]Description:[/color]    [color={Util.CC(Cc.Y)}]{Util.Obfuscate((analyzeNode as CorpNode).Faction.Desc)}[/color]");
-                Say($"[color={Util.CC(Cc.gR)}]▶ Business detail[/color]");
-                Say($"[color={Util.CC(Cc.rgb)}]Stock:[/color]          [color={Util.CC(Cc.y)}]{(analyzeNode as CorpNode).Stock.Name}[/color]");
-                Say($"[color={Util.CC(Cc.rgb)}]Value:[/color]          [color={Util.CC(Cc.C)}]{(analyzeNode as CorpNode).Stock.Price}[/color] [color={Util.CC(Cc.Y)}]GC[/color]");
+                Say("-tl", $@"
+[color={Util.CC(Cc.gR)}]▶ Faction detail[/color]
+[color={Util.CC(Cc.rgb)}]Name:[/color]           [color={Util.CC(Cc.y)}]{Util.Obfuscate((analyzeNode as CorpNode).Faction.Name)}[/color]
+[color={Util.CC(Cc.rgb)}]Description:[/color]    [color={Util.CC(Cc.g)}]{Util.Obfuscate((analyzeNode as CorpNode).Faction.Desc)}[/color]
+[color={Util.CC(Cc.gR)}]▶ Business detail[/color]
+[color={Util.CC(Cc.rgb)}]Stock:[/color]          [color={Util.CC(Cc.m)}]{(analyzeNode as CorpNode).Stock.Name}[/color]
+[color={Util.CC(Cc.rgb)}]Value:[/color]          [color={Util.CC(Cc.c)}]{(analyzeNode as CorpNode).Stock.Price}[/color][color={Util.CC(Cc.rgb)}]GC[/color]
+");
             }
         }
     }
@@ -471,4 +509,8 @@ public partial class Terminal : MarginContainer {
     }
     void SetCommandPrompt() { terminalCommandPrompt.Text = $"[color={Util.CC(Cc.m)}]{networkManager.UserName}[/color]@[color={Util.CC(Cc.G)}]{CurrentNode.HostName}[/color]:{CurrentDirectory.GetPath()}>"; }
     string EscapeBBCode(string code) { return code.Replace("[", "[lb]"); }
+    public void OnCommandFieldTextChanged() {
+        terminalCommandField.Text = terminalCommandField.Text.Replace("\n", "").Replace("\r", "");
+        terminalCommandField.SetCaretColumn(terminalCommandField.Text.Length);
+    }
 }

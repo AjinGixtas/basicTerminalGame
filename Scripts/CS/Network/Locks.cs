@@ -168,7 +168,7 @@ public class C3 : Lock {
     public override int MinLvl => 3;
 
     readonly string[] colors = ["red", "cyan", "green", "yellow", "blue", "magenta", "white", "black"];
-    readonly string[] groupNames = ["wb", "rgb", "cmy"];
+    readonly string[] groupNames = ["bw", "rgb", "cmy"];
     readonly string[][] colorGroups = [
         ["white", "black"],
         ["red", "green", "blue"],

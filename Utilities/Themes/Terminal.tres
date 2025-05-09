@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=20 format=4 uid="uid://cu26m1463lwkc"]
+[gd_resource type="Theme" load_steps=44 format=4 uid="uid://cu26m1463lwkc"]
 
 [ext_resource type="FontFile" uid="uid://xakp5tevmejy" path="res://Utilities/Fonts/JetBrainsMono-Regular.ttf" id="1_dvumi"]
 [ext_resource type="FontFile" uid="uid://h5ln15mrb0qu" path="res://Utilities/Fonts/JetBrainsMono-Bold.ttf" id="2_spmd1"]
@@ -889,6 +889,157 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
+[sub_resource type="Image" id="Image_w7sxo"]
+data = {
+"data": PackedByteArray("/f/9AP3//QD9//0A/f/9AP3//QD9//0A/f/9AP3//QD9//0A/f/9AP3//QD9//0A/f/9AP3//QD9//0A/f/9AP3//QD9//3e/f/98/3//fP9//3z/f/98/3//fP9//3z/f/98/3//fP9//3z/f/98/3//fP9//3z/f/93v3//QD9//0A/f/98/3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fP9//0A/f/9AP3//fP9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//3z/f/9AP3//QD9//3z/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/98/3//QD9//0A/f/98/3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fP9//0A/f/9AP3//fP9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//3z/f/9AP3//QD9//3z/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/98/3//QD9//0A/f/98/3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fP9//0A/f/9AP3//fP9//36/f/9+v3//fr9//36/f/9+/7//vT+//70/f/9+/3//fr9//36/f/9+v3//fr9//3z/f/9AP3//QD9//3z/f/9+v3//fr9//36/f/9+/7//ur8//xC/P/8Qv7//ur9//37/f/9+v3//fr9//36/f/98/3//QD9//0A/f/98/3//fr9//36////+f3//db///8i/P/8APz//AD///8j/f/91v7//vr9//36/f/9+v3//fP9//0A/f/9AP3//fP9//36////9/7//rH9//0N////AP///wD///8A////AP3//Q3+//6x/v/+9/3//fr9//3z/f/9AP3//QD9//3z/v/+9Pv/+33+//4C/v/+AP///wD///8A////AP///wD+//4A/v/+Av3//X39//30/f/98/3//QD9//0A/f/94v///0n7//sA+//7AP7//gD+//4A////AP///wD+//4A/v/+AP3//QD9//0A////Sf3//eL9//0A/f/9AP3//QD///8A////APv/+wD7//sA/v/+AP///wD///8A/v/+AP3//QD9//0A////AP///wD9//0A/f/9AA=="),
+"format": "RGBA8",
+"height": 16,
+"mipmaps": false,
+"width": 16
+}
+
+[sub_resource type="ImageTexture" id="ImageTexture_5mwjk"]
+image = SubResource("Image_w7sxo")
+
+[sub_resource type="Image" id="Image_f3k2c"]
+data = {
+"data": PackedByteArray("/11dAP9dXQD/XV0A/11dAP9bWwD/W1sA/1xcAP9cXAD/XFwA/1xcAP9dXQD/XV0A/1tbAP9bWwD/W1sA/1tbAP9dXQD/XV0A/11dAP9dXQD/W1sM/1tbQ/9cXGn/XFx6/1xcev9cXGn/XV1C/11dC/9bWwD/W1sA/1tbAP9bWwD/XV0A/11dAP9dXQD/XV0s/1xcev9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9cXHr/W1sq/1tbAP9bWwD/W1sA/11dAP9dXQD/XV0s/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9bWyr/W1sA/1tbAP9bWwD/XFwM/1xcev9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/XV15/11dC/9eXgD/W1sA/1tbQ/9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXkH/Xl4A/1xcAP9cXGn/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/XV1o/11dAP9cXAD/XFx6/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/1xcev9cXAD/XFwA/1xcev9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9dXXn/XV0A/1xcAP9cXGn/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl5n/15eAP9dXQD/XV1C/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/1paQf9aWgD/XV0A/11dC/9cXHr/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/11def9aWgr/WloA/1tbAP9bWwD/W1sq/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9dXSn/XV0A/11dAP9bWwD/W1sA/1tbAP9bWyr/XV15/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/11def9dXSn/XV0A/11dAP9dXQD/W1sA/1tbAP9bWwD/W1sA/11dC/9eXkH/XV1o/1xcev9dXXn/Xl5n/1paQf9dXQr/XV0A/11dAP9dXQD/XV0A/1tbAP9bWwD/W1sA/1tbAP9eXgD/Xl4A/11dAP9cXAD/XV0A/15eAP9aWgD/WloA/11dAP9dXQD/XV0A/11dAA=="),
+"format": "RGBA8",
+"height": 16,
+"mipmaps": false,
+"width": 16
+}
+
+[sub_resource type="ImageTexture" id="ImageTexture_7jrus"]
+image = SubResource("Image_f3k2c")
+
+[sub_resource type="Image" id="Image_3exhb"]
+data = {
+"data": PackedByteArray("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwsLAAsLCwALCwsACwsLAAsLCwALGxsQCxsbEAsbGxALGxsQCxsbEAsbGxALCwsACwsLAAsLCwALCwsACwsLAAsLCwALCwsACwsLAAsLCwALCwsACxsbEAsbGxALGxsQCxsbEAsbGxALGxsQCwsLAAsLCwALCwsACwsLAAsLCwALCwsACwsLAAsLCwALCwsACwsLAAsbGxALGxsQCxsbEAsbGxALGxsQCxsbEAsLCwALCwsACwsLAAsLCwALCwsACwsLAAsLCwALCwsACwsLAAsLCwALGxsQCxsbEAsbGxALGxsQCxsbEAsbGxALCwsACwsLAAsLCwALCwsACwsLAAsLCwALCwsACwsLAAsLCwALCwsFGxsbFYsbGxCbGxsQCxsbEAsbGxCbGxsViwsLBQsLCwALCwsACwsLAAsLCwALGxsQCxsbEAsbGxALGxsQCxsbFYsrKyc7GxsV6xsbEJsbGxCbGxsV+ysrJzsLCwV7CwsACwsLAAsLCwALCwsACxsbEAsbGxALGxsQCxsbEAsbGxCbGxsV6ysrJzsbGxaLGxsWiysrJzsbGxXrCwsAmwsLAAsLCwALCwsACwsLAAsbGxALGxsQCxsbEAsbGxALGxsQCxsbEJsbGxXrKysnOysrJzsbGxXrGxsQmxsbEAsLCwALCwsACwsLAAsLCwALGxsQCxsbEAsbGxALGxsQCxsbEAsbGxALGxsQmwsLBXsLCwV7GxsQmxsbEAsbGxALGxsQCwsLAAsLCwALCwsACxsbEAsbGxALGxsQCxsbEAsbGxALGxsQCwsLAAsLCwALCwsACwsLAAsbGxALGxsQCxsbEAsbGxALCwsACwsLAAAAAAALGxsQCxsbEAsbGxALGxsQCwsLAAsLCwALCwsACwsLAAsLCwALCwsACxsbEAsbGxALGxsQCxsbEAAAAAAAAAAAAAAAAAsbGxALGxsQCwsLAAsLCwALCwsACwsLAAsLCwALCwsACwsLAAsLCwALGxsQCxsbEAAAAAAAAAAAAAAAAAAAAAAAAAAACwsLAAsLCwALCwsACwsLAAsLCwALCwsACwsLAAsLCwALCwsACwsLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="),
+"format": "RGBA8",
+"height": 16,
+"mipmaps": false,
+"width": 16
+}
+
+[sub_resource type="ImageTexture" id="ImageTexture_uhye0"]
+image = SubResource("Image_3exhb")
+
+[sub_resource type="Image" id="Image_ra5jm"]
+data = {
+"data": PackedByteArray("////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///+4////////////////////////////////////tf///wD///8A////AP///wD//////////////////////////////////////////////wD///8A////AP///wD////o////K////3j//////////v///3X///8r////6////wD///8A////AP///wD////j////B////wD///9s////a////wD///8J////5v///wD///8A////AP///wD/////////uP///wf///8A////AP///wn///+7/////////wD///8A////AP///wD//////////////7j///8H////Cf///7v//////////////wD///8A////AP///wD////////////////////e////4P///////////////////wD///8A////AP///wD///+1////////////////////////////////////tP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A"),
+"format": "RGBA8",
+"height": 12,
+"mipmaps": false,
+"width": 12
+}
+
+[sub_resource type="ImageTexture" id="ImageTexture_yg5fu"]
+image = SubResource("Image_ra5jm")
+
+[sub_resource type="Image" id="Image_35ct0"]
+data = {
+"data": PackedByteArray("gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP///////////////////////////////////////////4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID///////////////////////////////////////////+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA////////////////////////////////////////////gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP///////////////////////////////////////////4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID///////////////////////////////////////////+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA////////////////////////////////////////////gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP///////////////////////////////////////////4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID//////////////////////////////////////////////////////////////////////////////////////4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID///////////////////////////////////////////+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA////////////////////////////////////////////gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP///////////////////////////////////////////4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID///////////////////////////////////////////+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA////////////////////////////////////////////gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP///////////////////////////////////////////4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID///////////////////////////////////////////+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/w=="),
+"format": "RGBA8",
+"height": 16,
+"mipmaps": false,
+"width": 16
+}
+
+[sub_resource type="ImageTexture" id="ImageTexture_tqyt0"]
+image = SubResource("Image_35ct0")
+
+[sub_resource type="Image" id="Image_qyrfp"]
+data = {
+"data": PackedByteArray("AAAAALCwsACwsLAAsLCwALCwsACwsLAAsbGxALGxsQCxsbEAsbGxALGxsQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwsLAAsLCwALCwsACwsLAAsLCwALGxsQCxsbEAsbGxALGxsQCxsbEAsbGxAAAAAAAAAAAAAAAAAAAAAAAAAAAAsLCwALCwsACwsLAAsLCwALCwsACxsbEAsbGxALGxsQCxsbEAsbGxALGxsQCxsbEAAAAAAAAAAAAAAAAAAAAAALCwsACwsLAAsLCwALCwsACwsLAAsbGxALGxsQCxsbEAsbGxALGxsQCxsbEAsbGxALCwsAAAAAAAAAAAAAAAAACwsLAAsLCwALCwsACwsLAAsLCwUbGxsVixsbEJsbGxALGxsQCxsbEAsbGxALCwsACwsLAAAAAAAAAAAAAAAAAAsbGxALGxsQCxsbEAsbGxALGxsViysrJzsbGxXrGxsQmxsbEAsbGxALCwsACwsLAAsLCwAAAAAAAAAAAAAAAAALGxsQCxsbEAsbGxALGxsQCxsbEJsbGxXrKysnOxsbFesbGxCbCwsACwsLAAsLCwALCwsAAAAAAAAAAAAAAAAACxsbEAsbGxALGxsQCxsbEAsbGxALGxsQmxsbFosrKyc7CwsFewsLAAsLCwALCwsACwsLAAAAAAAAAAAAAAAAAAsbGxALGxsQCxsbEAsbGxALGxsQCxsbEJsbGxaLKysnOwsLBXsLCwALCwsACwsLAAsLCwAAAAAAAAAAAAAAAAALGxsQCxsbEAsbGxALGxsQCxsbEJsbGxX7KysnOxsbFesLCwCbCwsACwsLAAsLCwALCwsAAAAAAAAAAAAAAAAACxsbEAsbGxALGxsQCxsbEAsbGxWLKysnOxsbFesbGxCbGxsQCwsLAAsLCwALCwsACwsLAAAAAAAAAAAAAAAAAAsLCwALCwsACwsLAAsLCwALCwsFCwsLBXsbGxCbGxsQCxsbEAsbGxALCwsACwsLAAsLCwAAAAAAAAAAAAAAAAALCwsACwsLAAsLCwALCwsACwsLAAsLCwALCwsACxsbEAsbGxALGxsQCxsbEAsLCwALCwsAAAAAAAAAAAAAAAAACwsLAAsLCwALCwsACwsLAAsLCwALCwsACwsLAAsLCwALGxsQCxsbEAsbGxALGxsQAAAAAAAAAAAAAAAAAAAAAAsLCwALCwsACwsLAAsLCwALCwsACwsLAAsLCwALCwsACwsLAAsbGxALGxsQAAAAAAAAAAAAAAAAAAAAAAAAAAALCwsACwsLAAsLCwALCwsACwsLAAsLCwALCwsACwsLAAsLCwALCwsAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="),
+"format": "RGBA8",
+"height": 16,
+"mipmaps": false,
+"width": 16
+}
+
+[sub_resource type="ImageTexture" id="ImageTexture_bdjae"]
+image = SubResource("Image_qyrfp")
+
+[sub_resource type="Image" id="Image_btpr4"]
+data = {
+"data": PackedByteArray("////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///+4/////////+j////j////////////////////tf///wD///8A////AP///wD//////////////yv///8H////uP///////////////////wD///8A////AP///wD//////////////3j///8A////B////7j//////////////wD///8A////AP///wD///////////////////9s////AP///wf////e/////////wD///8A////AP///wD///////////////7///9r////AP///wn////g/////////wD///8A////AP///wD//////////////3X///8A////CP///7r//////////////wD///8A////AP///wD//////////////yv///8I////uf///////////////////wD///8A////AP///wD///+1/////////+v////k////////////////////tP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A"),
+"format": "RGBA8",
+"height": 12,
+"mipmaps": false,
+"width": 12
+}
+
+[sub_resource type="ImageTexture" id="ImageTexture_o56bk"]
+image = SubResource("Image_btpr4")
+
+[sub_resource type="Image" id="Image_mahi1"]
+data = {
+"data": PackedByteArray("////AP///wn///8r////PP///0D///9A////QP///0D///9A////QP///zz///8r////Cf///wD///8J////PP///0D///9A////QP///0D///9A////QP///0D///9A////QP///0D///87////Cf///yv///9A////QP///0D///9A////QP///0D///9A////QP///0D///9A////QP///0D///8q////PP///0D///8P////FP///0D///9A////D////xT///9A////QP///w////8U////QP///zv///88////QP///xD///8R////QP///0D///8Q////Ef///0D///9A////EP///xH///9A////O////yv///9A////QP///0D///9A////QP///0D///9A////QP///0D///9A////QP///0D///8q////Cf///zv///9A////QP///0D///9A////QP///0D///9A////QP///0D///9A////O////wj///8A////Cf///yv///87////QP///0D///9A////QP///0D///9A////O////yr///8I////AA=="),
+"format": "RGBA8",
+"height": 8,
+"mipmaps": false,
+"width": 14
+}
+
+[sub_resource type="ImageTexture" id="ImageTexture_x3a5p"]
+image = SubResource("Image_mahi1")
+
+[sub_resource type="Image" id="Image_dkcel"]
+data = {
+"data": PackedByteArray("tLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tBO0tLQTtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQTtLS0QLS0tEC0tLQTtLS0ALS0tAC0tLQAtLS0ALS0tBO0tLRAtLS0QLS0tBO0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tBO0tLQTtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0AA=="),
+"format": "RGBA8",
+"height": 8,
+"mipmaps": false,
+"width": 8
+}
+
+[sub_resource type="ImageTexture" id="ImageTexture_m5oys"]
+image = SubResource("Image_dkcel")
+
+[sub_resource type="Image" id="Image_bp88o"]
+data = {
+"data": PackedByteArray("s7OzL7OzszKzs7MGr6+vALS0tAC0tLQAtLS0QLS0tECxsbExtLS0QK+vrzavr68Gr6+vALS0tAC0tLRAtLS0QLGxsQWxsbE0tLS0QK+vrzavr68GtLS0ALS0tEC0tLRAsbGxALGxsQWxsbE0tLS0QLOzszKzs7MAtLS0QLS0tECysrIAsrKyBrKysjW0tLRAsbGxMbGxsQC0tLRAtLS0QLKysgaysrI1tLS0QLKysjWxsbEFtLS0ALS0tEC0tLRAtbW1MLS0tECysrI1srKyBbKysgC0tLQAtLS0QLS0tEC1tbUptbW1MLKysgWysrIAtLS0ALS0tAC0tLRAtLS0QA=="),
+"format": "RGBA8",
+"height": 8,
+"mipmaps": false,
+"width": 8
+}
+
+[sub_resource type="ImageTexture" id="ImageTexture_yxd0l"]
+image = SubResource("Image_bp88o")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m0npu"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+corner_detail = 1
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gjbof"]
+bg_color = Color(1, 1, 1, 0.00392157)
+border_width_bottom = 2
+border_color = Color(0.0705882, 0.529412, 0.360784, 1)
+corner_detail = 1
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_q6ksu"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+corner_detail = 1
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hnhyy"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.101961, 0.101961, 0.101961, 0)
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 0.3)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w7sxo"]
 content_margin_left = 0.0
 content_margin_top = 0.0
@@ -920,13 +1071,14 @@ anti_aliasing = false
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lo3al"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
+draw_center = false
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dgasi"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.0627451, 0.0980392, 0.160784, 1)
+bg_color = Color(0.45, 0.45, 0.45, 0.47451)
 border_color = Color(0, 0, 0, 1)
 corner_detail = 1
 anti_aliasing = false
@@ -963,6 +1115,56 @@ Button/styles/focus = SubResource("StyleBoxFlat_f3k2c")
 Button/styles/hover = SubResource("StyleBoxFlat_7jrus")
 Button/styles/normal = SubResource("StyleBoxFlat_spmd1")
 Button/styles/pressed = SubResource("StyleBoxFlat_uhye0")
+CodeEdit/colors/background_color = Color(0, 0, 0, 0)
+CodeEdit/colors/bookmark_color = Color(0.5, 0.64, 1, 0.8)
+CodeEdit/colors/brace_mismatch_color = Color(1, 0.2, 0.2, 1)
+CodeEdit/colors/breakpoint_color = Color(0.9, 0.29, 0.3, 1)
+CodeEdit/colors/caret_background_color = Color(0, 0.145098, 0.286275, 1)
+CodeEdit/colors/caret_color = Color(0, 0.145098, 0.286275, 1)
+CodeEdit/colors/code_folding_color = Color(0.8, 0.8, 0.8, 0.8)
+CodeEdit/colors/completion_background_color = Color(0.17, 0.16, 0.2, 1)
+CodeEdit/colors/completion_existing_color = Color(0.87, 0.87, 0.87, 0.13)
+CodeEdit/colors/completion_scroll_color = Color(1, 1, 1, 0.29)
+CodeEdit/colors/completion_scroll_hovered_color = Color(1, 1, 1, 0.4)
+CodeEdit/colors/completion_selected_color = Color(0.26, 0.26, 0.27, 1)
+CodeEdit/colors/current_line_color = Color(0.25, 0.25, 0.26, 0.8)
+CodeEdit/colors/executing_line_color = Color(0.98, 0.89, 0.27, 1)
+CodeEdit/colors/folded_code_region_color = Color(0.68, 0.46, 0.77, 0.2)
+CodeEdit/colors/font_color = Color(0.875, 0.875, 0.875, 1)
+CodeEdit/colors/font_outline_color = Color(0, 0, 0, 1)
+CodeEdit/colors/font_placeholder_color = Color(0.875, 0.875, 0.875, 0.6)
+CodeEdit/colors/font_readonly_color = Color(0.875, 0.875, 0.875, 0.5)
+CodeEdit/colors/font_selected_color = Color(0, 0, 0, 0)
+CodeEdit/colors/line_length_guideline_color = Color(0.3, 0.5, 0.8, 0.1)
+CodeEdit/colors/line_number_color = Color(0.67, 0.67, 0.67, 0.4)
+CodeEdit/colors/search_result_border_color = Color(0.3, 0.3, 0.3, 0.4)
+CodeEdit/colors/search_result_color = Color(0.3, 0.3, 0.3, 1)
+CodeEdit/colors/selection_color = Color(0.5, 0.5, 0.5, 1)
+CodeEdit/colors/word_highlighted_color = Color(0.8, 0.9, 0.9, 0.15)
+CodeEdit/constants/caret_width = 3
+CodeEdit/constants/completion_lines = 7
+CodeEdit/constants/completion_max_width = 50
+CodeEdit/constants/completion_scroll_width = 6
+CodeEdit/constants/h_separation = 0
+CodeEdit/constants/line_spacing = 0
+CodeEdit/constants/outline_size = 0
+CodeEdit/font_sizes/font_size = 13
+CodeEdit/fonts/font = ExtResource("1_dvumi")
+CodeEdit/icons/bookmark = SubResource("ImageTexture_5mwjk")
+CodeEdit/icons/breakpoint = SubResource("ImageTexture_7jrus")
+CodeEdit/icons/can_fold = SubResource("ImageTexture_uhye0")
+CodeEdit/icons/can_fold_code_region = SubResource("ImageTexture_yg5fu")
+CodeEdit/icons/completion_color_bg = SubResource("ImageTexture_tqyt0")
+CodeEdit/icons/executing_line = SubResource("ImageTexture_bdjae")
+CodeEdit/icons/folded = SubResource("ImageTexture_bdjae")
+CodeEdit/icons/folded_code_region = SubResource("ImageTexture_o56bk")
+CodeEdit/icons/folded_eol_icon = SubResource("ImageTexture_x3a5p")
+CodeEdit/icons/space = SubResource("ImageTexture_m5oys")
+CodeEdit/icons/tab = SubResource("ImageTexture_yxd0l")
+CodeEdit/styles/completion = SubResource("StyleBoxFlat_m0npu")
+CodeEdit/styles/focus = SubResource("StyleBoxFlat_gjbof")
+CodeEdit/styles/normal = SubResource("StyleBoxFlat_q6ksu")
+CodeEdit/styles/read_only = SubResource("StyleBoxFlat_hnhyy")
 Label/colors/font_color = Color(1, 1, 1, 1)
 Label/colors/font_outline_color = Color(0, 0, 0, 0)
 Label/colors/font_shadow_color = Color(0, 0, 0, 0)

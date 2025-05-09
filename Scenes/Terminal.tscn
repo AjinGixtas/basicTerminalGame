@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://ywm7rhxebeh4"]
+[gd_scene load_steps=7 format=3 uid="uid://ywm7rhxebeh4"]
 
 [ext_resource type="Script" uid="uid://mb8mpa63ad2n" path="res://Scripts/CS/Network/Terminal.cs" id="1_q6j3v"]
 [ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="2_tjxev"]
+[ext_resource type="CodeHighlighter" uid="uid://dfl78raux0p25" path="res://Utilities/Styling/CommandFieldHighlighter.tres" id="3_c8ipk"]
 [ext_resource type="Script" uid="uid://de88ixhijljw" path="res://Scripts/CS/Network/NetworkManager.cs" id="4_c8ipk"]
 
 [sub_resource type="Environment" id="Environment_tjxev"]
@@ -64,13 +65,16 @@ text = "[color=purple]AjinGixtas[/color]@[color=green]home[/color]:~/>
 fit_content = true
 autowrap_mode = 0
 
-[node name="CommandField" type="LineEdit" parent="Splitter/TerminalCommandLine"]
+[node name="CommandField" type="CodeEdit" parent="Splitter/TerminalCommandLine"]
 self_modulate = Color(16, 16, 16, 0.25)
 layout_mode = 2
 size_flags_horizontal = 3
 theme = ExtResource("2_tjxev")
-keep_editing_on_text_submit = true
 caret_blink = true
+caret_multiple = false
+syntax_highlighter = ExtResource("3_c8ipk")
+indent_use_spaces = true
+auto_brace_completion_enabled = true
 
 [node name="TimersContainer" type="Node" parent="Splitter"]
 
@@ -84,6 +88,6 @@ one_shot = true
 [node name="NetworkManager" type="Node" parent="Splitter"]
 script = ExtResource("4_c8ipk")
 
-[connection signal="text_submitted" from="Splitter/TerminalCommandLine/CommandField" to="." method="SubmitCommand"]
+[connection signal="text_changed" from="Splitter/TerminalCommandLine/CommandField" to="." method="OnCommandFieldTextChanged"]
 [connection signal="timeout" from="Splitter/TimersContainer/ProcessTimer" to="." method="ProcessFinished"]
 [connection signal="timeout" from="Splitter/TimersContainer/UpdateProcessGraphicTimer" to="." method="UpdateProcessingGraphic"]

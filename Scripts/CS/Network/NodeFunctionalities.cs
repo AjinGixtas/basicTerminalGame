@@ -4,73 +4,48 @@ using System.Collections.Generic;
 
 public class LockSystem {
     List<Lock> activeLocks = [];
-    List<Lock> lockPool = [new I5(), new P9(), new I13(), new P16(), new C0(), new C1(), new C3(), new M2(), new M3()];
-    double startEpoch = 0, endEpoch = 0;
-    public LockSystem(int secLvl) {
-        LockIntialization(secLvl);
-        int LockIntialization(int secLvl) {
-            activeLocks.Clear(); int usedLvl = 0;
-            lockPool = Util.Shuffle<Lock>(lockPool);
-            for (int i = 0; i < lockPool.Count; i++) {
-                if (usedLvl + lockPool[i].Cost <= secLvl && lockPool[i].MinLvl <= secLvl) {
-                    activeLocks.Add(lockPool[i]);
-                    usedLvl += lockPool[i].Cost;
-                }
+    List<Lock> lockPool = [new I5(), new P23(), new I13(), new P16(), new C0(), new C1(), new C3(), new M2(), new M3()];
+    public LockSystem() { }
+    public int LockIntialization(int secLvl) {
+        activeLocks.Clear(); int usedLvl = 0;
+        lockPool = Util.Shuffle<Lock>(lockPool);
+        for (int i = 0; i < lockPool.Count; i++) {
+            if (usedLvl + lockPool[i].Cost <= secLvl && lockPool[i].MinLvl <= secLvl) {
+                activeLocks.Add(lockPool[i]);
+                usedLvl += lockPool[i].Cost;
             }
-            return 0;
-        }
-    }
-
-    public int BeginCrack() {
-        if (Time.GetUnixTimeFromSystem() < endEpoch) return 1; // Cracking already in process
-        startEpoch = Time.GetUnixTimeFromSystem();
-        endEpoch = startEpoch + 90;
-        for (int i = 0; i < activeLocks.Count; i++) {
-            activeLocks[i].Intialize();
         }
         return 0;
     }
-    // 0 - Success; 1 - Missing flag; 2 - Incorrect key; 3 - Missing key
-    readonly string[] PREFORMAT_STRING = [
-        $"[[color={Util.CC(Cc.C)}]UNLOCKED[/color]] Bypassed [color={Util.CC(Cc.gR)}]{{0}}[/color]\n",
-        $"[[color={Util.CC(Cc.R)}]DENIED[/color]] Missing parameter [color={Util.CC(Cc.gR)}]{{0}}[/color]\n",
-        $"[[color={Util.CC(Cc.R)}]DENIED[/color]] Missing key for parameter [color={Util.CC(Cc.gR)}]{{0}}[/color]\n",
-        $"[[color={Util.CC(Cc.R)}]DENIED[/color]] Incorrect key for parameter [color={Util.CC(Cc.gR)}]{{0}}[/color]\n{{1}}\n"
-    ];
-    public (int, string) CrackAttempt(Dictionary<string, string> ans) {
-        string output = "";
-        foreach (KeyValuePair<string, string> val in ans) {
-            GD.Print(val.Key, ' ', val.Value);
-        }
+    // 0 - Success; 1 - Missing flag; 2 - Missing key; 3 - Incorrect key; 4 - Timeout
+    public int CrackAttempt(Dictionary<string, string> ans) {
         for (int i = 0; i < activeLocks.Count; i++) {
             string[] flags = activeLocks[i].Flag;
             for (int j = 0; j < flags.Length; ++j) {
-                int unlockCode = -1; // Invalid value get flagged
-
                 if (ans.TryGetValue(flags[j], out string key)) {
-                    if (key == flags[j]) {
-                        unlockCode = 2; // Missing key 
-                        output += string.Format(PREFORMAT_STRING[unlockCode], flags[j]);
+                    if (key == "") {
+                        TerminalProcessor.Say($"[{Util.Format("N0VALUE", StrType.ERROR)}] Denied access by {Util.Format(activeLocks[i].Name, StrType.CMD_ARG)}");
+                        TerminalProcessor.Say("-r", $"Missing key for {Util.Format(flags[j], StrType.CMD_ARG)}");
+                        return 2;
                     } else if (!activeLocks[i].UnlockAttempt(key, j)) {
-                        unlockCode = 3; // Incorrect key
-                        output += string.Format(PREFORMAT_STRING[unlockCode], flags[j], activeLocks[i].Inp);
-                    } else {
-                        unlockCode = 0; // Unlocked this lock
+                        TerminalProcessor.Say($"[{Util.Format("WRON6KY", StrType.ERROR)}] Denied access by {Util.Format(activeLocks[i].Name, StrType.CMD_ARG)}");
+                        TerminalProcessor.Say("-r", $"Incorrect key for {Util.Format(flags[j], StrType.CMD_ARG)}");
+                        if (activeLocks[i].Clue.Length > 0) { TerminalProcessor.Say($"[color={Util.CC(Cc.rgb)}]{activeLocks[i].Clue}"); }
+                        return 3;
                     }
+                    continue;
                 } else {
-                    unlockCode = 1; // Missing flag
-                    GD.Print(PREFORMAT_STRING[unlockCode]);
-                    output += string.Format(PREFORMAT_STRING[unlockCode], flags[j]);
-                }
-
-                if (unlockCode != 0) { // Return if any lock is not unlocked
-                    return (unlockCode, output); 
+                    TerminalProcessor.Say($"[{Util.Format("MI55ING", StrType.ERROR)}] Denied access by {Util.Format(activeLocks[i].Name, StrType.CMD_ARG)}");
+                    TerminalProcessor.Say("-r", $"Missing flag {Util.Format(flags[j], StrType.CMD_ARG)}");
+                    return 1;
                 }
             }
-            output += string.Format(PREFORMAT_STRING[0], activeLocks[i].Name);
+            TerminalProcessor.Say($"[{Util.Format("SUCCESS", StrType.PARTIAL_SUCCESS)}] {Util.Format("Bypassed", StrType.DECOR)} {Util.Format(activeLocks[i].Name, StrType.CMD_ARG)}");
         }
         lockPool = []; activeLocks = []; // Destroy all security system
-        return (0, output); // Success
+        TerminalProcessor.Say($"{Util.Format("Node defense cracked.", StrType.FULL_SUCCESS)} All security system [color={Util.CC(Cc.gR)}]destroyed[/color].");
+        TerminalProcessor.Say($"Run {Util.Format("analyze", StrType.CMD)} for all new information.");
+        return 0;
     }
 }
 public class HackFarm {

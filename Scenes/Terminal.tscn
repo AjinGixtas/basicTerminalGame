@@ -31,7 +31,6 @@ environment = SubResource("Environment_tjxev")
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-split_offset = 825
 dragging_enabled = false
 dragger_visibility = 2
 
@@ -44,9 +43,8 @@ focus_mode = 2
 theme = ExtResource("2_tjxev")
 bbcode_enabled = true
 scroll_following = true
-threaded = true
-progress_bar_delay = -1
 selection_enabled = true
+visible_characters = 0
 
 [node name="TerminalCommandLine" type="HSplitContainer" parent="Splitter"]
 layout_direction = 2
@@ -70,6 +68,7 @@ self_modulate = Color(16, 16, 16, 0.25)
 layout_mode = 2
 size_flags_horizontal = 3
 theme = ExtResource("2_tjxev")
+wrap_mode = 1
 caret_blink = true
 caret_multiple = false
 syntax_highlighter = ExtResource("3_c8ipk")

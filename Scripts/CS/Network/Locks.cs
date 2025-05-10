@@ -34,14 +34,14 @@ public class I5 : Lock {
         base.Intialize();
     }
 }
-public class P9 : Lock {
-    public override string[] Flag => ["--p9"];
+public class P23 : Lock {
+    public override string[] Flag => ["--p23"];
     public override int Cost => 1;
     public override int MinLvl => 3;
 
-    readonly string[] ansPool = ["2", "3", "5", "7", "11", "13", "17", "19", "23"];
+    readonly string[] intPool = ["2", "3", "5", "7", "11", "13", "17", "19", "23"];
 
-    public P9() {
+    public P23() {
         name = "P9";
         clue = "Only the sentinels stand tall—their mind is themselves and their origin. Find the true guards among them.";
         help = $"{Flag} [int]";
@@ -49,15 +49,15 @@ public class P9 : Lock {
     }
 
     public override void Intialize() {
-        ans = [$"{ansPool[GD.RandRange(0, 8)]}"];
+        ans = [$"{intPool[GD.RandRange(0, 8)]}"];
         base.Intialize();
     }
 }
 public class F55 : Lock {
-    public override string[] Flag => ["--p9"];
+    public override string[] Flag => ["--f55"];
     public override int Cost => 1;
     public override int MinLvl => 3;
-    readonly string[] ansPool = ["1", "1", "2", "3", "5", "8", "13", "21", "34", "55"];
+    readonly string[] intPool = ["1", "1", "2", "3", "5", "8", "13", "21", "34", "55"];
     public F55() {
         name = "F55";
         clue = "In this world, growth follows memory. From the flicker to the fire storm, each step remembers the two before it.";
@@ -65,7 +65,7 @@ public class F55 : Lock {
         inp = "";
     }
     public override void Intialize() {
-        ans = [$"{ansPool[GD.RandRange(0, 9)]}"];
+        ans = [$"{intPool[GD.RandRange(0, 9)]}"];
         base.Intialize();
     }
 }
@@ -87,12 +87,12 @@ public class I13 : Lock {
     }
 }
 public class P16 : Lock {
-    public override string[] Flag => ["--p16"];
+    public override string[] Flag => ["--p16", "--16xtract"];
     public override int Cost => 1;
     public override int MinLvl => 9;
 
-    readonly string[] ansPool = ["2", "3", "5", "7", "11", "13", "17", "19", "23", "29", "31", "37", "41", "43", "47", "53"];
-
+    readonly string[] intPool = ["2", "3", "5", "7", "11", "13", "17", "19", "23", "29", "31", "37", "41", "43", "47", "53"];
+    readonly string[] actionPool = ["2bin", "fl1p", "der3f", "bl4nk"];
     public P16() {
         name = "P16";
         clue = "Gates only yield to those with indivisible will. Fight them all; the resolute will answer";
@@ -101,7 +101,7 @@ public class P16 : Lock {
     }
 
     public override void Intialize() {
-        ans = [$"{ansPool[GD.RandRange(0, 16)]}"];
+        ans = [$"{intPool[GD.RandRange(0, 16)]}", actionPool[GD.RandRange(0, actionPool.Length-1)]];
         base.Intialize();
     }
 }

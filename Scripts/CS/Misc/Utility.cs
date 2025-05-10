@@ -1,5 +1,7 @@
 using Godot;
+using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 public static class Util {
     public static T[] Shuffle<T>(T[] array) {
         for (int i = 0; i < array.Length; i++) {
@@ -61,5 +63,121 @@ public static class Util {
             chars[i] = (GD.Randf() < .9 ? OBFUSCATE_CHAR[GD.RandRange(0, OBFUSCATE_CHAR.Length-1)] : chars[i]);
         }
         return new string(chars);
+    }
+    public static string Format(string input, StrType type, params string[] addons) {
+        switch (type) {
+            case StrType.DECOR:
+                return $"[color={Util.CC(Cc.rgb)}]{input}[/color]";
+            case StrType.HOSTNAME:
+                return $"[color={Util.CC(Cc.G)}]{input}[/color]";
+            case StrType.DISPLAY_NAME:
+                return $"[color={Util.CC(Cc.y)}]{input}[/color]";
+            case StrType.DESC:
+                return $"[color={Util.CC(Cc.g)}]{input}[/color]";
+            case StrType.SYMBOL:
+                return $"[color={Util.CC(Cc.m)}]{input}[/color]";
+            case StrType.UNIT:
+                return $"[color={Util.CC(Cc.RGB)}]{input}[/color] [color={Util.CC(Cc.rgb)}]{addons[0]}[/color]";
+            case StrType.SEC_LVL: {
+                    string colorCode = "";
+                    if (addons.Length > 0) {
+                        colorCode = addons[0] switch {
+                            "0" or "1" or "2" => Util.CC(Cc.B),
+                            "3" or "4" or "5" or "7" => Util.CC(Cc.Y),
+                            "8" or "9" or "10" => Util.CC(Cc.R),
+                            _ => "_"
+                        };
+                    }
+                    if (colorCode == "_" || colorCode == "") {
+                        colorCode = input switch {
+                            "0" or "1" or "2" => Util.CC(Cc.B),
+                            "3" or "4" or "5" or "7" => Util.CC(Cc.Y),
+                            "8" or "9" or "10" => Util.CC(Cc.R),
+                            _ => Util.CC(Cc.R)
+                        };
+                    }
+                    return $"[color={colorCode}]{input}[/color]";
+                }
+            case StrType.DEF_LVL:
+                return $"[color={input switch { 
+                    "NOSEC" or "LOSEC" => Util.CC(Cc.R), 
+                    "MISEC" => Util.CC(Cc.Y), 
+                    "HISEC" or "MASEC" => Util.CC(Cc.B),
+                    // Fall back
+                    "0" or "1" or "2" => Util.CC(Cc.B),
+                    "3" or "4" or "5" or "7" => Util.CC(Cc.Y),
+                    "8" or "9" or "10" => Util.CC(Cc.R),
+                    // Final backup
+                    _ => Util.CC(Cc.R) }
+                }]{input}[/color]";
+            case StrType.NUMBER:
+                return $"[color={Util.CC(Cc.c)}]{input}[/color]";
+            case StrType.IP:
+                return $"[color={Util.CC(Cc.C)}]{input}[/color]";
+            case StrType.DIR:
+                return $"[color={Util.CC(Cc.C)}]{input}[/color]";
+            case StrType.FILE: {
+                    int lastSlash = input.LastIndexOf('/');
+                    if (lastSlash == -1 || lastSlash == input.Length - 1)
+                        return $"[color={Util.CC(Cc.G)}]{input}[/color]"; // fallback if no slash or only slash
+
+                    string dir = input[..(lastSlash + 1)];
+                    string file = input[(lastSlash + 1)..];
+
+                    return $"[color={Util.CC(Cc.C)}]{dir}[/color][color={Util.CC(Cc.G)}]{file}[/color]";
+                }
+            case StrType.CMD: {
+                string output = "";
+                string[] commands = input.Split(';');
+                for (int i = 0; i < commands.Length; i++) {
+                    if (i > 0) { output += ';'; }
+                    if (commands[i].Length == 0) { continue; }
+
+                    string[] tokens = commands[i].Split(' '); bool firstToken = true;
+                    for (int j = 0; j < tokens.Length; ++j) {
+                        if (j > 0) { output += ' '; }
+                        if (tokens[j].Length == 0) { continue; }
+
+                        if (firstToken) { output += $"[color={Util.CC(Cc.C)}]{tokens[j]}[/color]"; firstToken = false; } else if (tokens[j].StartsWith('-')) { output += $"[color={Util.CC(Cc.gR)}]{tokens[j]}[/color]"; } else { output += $"[color={Util.CC(Cc.rgb)}]{tokens[j]}[/color]"; }
+                    }
+                }
+                return output;
+            }
+            case StrType.ERROR:
+                return $"[color={Util.CC(Cc.R)}]{input}[/color]";
+            case StrType.HEADER:
+                return $"[color={Util.CC(Cc.gR)}]{input}[/color]";
+            case StrType.MONEY:
+                return $"[color={Util.CC(Cc.RGB)}]{input}[/color][color={Util.CC(Cc.rgb)}]GC[/color]";
+            case StrType.USERNAME:
+                return $"[color={Util.CC(Cc.M)}]{input}[/color]";
+            case StrType.WARNING:
+                throw new Exception("Not implemented!");
+            case StrType.PARTIAL_SUCCESS:
+                return $"[color={Util.CC(Cc.C)}]{input}[/color]";
+            case StrType.FULL_SUCCESS:
+                return $"[color={Util.CC(Cc.G)}]{input}[/color]";
+            case StrType.CMD_ARG:
+                return $"[color={Util.CC(Cc.gR)}]{input}[/color]";
+            default:
+                return input;
+        }
+    }
+    public static TEnum MapEnum<TEnum>(int securityPoint) where TEnum : Enum {
+        Type enumType = typeof(TEnum);
+
+        if (enumType == typeof(SecurityType)) {
+            var result = securityPoint switch {
+                < 1 => SecurityType.NOSEC,
+                < 3 => SecurityType.LOSEC,
+                < 6 => SecurityType.MISEC,
+                < 10 => SecurityType.HISEC,
+                _ => SecurityType.MASEC,
+            };
+
+            return (TEnum)(object)result;
+        }
+
+        throw new NotSupportedException($"Enum type {enumType.Name} is not supported by MapEnum.");
     }
 }

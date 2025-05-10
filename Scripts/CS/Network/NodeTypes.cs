@@ -24,7 +24,7 @@ public abstract class NetworkNode {
             value = Math.Clamp(value, 0, _defLvl);
             if (_secLvl == value) return;
             _secLvl = value;
-            LockSystem = new(_secLvl);
+            LockSystem.LockIntialization(_secLvl);
             _retLvl = _defLvl - _secLvl;
             SecType = _secLvl switch {
                 < 1 => SecurityType.NOSEC,
@@ -46,7 +46,7 @@ public abstract class NetworkNode {
     public NetworkNode(string hostName, string displayName, string IP, NetworkNodeType NodeType, NetworkNode parentNode) {
         HostName = hostName; DisplayName = displayName; this.IP = IP; this.NodeType = NodeType;
         CurrentOwner = this; ParentNode = parentNode; ChildNode = [];
-        NodeDirectory = new("~");
+        NodeDirectory = new("~"); LockSystem = new();
     }
     public virtual void Init(int SecLvl, int DefLvl, HackFarm HackFarm) {
         this.DefLvl = DefLvl; this.SecLvl = SecLvl; this.HackFarm = HackFarm;
@@ -63,16 +63,16 @@ public abstract class NetworkNode {
         }
         return output;
     }
-    public virtual Dictionary<string, string> Analyze() {
-        return new Dictionary<string, string>() {
-            { "IP", IP },
-            { "hostName",  HostName }, 
-            { "displayName", DisplayName },
-            { "defLvl", $"{DefLvl}" }, 
-            { "secLvl", $"{SecLvl}" }, 
-            { "retLvl", $"{_retLvl}" },
-            { "secType", $"{SecType}" },
-            { "nodeType", $"{NodeType}" }
+    public virtual NodeAnalysis Analyze() {
+        return new NodeAnalysis {
+            IP = IP,
+            HostName = HostName,
+            DisplayName = DisplayName,
+            DefLvl = DefLvl,
+            SecLvl = SecLvl,
+            RetLvl = _retLvl,
+            SecType = SecType,
+            NodeType = NodeType
         };
     }
     public static NetworkNode GenerateProceduralNode(NetworkNodeType nodeType, string hostName, string displayName, double indexRatio, double depthRatio, NetworkNode parentNode) {
@@ -93,20 +93,15 @@ public abstract class NetworkNode {
         node.Init(secLvl, defLvl, hackFarm);
         return node;
     }
-    public int BeginCrackNode() {
-        if (LockSystem == null) return 2; // No lockSys found
-        // 0 - Success; 1 - Already cracking
-        return LockSystem.BeginCrack();
-    }
     NetworkNode _currentOwner = null; 
     public NetworkNode CurrentOwner { 
         get => _currentOwner; 
         private set => _currentOwner = value; 
     }
     bool _isSecure = true; bool IsSecure { get => _isSecure; set => _isSecure = value; }
-    public (int, string) AttempCrackNode(Dictionary<string, string> ans) {
-        (int, string) result = LockSystem.CrackAttempt(ans);
-        if (result.Item1 == 0) IsSecure = false;
+    public int AttempCrackNode(Dictionary<string, string> ans) {
+        int result = LockSystem.CrackAttempt(ans);
+        if (result == 0) IsSecure = false;
         return result;
     }
     public int TransferOwnership(NetworkNode node) {
@@ -174,7 +169,7 @@ public class HoneypotNode : NetworkNode {
     }
     public string fakeHostName, fakeDisplayName;
     public int fakeDefLvl = 0, fakeSecLvl = 0, fakeRetLvl = 0;
-    SecurityType fakeSecType; NetworkNodeType fakeDisplayNetworkNodeType;
+    SecurityType fakeSecType; NetworkNodeType fakeNodeType;
     public void GenerateFakeData() {
         if (Time.GetUnixTimeFromSystem() - lastEpoch < 15) { return; }
         int chosenSection = GD.RandRange(0, namePool.GetLength(0) - 1);
@@ -189,7 +184,7 @@ public class HoneypotNode : NetworkNode {
         }
         lastEpoch = Time.GetUnixTimeFromSystem();
         fakeHostName = name.Item2; fakeDisplayName = name.Item3;
-        fakeDisplayNetworkNodeType = name.Item1;
+        fakeNodeType = name.Item1;
 
         fakeDefLvl = GD.RandRange(2, 10);
         fakeSecLvl = GD.RandRange(1, fakeDefLvl - 1);
@@ -202,17 +197,17 @@ public class HoneypotNode : NetworkNode {
             _ => SecurityType.MASEC
         };
     }
-    public override Dictionary<string, string> Analyze() {
+    public override NodeAnalysis Analyze() {
         GenerateFakeData();
-        return new() {
-            { "IP", IP },
-            { "hostName",  fakeHostName },
-            { "displayName", fakeDisplayName },
-            { "defLvl", $"{fakeDefLvl}" },
-            { "secLvl", $"{fakeSecLvl}" },
-            { "retLvl", $"{fakeRetLvl}" },
-            { "secType", $"{fakeSecType}" },
-            { "nodeType", $"{fakeDisplayNetworkNodeType}" }
+        return new NodeAnalysis {
+            IP = IP,
+            HostName = fakeHostName,
+            DisplayName = fakeDisplayName,
+            DefLvl = fakeDefLvl,
+            SecLvl = fakeSecLvl,
+            RetLvl = fakeRetLvl,
+            SecType = fakeSecType,
+            NodeType = fakeNodeType
         };
     }
 
@@ -233,4 +228,14 @@ public class RougeNode : NetworkNode {
     public override (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {
         return (10, GD.RandRange(3, 8));
     }
+}
+public struct NodeAnalysis {
+    public string IP { get; init; }
+    public string HostName { get; init; }
+    public string DisplayName { get; init; }
+    public int DefLvl { get; init; }
+    public int SecLvl { get; init; }
+    public int RetLvl { get; init; }
+    public SecurityType SecType { get; init; }
+    public NetworkNodeType NodeType { get; init; }
 }

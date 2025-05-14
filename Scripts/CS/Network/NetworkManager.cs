@@ -18,7 +18,7 @@ public partial class NetworkManager : Node {
     public NetworkNode GenerateNetwork() {
         int[] baseNodePerDepths = [5, 6, 10, 7, 6, 4, 5, 3, 3, 1]; int totalNode = baseNodePerDepths.Sum(x => x);
         NetworkNode network = new PlayerNode("home", "Player Terminal", $"{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}", null) {
-            HackFarm = new HackFarm(0, 0, 0, 1, 1, 1)
+            HackFarm = new HackFarm(1.0/totalNode, 1.0/totalNode, 1, 1, 1)
         }; 
         List<Tuple<NetworkNodeType, string, string>> namePool = []; int poolIndex = 0;
 
@@ -61,7 +61,7 @@ public partial class NetworkManager : Node {
             double indexRatio = (double)poolIndex / totalNode;
             double depthRatio = (double)(depth + 1) / layers.Count;
             (int secLvl, int defLvl) = node.GenerateSecAndDef(indexRatio, depthRatio);
-            node.Init(secLvl, defLvl, new(secLvl, indexRatio, depthRatio));
+            node.Init(secLvl, defLvl, new(indexRatio, depthRatio));
             node.ParentNode = parentNode;
             if (depth + 1 >= layers.Count) { layers.Add([]); }
             layers[depth + 1].Add(node);

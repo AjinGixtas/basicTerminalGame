@@ -89,7 +89,7 @@ public abstract class NetworkNode {
             _ => throw new Exception("Unknown node value")
         };
         (int secLvl, int defLvl) = node.GenerateSecAndDef(indexRatio, depthRatio);
-        HackFarm hackFarm = new(secLvl, indexRatio, depthRatio);
+        HackFarm hackFarm = new(indexRatio, depthRatio);
         node.Init(secLvl, defLvl, hackFarm);
         return node;
     }
@@ -99,8 +99,8 @@ public abstract class NetworkNode {
         private set => _currentOwner = value; 
     }
     bool _isSecure = true; bool IsSecure { get => _isSecure; set => _isSecure = value; }
-    public int AttempCrackNode(Dictionary<string, string> ans) {
-        int result = LockSystem.CrackAttempt(ans);
+    public int AttempCrackNode(Dictionary<string, string> ans, double timeStamp) {
+        int result = LockSystem.CrackAttempt(ans, timeStamp);
         if (result == 0) IsSecure = false;
         return result;
     }

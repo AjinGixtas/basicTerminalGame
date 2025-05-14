@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 
 public abstract class Lock {
-    protected string clue="<Empty>", err = "<Empty>", help = "<Empty>", inp = "<Empty>", name = "<Empty>";
+    protected string clue = "<Empty>", err = "<Empty>", help = "<Empty>", inp = "<Empty>", name = "<Empty>";
     public abstract int Cost { get; }
     public abstract int MinLvl { get; }
     public virtual void Intialize() { GD.Print(Flag[0] + ' ' + ans.Join(" ") + ' '); }
@@ -42,7 +42,7 @@ public class P23 : Lock {
     readonly string[] intPool = ["2", "3", "5", "7", "11", "13", "17", "19", "23"];
 
     public P23() {
-        name = "P9";
+        name = "P23";
         clue = "Only the sentinels stand tall—their mind is themselves and their origin. Find the true guards among them.";
         help = $"{Flag} [int]";
         inp = "";
@@ -101,7 +101,7 @@ public class P16 : Lock {
     }
 
     public override void Intialize() {
-        ans = [$"{intPool[GD.RandRange(0, 16)]}", actionPool[GD.RandRange(0, actionPool.Length-1)]];
+        ans = [$"{intPool[GD.RandRange(0, 16)]}", actionPool[GD.RandRange(0, actionPool.Length - 1)]];
         base.Intialize();
     }
 }

@@ -45,6 +45,7 @@ bbcode_enabled = true
 scroll_following = true
 selection_enabled = true
 visible_characters = 0
+visible_ratio = 0.0
 
 [node name="TerminalCommandLine" type="HSplitContainer" parent="Splitter"]
 layout_direction = 2

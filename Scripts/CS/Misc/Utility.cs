@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 public static class Util {
     public static T[] Shuffle<T>(T[] array) {
@@ -77,7 +78,7 @@ public static class Util {
             case StrType.SYMBOL:
                 return $"[color={Util.CC(Cc.m)}]{input}[/color]";
             case StrType.UNIT:
-                return $"[color={Util.CC(Cc.RGB)}]{input}[/color] [color={Util.CC(Cc.rgb)}]{addons[0]}[/color]";
+                return $"[color={Util.CC(Cc.RGB)}]{input}[/color][color={Util.CC(Cc.rgb)}]{addons[0]}[/color]";
             case StrType.SEC_LVL: {
                     string colorCode = "";
                     if (addons.Length > 0) {
@@ -147,8 +148,26 @@ public static class Util {
                 return $"[color={Util.CC(Cc.R)}]{input}[/color]";
             case StrType.HEADER:
                 return $"[color={Util.CC(Cc.gR)}]{input}[/color]";
-            case StrType.MONEY:
-                return $"[color={Util.CC(Cc.RGB)}]{input}[/color][color={Util.CC(Cc.rgb)}]GC[/color]";
+            case StrType.MONEY: {
+                    if (string.IsNullOrWhiteSpace(input)) return "";
+                    string[] parts = input.Split('.');
+                    if (parts.Length < 2) { parts = [parts[0], "00"]; }
+                    string integerPart = parts[0];
+                    string decimalPart = parts[1];
+                    Cc[] colors = new[] { Cc.y, Cc.r, Cc.g, Cc.b, Cc.c, Cc.m };
+                    string[] labels = new[] { "GC", "K", "M", "B", "T", "Q" };
+                    string output = "";
+                    int cursor = Math.Min(3, integerPart.Length);
+                    int index = 0;
+                    output = $"[color={Util.CC(Cc.RGB)}]{integerPart[^cursor..]}.{decimalPart}[/color][color={Util.CC(colors[index])}]{labels[index]}[/color]";
+                    ++index; cursor += 3;
+                    while (cursor < integerPart.Length && index < colors.Length && index < labels.Length) {
+                        output = ($"[color={Util.CC(Cc.RGB)}]{integerPart[^cursor..^(cursor - 3)]}[/color][color={Util.CC(colors[index])}]{labels[index]}[/color]") + output;
+                        cursor = Math.Min(cursor+3,integerPart.Length); ++index;
+                    }
+                    if (cursor < integerPart.Length) output = $"[color={Util.CC(Cc.RGB)}]{integerPart[..^cursor]}[/color]" + output;
+                    return output;
+                }
             case StrType.USERNAME:
                 return $"[color={Util.CC(Cc.M)}]{input}[/color]";
             case StrType.WARNING:

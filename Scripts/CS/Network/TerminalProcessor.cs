@@ -72,10 +72,7 @@ public static class TerminalProcessor {
         TerminalProcessor.ShowMoreChars(delta);
     }
 
-
-
     static Action<Dictionary<string, string>, string[]> finishFunction; static (Dictionary<string, string>, string[]) finishFunctionArgs;
-    
 	static bool _isProcessing = false; static bool IsProcessing { get { return _isProcessing; } set { _isProcessing = value; } }
     static readonly string[] SpinnerChars = ["|", "/", "-", "\\"]; static int tick = 0, progress = 0;
     static void StartProcess(double time, Action<Dictionary<string, string>, string[]> func, Dictionary<string, string> parseArgs, string[] positionalArgs) {
@@ -151,6 +148,7 @@ public static class TerminalProcessor {
             case "home": Home(parsedArgs, positionalArgs); break;
             case "edit": Edit(parsedArgs, positionalArgs); break;
             case "scan": Scan(parsedArgs, positionalArgs); return false;
+            case "farm": Farm(parsedArgs, positionalArgs); break;
             case "clear": Clear(parsedArgs, positionalArgs); break;
             case "mkdir": MkDir(parsedArgs, positionalArgs); break;
             case "rmdir": RmDir(parsedArgs, positionalArgs); break;
@@ -330,6 +328,69 @@ public static class TerminalProcessor {
             Say("-n", output);
         }
     }
+    static void Farm(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+        bool showStatus = parsedArgs.ContainsKey("-s") || parsedArgs.ContainsKey("--status");
+        bool showUpgradeInfo = parsedArgs.ContainsKey("--upgrad3info");
+
+        bool doUpgrade = parsedArgs.ContainsKey("-u") || parsedArgs.ContainsKey("--upgrade");
+        bool hasLevel = parsedArgs.ContainsKey("-l") || parsedArgs.ContainsKey("--level");
+        bool isAuto = parsedArgs.ContainsKey("-a") || parsedArgs.ContainsKey("--auto");
+
+        // Disallow mixing upgrade with status/info
+        if ((showStatus || showUpgradeInfo) && doUpgrade) { Say("-r", "Cannot combine upgrade with status or upgrade info."); return; }
+
+        // Check node's ownership
+        if (CurrNode.CurrentOwner != networkManager.network) { Say("-r", "You don't own this node's GC miner"); return; }
+        // Status display
+        if (showStatus || showUpgradeInfo) {
+            int hackLvl = CurrNode.HackFarm.HackLvl, timeLvl = CurrNode.HackFarm.TimeLvl, growLvl = CurrNode.HackFarm.TimeLvl;
+Say(@$"[ GC Farm Status for {CurrNode.DisplayName} ]
+Hack  : Lv.{hackLvl} → {CurrNode.HackFarm.CurHack:n1} GC/transfer
+Time  : Lv.{timeLvl} → {CurrNode.HackFarm.CurTime:n2} s/transfer
+Grow  : Lv.{growLvl} → {CurrNode.HackFarm.CurGrow:n1} GC/s");
+
+            if (showUpgradeInfo) {
+                Say(@$"[ Upgrade Info ]
+Hack +1 → {Enumerable.Range(hackLvl + 1, Math.Min(hackLvl + 2, 255) - hackLvl + 1).Sum(i => CurrNode.HackFarm.GetHackCost(i)):n1} | +10 → {Enumerable.Range(hackLvl + 1, Math.Min(hackLvl + 11, 255) - hackLvl + 1).Sum(i => CurrNode.HackFarm.GetHackCost(i)):n1}
+Time +1 → {Enumerable.Range(timeLvl + 1, Math.Min(hackLvl + 2, 255) - timeLvl + 1).Sum(i => CurrNode.HackFarm.GetTimeCost(i)):n1} | +10 → {Enumerable.Range(timeLvl + 1, Math.Min(hackLvl + 11, 255) - timeLvl + 1).Sum(i => CurrNode.HackFarm.GetTimeCost(i)):n1}
+Grow +1 → {Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255) - growLvl + 1).Sum(i => CurrNode.HackFarm.GetGrowCost(i)):n1} | +10 → {Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 11, 255) - growLvl + 1).Sum(i => CurrNode.HackFarm.GetGrowCost(i)):n1}");
+            }
+            return;
+        }
+
+        // Upgrade path
+        if (doUpgrade) {
+            string upgradeType = parsedArgs.GetValueOrDefault("-u") ?? parsedArgs.GetValueOrDefault("--upgrade") ?? "";
+            int level = 1;
+
+            if (!isAuto && !hasLevel) {
+                Say("You must specify either --auto or --level with --upgrade.");
+                return;
+            }
+
+            if (hasLevel) {
+                if (!int.TryParse(parsedArgs.GetValueOrDefault("-l") ?? parsedArgs.GetValueOrDefault("--level"), out level) || level <= 0) {
+                    Say("Invalid level amount.");
+                    return;
+                }
+            }
+
+            switch (upgradeType.ToLower()) {
+                case "hack":
+                    break;
+                case "time":
+                    break;
+                case "grow":
+                    break;
+                default:
+                    Say("Unknown upgrade type. Use: hack, time, or grow.");
+                    return;
+            }
+            Say("Upgrade complete.");
+        } else {
+            Say("No action specified. Use --status or --upgrade.");
+        }
+    }
     static void Clear(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         terminalOutputField.Clear();
     }
@@ -383,12 +444,14 @@ public static class TerminalProcessor {
             return 2;
         }
         if (Time.GetUnixTimeFromSystem() > endEpoch) {
-            Say($"{Util.Format("Kraken inactive", StrType.ERROR)}. Run {Util.Format("karaxe --flare", StrType.CMD)} to activate.");
+            Say($"{Util.Format("Kraken axe inactive", StrType.ERROR)}. Run {Util.Format("karaxe --flare", StrType.CMD)} to activate.");
             return 3;
         }
 
-        int result = node.AttempCrackNode(parsedArgs);
-        if (result == 0) { node.TransferOwnership(networkManager.network); }
+        int result = node.AttempCrackNode(parsedArgs, endEpoch);
+        if (result == 0) { 
+            node.TransferOwnership(networkManager.network); 
+        }
         return 0;
     }
     static void Inspect(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
@@ -437,9 +500,9 @@ public static class TerminalProcessor {
             }
             Say("-tl", $@"
 {Util.Format("▶ GC miner detail", StrType.HEADER)}
-{Util.Format("Transfer batch:", StrType.DECOR)} {Util.Format(analyzeNode.HackFarm.HackLevel.ToString(), StrType.NUMBER)} ({Util.Format(analyzeNode.HackFarm.CurHack.ToString("F2"), StrType.MONEY)})
-{Util.Format("Transfer speed:", StrType.DECOR)} {Util.Format(analyzeNode.HackFarm.TimeLevel.ToString(), StrType.NUMBER)} ({Util.Format(analyzeNode.HackFarm.CurTime.ToString("F2"), StrType.UNIT, "s")})
-{Util.Format("Mining speed:", StrType.DECOR)}   {Util.Format(analyzeNode.HackFarm.GrowLevel.ToString(), StrType.NUMBER)} ({Util.Format(analyzeNode.HackFarm.CurGrow.ToString("F2"), StrType.UNIT, "GC/s")})
+{Util.Format("Transfer batch:", StrType.DECOR)} {Util.Format(analyzeNode.HackFarm.HackLvl.ToString(), StrType.NUMBER)} ({Util.Format(analyzeNode.HackFarm.CurHack.ToString("F2"), StrType.MONEY)})
+{Util.Format("Transfer speed:", StrType.DECOR)} {Util.Format(analyzeNode.HackFarm.TimeLvl.ToString(), StrType.NUMBER)} ({Util.Format(analyzeNode.HackFarm.CurTime.ToString("F2"), StrType.UNIT, "s")})
+{Util.Format("Mining speed:", StrType.DECOR)}   {Util.Format(analyzeNode.HackFarm.GrowLvl.ToString(), StrType.NUMBER)} ({Util.Format(analyzeNode.HackFarm.CurGrow.ToString("F2"), StrType.UNIT, "GC/s")})
 ");
             if (analyzeNode is FactionNode) {
                 Say("-tl", $@"

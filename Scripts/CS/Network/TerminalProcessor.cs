@@ -20,7 +20,6 @@ public static class TerminalProcessor {
         get => _commandHistoryIndex;
         set {
             value = Math.Clamp(value, 0, Math.Max(0, commandHistory.Count - 1));
-            if (_commandHistoryIndex == value) { return; }
             _commandHistoryIndex = value;
             if (_commandHistoryIndex < commandHistory.Count) {
                 terminalCommandField.Text = commandHistory[_commandHistoryIndex];
@@ -70,13 +69,10 @@ public static class TerminalProcessor {
             terminalCommandField.Text = "";
             terminalCommandField.GrabFocus();
         }
-        int curVisibleChar = terminalOutputField.VisibleCharacters;
-        int totalCharCount = terminalOutputField.GetTotalCharacterCount();
-        if (totalCharCount != curVisibleChar) {
-            int charDelta = (int)(Math.Ceiling(Math.Max((totalCharCount - curVisibleChar) * 1.5, 1536)) * delta);
-            terminalOutputField.VisibleCharacters = Math.Clamp(curVisibleChar + charDelta, 0, totalCharCount);
-        }
+        TerminalProcessor.ShowMoreChars(delta);
     }
+
+
 
     static Action<Dictionary<string, string>, string[]> finishFunction; static (Dictionary<string, string>, string[]) finishFunctionArgs;
     
@@ -98,7 +94,7 @@ public static class TerminalProcessor {
     public static void UpdateProcessingGraphic() {
         if (!IsProcessing) return;
 
-        int t = GD.RandRange(0, 1 + (int)Math.Floor(150.0 / processTimer.WaitTime * updateProcessGraphicTimer.WaitTime));
+        int t = GD.RandRange(0, 1 + (int)Math.Floor(200.0 / processTimer.WaitTime * updateProcessGraphicTimer.WaitTime));
         progress = Mathf.Clamp(progress + t, 0, 99); tick = (tick + 1) % SpinnerChars.Length;
 
         Say("-n", $"...{progress}%");
@@ -292,7 +288,7 @@ public static class TerminalProcessor {
         }
     }
     static void Scan(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
-        StartProcess(.1, ScanCallback, parsedArgs, positionalArgs);
+        StartProcess(1.0, ScanCallback, parsedArgs, positionalArgs);
         void ScanCallback(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
             string L = " └─── ", M = " ├─── ", T = "      ", E = " │    ";
             Func<bool[], string> getTreePrefix = arr => string.Concat(arr.Select((b, i) => (i == arr.Length - 1 ? (b ? L : M) : (b ? T : E))));
@@ -314,6 +310,7 @@ public static class TerminalProcessor {
                     output += $"{Util.Format(descPrefix, StrType.DECOR)}  Display Name: {Util.Format(analyzeResult.DisplayName, StrType.DISPLAY_NAME)}\n";
                     output += $"{Util.Format(descPrefix, StrType.DECOR)}  Node Type:    {Util.Format(analyzeResult.NodeType.ToString(), StrType.SYMBOL)}\n";
                     output += $"{Util.Format(descPrefix, StrType.DECOR)}  Defense:      {Util.Format(analyzeResult.DefLvl.ToString(), StrType.DEF_LVL)}  Security: {Util.Format(Util.MapEnum<SecurityType>(analyzeResult.SecLvl).ToString(), StrType.SEC_LVL, analyzeResult.RetLvl.ToString())}\n";
+                    if (!string.IsNullOrWhiteSpace(descPrefix))
                     output += $"{Util.Format(descPrefix, StrType.DECOR)}\n";
                 }
                 visited.Add(node);
@@ -330,7 +327,7 @@ public static class TerminalProcessor {
                     ++k; stack.Push((child, depth + 1, [.. depthMarks, k == 1]));
                 }
             }
-            Say(output);
+            Say("-n", output);
         }
     }
     static void Clear(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
@@ -495,5 +492,42 @@ public static class TerminalProcessor {
     public static void OnCommandFieldTextChanged() {
         terminalCommandField.Text = terminalCommandField.Text.Replace("\n", "").Replace("\r", "");
         terminalCommandField.SetCaretColumn(terminalCommandField.Text.Length);
+    }
+
+    const int INSTA_FILL_MARGIN = 10;
+    const double TIME_TIL_NEXT_LINE = .05; static double timeLeft = TIME_TIL_NEXT_LINE;
+    static void ShowMoreChars(double delta) {
+        // Get current number of visible characters
+        int curChar = terminalOutputField.VisibleCharacters;
+        int allChar = terminalOutputField.GetTotalCharacterCount();
+        if (curChar >= allChar) return;
+
+        // Get full text and split into lines
+        string allText = terminalOutputField.GetParsedText();
+        string[] lines = allText.Split('\n');
+
+        // Get total and current visible lines
+        int allLines = lines.Length; int curLines = CountVisibleLines(lines, curChar);
+        int lineDelta = 0;
+        if (allLines - curLines > INSTA_FILL_MARGIN) { lineDelta += (int)Math.Ceiling((allLines - curLines - INSTA_FILL_MARGIN) * .1); }
+        timeLeft -= delta;
+        if (timeLeft < 0) { timeLeft += TIME_TIL_NEXT_LINE; lineDelta += 1; }
+        int newLineIndex = curLines + lineDelta;
+
+        // Update chars
+        int charsToShow = GetCharacterIndexAtLine(lines, newLineIndex);
+        terminalOutputField.VisibleCharacters = Mathf.Clamp(charsToShow, 0, allText.Length);
+    }
+    static int CountVisibleLines(string[] lines, int visibleCharCount) {
+        int sum = 0, i = -1;
+        for (int j = 0; j < lines.Length; j++) {
+            sum += lines[j].Length + 1;
+            if (sum > visibleCharCount) break;
+            i = j;
+        }
+        return i+1;
+    }
+    static int GetCharacterIndexAtLine(string[] lines, int lineIndex) {
+        return lines.Take(lineIndex + 1).Sum(s => s.Length+1);
     }
 }

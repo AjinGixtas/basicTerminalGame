@@ -5,15 +5,15 @@
 [ext_resource type="CodeHighlighter" uid="uid://dfl78raux0p25" path="res://Utilities/Styling/CommandFieldHighlighter.tres" id="3_c8ipk"]
 [ext_resource type="Script" uid="uid://de88ixhijljw" path="res://Scripts/CS/Network/NetworkManager.cs" id="4_c8ipk"]
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_c8ipk"]
+
 [sub_resource type="Environment" id="Environment_tjxev"]
 background_mode = 3
 glow_enabled = true
 glow_intensity = 0.67
 glow_hdr_threshold = 0.9
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_c8ipk"]
-
-[node name="Terminal" type="MarginContainer" node_paths=PackedStringArray("terminalOutputField", "terminalCommandPrompt", "terminalCommandField", "networkManager", "processTimer", "updateProcessGraphicTimer", "crackDurationTimer")]
+[node name="Terminal" type="MarginContainer" node_paths=PackedStringArray("terminalOutputField", "terminalCommandPrompt", "terminalCommandField", "networkManager", "processTimer", "updateProcessGraphicTimer", "crackDurationTimer", "processGraphicPadder")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -26,13 +26,11 @@ script = ExtResource("1_q6j3v")
 terminalOutputField = NodePath("Splitter/TerminalOutputArea")
 terminalCommandPrompt = NodePath("Splitter/TerminalCommandLine/CommandPrompt")
 terminalCommandField = NodePath("Splitter/TerminalCommandLine/CommandField")
-networkManager = NodePath("Splitter/NetworkManager")
-processTimer = NodePath("Splitter/TimersContainer/ProcessTimer")
-updateProcessGraphicTimer = NodePath("Splitter/TimersContainer/UpdateProcessGraphicTimer")
-crackDurationTimer = NodePath("Splitter/TimersContainer/CrackDurationTimer")
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_tjxev")
+networkManager = NodePath("NetworkManager")
+processTimer = NodePath("TimersContainer/ProcessTimer")
+updateProcessGraphicTimer = NodePath("TimersContainer/UpdateProcessGraphicTimer")
+crackDurationTimer = NodePath("TimersContainer/CrackDurationTimer")
+processGraphicPadder = NodePath("")
 
 [node name="Splitter" type="VSplitContainer" parent="."]
 layout_mode = 2
@@ -56,7 +54,6 @@ visible_characters = 0
 visible_ratio = 0.0
 
 [node name="TerminalCommandLine" type="HSplitContainer" parent="Splitter"]
-layout_direction = 2
 layout_mode = 2
 dragging_enabled = false
 dragger_visibility = 2
@@ -74,32 +71,35 @@ autowrap_mode = 0
 
 [node name="CommandField" type="CodeEdit" parent="Splitter/TerminalCommandLine"]
 self_modulate = Color(16, 16, 16, 0.25)
+clip_contents = false
+custom_minimum_size = Vector2(32, 0)
 layout_mode = 2
-size_flags_horizontal = 3
 theme = ExtResource("2_tjxev")
-wrap_mode = 1
 caret_blink = true
 caret_multiple = false
 syntax_highlighter = ExtResource("3_c8ipk")
 indent_use_spaces = true
 auto_brace_completion_enabled = true
 
-[node name="TimersContainer" type="Node" parent="Splitter"]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_tjxev")
 
-[node name="ProcessTimer" type="Timer" parent="Splitter/TimersContainer"]
+[node name="TimersContainer" type="Node" parent="."]
+
+[node name="ProcessTimer" type="Timer" parent="TimersContainer"]
 one_shot = true
 
-[node name="UpdateProcessGraphicTimer" type="Timer" parent="Splitter/TimersContainer"]
+[node name="UpdateProcessGraphicTimer" type="Timer" parent="TimersContainer"]
 wait_time = 0.25
 one_shot = true
 
-[node name="CrackDurationTimer" type="Timer" parent="Splitter/TimersContainer"]
+[node name="CrackDurationTimer" type="Timer" parent="TimersContainer"]
 one_shot = true
 
-[node name="NetworkManager" type="Node" parent="Splitter"]
+[node name="NetworkManager" type="Node" parent="."]
 script = ExtResource("4_c8ipk")
 
 [connection signal="text_changed" from="Splitter/TerminalCommandLine/CommandField" to="." method="OnCommandFieldTextChanged"]
-[connection signal="timeout" from="Splitter/TimersContainer/ProcessTimer" to="." method="ProcessFinished"]
-[connection signal="timeout" from="Splitter/TimersContainer/UpdateProcessGraphicTimer" to="." method="UpdateProcessingGraphic"]
-[connection signal="timeout" from="Splitter/TimersContainer/CrackDurationTimer" to="." method="OnCrackDurationTimerTimeout"]
+[connection signal="timeout" from="TimersContainer/ProcessTimer" to="." method="ProcessFinished"]
+[connection signal="timeout" from="TimersContainer/UpdateProcessGraphicTimer" to="." method="UpdateProcessingGraphic"]
+[connection signal="timeout" from="TimersContainer/CrackDurationTimer" to="." method="OnCrackDurationTimerTimeout"]

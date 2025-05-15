@@ -1064,7 +1064,6 @@ image = SubResource("Image_tqyt0")
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_40dey"]
 bg_color = Color(0.0627451, 0.0980392, 0.160784, 0)
 draw_center = false
-border_width_bottom = 2
 border_color = Color(0.0705882, 0.529412, 0.360784, 1)
 corner_detail = 1
 anti_aliasing = false

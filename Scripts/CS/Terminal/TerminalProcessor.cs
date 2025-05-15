@@ -13,7 +13,7 @@ public static class TerminalProcessor {
 	static NetworkManager networkManager;
 	static NetworkNode _currNode = null; static NodeDirectory _currDir = null;
 	static NodeDirectory CurrDir { get { return _currDir; } set { _currDir = value; SetCommandPrompt(); } }
-	static NetworkNode CurrNode { get { return _currNode; } set { _currNode = value; _currDir = _currNode.NodeDirectory; SetCommandPrompt(); } }
+	static NetworkNode CurrNode { get { return _currNode; } set { _currNode = value; SetCommandPrompt(); } }
 	static string UserName { get { return PlayerData.username; } set { PlayerData.username = value; SetCommandPrompt(); } }
 	static readonly List<string> commandHistory = []; static int _commandHistoryIndex = 0;
 	static int CommandHistoryIndex {
@@ -48,12 +48,11 @@ public static class TerminalProcessor {
 		TerminalProcessor.networkManager = networkManager;
 
 		// Initialize the current node and directory
-		TerminalProcessor.CurrNode = networkManager.network;
-		TerminalProcessor.CurrDir = _currNode.NodeDirectory;
+		TerminalProcessor._currDir = (networkManager.network as PlayerNode).nodeDirectory;
+        TerminalProcessor._currNode = networkManager.network;
 
-		// Set the username and command prompt
-		TerminalProcessor.UserName = networkManager.UserName;
-		SetCommandPrompt();
+        // Set the username and command prompt
+        TerminalProcessor.UserName = networkManager.UserName;
 		terminalCommandField.GrabFocus();
 
 		// Mark as initialized
@@ -71,14 +70,14 @@ public static class TerminalProcessor {
 		}
 		if (Input.IsActionJustPressed("submitCommand")) {
 			if (terminalCommandField.Text.Length == 0) { terminalCommandField.GrabFocus(); return; }
-			terminalCommandField.Text = terminalCommandField.Text.Trim('\r', '\n');
+			terminalCommandField.Text = terminalCommandField.Text.Replace("\n", "").Replace("\r", "");
 			SubmitCommand(terminalCommandField.Text);
 			terminalCommandField.Text = "";
 			terminalCommandField.GrabFocus();
 		}
-		TerminalProcessor.ShowMoreChars(delta);
+		ShowMoreChars(delta);
 		PlayerData.Process(delta);
-	}
+    }
 
 	static Action<Dictionary<string, string>, string[]> finishFunction; static (Dictionary<string, string>, string[]) finishFunctionArgs;
 	static bool _isProcessing = false; static bool IsProcessing { get { return _isProcessing; } set { _isProcessing = value; } }
@@ -90,8 +89,6 @@ public static class TerminalProcessor {
 		processTimer.WaitTime = time;
 		terminalCommandField.Editable = false;
 		progress = 0;
-		//tick = GD.RandRange(0, 3);
-		//int filledBar = Mathf.FloorToInt(progress / 100.0 * BarSize);
 		Say("-n", $"Start");
 		processTimer.Start();
 		updateProcessGraphicTimer.Start();
@@ -582,7 +579,10 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 		}
 		return (parsedArgs, positionalArgs.ToArray());
 	}
-	static void SetCommandPrompt() { terminalCommandPrompt.Text = $"{Util.Format(networkManager.UserName, StrType.USERNAME)}@{Util.Format(CurrNode.HostName, StrType.HOSTNAME)}:{Util.Format(CurrDir.GetPath(), StrType.DIR)}>"; }
+	static void SetCommandPrompt() { 
+		GD.Print(networkManager, ' ', CurrNode, ' ', CurrDir);
+        terminalCommandPrompt.Text = $"{Util.Format(networkManager.UserName, StrType.USERNAME)}@{Util.Format(CurrNode.HostName, StrType.HOSTNAME)}:{Util.Format(CurrDir.GetPath(), StrType.DIR)}>"; 
+	}
 	static string EscapeBBCode(string code) { return code.Replace("[", "[lb]"); }
 	public static void OnCommandFieldTextChanged() {
 		int pastCaretPos = terminalCommandField.GetCaretColumn();

@@ -16,7 +16,6 @@ public abstract class NetworkNode {
     public NetworkNode ParentNode { get => _parentNode; set { _parentNode ??= value; } }
     public HackFarm HackFarm { get => _hackFarm; set { _hackFarm ??= value; } }
     public List<NetworkNode> ChildNode { get; init; }
-    public NodeDirectory NodeDirectory { get; init; }
     public LockSystem LockSystem { get; private set; }
     public int SecLvl {
         get => _secLvl;
@@ -49,7 +48,7 @@ public abstract class NetworkNode {
     public NetworkNode(string hostName, string displayName, string IP, NetworkNodeType NodeType, NetworkNode parentNode) {
         HostName = hostName; DisplayName = displayName; this.IP = IP; this.NodeType = NodeType;
         CurrentOwner = this; ParentNode = parentNode; ChildNode = [];
-        NodeDirectory = new("~"); LockSystem = new();
+        LockSystem = new();
     }
     public virtual void Init(int SecLvl, int DefLvl, HackFarm HackFarm) {
         this.DefLvl = DefLvl; this.SecLvl = SecLvl; this.HackFarm = HackFarm;
@@ -116,8 +115,10 @@ public abstract class NetworkNode {
     }
 }
 public class PlayerNode : NetworkNode {
+    public NodeDirectory nodeDirectory { get; init; }
     public PlayerNode(string hostName, string displayName, string IP, NetworkNode parentNode)
         : base(hostName, displayName, IP, NetworkNodeType.PLAYER, parentNode) {
+        nodeDirectory = new("~");
     }
 }
 public class PersonNode : NetworkNode {
@@ -138,7 +139,6 @@ public class BusinessNode : NetworkNode {
     }
     // They're in it for the money, not to keep it
     public override (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {
-        GD.Print(indexRatio, ' ', depthRatio);
         int seclvl = GD.RandRange(5, 9) + (int)(depthRatio * 2) + (int)(indexRatio * 3);
         int deflvl = GD.RandRange((int)Math.Floor(seclvl * 0.6), seclvl);
         return (seclvl, deflvl);
@@ -173,7 +173,7 @@ public class HoneypotNode : NetworkNode {
         GenerateFakeData();
     }
     public override (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {
-        return (10, 0);
+        return (0, 10);
     }
     public string fakeHostName, fakeDisplayName;
     public int fakeDefLvl = 0, fakeSecLvl = 0, fakeRetLvl = 0;

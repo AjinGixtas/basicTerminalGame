@@ -6,7 +6,7 @@ public partial class Terminal : MarginContainer {
 	[Export] TextEdit terminalCommandField;
 	[Export] NetworkManager networkManager;
 	[Export] Timer processTimer, updateProcessGraphicTimer, crackDurationTimer;
-	string userName;
+    string userName;
 
 	bool isProcessing = false;
 	public override void _Ready() {
@@ -15,12 +15,12 @@ public partial class Terminal : MarginContainer {
 			terminalOutputField, terminalCommandPrompt, terminalCommandField, 
 			processTimer, updateProcessGraphicTimer, crackDurationTimer, 
 			networkManager);
-    }
+	}
 	public override void _Process(double delta) {
 		base._Process(delta);
 		TerminalProcessor.Process(delta);
 	}
-	public void OnCommandFieldTextChanged() { TerminalProcessor.OnCommandFieldTextChanged(); }
+    public void OnCommandFieldTextChanged() { TerminalProcessor.OnCommandFieldTextChanged(); }
 	public void ProcessFinished() { TerminalProcessor.ProcessFinished(); }
 	public void UpdateProcessingGraphic() { TerminalProcessor.UpdateProcessingGraphic(); }
 	public void OnCrackDurationTimerTimeout() { TerminalProcessor.OnCrackDurationTimerTimeout(); }

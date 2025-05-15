@@ -14,11 +14,12 @@ public partial class NetworkManager : Node {
             network = GenerateNetwork() as PlayerNode;
             DNS = GenerateDNS(network);
         }
+        PlayerData.AddHackFarm(network.HackFarm);
     }
     public NetworkNode GenerateNetwork() {
         int[] baseNodePerDepths = [5, 6, 10, 7, 6, 4, 5, 3, 3, 1]; int totalNode = baseNodePerDepths.Sum(x => x);
         NetworkNode network = new PlayerNode("home", "Player Terminal", $"{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}", null) {
-            HackFarm = new HackFarm(1.0/totalNode, 1.0/totalNode, 1, 1, 1)
+            HackFarm = new HackFarm(1.0, 1.0, 1, 1, 1)
         }; 
         List<Tuple<NetworkNodeType, string, string>> namePool = []; int poolIndex = 0;
 
@@ -125,48 +126,51 @@ public partial class NetworkManager : Node {
                 string filePath = Path.Combine(folderPath, fileName);
                 string IP = $"{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}";
                 switch (CATEGORY[i]) {
-                    case "Corp":
-                        CorpData corpData = GD.Load<CorpData>(filePath);
-                        if (corpData != null) {
-                            output.Add(new(
-                                corpData.minDepth,
-                                corpData.maxDepth,
-                                new CorpNode(corpData.hostName, corpData.displayName, IP, null) {
-                                    Faction = new Faction(corpData.f_name, corpData.f_desc, 0, 0),
-                                    Stock = new(corpData.s_symbol, corpData.s_price, corpData.s_drift, corpData.s_volatility, 0)
-                                }
-                            ));
-                            GD.Print($"Loaded CorpData: {corpData.hostName}, {corpData.displayName}");
+                    case "Corp": {
+                            CorpData corpData = GD.Load<CorpData>(filePath);
+                            if (corpData != null) {
+                                output.Add(new(
+                                    corpData.minDepth,
+                                    corpData.maxDepth,
+                                    new CorpNode(corpData.hostName, corpData.displayName, IP, null) {
+                                        Faction = new Faction(corpData.f_name, corpData.f_desc, 0, 0),
+                                        Stock = new(corpData.s_symbol, corpData.s_price, corpData.s_drift, corpData.s_volatility, 0)
+                                    }
+                                ));
+                                GD.Print($"Loaded CorpData: {corpData.hostName}, {corpData.displayName}");
+                            }
+                            break;
                         }
-                        break;
 
-                    case "Faction":
-                        FactionData factionData = GD.Load<FactionData>(filePath);
-                        if (factionData != null) {
-                            output.Add(new(
-                                factionData.minDepth,
-                                factionData.maxDepth,
-                                new FactionNode(factionData.hostName, factionData.displayName, IP, null) {
-                                    Faction = new(factionData.f_name, factionData.f_desc, 0, 0)
-                                }
-                            ));
-                            GD.Print($"Loaded FactionData: {factionData.hostName}, {factionData.displayName}");
+                    case "Faction": {
+                            FactionData factionData = GD.Load<FactionData>(filePath);
+                            if (factionData != null) {
+                                output.Add(new(
+                                    factionData.minDepth,
+                                    factionData.maxDepth,
+                                    new FactionNode(factionData.hostName, factionData.displayName, IP, null) {
+                                        Faction = new(factionData.f_name, factionData.f_desc, 0, 0)
+                                    }
+                                ));
+                                GD.Print($"Loaded FactionData: {factionData.hostName}, {factionData.displayName}");
+                            }
+                            break;
                         }
-                        break;
 
-                    case "Business":
-                        BusinessData businessData = GD.Load<BusinessData>(filePath);
-                        if (businessData != null) {
-                            output.Add(new(
-                                businessData.minDepth,
-                                businessData.maxDepth,
-                                new BusinessNode(businessData.hostName, businessData.displayName, IP, null) {
-                                    Stock = new(businessData.symbol, businessData.price, businessData.drift, businessData.volatility, 0)
-                                }
-                            ));
-                            GD.Print($"Loaded BusinessData: {businessData.hostName}, {businessData.displayName}");
+                    case "Business": {
+                            BusinessData businessData = GD.Load<BusinessData>(filePath);
+                            if (businessData != null) {
+                                output.Add(new(
+                                    businessData.minDepth,
+                                    businessData.maxDepth,
+                                    new BusinessNode(businessData.hostName, businessData.displayName, IP, null) {
+                                        Stock = new(businessData.symbol, businessData.price, businessData.drift, businessData.volatility, 0)
+                                    }
+                                ));
+                                GD.Print($"Loaded BusinessData: {businessData.hostName}, {businessData.displayName}");
+                            }
+                            break;
                         }
-                        break;
 
                     default:
                         GD.PrintErr($"Unknown category: {CATEGORY[i]}");

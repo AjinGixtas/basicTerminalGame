@@ -1,12 +1,12 @@
 [gd_scene load_steps=6 format=3 uid="uid://ccwqfx7w5pm3k"]
 
 [ext_resource type="PackedScene" uid="uid://ywm7rhxebeh4" path="res://Scenes/Terminal.tscn" id="1_hpc76"]
-[ext_resource type="Script" uid="uid://b2ynbwrig2yqu" path="res://Scripts/CS/GeneralUI/MenuManager.cs" id="1_nhkr4"]
-[ext_resource type="Script" uid="uid://cruda7xtodutw" path="res://Scripts/CS/Overseer.cs" id="1_qxria"]
+[ext_resource type="Script" uid="uid://b2ynbwrig2yqu" path="res://Scripts/CS/UIs/MenuManager.cs" id="1_nhkr4"]
+[ext_resource type="Script" uid="uid://cruda7xtodutw" path="res://Scripts/CS/UIs/Overseer.cs" id="1_qxria"]
 [ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="1_tr2i4"]
 [ext_resource type="PackedScene" uid="uid://dsqh3owg3cspi" path="res://Scenes/TextEditor.tscn" id="4_7rqgy"]
 
-[node name="Root" type="Control"]
+[node name="Overseer" type="Control" node_paths=PackedStringArray("terminal", "textEditor")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -14,6 +14,8 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_qxria")
+terminal = NodePath("HSplitContainer/TabContainer/Terminal")
+textEditor = NodePath("HSplitContainer/TabContainer/TextEditor")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1
@@ -67,13 +69,15 @@ size_flags_horizontal = 3
 current_tab = 0
 tabs_visible = false
 
-[node name="Terminal" parent="HSplitContainer/TabContainer" instance=ExtResource("1_hpc76")]
+[node name="Terminal" parent="HSplitContainer/TabContainer" node_paths=PackedStringArray("overseer") instance=ExtResource("1_hpc76")]
 layout_mode = 2
+overseer = NodePath("../../..")
 metadata/_tab_index = 0
 
-[node name="TextEditor" parent="HSplitContainer/TabContainer" instance=ExtResource("4_7rqgy")]
+[node name="TextEditor" parent="HSplitContainer/TabContainer" node_paths=PackedStringArray("overseer") instance=ExtResource("4_7rqgy")]
 visible = false
 layout_mode = 2
+overseer = NodePath("../../..")
 metadata/_tab_index = 1
 
 [connection signal="button_down" from="HSplitContainer/VBoxContainer/TerminalButton" to="HSplitContainer" method="TerminalButtonPressed"]

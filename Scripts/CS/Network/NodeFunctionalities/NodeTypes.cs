@@ -29,7 +29,7 @@ public abstract class NetworkNode {
             SecType = _secLvl switch {
                 < 1 => SecurityType.NOSEC,
                 < 4 => SecurityType.LOSEC,
-                < 7 => SecurityType.MISEC,
+                < 8 => SecurityType.MISEC,
                 < 10 => SecurityType.HISEC,
                 _ => SecurityType.MASEC
             };
@@ -42,6 +42,9 @@ public abstract class NetworkNode {
             SecLvl += value - _defLvl;
             _defLvl = value;
         }
+    }
+    public int RetLvl {
+        get => _retLvl;
     }
     public NetworkNode(string hostName, string displayName, string IP, NetworkNodeType NodeType, NetworkNode parentNode) {
         HostName = hostName; DisplayName = displayName; this.IP = IP; this.NodeType = NodeType;
@@ -101,7 +104,10 @@ public abstract class NetworkNode {
     bool _isSecure = true; bool IsSecure { get => _isSecure; set => _isSecure = value; }
     public int AttempCrackNode(Dictionary<string, string> ans, double timeStamp) {
         int result = LockSystem.CrackAttempt(ans, timeStamp);
-        if (result == 0) IsSecure = false;
+        if (result == 0) {
+            IsSecure = false;
+            SecLvl = 0; DefLvl = 0;
+        }
         return result;
     }
     public int TransferOwnership(NetworkNode node) {
@@ -121,7 +127,7 @@ public class PersonNode : NetworkNode {
     }
     public override (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {
         return (GD.RandRange(1, 3) + (int)Math.Ceiling(depthRatio * 4) + (int)Math.Ceiling(indexRatio * 30), 
-            GD.RandRange(1, DefLvl) + (int)Math.Ceiling(depthRatio * 10) + (int)Math.Ceiling(indexRatio * 4));
+            GD.RandRange(0, 1) + (int)Math.Ceiling(depthRatio * 6) + (int)Math.Ceiling(indexRatio * 4));
     }
 }
 public class BusinessNode : NetworkNode {
@@ -132,8 +138,10 @@ public class BusinessNode : NetworkNode {
     }
     // They're in it for the money, not to keep it
     public override (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {
-        return (GD.RandRange(5, 9) + (int)(depthRatio * 2) + (int)(indexRatio * 3), 
-            GD.RandRange((int)Math.Floor(DefLvl * 0.6), DefLvl)); 
+        GD.Print(indexRatio, ' ', depthRatio);
+        int seclvl = GD.RandRange(5, 9) + (int)(depthRatio * 2) + (int)(indexRatio * 3);
+        int deflvl = GD.RandRange((int)Math.Floor(seclvl * 0.6), seclvl);
+        return (seclvl, deflvl);
     }
 }
 public class CorpNode : NetworkNode {
@@ -218,7 +226,9 @@ public class MinerNode : NetworkNode {
     }
     // Kind of whatever, they're for production anyway.
     public override (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {
-        return (GD.RandRange(2, 10), GD.RandRange(1, DefLvl - 1));
+        int seclvl = GD.RandRange(2, 10);
+        int deflvl = GD.RandRange(1, seclvl - 1);
+        return (seclvl, deflvl);
     }
 }
 public class RougeNode : NetworkNode {

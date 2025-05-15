@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://ywm7rhxebeh4"]
 
-[ext_resource type="Script" uid="uid://mb8mpa63ad2n" path="res://Scripts/CS/Network/Terminal.cs" id="1_q6j3v"]
+[ext_resource type="Script" uid="uid://mb8mpa63ad2n" path="res://Scripts/CS/UIs/Terminal.cs" id="1_q6j3v"]
 [ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="2_tjxev"]
 [ext_resource type="CodeHighlighter" uid="uid://dfl78raux0p25" path="res://Utilities/Styling/CommandFieldHighlighter.tres" id="3_c8ipk"]
 [ext_resource type="Script" uid="uid://de88ixhijljw" path="res://Scripts/CS/Network/NetworkManager.cs" id="4_c8ipk"]
@@ -13,7 +13,7 @@ glow_hdr_threshold = 0.9
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_c8ipk"]
 
-[node name="Terminal" type="MarginContainer"]
+[node name="Terminal" type="MarginContainer" node_paths=PackedStringArray("terminalOutputField", "terminalCommandPrompt", "terminalCommandField", "networkManager", "processTimer", "updateProcessGraphicTimer", "crackDurationTimer")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -23,6 +23,13 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme = ExtResource("2_tjxev")
 script = ExtResource("1_q6j3v")
+terminalOutputField = NodePath("Splitter/TerminalOutputArea")
+terminalCommandPrompt = NodePath("Splitter/TerminalCommandLine/CommandPrompt")
+terminalCommandField = NodePath("Splitter/TerminalCommandLine/CommandField")
+networkManager = NodePath("Splitter/NetworkManager")
+processTimer = NodePath("Splitter/TimersContainer/ProcessTimer")
+updateProcessGraphicTimer = NodePath("Splitter/TimersContainer/UpdateProcessGraphicTimer")
+crackDurationTimer = NodePath("Splitter/TimersContainer/CrackDurationTimer")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_tjxev")
@@ -43,6 +50,7 @@ focus_mode = 2
 theme = ExtResource("2_tjxev")
 bbcode_enabled = true
 scroll_following = true
+vertical_alignment = 2
 selection_enabled = true
 visible_characters = 0
 visible_ratio = 0.0
@@ -85,9 +93,13 @@ one_shot = true
 wait_time = 0.25
 one_shot = true
 
+[node name="CrackDurationTimer" type="Timer" parent="Splitter/TimersContainer"]
+one_shot = true
+
 [node name="NetworkManager" type="Node" parent="Splitter"]
 script = ExtResource("4_c8ipk")
 
 [connection signal="text_changed" from="Splitter/TerminalCommandLine/CommandField" to="." method="OnCommandFieldTextChanged"]
 [connection signal="timeout" from="Splitter/TimersContainer/ProcessTimer" to="." method="ProcessFinished"]
 [connection signal="timeout" from="Splitter/TimersContainer/UpdateProcessGraphicTimer" to="." method="UpdateProcessingGraphic"]
+[connection signal="timeout" from="Splitter/TimersContainer/CrackDurationTimer" to="." method="OnCrackDurationTimerTimeout"]

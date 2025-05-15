@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 public static class Util {
@@ -77,22 +78,28 @@ public static class Util {
                 return $"[color={Util.CC(Cc.g)}]{input}[/color]";
             case StrType.SYMBOL:
                 return $"[color={Util.CC(Cc.m)}]{input}[/color]";
-            case StrType.UNIT:
-                return $"[color={Util.CC(Cc.RGB)}]{input}[/color][color={Util.CC(Cc.rgb)}]{addons[0]}[/color]";
+            case StrType.UNIT: {
+                    if (string.IsNullOrWhiteSpace(input)) return "";
+                    string[] parts = input.Split('.');
+                    if (parts.Length < 2) { parts = [parts[0], "00"]; }
+                    string integerPart = parts[0];
+                    string decimalPart = parts[1].PadLeft(2, '0');
+                    return $"[color={Util.CC(Cc.RGB)}]{integerPart}.{decimalPart}[/color][color={Util.CC(Cc.rgb)}]{addons[0]}[/color]";
+                }
             case StrType.SEC_LVL: {
                     string colorCode = "";
                     if (addons.Length > 0) {
                         colorCode = addons[0] switch {
-                            "0" or "1" or "2" => Util.CC(Cc.B),
-                            "3" or "4" or "5" or "7" => Util.CC(Cc.Y),
+                            "0" or "1" or "2" or "3" => Util.CC(Cc.B),
+                            "4" or "5" or "6" or "7" => Util.CC(Cc.Y),
                             "8" or "9" or "10" => Util.CC(Cc.R),
                             _ => "_"
                         };
                     }
                     if (colorCode == "_" || colorCode == "") {
                         colorCode = input switch {
-                            "0" or "1" or "2" => Util.CC(Cc.B),
-                            "3" or "4" or "5" or "7" => Util.CC(Cc.Y),
+                            "0" or "1" or "2" or "3" => Util.CC(Cc.B),
+                            "4" or "5" or "6" or "7" => Util.CC(Cc.Y),
                             "8" or "9" or "10" => Util.CC(Cc.R),
                             _ => Util.CC(Cc.R)
                         };
@@ -105,8 +112,8 @@ public static class Util {
                     "MISEC" => Util.CC(Cc.Y), 
                     "HISEC" or "MASEC" => Util.CC(Cc.B),
                     // Fall back
-                    "0" or "1" or "2" => Util.CC(Cc.B),
-                    "3" or "4" or "5" or "7" => Util.CC(Cc.Y),
+                    "0" or "1" or "2" or "3" => Util.CC(Cc.B),
+                    "4" or "5" or "6" or "7" => Util.CC(Cc.Y),
                     "8" or "9" or "10" => Util.CC(Cc.R),
                     // Final backup
                     _ => Util.CC(Cc.R) }
@@ -150,23 +157,39 @@ public static class Util {
                 return $"[color={Util.CC(Cc.gR)}]{input}[/color]";
             case StrType.MONEY: {
                     if (string.IsNullOrWhiteSpace(input)) return "";
-                    string[] parts = input.Split('.');
-                    if (parts.Length < 2) { parts = [parts[0], "00"]; }
-                    string integerPart = parts[0];
-                    string decimalPart = parts[1];
-                    Cc[] colors = new[] { Cc.y, Cc.r, Cc.g, Cc.b, Cc.c, Cc.m };
-                    string[] labels = new[] { "GC", "K", "M", "B", "T", "Q" };
-                    string output = "";
-                    int cursor = Math.Min(3, integerPart.Length);
-                    int index = 0;
-                    output = $"[color={Util.CC(Cc.RGB)}]{integerPart[^cursor..]}.{decimalPart}[/color][color={Util.CC(colors[index])}]{labels[index]}[/color]";
-                    ++index; cursor += 3;
-                    while (cursor < integerPart.Length && index < colors.Length && index < labels.Length) {
-                        output = ($"[color={Util.CC(Cc.RGB)}]{integerPart[^cursor..^(cursor - 3)]}[/color][color={Util.CC(colors[index])}]{labels[index]}[/color]") + output;
-                        cursor = Math.Min(cursor+3,integerPart.Length); ++index;
+
+                    // Parse the input as a decimal number
+                    if (!double.TryParse(input, out double value))
+                        return $"[color={Util.CC(Cc.y)}]{input}[/color][color={Util.CC(Cc.y)}]GC[/color]";
+
+                    // Define units and their values
+                    string[] units =    ["Q",  "T",  "B",  "M",  "K"];
+                    double[] divisors = [1e15, 1e12, 1e9,  1e6,  1e3];
+                    Cc[] colors =       [Cc.r, Cc.g, Cc.b, Cc.c, Cc.m]; // Q, T, B, M, K
+
+                    StringBuilder sb = new();
+                    double remainder = value;
+
+                    for (int i = 0; i < units.Length; i++) {
+                        if (remainder >= divisors[i]) {
+                            int unitValue = (int)Math.Floor(remainder / divisors[i]);
+                            remainder -= unitValue * divisors[i];
+                            sb.Append($"[color={Util.CC(colors[i])}]{unitValue}{units[i]}[/color]");
+                        }
                     }
-                    if (cursor < integerPart.Length) output = $"[color={Util.CC(Cc.RGB)}]{integerPart[..^cursor]}[/color]" + output;
-                    return output;
+
+                    string gcValue;
+                    if (value > 10_000) {
+                        // Round up to the next integer if value is big
+                        gcValue = Math.Ceiling(remainder).ToString("F0");
+                    } else {
+                        // Keep two decimals for small values
+                        gcValue = remainder.ToString("N2");
+                        gcValue = gcValue.Replace(",", "");
+                    }
+                    sb.Append($"[color={Util.CC(Cc.y)}]{gcValue}[/color]");
+                    sb.Append($"[color={Util.CC(Cc.y)}]GC[/color]");
+                    return sb.ToString();
                 }
             case StrType.USERNAME:
                 return $"[color={Util.CC(Cc.M)}]{input}[/color]";
@@ -188,8 +211,8 @@ public static class Util {
         if (enumType == typeof(SecurityType)) {
             var result = securityPoint switch {
                 < 1 => SecurityType.NOSEC,
-                < 3 => SecurityType.LOSEC,
-                < 6 => SecurityType.MISEC,
+                < 4 => SecurityType.LOSEC,
+                < 7 => SecurityType.MISEC,
                 < 10 => SecurityType.HISEC,
                 _ => SecurityType.MASEC,
             };

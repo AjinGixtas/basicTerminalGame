@@ -31,6 +31,7 @@ public class LockSystem {
                     if (key == "") {
                         TerminalProcessor.Say($"[{Util.Format("N0VALUE", StrType.ERROR)}] Denied access by {Util.Format(activeLocks[i].Name, StrType.CMD_ARG)}");
                         TerminalProcessor.Say("-r", $"Missing key for {Util.Format(flags[j], StrType.CMD_ARG)}");
+                        if (activeLocks[i].Clue.Length > 0) { TerminalProcessor.Say($"[color={Util.CC(Cc.rgb)}]{activeLocks[i].Inp}"); }
                         return 2;
                     } else if (!activeLocks[i].UnlockAttempt(key, j)) {
                         TerminalProcessor.Say($"[{Util.Format("WRON6KY", StrType.ERROR)}] Denied access by {Util.Format(activeLocks[i].Name, StrType.CMD_ARG)}");
@@ -55,9 +56,9 @@ public class LockSystem {
 }
 public class HackFarm {
     const int MAX_LVL = 255;
-    const double BASE_HACK = 12, POWR_HACK = 1.1,    SHIF_HACK = 1.4, BASE_COST_HACK = 35;
-    const double BASE_TIME = 60, POWR_TIME = Math.E, SHIF_TIME = .06, BASE_COST_TIME = 30;
-    const double BASE_GROW = .2, POWR_GROW = 6.75,   SHIF_GROW = 2.4, BASE_COST_GROW = 32;
+    const double BASE_HACK = 12, POWR_HACK =   1.01, SHIF_HACK =    0, BASE_COST_HACK = 35;
+    const double BASE_TIME = 60, POWR_TIME = Math.E, SHIF_TIME = .065, BASE_COST_TIME = 30;
+    const double BASE_GROW = .2, POWR_GROW =    6.7, SHIF_GROW =  2.4, BASE_COST_GROW = 32;
     double HackFactor { get; init; } // GC transfer to host per "hack"
     double TimeFactor { get; init; } // Interval between "hacks"
     double GrowFactor { get; init; } // GC create per second
@@ -83,26 +84,27 @@ public class HackFarm {
         }
     }
     public HackFarm(double indexRatio, double depthRatio, int HackLevel=1, int TimeLevel=1, int GrowLevel=1) {
-        double MAX_GROW = 1_000_000_000 / indexRatio;
+        double MAX_GROW = 1_000 * 0.7958800173440752 * Math.Log10(indexRatio+.6);
         double MIN_TIME = 0.05;
         double MAX_HACK = MAX_GROW * MIN_TIME;
-        HackFactor = + (MAX_HACK - BASE_HACK - SHIF_HACK * MAX_LVL) / Math.Pow(POWR_HACK, MAX_LVL);
-        TimeFactor = - (MIN_TIME - BASE_TIME - SHIF_TIME * MAX_LVL) / Math.Log(MAX_LVL, POWR_TIME);
+        HackFactor = + (MAX_HACK - BASE_HACK) / Math.Pow(POWR_HACK, MAX_LVL);
+        TimeFactor =   (BASE_TIME- MIN_TIME  + SHIF_TIME * MAX_LVL) / Math.Log2(MAX_LVL);
         GrowFactor = + (MAX_GROW - BASE_GROW - SHIF_GROW * MAX_LVL) / Math.Pow(MAX_LVL, POWR_GROW);
      
-        this.HackLvl = HackLevel; this.TimeLvl = TimeLevel; this.GrowLvl = GrowLevel;
-        GD.Print(GetHackValue(1), ' ', GetHackValue(3), ' ', GetHackValue(5), ' ', GetHackValue(100));
-        //this.HackLevel = GD.RandRange(1, 100); this.TimeLevel = GD.RandRange(1, 100); this.GrowLevel = GD.RandRange(1, 100);
+        //this.HackLvl = HackLevel; this.TimeLvl = TimeLevel; this.GrowLvl = GrowLevel;
+        this.HackLvl = 255; this.TimeLvl = 255; this.GrowLvl = 255;
+        timeRemain = CurTime;
     }
     double currencyPile = 0, timeRemain = 0;
-    public double Update(double delta) {
+    public double CurrencyPile { get => currencyPile; }
+    public double Process(double delta) {
         // Time related mechanism
         timeRemain -= delta; currencyPile += CurGrow * delta;
         // Hack related mechanism
         if (timeRemain > 0) return 0;
         double totalHackAmount = 0;
         while (timeRemain < 0) {
-            double hackedAmount = currencyPile * CurHack;
+            double hackedAmount = Math.Max(currencyPile, CurHack);
             currencyPile -= hackedAmount;
             totalHackAmount += hackedAmount;
             timeRemain += CurTime;
@@ -113,9 +115,9 @@ public class HackFarm {
     public void UpgradeHackLevel() { ++HackLvl; }
     public void UpgradeTimeLevel() { ++TimeLvl; }
     public void UpgradeGrowLevel() { ++GrowLvl; }
-    public double GetHackValue(int level) { return BASE_HACK + HackFactor * Math.Pow(POWR_HACK, level) + SHIF_HACK * level; }
-    public double GetTimeValue(int level) { return BASE_TIME - TimeFactor * Math.Log(level, POWR_TIME) - SHIF_TIME * level; }
-    public double GetGrowValue(int level) { return BASE_GROW + GrowFactor * Math.Pow(level, POWR_GROW) + SHIF_GROW * level; }
+    public double GetHackValue(int level) { return BASE_HACK + HackFactor * Math.Pow(POWR_HACK, level) + 1; } // Add a hard coded amount to account for floaty error
+    public double GetTimeValue(int level) { return BASE_TIME - TimeFactor * Math.Log2(level) + SHIF_TIME * level; }
+    public double GetGrowValue(int level) { return BASE_GROW + GrowFactor * Math.Pow(level, POWR_GROW) + level * SHIF_GROW; }
     public double GetHackCost(int level) { return BASE_COST_HACK * Math.Pow(1.10, level) + 44 * Math.Pow(level, 2.30); }
     public double GetTimeCost(int level) { return BASE_COST_TIME * Math.Pow(1.09, level) + 30 * Math.Pow(level, 2.45); }
     public double GetGrowCost(int level) { return BASE_COST_GROW * Math.Pow(1.08, level) + 25 * Math.Pow(level, 2.50); }

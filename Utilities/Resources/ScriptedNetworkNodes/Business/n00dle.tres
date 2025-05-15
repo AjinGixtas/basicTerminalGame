@@ -4,12 +4,12 @@
 
 [resource]
 script = ExtResource("1_u3ohy")
-stockSymbol = "ODL"
-stockValue = 0.0
-stockDrift = 0.0
-stockVolatility = 0.0
+symbol = "ODL"
+price = 0.0
+drift = 0.0
+volatility = 0.0
 hostName = "n00dle"
 displayName = "N00dle Shop"
 minDepth = 0
-maxDepth = -1
+maxDepth = 2
 enum_NodeType = 2

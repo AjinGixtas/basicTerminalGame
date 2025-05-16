@@ -951,7 +951,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="Image" id="Image_spmd1"]
+[sub_resource type="Image" id="Image_w7sxo"]
 data = {
 "data": PackedByteArray("/f/9AP3//QD9//0A/f/9AP3//QD9//0A/f/9AP3//QD9//0A/f/9AP3//QD9//0A/f/9AP3//QD9//0A/f/9AP3//QD9//3e/f/98/3//fP9//3z/f/98/3//fP9//3z/f/98/3//fP9//3z/f/98/3//fP9//3z/f/93v3//QD9//0A/f/98/3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fP9//0A/f/9AP3//fP9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//3z/f/9AP3//QD9//3z/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/98/3//QD9//0A/f/98/3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fP9//0A/f/9AP3//fP9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//3z/f/9AP3//QD9//3z/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/98/3//QD9//0A/f/98/3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fr9//36/f/9+v3//fP9//0A/f/9AP3//fP9//36/f/9+v3//fr9//36/f/9+/7//vT+//70/f/9+/3//fr9//36/f/9+v3//fr9//3z/f/9AP3//QD9//3z/f/9+v3//fr9//36/f/9+/7//ur8//xC/P/8Qv7//ur9//37/f/9+v3//fr9//36/f/98/3//QD9//0A/f/98/3//fr9//36////+f3//db///8i/P/8APz//AD///8j/f/91v7//vr9//36/f/9+v3//fP9//0A/f/9AP3//fP9//36////9/7//rH9//0N////AP///wD///8A////AP3//Q3+//6x/v/+9/3//fr9//3z/f/9AP3//QD9//3z/v/+9Pv/+33+//4C/v/+AP///wD///8A////AP///wD+//4A/v/+Av3//X39//30/f/98/3//QD9//0A/f/94v///0n7//sA+//7AP7//gD+//4A////AP///wD+//4A/v/+AP3//QD9//0A////Sf3//eL9//0A/f/9AP3//QD///8A////APv/+wD7//sA/v/+AP///wD///8A/v/+AP3//QD9//0A////AP///wD9//0A/f/9AA=="),
 "format": "RGBA8",
@@ -961,9 +961,9 @@ data = {
 }
 
 [sub_resource type="ImageTexture" id="ImageTexture_5mwjk"]
-image = SubResource("Image_spmd1")
+image = SubResource("Image_w7sxo")
 
-[sub_resource type="Image" id="Image_w7sxo"]
+[sub_resource type="Image" id="Image_5mwjk"]
 data = {
 "data": PackedByteArray("/11dAP9dXQD/XV0A/11dAP9bWwD/W1sA/1xcAP9cXAD/XFwA/1xcAP9dXQD/XV0A/1tbAP9bWwD/W1sA/1tbAP9dXQD/XV0A/11dAP9dXQD/W1sM/1tbQ/9cXGn/XFx6/1xcev9cXGn/XV1C/11dC/9bWwD/W1sA/1tbAP9bWwD/XV0A/11dAP9dXQD/XV0s/1xcev9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9cXHr/W1sq/1tbAP9bWwD/W1sA/11dAP9dXQD/XV0s/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9bWyr/W1sA/1tbAP9bWwD/XFwM/1xcev9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/XV15/11dC/9eXgD/W1sA/1tbQ/9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXkH/Xl4A/1xcAP9cXGn/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/XV1o/11dAP9cXAD/XFx6/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/1xcev9cXAD/XFwA/1xcev9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9dXXn/XV0A/1xcAP9cXGn/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl5n/15eAP9dXQD/XV1C/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/1paQf9aWgD/XV0A/11dC/9cXHr/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/11def9aWgr/WloA/1tbAP9bWwD/W1sq/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/15egP9dXSn/XV0A/11dAP9bWwD/W1sA/1tbAP9bWyr/XV15/15egP9eXoD/Xl6A/15egP9eXoD/Xl6A/11def9dXSn/XV0A/11dAP9dXQD/W1sA/1tbAP9bWwD/W1sA/11dC/9eXkH/XV1o/1xcev9dXXn/Xl5n/1paQf9dXQr/XV0A/11dAP9dXQD/XV0A/1tbAP9bWwD/W1sA/1tbAP9eXgD/Xl4A/11dAP9cXAD/XV0A/15eAP9aWgD/WloA/11dAP9dXQD/XV0A/11dAA=="),
 "format": "RGBA8",
@@ -973,9 +973,9 @@ data = {
 }
 
 [sub_resource type="ImageTexture" id="ImageTexture_7jrus"]
-image = SubResource("Image_w7sxo")
+image = SubResource("Image_5mwjk")
 
-[sub_resource type="Image" id="Image_5mwjk"]
+[sub_resource type="Image" id="Image_f3k2c"]
 data = {
 "data": PackedByteArray("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwsLAAsLCwALCwsACwsLAAsLCwALGxsQCxsbEAsbGxALGxsQCxsbEAsbGxALCwsACwsLAAsLCwALCwsACwsLAAsLCwALCwsACwsLAAsLCwALCwsACxsbEAsbGxALGxsQCxsbEAsbGxALGxsQCwsLAAsLCwALCwsACwsLAAsLCwALCwsACwsLAAsLCwALCwsACwsLAAsbGxALGxsQCxsbEAsbGxALGxsQCxsbEAsLCwALCwsACwsLAAsLCwALCwsACwsLAAsLCwALCwsACwsLAAsLCwALGxsQCxsbEAsbGxALGxsQCxsbEAsbGxALCwsACwsLAAsLCwALCwsACwsLAAsLCwALCwsACwsLAAsLCwALCwsFGxsbFYsbGxCbGxsQCxsbEAsbGxCbGxsViwsLBQsLCwALCwsACwsLAAsLCwALGxsQCxsbEAsbGxALGxsQCxsbFYsrKyc7GxsV6xsbEJsbGxCbGxsV+ysrJzsLCwV7CwsACwsLAAsLCwALCwsACxsbEAsbGxALGxsQCxsbEAsbGxCbGxsV6ysrJzsbGxaLGxsWiysrJzsbGxXrCwsAmwsLAAsLCwALCwsACwsLAAsbGxALGxsQCxsbEAsbGxALGxsQCxsbEJsbGxXrKysnOysrJzsbGxXrGxsQmxsbEAsLCwALCwsACwsLAAsLCwALGxsQCxsbEAsbGxALGxsQCxsbEAsbGxALGxsQmwsLBXsLCwV7GxsQmxsbEAsbGxALGxsQCwsLAAsLCwALCwsACxsbEAsbGxALGxsQCxsbEAsbGxALGxsQCwsLAAsLCwALCwsACwsLAAsbGxALGxsQCxsbEAsbGxALCwsACwsLAAAAAAALGxsQCxsbEAsbGxALGxsQCwsLAAsLCwALCwsACwsLAAsLCwALCwsACxsbEAsbGxALGxsQCxsbEAAAAAAAAAAAAAAAAAsbGxALGxsQCwsLAAsLCwALCwsACwsLAAsLCwALCwsACwsLAAsLCwALGxsQCxsbEAAAAAAAAAAAAAAAAAAAAAAAAAAACwsLAAsLCwALCwsACwsLAAsLCwALCwsACwsLAAsLCwALCwsACwsLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="),
 "format": "RGBA8",
@@ -985,9 +985,9 @@ data = {
 }
 
 [sub_resource type="ImageTexture" id="ImageTexture_uhye0"]
-image = SubResource("Image_5mwjk")
+image = SubResource("Image_f3k2c")
 
-[sub_resource type="Image" id="Image_f3k2c"]
+[sub_resource type="Image" id="Image_7jrus"]
 data = {
 "data": PackedByteArray("////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///+4////////////////////////////////////tf///wD///8A////AP///wD//////////////////////////////////////////////wD///8A////AP///wD////o////K////3j//////////v///3X///8r////6////wD///8A////AP///wD////j////B////wD///9s////a////wD///8J////5v///wD///8A////AP///wD/////////uP///wf///8A////AP///wn///+7/////////wD///8A////AP///wD//////////////7j///8H////Cf///7v//////////////wD///8A////AP///wD////////////////////e////4P///////////////////wD///8A////AP///wD///+1////////////////////////////////////tP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A"),
 "format": "RGBA8",
@@ -997,9 +997,9 @@ data = {
 }
 
 [sub_resource type="ImageTexture" id="ImageTexture_yg5fu"]
-image = SubResource("Image_f3k2c")
+image = SubResource("Image_7jrus")
 
-[sub_resource type="Image" id="Image_7jrus"]
+[sub_resource type="Image" id="Image_3exhb"]
 data = {
 "data": PackedByteArray("gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP///////////////////////////////////////////4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID///////////////////////////////////////////+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA////////////////////////////////////////////gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP///////////////////////////////////////////4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID///////////////////////////////////////////+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA////////////////////////////////////////////gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP///////////////////////////////////////////4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID//////////////////////////////////////////////////////////////////////////////////////4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID///////////////////////////////////////////+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA////////////////////////////////////////////gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP///////////////////////////////////////////4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID///////////////////////////////////////////+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA////////////////////////////////////////////gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP///////////////////////////////////////////4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID///////////////////////////////////////////+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/w=="),
 "format": "RGBA8",
@@ -1009,9 +1009,9 @@ data = {
 }
 
 [sub_resource type="ImageTexture" id="ImageTexture_tqyt0"]
-image = SubResource("Image_7jrus")
+image = SubResource("Image_3exhb")
 
-[sub_resource type="Image" id="Image_3exhb"]
+[sub_resource type="Image" id="Image_uhye0"]
 data = {
 "data": PackedByteArray("AAAAALCwsACwsLAAsLCwALCwsACwsLAAsbGxALGxsQCxsbEAsbGxALGxsQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwsLAAsLCwALCwsACwsLAAsLCwALGxsQCxsbEAsbGxALGxsQCxsbEAsbGxAAAAAAAAAAAAAAAAAAAAAAAAAAAAsLCwALCwsACwsLAAsLCwALCwsACxsbEAsbGxALGxsQCxsbEAsbGxALGxsQCxsbEAAAAAAAAAAAAAAAAAAAAAALCwsACwsLAAsLCwALCwsACwsLAAsbGxALGxsQCxsbEAsbGxALGxsQCxsbEAsbGxALCwsAAAAAAAAAAAAAAAAACwsLAAsLCwALCwsACwsLAAsLCwUbGxsVixsbEJsbGxALGxsQCxsbEAsbGxALCwsACwsLAAAAAAAAAAAAAAAAAAsbGxALGxsQCxsbEAsbGxALGxsViysrJzsbGxXrGxsQmxsbEAsbGxALCwsACwsLAAsLCwAAAAAAAAAAAAAAAAALGxsQCxsbEAsbGxALGxsQCxsbEJsbGxXrKysnOxsbFesbGxCbCwsACwsLAAsLCwALCwsAAAAAAAAAAAAAAAAACxsbEAsbGxALGxsQCxsbEAsbGxALGxsQmxsbFosrKyc7CwsFewsLAAsLCwALCwsACwsLAAAAAAAAAAAAAAAAAAsbGxALGxsQCxsbEAsbGxALGxsQCxsbEJsbGxaLKysnOwsLBXsLCwALCwsACwsLAAsLCwAAAAAAAAAAAAAAAAALGxsQCxsbEAsbGxALGxsQCxsbEJsbGxX7KysnOxsbFesLCwCbCwsACwsLAAsLCwALCwsAAAAAAAAAAAAAAAAACxsbEAsbGxALGxsQCxsbEAsbGxWLKysnOxsbFesbGxCbGxsQCwsLAAsLCwALCwsACwsLAAAAAAAAAAAAAAAAAAsLCwALCwsACwsLAAsLCwALCwsFCwsLBXsbGxCbGxsQCxsbEAsbGxALCwsACwsLAAsLCwAAAAAAAAAAAAAAAAALCwsACwsLAAsLCwALCwsACwsLAAsLCwALCwsACxsbEAsbGxALGxsQCxsbEAsLCwALCwsAAAAAAAAAAAAAAAAACwsLAAsLCwALCwsACwsLAAsLCwALCwsACwsLAAsLCwALGxsQCxsbEAsbGxALGxsQAAAAAAAAAAAAAAAAAAAAAAsLCwALCwsACwsLAAsLCwALCwsACwsLAAsLCwALCwsACwsLAAsbGxALGxsQAAAAAAAAAAAAAAAAAAAAAAAAAAALCwsACwsLAAsLCwALCwsACwsLAAsLCwALCwsACwsLAAsLCwALCwsAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="),
 "format": "RGBA8",
@@ -1021,9 +1021,9 @@ data = {
 }
 
 [sub_resource type="ImageTexture" id="ImageTexture_bdjae"]
-image = SubResource("Image_3exhb")
+image = SubResource("Image_uhye0")
 
-[sub_resource type="Image" id="Image_uhye0"]
+[sub_resource type="Image" id="Image_ra5jm"]
 data = {
 "data": PackedByteArray("////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///+4/////////+j////j////////////////////tf///wD///8A////AP///wD//////////////yv///8H////uP///////////////////wD///8A////AP///wD//////////////3j///8A////B////7j//////////////wD///8A////AP///wD///////////////////9s////AP///wf////e/////////wD///8A////AP///wD///////////////7///9r////AP///wn////g/////////wD///8A////AP///wD//////////////3X///8A////CP///7r//////////////wD///8A////AP///wD//////////////yv///8I////uf///////////////////wD///8A////AP///wD///+1/////////+v////k////////////////////tP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A"),
 "format": "RGBA8",
@@ -1033,9 +1033,9 @@ data = {
 }
 
 [sub_resource type="ImageTexture" id="ImageTexture_o56bk"]
-image = SubResource("Image_uhye0")
+image = SubResource("Image_ra5jm")
 
-[sub_resource type="Image" id="Image_ra5jm"]
+[sub_resource type="Image" id="Image_yg5fu"]
 data = {
 "data": PackedByteArray("////AP///wn///8r////PP///0D///9A////QP///0D///9A////QP///zz///8r////Cf///wD///8J////PP///0D///9A////QP///0D///9A////QP///0D///9A////QP///0D///87////Cf///yv///9A////QP///0D///9A////QP///0D///9A////QP///0D///9A////QP///0D///8q////PP///0D///8P////FP///0D///9A////D////xT///9A////QP///w////8U////QP///zv///88////QP///xD///8R////QP///0D///8Q////Ef///0D///9A////EP///xH///9A////O////yv///9A////QP///0D///9A////QP///0D///9A////QP///0D///9A////QP///0D///8q////Cf///zv///9A////QP///0D///9A////QP///0D///9A////QP///0D///9A////O////wj///8A////Cf///yv///87////QP///0D///9A////QP///0D///9A////O////yr///8I////AA=="),
 "format": "RGBA8",
@@ -1045,9 +1045,9 @@ data = {
 }
 
 [sub_resource type="ImageTexture" id="ImageTexture_x3a5p"]
-image = SubResource("Image_ra5jm")
+image = SubResource("Image_yg5fu")
 
-[sub_resource type="Image" id="Image_yg5fu"]
+[sub_resource type="Image" id="Image_35ct0"]
 data = {
 "data": PackedByteArray("tLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tBO0tLQTtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQTtLS0QLS0tEC0tLQTtLS0ALS0tAC0tLQAtLS0ALS0tBO0tLRAtLS0QLS0tBO0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tBO0tLQTtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0AA=="),
 "format": "RGBA8",
@@ -1057,9 +1057,9 @@ data = {
 }
 
 [sub_resource type="ImageTexture" id="ImageTexture_m5oys"]
-image = SubResource("Image_yg5fu")
+image = SubResource("Image_35ct0")
 
-[sub_resource type="Image" id="Image_35ct0"]
+[sub_resource type="Image" id="Image_tqyt0"]
 data = {
 "data": PackedByteArray("s7OzL7OzszKzs7MGr6+vALS0tAC0tLQAtLS0QLS0tECxsbExtLS0QK+vrzavr68Gr6+vALS0tAC0tLRAtLS0QLGxsQWxsbE0tLS0QK+vrzavr68GtLS0ALS0tEC0tLRAsbGxALGxsQWxsbE0tLS0QLOzszKzs7MAtLS0QLS0tECysrIAsrKyBrKysjW0tLRAsbGxMbGxsQC0tLRAtLS0QLKysgaysrI1tLS0QLKysjWxsbEFtLS0ALS0tEC0tLRAtbW1MLS0tECysrI1srKyBbKysgC0tLQAtLS0QLS0tEC1tbUptbW1MLKysgWysrIAtLS0ALS0tAC0tLRAtLS0QA=="),
 "format": "RGBA8",
@@ -1069,7 +1069,7 @@ data = {
 }
 
 [sub_resource type="ImageTexture" id="ImageTexture_yxd0l"]
-image = SubResource("Image_35ct0")
+image = SubResource("Image_tqyt0")
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m0npu"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
@@ -1105,7 +1105,7 @@ bg_color = Color(1, 0, 0, 1)
 corner_detail = 1
 anti_aliasing = false
 
-[sub_resource type="Image" id="Image_tqyt0"]
+[sub_resource type="Image" id="Image_bdjae"]
 data = {
 "data": PackedByteArray("////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////YP///2D///8A////AP///wD///8A////AP///wD///8A////AP///2D///9g////AP///wD///8A////YP///7////+/////YP///wD///8A////AP///wD///8A////AP///2D///+/////v////2D///8A////AP///2D///+/////v////7////9g////AP///wD///8A////AP///2D///+/////v////7////9g////AP///wD///8A////YP///7////+/////v////2D///8A////AP///2D///+/////v////7////9g////AP///wD///8A////AP///wD///9g////v////7////+/////YP///2D///+/////v////7////9g////AP///wD///8A////AP///wD///8A////AP///2D///+/////v////7////+/////v////7////9g////AP///wD///8A////AP///wD///8A////AP///wD///8A////YP///7////+/////v////7////9g////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///2D///+/////v////7////+/////YP///wD///8A////AP///wD///8A////AP///wD///8A////AP///2D///+/////v////7////+/////v////7////9g////AP///wD///8A////AP///wD///8A////AP///2D///+/////v////7////9g////YP///7////+/////v////2D///8A////AP///wD///8A////AP///2D///+/////v////7////9g////AP///wD///9g////v////7////+/////YP///wD///8A////AP///2D///+/////v////7////9g////AP///wD///8A////AP///2D///+/////v////7////9g////AP///wD///9g////v////7////9g////AP///wD///8A////AP///wD///8A////YP///7////+/////YP///wD///8A////AP///2D///9g////AP///wD///8A////AP///wD///8A////AP///wD///9g////YP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AA=="),
 "format": "RGBA8",
@@ -1115,7 +1115,7 @@ data = {
 }
 
 [sub_resource type="ImageTexture" id="ImageTexture_oclfs"]
-image = SubResource("Image_tqyt0")
+image = SubResource("Image_bdjae")
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_40dey"]
 bg_color = Color(0.0627451, 0.0980392, 0.160784, 0)

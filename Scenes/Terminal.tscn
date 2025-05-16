@@ -109,14 +109,26 @@ selection_enabled = true
 self_modulate = Color(8, 8, 8, 0.2)
 layout_mode = 2
 size_flags_vertical = 3
-text = "▲▴▶▸▼▾◀◂█◆◢◣◥◤
-               ▴
- ▴  ▲         ◢█◣
-◂█▸◀█▶       ◂███▸
- ▾  ▼         ◥█◤
-               ▾
-qwertyuiopasdfghjklzxcvbnm
-qwertyuiopasdfghjklzxcvbnm"
+theme = ExtResource("4_oclfs")
+text = "        /`>
+  __◢█◤; ▾;◥█◣__
+╱╱/◢--      ---◣╲╲
+
+// /\\\\      |/ ||\\
+|| | =██◣▼▴▼◢█ || |
+|| |  {--▾-▾-} || |
+
+ _.─────._     _  ,
+(_       _).o.(_)c
+  `─────'  ╱ \\╲
+
+
+
+=>
+
+╱╲▲▴▶▸▼▾◀◂█◆◢◣◥◤
+╱╲▲▴▶▸▼▾◀◂█◆◢◣◥◤"
+caret_multiple = false
 
 [node name="TimersContainer" type="Node" parent="."]
 

@@ -1080,7 +1080,7 @@ content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
 
-[sub_resource type="Image" id="Image_cul4d"]
+[sub_resource type="Image" id="Image_53od4"]
 data = {
 "data": PackedByteArray("tLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tBO0tLQTtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQTtLS0QLS0tEC0tLQTtLS0ALS0tAC0tLQAtLS0ALS0tBO0tLRAtLS0QLS0tBO0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tBO0tLQTtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0ALS0tAC0tLQAtLS0AA=="),
 "format": "RGBA8",
@@ -1090,9 +1090,9 @@ data = {
 }
 
 [sub_resource type="ImageTexture" id="ImageTexture_l78ki"]
-image = SubResource("Image_cul4d")
+image = SubResource("Image_53od4")
 
-[sub_resource type="Image" id="Image_41ggn"]
+[sub_resource type="Image" id="Image_cul4d"]
 data = {
 "data": PackedByteArray("s7OzL7OzszKzs7MGr6+vALS0tAC0tLQAtLS0QLS0tECxsbExtLS0QK+vrzavr68Gr6+vALS0tAC0tLRAtLS0QLGxsQWxsbE0tLS0QK+vrzavr68GtLS0ALS0tEC0tLRAsbGxALGxsQWxsbE0tLS0QLOzszKzs7MAtLS0QLS0tECysrIAsrKyBrKysjW0tLRAsbGxMbGxsQC0tLRAtLS0QLKysgaysrI1tLS0QLKysjWxsbEFtLS0ALS0tEC0tLRAtbW1MLS0tECysrI1srKyBbKysgC0tLQAtLS0QLS0tEC1tbUptbW1MLKysgWysrIAtLS0ALS0tAC0tLRAtLS0QA=="),
 "format": "RGBA8",
@@ -1102,7 +1102,7 @@ data = {
 }
 
 [sub_resource type="ImageTexture" id="ImageTexture_6ujpy"]
-image = SubResource("Image_41ggn")
+image = SubResource("Image_cul4d")
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8ej2l"]
 content_margin_left = 4.0
@@ -1180,7 +1180,7 @@ TextEdit/colors/search_result_color = Color(0.3, 0.3, 0.3, 1)
 TextEdit/colors/selection_color = Color(0.501961, 0.501961, 0.501961, 0.12549)
 TextEdit/colors/word_highlighted_color = Color(0.501961, 0.501961, 0.168627, 0.12549)
 TextEdit/constants/caret_width = 1
-TextEdit/constants/line_spacing = -5
+TextEdit/constants/line_spacing = -2
 TextEdit/constants/outline_size = 0
 TextEdit/font_sizes/font_size = 13
 TextEdit/fonts/font = ExtResource("1_53od4")

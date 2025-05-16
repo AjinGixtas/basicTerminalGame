@@ -84,7 +84,7 @@ public static class Util {
                     if (parts.Length < 2) { parts = [parts[0], "00"]; }
                     string integerPart = parts[0];
                     string decimalPart = parts[1].PadLeft(2, '0');
-                    return $"[color={Util.CC(Cc.RGB)}]{integerPart}.{decimalPart}[/color][color={Util.CC(Cc.rgb)}]{addons[0]}[/color]";
+                    return $"[color={Util.CC(Cc.rgb)}]{integerPart}.{decimalPart}[/color][color={Util.CC(Cc.RGB)}]{addons[0]}[/color]";
                 }
             case StrType.SEC_LVL: {
                     string colorCode = "";
@@ -163,9 +163,9 @@ public static class Util {
                         return $"[color={Util.CC(Cc.y)}]{input}[/color][color={Util.CC(Cc.y)}]GC[/color]";
 
                     // Define units and their values
-                    string[] units =    ["Q",  "T",  "B",  "M",  "K"];
-                    double[] divisors = [1e15, 1e12, 1e9,  1e6,  1e3];
-                    Cc[] colors =       [Cc.r, Cc.g, Cc.b, Cc.c, Cc.m]; // Q, T, B, M, K
+                    string[] units =    ["Q" , "T" , "B" , "M" , "K" ];
+                    double[] divisors = [1e15, 1e12, 1e9 , 1e6 , 1e3 ];
+                    Cc[] colors =       [Cc.R, Cc.M, Cc.G, Cc.B, Cc.C]; // Q, T, B, M, K
 
                     StringBuilder sb = new();
                     double remainder = value;
@@ -174,7 +174,7 @@ public static class Util {
                         if (remainder >= divisors[i]) {
                             int unitValue = (int)Math.Floor(remainder / divisors[i]);
                             remainder -= unitValue * divisors[i];
-                            sb.Append($"[color={Util.CC(colors[i])}]{unitValue}{units[i]}[/color]");
+                            sb.Append($"[color={Util.CC(Cc.rgb)}]{unitValue}[/color][color={Util.CC(colors[i])}]{units[i]}[/color]");
                         }
                     }
 
@@ -182,13 +182,14 @@ public static class Util {
                     if (value > 10_000) {
                         // Round up to the next integer if value is big
                         gcValue = Math.Ceiling(remainder).ToString("F0");
+                        if (gcValue == "000") { gcValue = ""; }
                     } else {
                         // Keep two decimals for small values
-                        gcValue = remainder.ToString("N2");
-                        gcValue = gcValue.Replace(",", "");
+                        gcValue = remainder.ToString("N2").Replace(",", "");
+                        if (gcValue == "000.00") { gcValue = ""; }
                     }
-                    sb.Append($"[color={Util.CC(Cc.y)}]{gcValue}[/color]");
-                    sb.Append($"[color={Util.CC(Cc.y)}]GC[/color]");
+                    sb.Append($"[color={Util.CC(Cc.rgb)}]{gcValue}[/color]");
+                    sb.Append($"[color={Util.CC(Cc.Y)}]GC[/color]");
                     return sb.ToString();
                 }
             case StrType.USERNAME:

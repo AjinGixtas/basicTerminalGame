@@ -62,21 +62,26 @@ public static class TerminalProcessor {
 	}
 	static double minHeight = 18; // Hard coded for convenience, prob should be generate at init runtime instead.
 	public static void Process(double delta) {
-		if (Input.IsActionJustPressed("moveDownHistory")) {
-			if (minHeight >= terminalCommandField.Size.Y) CommandHistoryIndex += 1; 
-		}
-		if (Input.IsActionJustPressed("moveUpHistory")) { 
-			if (minHeight >= terminalCommandField.Size.Y) CommandHistoryIndex -= 1; 
-		}
-		if (Input.IsActionJustPressed("submitCommand")) {
-			if (terminalCommandField.Text.Length == 0) { terminalCommandField.GrabFocus(); return; }
-			terminalCommandField.Text = terminalCommandField.Text.Replace("\n", "").Replace("\r", "");
-			SubmitCommand(terminalCommandField.Text);
-			terminalCommandField.Text = "";
-			terminalCommandField.GrabFocus();
-		}
+		HandleInput(delta);
 		ShowMoreChars(delta);
 		PlayerData.Process(delta);
+    }
+	public static void HandleInput(double dela) {
+		if (terminalCommandField.HasFocus()) {
+			if (Input.IsActionJustPressed("moveDownHistory")) {
+				if (minHeight >= terminalCommandField.Size.Y) CommandHistoryIndex += 1;
+			}
+			if (Input.IsActionJustPressed("moveUpHistory")) {
+				if (minHeight >= terminalCommandField.Size.Y) CommandHistoryIndex -= 1;
+			}
+			if (Input.IsActionJustPressed("submitCommand")) {
+				if (terminalCommandField.Text.Length == 0) { terminalCommandField.GrabFocus(); return; }
+				terminalCommandField.Text = terminalCommandField.Text.Replace("\n", "").Replace("\r", "");
+				SubmitCommand(terminalCommandField.Text);
+				terminalCommandField.Text = "";
+				terminalCommandField.GrabFocus();
+			}
+		}
     }
 
 	static Action<Dictionary<string, string>, string[]> finishFunction; static (Dictionary<string, string>, string[]) finishFunctionArgs;
@@ -120,24 +125,28 @@ public static class TerminalProcessor {
 		string[] commands = newCommand.Split(';', StringSplitOptions.RemoveEmptyEntries);
 		Say($"{terminalCommandPrompt.Text}{Util.Format(newCommand, StrType.CMD)}");
 		for (int i = 0; i < commands.Length; i++) {
-			string[] components = ParseArguments(commands[i]);
+			string[] components = Tokenize(commands[i]);
 			if (components.Length == 0) continue;
-
 			if (!ProcessCommand(components[0], components[1..])) break;
 		}
-		static string[] ParseArguments(string input) {
-			var matches = Regex.Matches(input, @"(?:[\""].+?[\""]|\S+)(?=\s*=\s*)|\S+");
-			var result = matches.Select(m => m.Value.Trim('"')).ToArray();
-			return [.. result.Select(arg =>
-			{
-				if (!arg.Contains('\"')) {
-					var split = arg.Split(['='], 2);
-					return split.Length > 1 ? split : [split[0]];
-				}
-				return [arg];
-			})
-			.SelectMany(x => x)];
-		}
+		static string[] Tokenize(string input) {
+            var tokens = new List<string>();
+
+            // Regex: match quoted text or unquoted word
+            var matches = Regex.Matches(input, "\"([^\"]*)\"|(\\S+)");
+
+            foreach (Match match in matches) {
+                if (match.Groups[1].Success) {
+                    // Quoted group
+                    tokens.Add(match.Groups[1].Value);
+                } else {
+                    // Unquoted group
+                    tokens.Add(match.Groups[2].Value);
+                }
+            }
+
+            return tokens.ToArray();
+        }
 	}
 	static bool ProcessCommand(string command, string[] args) {
 		command = command.ToLower();
@@ -209,10 +218,10 @@ public static class TerminalProcessor {
 	// It gets 2 since this one is REALLY close to standard, but since it's also called independently a lot, allow for seperate shorthand flag is way better.
 	static void Say(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		if (positionalArgs.Length == 0) { Say(""); return; }
-		string c = terminalOutputField.GetParsedText();
+		string c = terminalOutputField.Text;
 		if (c.Length >= MAX_HISTORY_CHAR_SIZE) {
 			terminalOutputField.Clear();
-			terminalOutputField.AppendText(c[^RESET_HISTORY_CHAR_SIZE..]);
+			terminalOutputField.AppendText(GetLastLinesUnderLimit(c, RESET_HISTORY_CHAR_SIZE));
 		}
 		string text = string.Join(" ", positionalArgs);
 		if (parsedArgs.ContainsKey("-e")) text = Regex.Unescape(text); // handles \n, \t, etc.
@@ -227,10 +236,10 @@ public static class TerminalProcessor {
 	public static void Say(params string[] args) {
 		if (args.Length == 0) { Say(""); return; }
 
-		string c = terminalOutputField.GetParsedText();
+		string c = terminalOutputField.Text;
 		if (c.Length >= MAX_HISTORY_CHAR_SIZE) {
 			terminalOutputField.Clear();
-			terminalOutputField.AppendText(c[^RESET_HISTORY_CHAR_SIZE..]);
+			terminalOutputField.AppendText(GetLastLinesUnderLimit(c, RESET_HISTORY_CHAR_SIZE));
 		}
 
 		bool noNewline = false, interpretEscapes = false, escapeBBcode = false, makeRed = false, makeYellow = false;
@@ -261,7 +270,38 @@ public static class TerminalProcessor {
 
         terminalOutputField.AppendText(text);
 	}
-	static void Help(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+    static string GetLastLinesUnderLimit(string text, int maxChars) {
+        var lines = text.AsSpan(); // Avoid allocating full array
+        var newline = '\n';
+        List<int> lineBreaks = new(); // Store line start indices
+
+        // Step 1: Find all newline positions
+        for (int i = 0; i < lines.Length; i++) {
+            if (lines[i] == newline)
+                lineBreaks.Add(i);
+        }
+
+        int totalChars = 0;
+        int startLineIndex = lineBreaks.Count;
+
+        // Step 2: Walk backwards through line breaks
+        for (int i = lineBreaks.Count - 1; i >= 0; i--) {
+            int lineStart = (i == 0) ? 0 : lineBreaks[i - 1] + 1;
+            int lineEnd = lineBreaks[i] + 1; // include '\n'
+            int lineLength = lineEnd - lineStart;
+
+            if (totalChars + lineLength > maxChars)
+                break;
+
+            totalChars += lineLength;
+            startLineIndex = i;
+        }
+
+        // Step 3: Slice the original span
+        int startChar = (startLineIndex == 0) ? 0 : lineBreaks[startLineIndex - 1] + 1;
+        return text.Substring(startChar);
+    }
+    static void Help(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		string fileName = parsedArgs.ContainsKey("-v") ? "helpVerbose.txt" : "helpShort.txt";
 		FileAccess fileAccess = FileAccess.Open($"res://Utilities/TextFiles/CommandOutput/{fileName}", FileAccess.ModeFlags.Read);
 		Say(fileAccess.GetAsText());

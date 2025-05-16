@@ -2,15 +2,23 @@ using Godot;
 
 public partial class EditorTab : CodeEdit
 {
-    NodeFile file;
-    public void Begin(NodeFile nodeFile) {
-        file = nodeFile;
-        Text = file.Content;
-    }
-    public bool IsDirty() {
-        return Text != file.Content;
-    }
-    public void Save() {
-        file.Content = Text;
-    }
+	NodeFile file;
+	TextEditor textEditor;
+	public void Begin(NodeFile nodeFile, TextEditor textEditor) {
+		file = nodeFile;
+		Text = file.Content;
+		this.textEditor = textEditor;
+	}
+	public override void _Process(double delta) {
+		if (HasFocus()) {
+			if (Input.IsActionJustPressed("closeTab")) { textEditor.CloseTab(); }
+			if (Input.IsActionJustPressed("saveFile")) { textEditor.SaveFile(); }
+		}
+	}
+	public bool IsDirty() {
+		return Text != file.Content;
+	}
+	public void Save() {
+		file.Content = Text;
+	}
 }

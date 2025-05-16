@@ -11,15 +11,11 @@ public partial class TextEditor : MarginContainer {
 		tabContainer = GetNode<TabContainer>("VSplitContainer/TabContainer");
 		editorTabScene = GD.Load<PackedScene>("res://Scenes/EditorTab.tscn");
 	}
-	public override void _Process(double delta) {
-		if (Input.IsActionJustPressed("closeTab")) { CloseTab(); }
-		if (Input.IsActionJustPressed("saveFile")) { SaveFile(); }
-	}
 	public void OpenNewFile(string HostName, NodeFile nodeFile) {
 		tabBar.AddTab($"{HostName}:{nodeFile.Name}", null);
 		EditorTab newTab = editorTabScene.Instantiate<EditorTab>();
 		tabContainer.AddChild(newTab, true);
-		newTab.Begin(nodeFile);
+		newTab.Begin(nodeFile, this);
 	}
 	public void SaveFile() {
 		if (tabContainer.CurrentTab == -1) return; // No tab is selected

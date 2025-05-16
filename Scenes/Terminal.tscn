@@ -4,16 +4,11 @@
 [ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="2_tjxev"]
 [ext_resource type="CodeHighlighter" uid="uid://dfl78raux0p25" path="res://Utilities/Styling/CommandFieldHighlighter.tres" id="3_c8ipk"]
 [ext_resource type="Script" uid="uid://de88ixhijljw" path="res://Scripts/CS/Network/NetworkManager.cs" id="4_c8ipk"]
+[ext_resource type="Theme" uid="uid://befi50wkxv0ub" path="res://Utilities/Themes/TerminalSidebar.tres" id="4_oclfs"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_c8ipk"]
 
-[sub_resource type="Environment" id="Environment_tjxev"]
-background_mode = 3
-glow_enabled = true
-glow_intensity = 0.67
-glow_hdr_threshold = 0.9
-
-[node name="Terminal" type="MarginContainer" node_paths=PackedStringArray("terminalOutputField", "terminalCommandPrompt", "terminalCommandField", "networkManager", "processTimer", "updateProcessGraphicTimer", "crackDurationTimer", "processGraphicPadder")]
+[node name="Terminal" type="MarginContainer" node_paths=PackedStringArray("terminalOutputField", "terminalCommandPrompt", "terminalCommandField", "networkManager", "processTimer", "updateProcessGraphicTimer", "crackDurationTimer")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -23,23 +18,25 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme = ExtResource("2_tjxev")
 script = ExtResource("1_q6j3v")
-terminalOutputField = NodePath("Splitter/TerminalOutputArea")
-terminalCommandPrompt = NodePath("Splitter/TerminalCommandLine/CommandPrompt")
-terminalCommandField = NodePath("Splitter/TerminalCommandLine/CommandField")
+terminalOutputField = NodePath("TerminalSplitPart/TerminalZone/TerminalOutputArea")
+terminalCommandPrompt = NodePath("TerminalSplitPart/TerminalZone/TerminalCommandLine/CommandPrompt")
+terminalCommandField = NodePath("TerminalSplitPart/TerminalZone/TerminalCommandLine/CommandField")
 networkManager = NodePath("NetworkManager")
 processTimer = NodePath("TimersContainer/ProcessTimer")
 updateProcessGraphicTimer = NodePath("TimersContainer/UpdateProcessGraphicTimer")
 crackDurationTimer = NodePath("TimersContainer/CrackDurationTimer")
-processGraphicPadder = NodePath("")
 
-[node name="Splitter" type="VSplitContainer" parent="."]
+[node name="TerminalSplitPart" type="HSplitContainer" parent="."]
+layout_mode = 2
+
+[node name="TerminalZone" type="VSplitContainer" parent="TerminalSplitPart"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 dragging_enabled = false
 dragger_visibility = 2
 
-[node name="TerminalOutputArea" type="RichTextLabel" parent="Splitter"]
+[node name="TerminalOutputArea" type="RichTextLabel" parent="TerminalSplitPart/TerminalZone"]
 self_modulate = Color(16, 16, 16, 0.2)
 material = SubResource("ShaderMaterial_c8ipk")
 layout_mode = 2
@@ -53,12 +50,12 @@ selection_enabled = true
 visible_characters = 0
 visible_ratio = 0.0
 
-[node name="TerminalCommandLine" type="HSplitContainer" parent="Splitter"]
+[node name="TerminalCommandLine" type="HSplitContainer" parent="TerminalSplitPart/TerminalZone"]
 layout_mode = 2
 dragging_enabled = false
 dragger_visibility = 2
 
-[node name="CommandPrompt" type="RichTextLabel" parent="Splitter/TerminalCommandLine"]
+[node name="CommandPrompt" type="RichTextLabel" parent="TerminalSplitPart/TerminalZone/TerminalCommandLine"]
 self_modulate = Color(16, 16, 16, 0.25)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -69,20 +66,57 @@ text = "[color=purple]AjinGixtas[/color]@[color=green]home[/color]:~/>
 fit_content = true
 autowrap_mode = 0
 
-[node name="CommandField" type="CodeEdit" parent="Splitter/TerminalCommandLine"]
+[node name="CommandField" type="CodeEdit" parent="TerminalSplitPart/TerminalZone/TerminalCommandLine"]
 self_modulate = Color(16, 16, 16, 0.25)
 clip_contents = false
 custom_minimum_size = Vector2(32, 0)
 layout_mode = 2
 theme = ExtResource("2_tjxev")
+wrap_mode = 1
 caret_blink = true
 caret_multiple = false
 syntax_highlighter = ExtResource("3_c8ipk")
 indent_use_spaces = true
 auto_brace_completion_enabled = true
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_tjxev")
+[node name="Sidebar" type="MarginContainer" parent="TerminalSplitPart"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme = ExtResource("4_oclfs")
+
+[node name="VSplitContainer" type="VSplitContainer" parent="TerminalSplitPart/Sidebar"]
+layout_mode = 2
+dragging_enabled = false
+dragger_visibility = 2
+
+[node name="PlayerStatDisplay" type="RichTextLabel" parent="TerminalSplitPart/Sidebar/VSplitContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 2
+theme = ExtResource("4_oclfs")
+bbcode_enabled = true
+text = "▲▴▶▸▼▾◀◂█◆◢◣◥◤
+               ▴
+ ▴  ▲         ◢█◣
+◂█▸◀█▶       ◂███▸
+ ▾  ▼         ◥█◤
+               ▾
+qwertyuiopasdfghjklzxcvbnm
+qwertyuiopasdfghjklzxcvbnm"
+selection_enabled = true
+
+[node name="ScratchPad" type="TextEdit" parent="TerminalSplitPart/Sidebar/VSplitContainer"]
+self_modulate = Color(8, 8, 8, 0.2)
+layout_mode = 2
+size_flags_vertical = 3
+text = "▲▴▶▸▼▾◀◂█◆◢◣◥◤
+               ▴
+ ▴  ▲         ◢█◣
+◂█▸◀█▶       ◂███▸
+ ▾  ▼         ◥█◤
+               ▾
+qwertyuiopasdfghjklzxcvbnm
+qwertyuiopasdfghjklzxcvbnm"
 
 [node name="TimersContainer" type="Node" parent="."]
 
@@ -99,7 +133,7 @@ one_shot = true
 [node name="NetworkManager" type="Node" parent="."]
 script = ExtResource("4_c8ipk")
 
-[connection signal="text_changed" from="Splitter/TerminalCommandLine/CommandField" to="." method="OnCommandFieldTextChanged"]
+[connection signal="text_changed" from="TerminalSplitPart/TerminalZone/TerminalCommandLine/CommandField" to="." method="OnCommandFieldTextChanged"]
 [connection signal="timeout" from="TimersContainer/ProcessTimer" to="." method="ProcessFinished"]
 [connection signal="timeout" from="TimersContainer/UpdateProcessGraphicTimer" to="." method="UpdateProcessingGraphic"]
 [connection signal="timeout" from="TimersContainer/CrackDurationTimer" to="." method="OnCrackDurationTimerTimeout"]

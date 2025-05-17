@@ -155,7 +155,7 @@ public static class Util {
                 return $"[color={Util.CC(Cc.R)}]{input}[/color]";
             case StrType.HEADER:
                 return $"[color={Util.CC(Cc.gR)}]{input}[/color]";
-            case StrType.MONEY: {
+            case StrType.MONEY: { // GC is short for Gold Coin. That's all. lol
                     if (string.IsNullOrWhiteSpace(input)) return "";
 
                     // Parse the input as a decimal number
@@ -189,7 +189,7 @@ public static class Util {
                         if (gcValue == "000.00") { gcValue = ""; }
                     }
                     sb.Append($"[color={Util.CC(Cc.RGB)}]{gcValue}[/color]");
-                    sb.Append($"[color={Util.CC(Cc.Y)}]G[/color]");
+                    sb.Append($"[color={Util.CC(Cc.Y)}]GC[/color]");
                     return sb.ToString();
                 }
             case StrType.USERNAME:

@@ -13,7 +13,6 @@ always_on_top = true
 transparent = true
 unfocusable = true
 sharp_corners = true
-force_native = true
 theme = ExtResource("1_xu0i0")
 script = ExtResource("1_p462v")
 moneyDisplay = NodePath("Control/RichTextLabel")

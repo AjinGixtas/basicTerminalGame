@@ -1,11 +1,12 @@
-[gd_scene load_steps=8 format=3 uid="uid://ccwqfx7w5pm3k"]
+[gd_scene load_steps=9 format=3 uid="uid://ccwqfx7w5pm3k"]
 
-[ext_resource type="PackedScene" uid="uid://ywm7rhxebeh4" path="res://Scenes/Terminal.tscn" id="1_hpc76"]
-[ext_resource type="Script" uid="uid://b2ynbwrig2yqu" path="res://Scripts/CS/UIs/MenuManager.cs" id="1_nhkr4"]
-[ext_resource type="Script" uid="uid://cruda7xtodutw" path="res://Scripts/CS/UIs/Overseer.cs" id="1_qxria"]
-[ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="1_tr2i4"]
-[ext_resource type="PackedScene" uid="uid://dsqh3owg3cspi" path="res://Scenes/TextEditor.tscn" id="4_7rqgy"]
-[ext_resource type="PackedScene" uid="uid://blkjllh1u7by7" path="res://Scenes/OverlayWindow.tscn" id="6_y4jh7"]
+[ext_resource type="Script" uid="uid://cruda7xtodutw" path="res://Scripts/CS/UIs/Overseer.cs" id="1_4uenp"]
+[ext_resource type="Script" uid="uid://b2ynbwrig2yqu" path="res://Scripts/CS/UIs/MenuManager.cs" id="2_qknim"]
+[ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="3_ktohp"]
+[ext_resource type="PackedScene" uid="uid://ywm7rhxebeh4" path="res://Scenes/MajorScenes/Terminal.tscn" id="4_yawr3"]
+[ext_resource type="PackedScene" uid="uid://dsqh3owg3cspi" path="res://Scenes/MajorScenes/TextEditor.tscn" id="5_u07qj"]
+[ext_resource type="PackedScene" uid="uid://blkjllh1u7by7" path="res://Scenes/MajorScenes/OverlayWindow.tscn" id="6_ow1ef"]
+[ext_resource type="PackedScene" uid="uid://c8l7cbh5upv75" path="res://Scenes/MajorScenes/SaveManager.tscn" id="7_qknim"]
 
 [sub_resource type="Environment" id="Environment_y4jh7"]
 background_mode = 3
@@ -20,7 +21,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_qxria")
+script = ExtResource("1_4uenp")
 terminal = NodePath("HSplitContainer/TabContainer/Terminal")
 textEditor = NodePath("HSplitContainer/TabContainer/TextEditor")
 
@@ -43,7 +44,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_nhkr4")
+script = ExtResource("2_qknim")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HSplitContainer"]
 modulate = Color(16, 16, 16, 0.2)
@@ -53,26 +54,26 @@ alignment = 1
 
 [node name="TerminalButton" type="Button" parent="HSplitContainer/VBoxContainer"]
 layout_mode = 2
-theme = ExtResource("1_tr2i4")
+theme = ExtResource("3_ktohp")
 text = "Terminal"
 alignment = 0
 
 [node name="EditorButton" type="Button" parent="HSplitContainer/VBoxContainer"]
 layout_mode = 2
-theme = ExtResource("1_tr2i4")
+theme = ExtResource("3_ktohp")
 text = "Editor"
 alignment = 0
 
 [node name="Other" type="Button" parent="HSplitContainer/VBoxContainer"]
 layout_mode = 2
-theme = ExtResource("1_tr2i4")
+theme = ExtResource("3_ktohp")
 text = "Other
 "
 alignment = 0
 
 [node name="VSeparator" type="VSeparator" parent="HSplitContainer"]
 layout_mode = 2
-theme = ExtResource("1_tr2i4")
+theme = ExtResource("3_ktohp")
 
 [node name="TabContainer" type="TabContainer" parent="HSplitContainer"]
 layout_mode = 2
@@ -80,20 +81,22 @@ size_flags_horizontal = 3
 current_tab = 0
 tabs_visible = false
 
-[node name="Terminal" parent="HSplitContainer/TabContainer" node_paths=PackedStringArray("overseer") instance=ExtResource("1_hpc76")]
+[node name="Terminal" parent="HSplitContainer/TabContainer" node_paths=PackedStringArray("overseer") instance=ExtResource("4_yawr3")]
 layout_mode = 2
 overseer = NodePath("../../..")
 metadata/_tab_index = 0
 
-[node name="TextEditor" parent="HSplitContainer/TabContainer" node_paths=PackedStringArray("overseer") instance=ExtResource("4_7rqgy")]
+[node name="TextEditor" parent="HSplitContainer/TabContainer" node_paths=PackedStringArray("overseer") instance=ExtResource("5_u07qj")]
 visible = false
 layout_mode = 2
 overseer = NodePath("../../..")
 metadata/_tab_index = 1
 
-[node name="OverlayWindow" parent="." instance=ExtResource("6_y4jh7")]
+[node name="OverlayWindow" parent="." instance=ExtResource("6_ow1ef")]
 position = Vector2i(960, 64)
-force_native = false
+
+[node name="SaveManager" parent="." node_paths=PackedStringArray("overseer") instance=ExtResource("7_qknim")]
+overseer = NodePath("..")
 
 [connection signal="button_down" from="HSplitContainer/VBoxContainer/TerminalButton" to="HSplitContainer" method="TerminalButtonPressed"]
 [connection signal="button_down" from="HSplitContainer/VBoxContainer/EditorButton" to="HSplitContainer" method="EditorButtonPressed"]

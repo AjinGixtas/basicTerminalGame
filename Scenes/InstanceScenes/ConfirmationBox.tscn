@@ -1,0 +1,4 @@
+[gd_scene format=3 uid="uid://2qi1vg1tujj5"]
+
+[node name="ConfirmationBox" type="ConfirmationDialog"]
+visible = true

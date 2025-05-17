@@ -4,7 +4,7 @@ public partial class Terminal : MarginContainer {
 	[Export] public Overseer overseer;
 	[Export] RichTextLabel terminalOutputField; [Export] RichTextLabel terminalCommandPrompt;
 	[Export] TextEdit terminalCommandField;
-	[Export] NetworkManager networkManager;
+	[Export] public NetworkManager networkManager;
 	[Export] Timer processTimer, updateProcessGraphicTimer, crackDurationTimer;
 	string userName;
 

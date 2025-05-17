@@ -1,0 +1,56 @@
+[gd_scene load_steps=4 format=3 uid="uid://dsqh3owg3cspi"]
+
+[ext_resource type="Script" uid="uid://mp4u0q4eb6nf" path="res://Scripts/CS/Editor/TextEditor.cs" id="1_nbc5l"]
+[ext_resource type="PackedScene" uid="uid://dcg54ljq6rpbt" path="res://Scenes/InstanceScenes/EditorTab.tscn" id="2_640ve"]
+[ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="3_0ojv2"]
+
+[node name="TextEditor" type="MarginContainer" node_paths=PackedStringArray("tabBar", "tabContainer", "noFileOpenedTab", "saveDialog")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_nbc5l")
+tabBar = NodePath("VSplitContainer/TabBar")
+tabContainer = NodePath("VSplitContainer/TabContainer")
+editorTabScene = ExtResource("2_640ve")
+noFileOpenedTab = NodePath("VSplitContainer/TabContainer/NoFileOpenedTab")
+saveDialog = NodePath("ConfirmationDialog")
+
+[node name="VSplitContainer" type="VSplitContainer" parent="."]
+layout_mode = 2
+dragging_enabled = false
+dragger_visibility = 2
+
+[node name="TabBar" type="TabBar" parent="VSplitContainer"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_vertical = 0
+drag_to_rearrange_enabled = true
+
+[node name="TabContainer" type="TabContainer" parent="VSplitContainer"]
+layout_mode = 2
+current_tab = 0
+tabs_visible = false
+
+[node name="NoFileOpenedTab" type="RichTextLabel" parent="VSplitContainer/TabContainer"]
+self_modulate = Color(16, 16, 16, 0.12)
+layout_mode = 2
+theme = ExtResource("3_0ojv2")
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "wefwef"
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_tab_index = 0
+
+[node name="ConfirmationDialog" type="ConfirmationDialog" parent="."]
+initial_position = 2
+size = Vector2i(336, 100)
+unresizable = true
+always_on_top = true
+dialog_text = "Unsaved change detected. Close anyway?"
+
+[connection signal="tab_selected" from="VSplitContainer/TabBar" to="." method="OnTabSelected"]
+[connection signal="canceled" from="ConfirmationDialog" to="." method="ConfirmedCanceled"]
+[connection signal="confirmed" from="ConfirmationDialog" to="." method="ConfirmedClosing"]

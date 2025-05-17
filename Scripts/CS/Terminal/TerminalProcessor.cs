@@ -92,7 +92,7 @@ public static class TerminalProcessor {
 		Say("-n", $"   ");
 		processTimer.WaitTime = time;
 		processTimer.Start();
-        updateProcessGraphicTimer.WaitTime = Math.Max(.05, time / 11.0);
+        updateProcessGraphicTimer.WaitTime = Math.Max(.05, time / 17.0);
 		updateProcessGraphicTimer.Start();
     }
 	public static void UpdateProcessingGraphic() {
@@ -101,7 +101,8 @@ public static class TerminalProcessor {
 		int t = GD.RandRange(0, 1 + (int)Math.Floor(200.0 / processTimer.WaitTime * updateProcessGraphicTimer.WaitTime));
 		progress = Mathf.Clamp(progress + t, 0, 99); tick++;
 
-		Say("-n", $"[color=#ffffff{(int)(255.0 * tick / 11.0):X}]>[/color]");
+		Say("-n", $"[color=#ffffff{Math.Max(1, tick*tick):X2}]>[/color]");
+		GD.Print(Math.Max(1, tick * tick), ' ', tick*tick, ' ', $"{(tick*tick):X}");
 		updateProcessGraphicTimer.Start();
 	}
 	public static void ProcessFinished() {
@@ -125,7 +126,7 @@ public static class TerminalProcessor {
 		Say("-n", $"{terminalCommandPrompt.Text}{Util.Format(newCommand, StrType.CMD)}");
 		queuedAction = ExecuteCommands;
         queuedCommands = commands;
-        StartProcess(Math.Max(.3 + GD.Randf() * .2, .02 * newCommand.Length));
+        StartProcess(Math.Max(.5 + GD.Randf() * .1, .05 * newCommand.Length));
 		return true;
         static void ExecuteCommands(string[] commands) {
             for (int i = 0; i < commands.Length; i++) {
@@ -317,16 +318,16 @@ public static class TerminalProcessor {
 	const int MAX_HISTORY_CHAR_SIZE = 65536, RESET_HISTORY_CHAR_SIZE = 16384;
 	static void Edit(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		if (positionalArgs.Length == 0) { Say("-r", "No file name provided."); return; }
+		int fileOpened = 0;
 		for (int i = 0; i < positionalArgs.Length; i++) {
 			NodeFile file = _currDir.GetFile(positionalArgs[i]);
 			if (file == null) {
 				Say("-r", $"File not found: {Util.Format(positionalArgs[i], StrType.FILE)}");
-				return;
-			}
-			overseer.textEditor.OpenNewFile(CurrNode.HostName, file);
-		}
-	}
-	static void MkF(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+			} else { overseer.textEditor.OpenNewFile(CurrNode.HostName, file); ++fileOpened; }
+        }
+		Say($"{fileOpened} file(s) opened. See the editor.");
+    }
+    static void MkF(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		if (positionalArgs.Length == 0) { Say("-r", $"No file name provided."); return; }
 		NodeDirectory parentDirectory;
 		for (int i = 0; i < positionalArgs.Length; i++) {

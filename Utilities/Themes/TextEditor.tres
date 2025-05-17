@@ -1,6 +1,6 @@
 [gd_resource type="Theme" load_steps=51 format=4 uid="uid://d4flr0varsg8l"]
 
-[ext_resource type="FontFile" uid="uid://b2rqbbtg7bpn" path="res://Utilities/Fonts/JetBrainsMono-Regular-Modified.ttf" id="1_ccsvj"]
+[ext_resource type="FontFile" uid="uid://b2rqbbtg7bpn" path="res://Utilities/Fonts/DejaVuSansMono" id="1_ccsvj"]
 
 [sub_resource type="Image" id="Image_pnp83"]
 data = {

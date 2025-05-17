@@ -174,7 +174,7 @@ public static class Util {
                         if (remainder >= divisors[i]) {
                             int unitValue = (int)Math.Floor(remainder / divisors[i]);
                             remainder -= unitValue * divisors[i];
-                            sb.Append($"[color={Util.CC(Cc.rgb)}]{unitValue}[/color][color={Util.CC(colors[i])}]{units[i]}[/color]");
+                            sb.Append($"[color={Util.CC(Cc.RGB)}]{unitValue}[/color][color={Util.CC(colors[i])}]{units[i]}[/color]");
                         }
                     }
 
@@ -188,8 +188,8 @@ public static class Util {
                         gcValue = remainder.ToString("N2").Replace(",", "");
                         if (gcValue == "000.00") { gcValue = ""; }
                     }
-                    sb.Append($"[color={Util.CC(Cc.rgb)}]{gcValue}[/color]");
-                    sb.Append($"[color={Util.CC(Cc.Y)}]GC[/color]");
+                    sb.Append($"[color={Util.CC(Cc.RGB)}]{gcValue}[/color]");
+                    sb.Append($"[color={Util.CC(Cc.Y)}]G[/color]");
                     return sb.ToString();
                 }
             case StrType.USERNAME:

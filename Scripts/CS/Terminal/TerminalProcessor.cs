@@ -75,60 +75,65 @@ public static class TerminalProcessor {
 				if (minHeight >= terminalCommandField.Size.Y) CommandHistoryIndex -= 1;
 			}
 			if (Input.IsActionJustPressed("submitCommand")) {
-				if (terminalCommandField.Text.Length == 0) { terminalCommandField.GrabFocus(); return; }
+				if (terminalCommandField.Text.Length == 0) { return; }
 				terminalCommandField.Text = terminalCommandField.Text.Replace("\n", "").Replace("\r", "");
-				SubmitCommand(terminalCommandField.Text);
-				terminalCommandField.Text = "";
-				terminalCommandField.GrabFocus();
+				if(SubmitCommand(terminalCommandField.Text)) terminalCommandField.Text = "";
 			}
 		}
     }
 
-	static Action<Dictionary<string, string>, string[]> finishFunction; static (Dictionary<string, string>, string[]) finishFunctionArgs;
 	static bool _isProcessing = false; static bool IsProcessing { get { return _isProcessing; } set { _isProcessing = value; } }
-	static readonly string[] SpinnerChars = ["|", "/", "-", "\\"]; static int tick = 0, progress = 0;
-	static void StartProcess(double time, Action<Dictionary<string, string>, string[]> func, Dictionary<string, string> parseArgs, string[] positionalArgs) {
+	static readonly string[] ProgressChars = [$"[color={Util.CC(Cc.RGB)}]>[/color]", $"[color={Util.CC(Cc.rgb)}]>[/color]"]; static int tick = 0, progress = 0;
+	static string[] queuedCommands = []; static Action<string[]> queuedAction = null;
+    static void StartProcess(double time) {
 		if (IsProcessing) return;
-		finishFunction = func; finishFunctionArgs = (parseArgs, positionalArgs);
 		IsProcessing = true;
+		progress = 0; tick = 0;
+		Say("-n", $"   ");
 		processTimer.WaitTime = time;
-		terminalCommandField.Editable = false;
-		progress = 0;
-		Say("-n", $"Start");
 		processTimer.Start();
+        updateProcessGraphicTimer.WaitTime = Math.Max(.05, time / 11.0);
 		updateProcessGraphicTimer.Start();
-	}
+    }
 	public static void UpdateProcessingGraphic() {
 		if (!IsProcessing) return;
 
 		int t = GD.RandRange(0, 1 + (int)Math.Floor(200.0 / processTimer.WaitTime * updateProcessGraphicTimer.WaitTime));
-		progress = Mathf.Clamp(progress + t, 0, 99); tick = (tick + 1) % SpinnerChars.Length;
+		progress = Mathf.Clamp(progress + t, 0, 99); tick++;
 
-		Say("-n", $"...{progress}%");
+		Say("-n", $"[color=#ffffff{(int)(255.0 * tick / 11.0):X}]>[/color]");
 		updateProcessGraphicTimer.Start();
 	}
 	public static void ProcessFinished() {
 		IsProcessing = false; terminalCommandField.Editable = true; terminalCommandField.GrabFocus();
-		tick = (tick + 1) % 4;
-		Say($"...Done!");
+		for (int i = tick+1; i < 11; ++i) {
+            Say("-n", $"[color=#ffffffff]>[/color]");
+        } tick = 0; Say("-n", $"\n");
 		progress = 0; tick = 0;
-		finishFunction(finishFunctionArgs.Item1, finishFunctionArgs.Item2);
+		queuedAction(queuedCommands);
 	}
 
 	const int MAX_HISTORY_CMD_SIZE = 64;
-	static void SubmitCommand(string newCommand) {
+	static bool SubmitCommand(string newCommand) {
+		if (IsProcessing) return false;
 		if (commandHistory.Count == 0 || (commandHistory.Count > 0 && commandHistory[^1] != newCommand)) {
 			commandHistory.Add(newCommand);
 			while (commandHistory.Count > MAX_HISTORY_CMD_SIZE) { commandHistory.RemoveAt(0); }
 			CommandHistoryIndex = commandHistory.Count;
 		}
 		string[] commands = newCommand.Split(';', StringSplitOptions.RemoveEmptyEntries);
-		Say($"{terminalCommandPrompt.Text}{Util.Format(newCommand, StrType.CMD)}");
-		for (int i = 0; i < commands.Length; i++) {
-			string[] components = Tokenize(commands[i]);
-			if (components.Length == 0) continue;
-			if (!ProcessCommand(components[0], components[1..])) break;
-		}
+		Say("-n", $"{terminalCommandPrompt.Text}{Util.Format(newCommand, StrType.CMD)}");
+		queuedAction = ExecuteCommands;
+        queuedCommands = commands;
+        StartProcess(Math.Max(.3 + GD.Randf() * .2, .02 * newCommand.Length));
+		return true;
+        static void ExecuteCommands(string[] commands) {
+            for (int i = 0; i < commands.Length; i++) {
+                string[] components = Tokenize(commands[i]);
+                if (components.Length == 0) continue;
+                if (!ProcessCommand(components[0], components[1..])) break;
+            }
+        }
 		static string[] Tokenize(string input) {
             var tokens = new List<string>();
 
@@ -339,47 +344,44 @@ public static class TerminalProcessor {
 		}
 	}
 	static void Scan(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
-		StartProcess(1.0, ScanCallback, parsedArgs, positionalArgs);
-		void ScanCallback(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
-			string L = " └─── ", M = " ├─── ", T = "      ", E = " │    ";
-			Func<bool[], string> getTreePrefix = arr => string.Concat(arr.Select((b, i) => (i == arr.Length - 1 ? (b ? L : M) : (b ? T : E))));
-			Func<bool[], string> getDescPrefix = arr => string.Concat(arr.Select((b, i) => (b ? T : E)));
-			if (!parsedArgs.TryGetValue("-d", out string value)) { value = "1"; parsedArgs["-d"] = value; }
-			if (!int.TryParse(value, out int MAX_DEPTH)) { Say("-r", $"Invalid depth: {Util.Format(value, StrType.NUMBER)}"); return; }
+		string L = " └─── ", M = " ├─── ", T = "      ", E = " │    ";
+		Func<bool[], string> getTreePrefix = arr => string.Concat(arr.Select((b, i) => (i == arr.Length - 1 ? (b ? L : M) : (b ? T : E))));
+		Func<bool[], string> getDescPrefix = arr => string.Concat(arr.Select((b, i) => (b ? T : E)));
+		if (!parsedArgs.TryGetValue("-d", out string value)) { value = "1"; parsedArgs["-d"] = value; }
+		if (!int.TryParse(value, out int MAX_DEPTH)) { Say("-r", $"Invalid depth: {Util.Format(value, StrType.NUMBER)}"); return; }
 
-			Stack<(NetworkNode, int, bool[])> stack = new([(_currNode, 0, [])]);
-			List<NetworkNode> visited = [];
-			string output = "";
-			while (stack.Count > 0) {
-				(NetworkNode node, int depth, bool[] depthMarks) = stack.Pop();
-				if (depth > MAX_DEPTH || visited.Contains(node)) continue;
-				NodeAnalysis analyzeResult = node.Analyze();
-				output += $"{Util.Format(getTreePrefix(depthMarks), StrType.DECOR)}{Util.Format(analyzeResult.IP.PadRight(15), StrType.IP)} {Util.Format(analyzeResult.HostName, StrType.HOSTNAME)}\n";
+		Stack<(NetworkNode, int, bool[])> stack = new([(_currNode, 0, [])]);
+		List<NetworkNode> visited = [];
+		string output = "";
+		while (stack.Count > 0) {
+			(NetworkNode node, int depth, bool[] depthMarks) = stack.Pop();
+			if (depth > MAX_DEPTH || visited.Contains(node)) continue;
+			NodeAnalysis analyzeResult = node.Analyze();
+			output += $"{Util.Format(getTreePrefix(depthMarks), StrType.DECOR)}{Util.Format(analyzeResult.IP.PadRight(15), StrType.IP)} {Util.Format(analyzeResult.HostName, StrType.HOSTNAME)}\n";
 
-				if (parsedArgs.ContainsKey("-v")) {
-					string descPrefix = getDescPrefix(depthMarks) + ((depth == MAX_DEPTH ? 0 : ((node.ParentNode != null ? 0 : -1) + node.ChildNode.Count)) > 0 ? " │" : "  ");
-					output += $"{Util.Format(descPrefix, StrType.DECOR)}  Display Name: {Util.Format(analyzeResult.DisplayName, StrType.DISPLAY_NAME)}\n";
-					output += $"{Util.Format(descPrefix, StrType.DECOR)}  Node Type:    {Util.Format(analyzeResult.NodeType.ToString(), StrType.SYMBOL)}\n";
-					output += $"{Util.Format(descPrefix, StrType.DECOR)}  Defense:      {Util.Format(analyzeResult.DefLvl.ToString(), StrType.DEF_LVL)}  Security: {Util.Format(Util.MapEnum<SecurityType>(analyzeResult.SecLvl).ToString(), StrType.SEC_LVL, analyzeResult.RetLvl.ToString())}\n";
-					if (!string.IsNullOrWhiteSpace(descPrefix))
+			if (parsedArgs.ContainsKey("-v")) {
+				string descPrefix = getDescPrefix(depthMarks) + ((depth == MAX_DEPTH ? 0 : ((node.ParentNode != null ? 0 : -1) + node.ChildNode.Count)) > 0 ? " │" : "  ");
+				output += $"{Util.Format(descPrefix, StrType.DECOR)}  Display Name: {Util.Format(analyzeResult.DisplayName, StrType.DISPLAY_NAME)}\n";
+				output += $"{Util.Format(descPrefix, StrType.DECOR)}  Node Type:    {Util.Format(analyzeResult.NodeType.ToString(), StrType.SYMBOL)}\n";
+				output += $"{Util.Format(descPrefix, StrType.DECOR)}  Defense:      {Util.Format(analyzeResult.DefLvl.ToString(), StrType.DEF_LVL)}  Security: {Util.Format(Util.MapEnum<SecurityType>(analyzeResult.SecLvl).ToString(), StrType.SEC_LVL, analyzeResult.RetLvl.ToString())}\n";
+				if (!string.IsNullOrWhiteSpace(descPrefix))
 					output += $"{Util.Format(descPrefix, StrType.DECOR)}\n";
-				}
-				visited.Add(node);
-
-				// Use k==1 due to FILO algorithm.
-				List<NetworkNode> nextOfQueue = [];
-				if (node.ParentNode != null && !visited.Contains(node.ParentNode) && depth <= MAX_DEPTH) nextOfQueue.Add(node.ParentNode);
-				foreach (NetworkNode child in node.ChildNode) {
-					if (visited.Contains(child) || depth > MAX_DEPTH) continue;
-					nextOfQueue.Add(child);
-				}
-
-				int k = 0; foreach (NetworkNode child in nextOfQueue) {
-					++k; stack.Push((child, depth + 1, [.. depthMarks, k == 1]));
-				}
 			}
-			Say("-n", output);
+			visited.Add(node);
+
+			// Use k==1 due to FILO algorithm.
+			List<NetworkNode> nextOfQueue = [];
+			if (node.ParentNode != null && !visited.Contains(node.ParentNode) && depth <= MAX_DEPTH) nextOfQueue.Add(node.ParentNode);
+			foreach (NetworkNode child in node.ChildNode) {
+				if (visited.Contains(child) || depth > MAX_DEPTH) continue;
+				nextOfQueue.Add(child);
+			}
+
+			int k = 0; foreach (NetworkNode child in nextOfQueue) {
+				++k; stack.Push((child, depth + 1, [.. depthMarks, k == 1]));
+			}
 		}
+		Say("-n", output);
 	}
 	static void Farm(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		bool showStatus = parsedArgs.ContainsKey("-s") || parsedArgs.ContainsKey("--status");
@@ -545,13 +547,11 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 			Say("-r", $"Host not found: {positionalArgs[0]}");
 			return;
 		}
-		StartProcess(.5 + GD.Randf() * .5, AnalyzeCallback, parsedArgs, positionalArgs);
-		void AnalyzeCallback(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
-			NetworkNode analyzeNode = null;
-			if (CurrNode.ChildNode.FindLast(s => s.HostName == positionalArgs[0]) != null) analyzeNode = CurrNode.ChildNode.FindLast(s => s.HostName == positionalArgs[0]);
-			else if (CurrNode.ParentNode != null && CurrNode.ParentNode.HostName == positionalArgs[0]) analyzeNode = CurrNode.ParentNode;
-			else if (CurrNode.HostName == positionalArgs[0]) analyzeNode = CurrNode;
-			Say("-tl", $@"
+		NetworkNode analyzeNode = null;
+		if (CurrNode.ChildNode.FindLast(s => s.HostName == positionalArgs[0]) != null) analyzeNode = CurrNode.ChildNode.FindLast(s => s.HostName == positionalArgs[0]);
+		else if (CurrNode.ParentNode != null && CurrNode.ParentNode.HostName == positionalArgs[0]) analyzeNode = CurrNode.ParentNode;
+		else if (CurrNode.HostName == positionalArgs[0]) analyzeNode = CurrNode;
+		Say("-tl", $@"
 {Util.Format("▶ Node Info", StrType.HEADER)}
 {Util.Format("Host name:", StrType.DECOR)}      {Util.Format(analyzeNode.HostName, StrType.HOSTNAME)}
 {Util.Format("IP address:", StrType.DECOR)}     {Util.Format(analyzeNode.IP, StrType.IP)}
@@ -562,33 +562,33 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 {Util.Format("Security level:", StrType.DECOR)} {Util.Format($"{analyzeNode.SecType}", StrType.SEC_LVL, $"{analyzeNode.RetLvl}")}
 ");
 
-			// Honeypot node don't dare to impersonate actual organization or corporation.
-			if (analyzeNode.CurrentOwner != networkManager.network || analyzeNode.GetType() == typeof(HoneypotNode)) {
-				Say($"Crack this node security system to get further access.");
-				return;
-			}
-			Say("-tl", $@"
+		// Honeypot node don't dare to impersonate actual organization or corporation.
+		if (analyzeNode.CurrentOwner != networkManager.network || analyzeNode.GetType() == typeof(HoneypotNode)) {
+			Say($"Crack this node security system to get further access.");
+			return;
+		}
+		Say("-tl", $@"
 {Util.Format("▶ GC miner detail", StrType.HEADER)}
 {Util.Format("Transfer batch:", StrType.DECOR)} {Util.Format(analyzeNode.HackFarm.HackLvl.ToString(), StrType.NUMBER)} ({Util.Format(analyzeNode.HackFarm.CurHack.ToString("F2"), StrType.MONEY)})
 {Util.Format("Transfer speed:", StrType.DECOR)} {Util.Format(analyzeNode.HackFarm.TimeLvl.ToString(), StrType.NUMBER)} ({Util.Format(analyzeNode.HackFarm.CurTime.ToString("F2"), StrType.UNIT, "s")})
 {Util.Format("Mining speed:", StrType.DECOR)}   {Util.Format(analyzeNode.HackFarm.GrowLvl.ToString(), StrType.NUMBER)} ({Util.Format(analyzeNode.HackFarm.CurGrow.ToString("F2"), StrType.UNIT, "GC/s")})
 ");
-			if (analyzeNode is FactionNode) {
-				Say("-tl", $@"
+		if (analyzeNode is FactionNode) {
+			Say("-tl", $@"
 {Util.Format("▶ Faction detail", StrType.HEADER)}
 {Util.Format("Name:", StrType.DECOR)}           {Util.Format(Util.Obfuscate((analyzeNode as FactionNode).Faction.Name), StrType.DISPLAY_NAME)}
 {Util.Format("Description:", StrType.DECOR)}    {Util.Format(Util.Obfuscate((analyzeNode as FactionNode).Faction.Desc), StrType.DESC)}
 ");
-			}
-			if (analyzeNode is BusinessNode) {
-				Say("-tl", $@"
+		}
+		if (analyzeNode is BusinessNode) {
+			Say("-tl", $@"
 {Util.Format("▶ Business detail", StrType.HEADER)}
 {Util.Format("Stock:", StrType.DECOR)}          {Util.Format((analyzeNode as BusinessNode).Stock.Name, StrType.DISPLAY_NAME)}
 {Util.Format("Value:", StrType.DECOR)}          {Util.Format((analyzeNode as BusinessNode).Stock.Price.ToString("F2"), StrType.MONEY)}
 ");
-			}
-			if (analyzeNode is CorpNode) {
-				Say("-tl", $@"
+		}
+		if (analyzeNode is CorpNode) {
+			Say("-tl", $@"
 {Util.Format("▶ Faction detail", StrType.HEADER)}
 {Util.Format("Name:", StrType.DECOR)}           {Util.Format(Util.Obfuscate((analyzeNode as CorpNode).Faction.Name), StrType.DISPLAY_NAME)}
 {Util.Format("Description:", StrType.DECOR)}    {Util.Format(Util.Obfuscate((analyzeNode as CorpNode).Faction.Desc), StrType.DESC)}
@@ -596,7 +596,6 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 {Util.Format("Stock:", StrType.DECOR)}          {Util.Format((analyzeNode as CorpNode).Stock.Name, StrType.DISPLAY_NAME)}
 {Util.Format("Value:", StrType.DECOR)}          {Util.Format((analyzeNode as CorpNode).Stock.Price.ToString("F2"), StrType.MONEY)}
 ");
-			}
 		}
 	}
 	static (Dictionary<string, string>, string[]) ParseArgs(string[] args) {

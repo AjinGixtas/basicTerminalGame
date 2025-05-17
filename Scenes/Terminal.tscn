@@ -90,19 +90,31 @@ dragging_enabled = false
 dragger_visibility = 2
 
 [node name="PlayerStatDisplay" type="RichTextLabel" parent="TerminalSplitPart/Sidebar/VSplitContainer"]
+self_modulate = Color(16, 16, 16, 0.1)
 layout_mode = 2
 size_flags_vertical = 3
 focus_mode = 2
-theme = ExtResource("4_oclfs")
+theme = ExtResource("2_tjxev")
 bbcode_enabled = true
-text = "▲▴▶▸▼▾◀◂█◆◢◣◥◤
-               ▴
- ▴  ▲         ◢█◣
-◂█▸◀█▶       ◂███▸
- ▾  ▼         ◥█◤
-               ▾
-qwertyuiopasdfghjklzxcvbnm
-qwertyuiopasdfghjklzxcvbnm"
+text = "[color=cyan]
+___     /`>     ___
+ \\\\\\\\◢█◤;  ;◥█◣///
+   \\╲◥=----=◤╱/
+
+
+// /\\\\      |/ ||\\
+|| | =██◣▼▴▼◢█ || |
+|| |  {--▾-▾-} || |
+
+
+  === __/| /|__ ──  
+==    \\◥ \"▴' ◤/==
+  ─=─  \\ ═╵═ /=─  =
+
+
+/█◣◣──▲▲─,─▲▲──◢◢█\\
+█  ◥█◣b\\   /d◢█◤  █
+'▶    )  ╨  (    ◀'"
 selection_enabled = true
 
 [node name="ScratchPad" type="TextEdit" parent="TerminalSplitPart/Sidebar/VSplitContainer"]
@@ -110,24 +122,6 @@ self_modulate = Color(8, 8, 8, 0.2)
 layout_mode = 2
 size_flags_vertical = 3
 theme = ExtResource("4_oclfs")
-text = "        /`>
-  __◢█◤; ▾;◥█◣__
-╱╱/◢--      ---◣╲╲
-
-// /\\\\      |/ ||\\
-|| | =██◣▼▴▼◢█ || |
-|| |  {--▾-▾-} || |
-
- _.─────._     _  ,
-(_       _).o.(_)c
-  `─────'  ╱ \\╲
-
-
-
-=>
-
-╱╲▲▴▶▸▼▾◀◂█◆◢◣◥◤
-╱╲▲▴▶▸▼▾◀◂█◆◢◣◥◤"
 caret_multiple = false
 
 [node name="TimersContainer" type="Node" parent="."]

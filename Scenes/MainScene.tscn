@@ -93,7 +93,7 @@ metadata/_tab_index = 1
 
 [node name="OverlayWindow" parent="." instance=ExtResource("6_y4jh7")]
 position = Vector2i(960, 64)
-visible = false
+force_native = false
 
 [connection signal="button_down" from="HSplitContainer/VBoxContainer/TerminalButton" to="HSplitContainer" method="TerminalButtonPressed"]
 [connection signal="button_down" from="HSplitContainer/VBoxContainer/EditorButton" to="HSplitContainer" method="EditorButtonPressed"]

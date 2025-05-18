@@ -82,13 +82,13 @@ public partial class NetworkManager : Node {
         }
         return output;
     }
+    
     readonly Tuple<string, NetworkNodeType>[] nodeTypeData = [
         new Tuple<string, NetworkNodeType>("Person.txt", NetworkNodeType.PERSON),
         new Tuple<string, NetworkNodeType>("Rouge.txt", NetworkNodeType.ROUGE),
         new Tuple<string, NetworkNodeType>("Honeypot.txt", NetworkNodeType.HONEYPOT),
         new Tuple<string, NetworkNodeType>("Miner.txt", NetworkNodeType.MINER),
     ];
-
     Tuple<NetworkNodeType, string, string>[][] ReadProvidedNodeName() {
         Tuple<NetworkNodeType, string, string>[][] output = new Tuple<NetworkNodeType, string, string>[nodeTypeData.Length][];
         for (int i = 0; i < nodeTypeData.Length; i++) { output[i] = ReadNodeNameOfType(nodeTypeData[i]); }

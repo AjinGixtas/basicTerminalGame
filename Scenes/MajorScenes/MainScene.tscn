@@ -14,7 +14,7 @@ glow_enabled = true
 glow_intensity = 0.75
 glow_hdr_threshold = 0.9
 
-[node name="Overseer" type="Control" node_paths=PackedStringArray("terminal", "textEditor")]
+[node name="Overseer" type="Control" node_paths=PackedStringArray("terminal", "textEditor", "saveManager")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -24,6 +24,7 @@ grow_vertical = 2
 script = ExtResource("1_4uenp")
 terminal = NodePath("HSplitContainer/TabContainer/Terminal")
 textEditor = NodePath("HSplitContainer/TabContainer/TextEditor")
+saveManager = NodePath("SaveManager")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_y4jh7")

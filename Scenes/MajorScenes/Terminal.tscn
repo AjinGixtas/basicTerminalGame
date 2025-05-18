@@ -26,6 +26,9 @@ processTimer = NodePath("TimersContainer/ProcessTimer")
 updateProcessGraphicTimer = NodePath("TimersContainer/UpdateProcessGraphicTimer")
 crackDurationTimer = NodePath("TimersContainer/CrackDurationTimer")
 
+[node name="NetworkManager" type="Node" parent="."]
+script = ExtResource("4_c8ipk")
+
 [node name="TerminalSplitPart" type="HSplitContainer" parent="."]
 layout_mode = 2
 
@@ -61,7 +64,7 @@ layout_mode = 2
 size_flags_horizontal = 4
 theme = ExtResource("2_tjxev")
 bbcode_enabled = true
-text = "[color=purple]AjinGixtas[/color]@[color=green]home[/color]:~/>
+text = "[color=purple]UN1NTIALiZED_USER[/color]@[color=green]PURGRATORY[/color]:~/>
 "
 fit_content = true
 autowrap_mode = 0
@@ -135,9 +138,6 @@ one_shot = true
 
 [node name="CrackDurationTimer" type="Timer" parent="TimersContainer"]
 one_shot = true
-
-[node name="NetworkManager" type="Node" parent="."]
-script = ExtResource("4_c8ipk")
 
 [connection signal="text_changed" from="TerminalSplitPart/TerminalZone/TerminalCommandLine/CommandField" to="." method="OnCommandFieldTextChanged"]
 [connection signal="timeout" from="TimersContainer/ProcessTimer" to="." method="ProcessFinished"]

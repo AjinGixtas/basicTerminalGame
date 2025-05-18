@@ -1,12 +1,11 @@
-[gd_scene load_steps=9 format=3 uid="uid://ccwqfx7w5pm3k"]
+[gd_scene load_steps=8 format=3 uid="uid://ccwqfx7w5pm3k"]
 
-[ext_resource type="Script" uid="uid://cruda7xtodutw" path="res://Scripts/CS/UIs/Overseer.cs" id="1_4uenp"]
-[ext_resource type="Script" uid="uid://b2ynbwrig2yqu" path="res://Scripts/CS/UIs/MenuManager.cs" id="2_qknim"]
-[ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="3_ktohp"]
-[ext_resource type="PackedScene" uid="uid://ywm7rhxebeh4" path="res://Scenes/MajorScenes/Terminal.tscn" id="4_yawr3"]
-[ext_resource type="PackedScene" uid="uid://dsqh3owg3cspi" path="res://Scenes/MajorScenes/TextEditor.tscn" id="5_u07qj"]
-[ext_resource type="PackedScene" uid="uid://blkjllh1u7by7" path="res://Scenes/MajorScenes/OverlayWindow.tscn" id="6_ow1ef"]
-[ext_resource type="PackedScene" uid="uid://c8l7cbh5upv75" path="res://Scenes/MajorScenes/SaveManager.tscn" id="7_qknim"]
+[ext_resource type="Script" uid="uid://cruda7xtodutw" path="res://Scripts/CS/UIs/RuntimeDirector.cs" id="1_40tl5"]
+[ext_resource type="Script" uid="uid://b2ynbwrig2yqu" path="res://Scripts/CS/UIs/MenuManager.cs" id="2_rv8lf"]
+[ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="3_0n3pm"]
+[ext_resource type="PackedScene" uid="uid://ywm7rhxebeh4" path="res://Scenes/MajorScenes/Terminal.tscn" id="4_rbu8k"]
+[ext_resource type="PackedScene" uid="uid://dsqh3owg3cspi" path="res://Scenes/MajorScenes/TextEditor.tscn" id="5_vnf3w"]
+[ext_resource type="PackedScene" uid="uid://blkjllh1u7by7" path="res://Scenes/MajorScenes/OverlayWindow.tscn" id="6_1de4d"]
 
 [sub_resource type="Environment" id="Environment_y4jh7"]
 background_mode = 3
@@ -14,17 +13,16 @@ glow_enabled = true
 glow_intensity = 0.75
 glow_hdr_threshold = 0.9
 
-[node name="Overseer" type="Control" node_paths=PackedStringArray("terminal", "textEditor", "saveManager")]
+[node name="RuntimeDirector" type="Control" node_paths=PackedStringArray("terminal", "textEditor")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_4uenp")
+script = ExtResource("1_40tl5")
 terminal = NodePath("HSplitContainer/TabContainer/Terminal")
 textEditor = NodePath("HSplitContainer/TabContainer/TextEditor")
-saveManager = NodePath("SaveManager")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_y4jh7")
@@ -45,7 +43,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("2_qknim")
+script = ExtResource("2_rv8lf")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HSplitContainer"]
 modulate = Color(16, 16, 16, 0.2)
@@ -55,26 +53,26 @@ alignment = 1
 
 [node name="TerminalButton" type="Button" parent="HSplitContainer/VBoxContainer"]
 layout_mode = 2
-theme = ExtResource("3_ktohp")
+theme = ExtResource("3_0n3pm")
 text = "Terminal"
 alignment = 0
 
 [node name="EditorButton" type="Button" parent="HSplitContainer/VBoxContainer"]
 layout_mode = 2
-theme = ExtResource("3_ktohp")
+theme = ExtResource("3_0n3pm")
 text = "Editor"
 alignment = 0
 
 [node name="Other" type="Button" parent="HSplitContainer/VBoxContainer"]
 layout_mode = 2
-theme = ExtResource("3_ktohp")
+theme = ExtResource("3_0n3pm")
 text = "Other
 "
 alignment = 0
 
 [node name="VSeparator" type="VSeparator" parent="HSplitContainer"]
 layout_mode = 2
-theme = ExtResource("3_ktohp")
+theme = ExtResource("3_0n3pm")
 
 [node name="TabContainer" type="TabContainer" parent="HSplitContainer"]
 layout_mode = 2
@@ -82,22 +80,19 @@ size_flags_horizontal = 3
 current_tab = 0
 tabs_visible = false
 
-[node name="Terminal" parent="HSplitContainer/TabContainer" node_paths=PackedStringArray("overseer") instance=ExtResource("4_yawr3")]
+[node name="Terminal" parent="HSplitContainer/TabContainer" node_paths=PackedStringArray("overseer") instance=ExtResource("4_rbu8k")]
 layout_mode = 2
 overseer = NodePath("../../..")
 metadata/_tab_index = 0
 
-[node name="TextEditor" parent="HSplitContainer/TabContainer" node_paths=PackedStringArray("overseer") instance=ExtResource("5_u07qj")]
+[node name="TextEditor" parent="HSplitContainer/TabContainer" node_paths=PackedStringArray("overseer") instance=ExtResource("5_vnf3w")]
 visible = false
 layout_mode = 2
 overseer = NodePath("../../..")
 metadata/_tab_index = 1
 
-[node name="OverlayWindow" parent="." instance=ExtResource("6_ow1ef")]
-position = Vector2i(960, 64)
-
-[node name="SaveManager" parent="." node_paths=PackedStringArray("overseer") instance=ExtResource("7_qknim")]
-overseer = NodePath("..")
+[node name="OverlayWindow" parent="." instance=ExtResource("6_1de4d")]
+position = Vector2i(427, 64)
 
 [connection signal="button_down" from="HSplitContainer/VBoxContainer/TerminalButton" to="HSplitContainer" method="TerminalButtonPressed"]
 [connection signal="button_down" from="HSplitContainer/VBoxContainer/EditorButton" to="HSplitContainer" method="EditorButtonPressed"]

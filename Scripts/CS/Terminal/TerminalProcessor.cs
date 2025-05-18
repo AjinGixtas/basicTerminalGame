@@ -1,12 +1,11 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 
 public static class TerminalProcessor {
-	static Overseer overseer;
+	static RuntimeDirector overseer;
 	static RichTextLabel terminalOutputField; static RichTextLabel terminalCommandPrompt; 
 	static TextEdit terminalCommandField; 
 	static Timer processTimer, updateProcessGraphicTimer, crackDurationTimer;
@@ -14,7 +13,6 @@ public static class TerminalProcessor {
 	static NetworkNode _currNode = null; static NodeDirectory _currDir = null;
 	static NodeDirectory CurrDir { get { return _currDir; } set { _currDir = value; SetCommandPrompt(); } }
 	static NetworkNode CurrNode { get { return _currNode; } set { _currNode = value; SetCommandPrompt(); } }
-	static string UserName { get { return PlayerData.username; } set { PlayerData.username = value; SetCommandPrompt(); } }
 	static readonly List<string> commandHistory = []; static int _commandHistoryIndex = 0;
 	static int CommandHistoryIndex {
 		get => _commandHistoryIndex;
@@ -27,15 +25,13 @@ public static class TerminalProcessor {
 			}
 		}
 	}
-	static bool initialized = false;
 	public static void Intialize(
-		Overseer overseer, 
+		RuntimeDirector overseer, 
 		RichTextLabel terminalOutputField, 
 		RichTextLabel terminalCommandPrompt, 
 		TextEdit terminalCommandField, 
 		Timer processTimer, Timer updateProcessGraphicTimer, Timer crackDurationTimer, 
 		NetworkManager networkManager) {
-		if (initialized) return;
 
 		// Assign provided parameters to static fields
 		TerminalProcessor.overseer = overseer;
@@ -48,17 +44,16 @@ public static class TerminalProcessor {
 		TerminalProcessor.networkManager = networkManager;
 
 		// Initialize the current node and directory
-		TerminalProcessor._currDir = (networkManager.playerNode as PlayerNode).nodeDirectory;
+        TerminalProcessor._currDir = networkManager.playerNode.nodeDirectory;
         TerminalProcessor._currNode = networkManager.playerNode;
 
         // Set the username and command prompt
 		terminalCommandField.GrabFocus();
 
 		// Mark as initialized
-		initialized = true;
 		terminalCommandField.ScrollFitContentHeight = true;
 		terminalCommandField.ScrollFitContentWidth = true;
-		PlayerData.ReadPlayerData("user://SaveData/PlayerData.dat");
+		TerminalProcessor.SetCommandPrompt();
     }
 	static double minHeight = 18; // Hard coded for convenience, prob should be generate at init runtime instead.
 	public static void Process(double delta) {
@@ -76,14 +71,16 @@ public static class TerminalProcessor {
 			}
 			if (Input.IsActionJustPressed("submitCommand")) {
 				if (terminalCommandField.Text.Length == 0) { return; }
-				terminalCommandField.Text = terminalCommandField.Text.Replace("\n", "").Replace("\r", "");
+				terminalCommandField.Text = terminalCommandField.Text.Replace("\r", " ").Replace("\n", " ");
 				if(SubmitCommand(terminalCommandField.Text)) terminalCommandField.Text = "";
 			}
-		}
+        }
+		//GD.Print(terminalCommandField.Text.Length, ' ', terminalCommandField.HasFocus(), ' ', terminalCommandField);
     }
 
-	static bool _isProcessing = false; static bool IsProcessing { get { return _isProcessing; } set { _isProcessing = value; } }
-	static readonly string[] ProgressChars = [$"[color={Util.CC(Cc.RGB)}]>[/color]", $"[color={Util.CC(Cc.rgb)}]>[/color]"]; static int tick = 0;
+    static bool _isProcessing = false; static bool IsProcessing { get { return _isProcessing; } set { _isProcessing = value; } }
+	static readonly string[] ProgressChars = [$"[color={Util.CC(Cc.RGB)}]>[/color]", $"[color={Util.CC(Cc.rgb)}]>[/color]"]; 
+	static int tick = 0;
 	static string[] queuedCommands = []; static Action<string[]> queuedAction = null;
     static void StartProcess(double time) {
 		if (IsProcessing) return;
@@ -96,16 +93,13 @@ public static class TerminalProcessor {
     }
 	public static void UpdateProcessingGraphic() {
 		if (!IsProcessing) return;
-
-		Say("-n", $"[color=#ffffff{Math.Max(1, tick*tick):X2}]>[/color]");
-		GD.Print(Math.Max(1, tick * tick), ' ', tick*tick, ' ', $"{(tick*tick):X}");
+		++tick; Say("-n", $"[color=#ffffff{Math.Clamp(tick*tick, 1, 255):X2}]>[/color]");
 		updateProcessGraphicTimer.Start();
 	}
 	public static void ProcessFinished() {
 		IsProcessing = false; terminalCommandField.Editable = true; terminalCommandField.GrabFocus();
-		for (int i = tick+1; i < 11; ++i) {
-            Say("-n", $"[color=#ffffffff]>[/color]");
-        } tick = 0; Say("-n", $"\n");
+		for (int i = tick+1; i < 17; ++i) { Say("-n", $"[color=#ffffff{Math.Clamp(tick * tick, 1, 255):X2}]>[/color]"); } 
+		tick = 0; Say("-n", $"\n");
 		queuedAction(queuedCommands);
 	}
 
@@ -118,10 +112,11 @@ public static class TerminalProcessor {
 			CommandHistoryIndex = commandHistory.Count;
 		}
 		string[] commands = newCommand.Split(';', StringSplitOptions.RemoveEmptyEntries);
-		Say("-n", $"{terminalCommandPrompt.Text}{Util.Format(newCommand, StrType.CMD)}");
-		queuedAction = ExecuteCommands;
+		Say("-n", $"{terminalCommandPrompt.Text.Replace("\r", "").Replace("\n", "")}{Util.Format(newCommand, StrType.CMD)}");
+        queuedAction = ExecuteCommands;
         queuedCommands = commands;
-        StartProcess(Math.Max(.5 + GD.Randf() * .1, .05 * newCommand.Length));
+		//StartProcess(Math.Max(.5 + GD.Randf() * .1, .05 * newCommand.Length));
+		StartProcess(1);
 		return true;
         static void ExecuteCommands(string[] commands) {
             for (int i = 0; i < commands.Length; i++) {
@@ -162,7 +157,7 @@ public static class TerminalProcessor {
 			case "help": Help(parsedArgs, positionalArgs); break; // List how commands work
 			case "home": Home(parsedArgs, positionalArgs); break; // Go to the player's node
 			case "edit": Edit(parsedArgs, positionalArgs); break; // Open a file for edit
-			case "scan": Scan(parsedArgs, positionalArgs); return false; // Scan neighbouring node
+			case "scan": Scan(parsedArgs, positionalArgs); break; // Scan neighbouring node
 			case "farm": Farm(parsedArgs, positionalArgs); break; // Interact with a node's HackFarm (GCminer)
 			case "stats": Stats(parsedArgs, positionalArgs); break;
 			case "clear": Clear(parsedArgs, positionalArgs); break; // Clear all text on the terminal
@@ -171,8 +166,9 @@ public static class TerminalProcessor {
 			case "karaxe": Crack(parsedArgs, positionalArgs); break; // Interact with the rush hacking system
 			case "inspect": Inspect(parsedArgs, positionalArgs); break; // Doesn't do anything yet
 			case "connect": Connect(parsedArgs, positionalArgs); break; // Connect to node
-			case "analyze": Analyze(parsedArgs, positionalArgs); return false; // Give data about a node
-			default: Say("-r", $"{command} is not a valid command."); break;
+			case "analyze": Analyze(parsedArgs, positionalArgs); break; // Give data about a node
+			case "setusername": SetUsername(parsedArgs, positionalArgs); break; // Set the player's username
+            default: Say("-r", $"{command} is not a valid command."); break;
 		}
 		return true;
 	}
@@ -440,7 +436,7 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 		}
 	}
 	static void Stats(Dictionary<string, string> parsedArgs, string[] postionalArgs) {
-		Say($"Username: {PlayerData.username}");
+		Say($"Username: {PlayerData.Username}");
 		Say($"Balance:  {Util.Format(PlayerData.GC_Amount.ToString(), StrType.MONEY)}");
 	}
 	static void Clear(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
@@ -594,7 +590,13 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 ");
 		}
 	}
-	static (Dictionary<string, string>, string[]) ParseArgs(string[] args) {
+	static void SetUsername(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+        if (positionalArgs.Length == 0) { Say("-r", $"No username provided."); return; }
+        if (positionalArgs[0].Length > 20) { Say("-r", $"Username too long. Max length is 20 characters."); return; }
+        PlayerData.Username = positionalArgs[0];
+        SetCommandPrompt();
+    }
+    static (Dictionary<string, string>, string[]) ParseArgs(string[] args) {
 		Dictionary<string, string> parsedArgs = [];
 		List<string> positionalArgs = [];
 		for (int i = 0; i < args.Length; ++i) {
@@ -615,7 +617,7 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 		return (parsedArgs, positionalArgs.ToArray());
 	}
 	static void SetCommandPrompt() { 
-        terminalCommandPrompt.Text = $"{Util.Format(PlayerData.username, StrType.USERNAME)}@{Util.Format(CurrNode.HostName, StrType.HOSTNAME)}:{Util.Format(CurrDir.GetPath(), StrType.DIR)}>"; 
+        terminalCommandPrompt.Text = $"{Util.Format(PlayerData.Username, StrType.USERNAME)}@{Util.Format(CurrNode.HostName, StrType.HOSTNAME)}:{Util.Format(CurrDir.GetPath(), StrType.DIR)}>";
 	}
 	static string EscapeBBCode(string code) { return code.Replace("[", "[lb]"); }
 	public static void OnCommandFieldTextChanged() {

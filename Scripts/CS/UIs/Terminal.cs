@@ -1,7 +1,7 @@
 using Godot;
 
 public partial class Terminal : MarginContainer {
-	[Export] public Overseer overseer;
+	[Export] public RuntimeDirector overseer;
 	[Export] RichTextLabel terminalOutputField; [Export] RichTextLabel terminalCommandPrompt;
 	[Export] TextEdit terminalCommandField;
 	[Export] public NetworkManager networkManager;

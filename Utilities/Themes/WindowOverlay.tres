@@ -1,4 +1,6 @@
-[gd_resource type="Theme" load_steps=9 format=4 uid="uid://cqr3fl5avxyjh"]
+[gd_resource type="Theme" load_steps=6 format=4 uid="uid://cqr3fl5avxyjh"]
+
+[ext_resource type="Texture2D" uid="uid://tj5t478rv7nj" path="res://Utilities/Images/null_texture.png" id="1_ddtnn"]
 
 [sub_resource type="Image" id="Image_uh7au"]
 data = {
@@ -827,30 +829,6 @@ cache/0/16/0/glyphs/268435475/size = Vector2(10, 14)
 cache/0/16/0/glyphs/268435475/uv_rect = Rect2(168, 129, 10, 14)
 cache/0/16/0/glyphs/268435475/texture_idx = 0
 
-[sub_resource type="Image" id="Image_ddtnn"]
-data = {
-"data": PackedByteArray("////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////YP///2D///8A////AP///wD///8A////AP///wD///8A////AP///2D///9g////AP///wD///8A////YP///7////+/////YP///wD///8A////AP///wD///8A////AP///2D///+/////v////2D///8A////AP///2D///+/////v////7////9g////AP///wD///8A////AP///2D///+/////v////7////9g////AP///wD///8A////YP///7////+/////v////2D///8A////AP///2D///+/////v////7////9g////AP///wD///8A////AP///wD///9g////v////7////+/////YP///2D///+/////v////7////9g////AP///wD///8A////AP///wD///8A////AP///2D///+/////v////7////+/////v////7////9g////AP///wD///8A////AP///wD///8A////AP///wD///8A////YP///7////+/////v////7////9g////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///2D///+/////v////7////+/////YP///wD///8A////AP///wD///8A////AP///wD///8A////AP///2D///+/////v////7////+/////v////7////9g////AP///wD///8A////AP///wD///8A////AP///2D///+/////v////7////9g////YP///7////+/////v////2D///8A////AP///wD///8A////AP///2D///+/////v////7////9g////AP///wD///9g////v////7////+/////YP///wD///8A////AP///2D///+/////v////7////9g////AP///wD///8A////AP///2D///+/////v////7////9g////AP///wD///9g////v////7////9g////AP///wD///8A////AP///wD///8A////YP///7////+/////YP///wD///8A////AP///2D///9g////AP///wD///8A////AP///wD///8A////AP///wD///9g////YP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AA=="),
-"format": "RGBA8",
-"height": 16,
-"mipmaps": false,
-"width": 16
-}
-
-[sub_resource type="ImageTexture" id="ImageTexture_dy77c"]
-image = SubResource("Image_ddtnn")
-
-[sub_resource type="Image" id="Image_jbpdl"]
-data = {
-"data": PackedByteArray("////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////gP///4H///8A////AP///wD///8A////AP///wD///8A////AP///4D///+B////AP///wD///8A////gP//////////////gf///wD///8A////AP///wD///8A////AP///4D//////////////4H///8A////AP///4H///////////////////+B////AP///wD///8A////AP///4D///////////////////+A////AP///wD///8A////gf///////////////////4H///8A////AP///4D///////////////////+A////AP///wD///8A////AP///wD///+B////////////////////gf///4D///////////////////+A////AP///wD///8A////AP///wD///8A////AP///4H///////////////////////////////////+A////AP///wD///8A////AP///wD///8A////AP///wD///8A////gf////////////////////////+A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///4D/////////////////////////gf///wD///8A////AP///wD///8A////AP///wD///8A////AP///4D///////////////////////////////////+B////AP///wD///8A////AP///wD///8A////AP///4D///////////////////+A////gf///////////////////4H///8A////AP///wD///8A////AP///4D///////////////////+A////AP///wD///+B////////////////////gf///wD///8A////AP///4D///////////////////+A////AP///wD///8A////AP///4H///////////////////+B////AP///wD///+B//////////////+A////AP///wD///8A////AP///wD///8A////gf//////////////gP///wD///8A////AP///4H///+A////AP///wD///8A////AP///wD///8A////AP///wD///+B////gP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AA=="),
-"format": "RGBA8",
-"height": 16,
-"mipmaps": false,
-"width": 16
-}
-
-[sub_resource type="ImageTexture" id="ImageTexture_xmmde"]
-image = SubResource("Image_jbpdl")
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o3bqm"]
 content_margin_left = 10.0
 content_margin_top = 28.0
@@ -888,7 +866,7 @@ Window/constants/title_height = 32
 Window/constants/title_outline_size = 0
 Window/font_sizes/title_font_size = 16
 Window/fonts/title_font = SubResource("FontFile_ddtnn")
-Window/icons/close = SubResource("ImageTexture_dy77c")
-Window/icons/close_pressed = SubResource("ImageTexture_xmmde")
+Window/icons/close = ExtResource("1_ddtnn")
+Window/icons/close_pressed = ExtResource("1_ddtnn")
 Window/styles/embedded_border = SubResource("StyleBoxFlat_o3bqm")
 Window/styles/embedded_unfocused_border = SubResource("StyleBoxFlat_mrlc0")

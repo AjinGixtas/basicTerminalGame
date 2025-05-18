@@ -1,7 +1,7 @@
 using Godot;
 
 public partial class TextEditor : MarginContainer {
-	[Export] public Overseer overseer;
+	[Export] public RuntimeDirector overseer;
 	[Export] TabBar tabBar; [Export] TabContainer tabContainer; [Export] PackedScene editorTabScene;
 	[Export] RichTextLabel noFileOpenedTab;
 	[Export] ConfirmationDialog saveDialog;

@@ -19,20 +19,24 @@ Run {Util.Format("edit FILENAME", StrType.CMD)} to open that file here.";
 		EditorTab newTab = editorTabScene.Instantiate<EditorTab>();
 		tabContainer.AddChild(newTab, true);
 		newTab.Begin(nodeFile, this);
-	}
+		if (tabContainer.CurrentTab == 0) tabContainer.CurrentTab = 1;
+    }
 	public void SaveFile() {
-		if (tabContainer.CurrentTab == -1) return; // No tab is selected
+		if (tabBar.CurrentTab == -1) return; // No tab is selected
 		EditorTab tab = tabContainer.GetChild<EditorTab>(tabContainer.CurrentTab);
 		tab.Save();
 	}
 	public void CloseTab(bool forced) {
-		if (tabContainer.CurrentTab == -1) return; // No tab is selected
+		if (tabBar.CurrentTab == -1) return; // No tab is selected
 		EditorTab tab = tabContainer.GetChild<EditorTab>(tabContainer.CurrentTab);
 		if (tab.IsDirty() && !forced) { saveDialog.Show(); saveDialog.GrabFocus(); return; }
-		tabBar.RemoveTab(tabContainer.CurrentTab);
+		tabBar.RemoveTab(tabContainer.CurrentTab-1);
 		tabContainer.RemoveChild(tab);
-		tabContainer.CurrentTab = tabBar.CurrentTab + 1;
-	}
+		if (tabBar.TabCount > 0) { 
+			tabBar.CurrentTab = tabBar.TabCount - 1; 
+			tabContainer.CurrentTab = tabContainer.GetTabCount()  - 1;
+		}
+    }
 	public void ConfirmedClosing() {
 		CloseTab(true);
 	}
@@ -40,6 +44,6 @@ Run {Util.Format("edit FILENAME", StrType.CMD)} to open that file here.";
 		saveDialog.Hide();
 	}
 	public void OnTabSelected(int tab) {
-		tabContainer.CurrentTab = tab+1;
+		tabContainer.CurrentTab = Mathf.Clamp(tab+1, 0, tabContainer.GetTabCount()-1);
 	}
 }

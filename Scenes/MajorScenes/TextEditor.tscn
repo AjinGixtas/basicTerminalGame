@@ -36,12 +36,14 @@ tabs_visible = false
 [node name="NoFileOpenedTab" type="RichTextLabel" parent="VSplitContainer/TabContainer"]
 self_modulate = Color(16, 16, 16, 0.12)
 layout_mode = 2
+focus_mode = 2
 theme = ExtResource("3_0ojv2")
 theme_override_font_sizes/normal_font_size = 24
 bbcode_enabled = true
 text = "wefwef"
 horizontal_alignment = 1
 vertical_alignment = 1
+selection_enabled = true
 metadata/_tab_index = 0
 
 [node name="ConfirmationDialog" type="ConfirmationDialog" parent="."]

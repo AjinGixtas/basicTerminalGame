@@ -9,9 +9,9 @@ public static class TerminalProcessor {
 	static RichTextLabel terminalOutputField; static RichTextLabel terminalCommandPrompt; 
 	static TextEdit terminalCommandField; 
 	static Timer processTimer, updateProcessGraphicTimer, crackDurationTimer;
-	static NetworkManager networkManager;
-	static NetworkNode _currNode = null; static NodeDirectory _currDir = null;
-	static NodeDirectory CurrDir { get { return _currDir; } set { _currDir = value; SetCommandPrompt(); } }
+	static NetworkManager networkManager; public static NetworkManager NetworkManager { get { return networkManager; } }
+    static NetworkNode _currNode = null; static NodeDirectory _currDir = null;
+	public static NodeDirectory CurrDir { get { return _currDir; } set { _currDir = value; SetCommandPrompt(); } }
 	static NetworkNode CurrNode { get { return _currNode; } set { _currNode = value; SetCommandPrompt(); } }
 	static readonly List<string> commandHistory = []; static int _commandHistoryIndex = 0;
 	static int CommandHistoryIndex {
@@ -44,8 +44,8 @@ public static class TerminalProcessor {
 		TerminalProcessor.networkManager = networkManager;
 
 		// Initialize the current node and directory
-        TerminalProcessor._currDir = networkManager.playerNode.nodeDirectory;
         TerminalProcessor._currNode = networkManager.playerNode;
+        TerminalProcessor._currDir = networkManager.playerNode.nodeDirectory;
 
         // Set the username and command prompt
 		terminalCommandField.GrabFocus();
@@ -311,7 +311,7 @@ public static class TerminalProcessor {
 		if (positionalArgs.Length == 0) { Say("-r", "No file name provided."); return; }
 		int fileOpened = 0;
 		for (int i = 0; i < positionalArgs.Length; i++) {
-			NodeFile file = _currDir.GetFile(positionalArgs[i]);
+			NodeFile file = CurrDir.GetFile(positionalArgs[i]);
 			if (file == null) {
 				Say("-r", $"File not found: {Util.Format(positionalArgs[i], StrType.FILE)}");
 			} else { overseer.textEditor.OpenNewFile(CurrNode.HostName, file); ++fileOpened; }

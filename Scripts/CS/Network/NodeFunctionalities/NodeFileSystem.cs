@@ -72,7 +72,7 @@ public class NodeDirectory : NodeSystemItem {
     // TerminalDirectory-Directory found; null-Directory not found
     public NodeDirectory GetDirectory(string name) {
         string[] components = name.Split(['/'], StringSplitOptions.RemoveEmptyEntries);
-        NodeDirectory curDir = this;
+        NodeDirectory curDir = name.StartsWith('/') ? GetRoot() : this;
         foreach (string component in components) {
             if (component == "..") {
                 if (curDir.Parent == null) return null; // Root dir is characterized by a lack of parent.
@@ -87,7 +87,7 @@ public class NodeDirectory : NodeSystemItem {
     }
     public NodeFile GetFile(string name) {
         string[] components = name.Split(['/'], StringSplitOptions.RemoveEmptyEntries);
-        NodeDirectory curDir = this;
+        NodeDirectory curDir = name.StartsWith('/') ? GetRoot() : this;
         string[] pathComponents = components[..^1]; string fileName = components[^1];
         foreach (string component in pathComponents) {
             if (component == "..") {
@@ -100,5 +100,12 @@ public class NodeDirectory : NodeSystemItem {
             continue;
         }
         return (NodeFile)(curDir?.Childrens.Find(item => (item.GetType() == typeof(NodeFile) && item.Name == fileName)));
+    }
+    public NodeDirectory GetRoot() {
+        NodeDirectory current = this;
+        while (current.Parent != null) {
+            current = current.Parent;
+        }
+        return current;
     }
 }

@@ -20,8 +20,7 @@ public partial class LifeCycleDirector : Node
 	public override void _Process(double delta) {
 		if (Input.IsActionJustPressed("quickSaveGame")) { QuickSave(); }
         if (Input.IsActionJustPressed("quickLoadGame")) { 
-            QuickLoad();
-            RemakeScene();
+            QuickLoad(this);
         }
 	}
     private const string SaveRoot = "user://Saves";
@@ -57,25 +56,40 @@ public partial class LifeCycleDirector : Node
         string userSaveFilePath = ProjectSettings.LocalizePath(saveFilePath);
 
         PlayerData.SavePlayerData(userSaveFilePath);
-
+        FileSystemSerializer.ExportToDisk(TerminalProcessor.NetworkManager.playerNode.nodeDirectory, Path.Combine(newSaveFolderPath, "FileSys")); // Export the virtual file system to disk
         GD.Print($"Quick saved to {userSaveFilePath}");
     }
-	static void QuickLoad() {
-        string fullPath = ProjectSettings.GlobalizePath(SaveRoot);  // Convert Godot path to system path
-        if (!Directory.Exists(fullPath)) { Directory.CreateDirectory(fullPath); }
-        // Find all PlayerData.tres files in subdirectories
-        var saveFiles = Directory.GetDirectories(fullPath).Select(dir => Path.Combine(dir, "PlayerData.tres")).Where(File.Exists).ToList();
+    static void QuickLoad(LifeCycleDirector lifeCycleDirector) {
+        string fullPath = ProjectSettings.GlobalizePath(SaveRoot);  // Convert Godot path to absolute system path
+        if (!Directory.Exists(fullPath)) { GD.Print("Save directory does not exist."); return; }
 
-        if (saveFiles.Count == 0) {
-            GD.Print("No save files found.");
-            return;
+        // Find all save folders named like "Game_###"
+        var saveFolders = Directory.GetDirectories(fullPath).Where(dir => Regex.IsMatch(dir, @"Game_\d{3}$")).ToList();
+
+        if (saveFolders.Count == 0) { GD.Print("No save files found."); return; }
+
+        // Find the most recently updated one
+        string latestFolder = saveFolders.OrderByDescending(dir => Directory.GetLastWriteTime(Path.Combine(dir, "PlayerData.tres"))).First();
+
+        string playerDataPath = Path.Combine(latestFolder, "PlayerData.tres");
+        string fileSystemPath = Path.Combine(latestFolder, "FileSys");
+
+        if (!File.Exists(playerDataPath)) {GD.Print("PlayerData.tres not found in latest save."); return; }
+        
+        GD.Print($"Loading save from: {playerDataPath}");
+        // Load global data
+        PlayerData.LoadPlayerData(ProjectSettings.LocalizePath(playerDataPath));
+
+        lifeCycleDirector.RemakeScene();
+        // Load instance data
+        if (Directory.Exists(fileSystemPath)) {
+            TerminalProcessor.NetworkManager.playerNode.nodeDirectory = FileSystemSerializer.ImportFromDisk(fileSystemPath);
+            TerminalProcessor.CurrDir = TerminalProcessor.NetworkManager.playerNode.nodeDirectory;
+            GD.Print(string.Join(" ", TerminalProcessor.CurrDir.Childrens.Select(x => x.Name)));
+            GD.Print("Virtual file system restored.");
+        } else {
+            GD.Print("No virtual file system found in save.");
         }
-
-        // Pick the one with the latest write time
-        string latestSave = saveFiles.OrderByDescending(File.GetLastWriteTime).First();
-
-        GD.Print("Loading save from: " + latestSave);
-        PlayerData.LoadPlayerData(ProjectSettings.LocalizePath(latestSave));
     }
     void RemakeScene() {
         RemoveChild(runtimeDirector);

@@ -48,18 +48,18 @@ public static class TerminalProcessor {
 		TerminalProcessor.networkManager = networkManager;
 
 		// Initialize the current node and directory
-		TerminalProcessor._currDir = (networkManager.network as PlayerNode).nodeDirectory;
-        TerminalProcessor._currNode = networkManager.network;
+		TerminalProcessor._currDir = (networkManager.playerNode as PlayerNode).nodeDirectory;
+        TerminalProcessor._currNode = networkManager.playerNode;
 
         // Set the username and command prompt
-        TerminalProcessor.UserName = networkManager.UserName;
 		terminalCommandField.GrabFocus();
 
 		// Mark as initialized
 		initialized = true;
 		terminalCommandField.ScrollFitContentHeight = true;
 		terminalCommandField.ScrollFitContentWidth = true;
-	}
+		PlayerData.ReadPlayerData("user://SaveData/PlayerData.dat");
+    }
 	static double minHeight = 18; // Hard coded for convenience, prob should be generate at init runtime instead.
 	public static void Process(double delta) {
 		HandleInput(delta);
@@ -83,12 +83,11 @@ public static class TerminalProcessor {
     }
 
 	static bool _isProcessing = false; static bool IsProcessing { get { return _isProcessing; } set { _isProcessing = value; } }
-	static readonly string[] ProgressChars = [$"[color={Util.CC(Cc.RGB)}]>[/color]", $"[color={Util.CC(Cc.rgb)}]>[/color]"]; static int tick = 0, progress = 0;
+	static readonly string[] ProgressChars = [$"[color={Util.CC(Cc.RGB)}]>[/color]", $"[color={Util.CC(Cc.rgb)}]>[/color]"]; static int tick = 0;
 	static string[] queuedCommands = []; static Action<string[]> queuedAction = null;
     static void StartProcess(double time) {
 		if (IsProcessing) return;
-		IsProcessing = true;
-		progress = 0; tick = 0;
+		IsProcessing = true; tick = 0;
 		Say("-n", $"   ");
 		processTimer.WaitTime = time;
 		processTimer.Start();
@@ -97,9 +96,6 @@ public static class TerminalProcessor {
     }
 	public static void UpdateProcessingGraphic() {
 		if (!IsProcessing) return;
-
-		int t = GD.RandRange(0, 1 + (int)Math.Floor(200.0 / processTimer.WaitTime * updateProcessGraphicTimer.WaitTime));
-		progress = Mathf.Clamp(progress + t, 0, 99); tick++;
 
 		Say("-n", $"[color=#ffffff{Math.Max(1, tick*tick):X2}]>[/color]");
 		GD.Print(Math.Max(1, tick * tick), ' ', tick*tick, ' ', $"{(tick*tick):X}");
@@ -110,7 +106,6 @@ public static class TerminalProcessor {
 		for (int i = tick+1; i < 11; ++i) {
             Say("-n", $"[color=#ffffffff]>[/color]");
         } tick = 0; Say("-n", $"\n");
-		progress = 0; tick = 0;
 		queuedAction(queuedCommands);
 	}
 
@@ -313,7 +308,7 @@ public static class TerminalProcessor {
 		Say(fileAccess.GetAsText());
 	}
 	static void Home(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
-		CurrNode = networkManager.network;
+		CurrNode = networkManager.playerNode;
 	}
 	const int MAX_HISTORY_CHAR_SIZE = 65536, RESET_HISTORY_CHAR_SIZE = 16384;
 	static void Edit(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
@@ -396,7 +391,7 @@ public static class TerminalProcessor {
 		if ((showStatus || showUpgradeInfo) && doUpgrade) { Say("-r", "Cannot combine upgrade with status or upgrade info."); return; }
 
 		// Check node's ownership
-		if (CurrNode.CurrentOwner != networkManager.network) { Say("-r", "You don't own this node's GC miner"); return; }
+		if (CurrNode.CurrentOwner != networkManager.playerNode) { Say("-r", "You don't own this node's GC miner"); return; }
 		// Status display
 		if (showStatus || showUpgradeInfo) {
 			int hackLvl = CurrNode.HackFarm.HackLvl, timeLvl = CurrNode.HackFarm.TimeLvl, growLvl = CurrNode.HackFarm.TimeLvl;
@@ -521,7 +516,7 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 
 		int result = node.AttempCrackNode(parsedArgs, endEpoch);
 		if (result == 0) { 
-			node.TransferOwnership(networkManager.network);
+			node.TransferOwnership(networkManager.playerNode);
 			PlayerData.AddHackFarm(node.HackFarm);
 		}
 		return 0;
@@ -564,7 +559,7 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 ");
 
 		// Honeypot node don't dare to impersonate actual organization or corporation.
-		if (analyzeNode.CurrentOwner != networkManager.network || analyzeNode.GetType() == typeof(HoneypotNode)) {
+		if (analyzeNode.CurrentOwner != networkManager.playerNode || analyzeNode.GetType() == typeof(HoneypotNode)) {
 			Say($"Crack this node security system to get further access.");
 			return;
 		}
@@ -620,8 +615,7 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 		return (parsedArgs, positionalArgs.ToArray());
 	}
 	static void SetCommandPrompt() { 
-		GD.Print(networkManager, ' ', CurrNode, ' ', CurrDir);
-        terminalCommandPrompt.Text = $"{Util.Format(networkManager.UserName, StrType.USERNAME)}@{Util.Format(CurrNode.HostName, StrType.HOSTNAME)}:{Util.Format(CurrDir.GetPath(), StrType.DIR)}>"; 
+        terminalCommandPrompt.Text = $"{Util.Format(PlayerData.username, StrType.USERNAME)}@{Util.Format(CurrNode.HostName, StrType.HOSTNAME)}:{Util.Format(CurrDir.GetPath(), StrType.DIR)}>"; 
 	}
 	static string EscapeBBCode(string code) { return code.Replace("[", "[lb]"); }
 	public static void OnCommandFieldTextChanged() {
@@ -669,4 +663,14 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 	public static void OnCrackDurationTimerTimeout() {
 		Say($"{Util.Format("Flare sequence timeout", StrType.ERROR)}. All [color={Util.CC(Cc.Y)}]lok[/color] closed.");
     }
+}
+public struct NodeAnalysis {
+    public string IP { get; init; }
+    public string HostName { get; init; }
+    public string DisplayName { get; init; }
+    public int DefLvl { get; init; }
+    public int SecLvl { get; init; }
+    public int RetLvl { get; init; }
+    public SecurityType SecType { get; init; }
+    public NetworkNodeType NodeType { get; init; }
 }

@@ -1,7 +1,7 @@
-using System;
 using Godot;
+using System;
 using System.Collections.Generic;
-using System.Data;
+using System.IO;
 
 public static class PlayerData {
     static List<HackFarm> GC_miners = new();
@@ -22,7 +22,15 @@ public static class PlayerData {
     public static double GC_Amount {
         get { return GC_total; }
     }
-    public static string username;
+    public static string username = "AjinGixtas";
+    public static void ReadPlayerData(string filePath) {
+        if (!Godot.FileAccess.FileExists(filePath)) return;
+        Godot.FileAccess file = Godot.FileAccess.Open(filePath, Godot.FileAccess.ModeFlags.Read);
+        username = file.GetLine();
+        GC_total = double.Parse(file.GetLine());
+        GC_max = double.Parse(file.GetLine());
+        file.Close();
+    }
     public static void AddHackFarm(HackFarm h) {  GC_miners.Add(h); }
     public static void RemoveHackFarm(HackFarm h) { GC_miners.Remove(h); }
 

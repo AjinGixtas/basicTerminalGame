@@ -5,91 +5,33 @@ using System.IO;
 using System.Linq;
 using System.Text;
 public partial class NetworkManager : Node {
-    [Export] string userName = "AjinGixtas";
-    public string UserName { get => userName; private set => userName = value; }
-    public NetworkNode network;
+    public PlayerNode playerNode;
+    public NetworkNode currentNetwork;
+    public NetworkNode[] networks;
     public Dictionary<string, NetworkNode> DNS;
     public override void _Ready() {
-        while (DNS == null) {
-            network = GenerateNetwork() as PlayerNode;
-            DNS = GenerateDNS(network);
-        }
-        PlayerData.AddHackFarm(network.HackFarm);
-    }
-    public NetworkNode GenerateNetwork() {
-        int[] baseNodePerDepths = [5, 6, 10, 7, 6, 4, 5, 3, 3, 1]; int totalNode = baseNodePerDepths.Sum(x => x);
-        NetworkNode network = new PlayerNode("home", "Player Terminal", $"{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}", null) {
+        DNS = [];
+        string playerIP = GetRandomIP();
+        playerNode = new PlayerNode("home", "Player Terminal", playerIP, null) {
             HackFarm = new HackFarm(1.0, 1.0, 1, 1, 1)
-        }; 
-        List<Tuple<NetworkNodeType, string, string>> namePool = []; int poolIndex = 0;
-
-        List<List<NetworkNode>> layers = [[network]];
-
-        // Build procedural network
-        Tuple<NetworkNodeType, string, string>[][] nodeNames = ReadProvidedNodeName();
-        HoneypotNode.namePool = nodeNames;
-        for (int i = 0; i < baseNodePerDepths.Length; ++i) {
-            layers.Add([]);
-            if (i < nodeNames.Length) for (int k = 0; k < nodeNames[i].Length; ++k) { namePool.Add(nodeNames[i][k]); }
-            for (int k = 0; k < namePool.Count; ++k) { int _k = GD.RandRange(0, namePool.Count - 1); (namePool[k], namePool[_k]) = (namePool[_k], namePool[k]); }
-            for (int j = 0; j < baseNodePerDepths[i]; ++j) {
-                if (namePool.Count == 0) {
-                    for (int k = 0; k < nodeNames[i].Length; ++k) { namePool.Add(nodeNames[i][k]); } ++i;
-                    for (int k = 0; k < namePool.Count; ++k) { int _k = GD.RandRange(0, namePool.Count - 1); (namePool[k], namePool[_k]) = (namePool[_k], namePool[k]); }
-                }
-                // Read the one at the top
-                Tuple<NetworkNodeType, string, string> nodeData = namePool[0];
-                namePool.RemoveAt(0);
-                NetworkNode parentNode = layers[i][GD.RandRange(0, layers[i].Count - 1)];
-                NetworkNode node = NetworkNode.GenerateProceduralNode(nodeData.Item1, nodeData.Item2, nodeData.Item3, (double)(i + 1) / baseNodePerDepths.Length, (double)poolIndex / totalNode, parentNode);
-                layers[i + 1].Add(node);
-                parentNode.ChildNode.Add(node);
-                ++poolIndex;
-            }
-        }
-
-        // Add scripted node data
-        NetworkNodeData[] scriptedNodeData = ReadScriptedNodeData();
-        for (int i = 0; i < scriptedNodeData.Length; ++i) {
-            NetworkNodeData nodeData = scriptedNodeData[i];
-            int minDepth = Math.Clamp(nodeData.minDepth, 0, layers.Count - 1);
-            int maxDepth = (nodeData.maxDepth < 0 ? (layers.Count - 1) : Math.Clamp(nodeData.maxDepth, 0, layers.Count - 1));
-            int depth = GD.RandRange(minDepth, maxDepth);
-            for (int j = 0; j < 20 && layers[depth].Count == 0; ++j) { depth = GD.RandRange(minDepth, maxDepth); }
-            NetworkNode parentNode = layers[depth][GD.RandRange(0, layers[depth].Count - 1)];
-            NetworkNode node = nodeData.networkNode;
-            poolIndex = layers.Take(depth).Sum(list => list.Count) + GD.RandRange(0, layers[depth].Count);
-            double indexRatio = (double)poolIndex / totalNode;
-            double depthRatio = (double)(depth + 1) / layers.Count;
-            (int secLvl, int defLvl) = node.GenerateSecAndDef(indexRatio, depthRatio);
-            node.Init(secLvl, defLvl, new(indexRatio, depthRatio));
-            node.ParentNode = parentNode;
-            if (depth + 1 >= layers.Count) { layers.Add([]); }
-            layers[depth + 1].Add(node);
-            parentNode.ChildNode.Add(node);
-            totalNode++;
-        }
-        return network;
+        }; DNS[playerIP] = playerNode;
+        PlayerData.AddHackFarm(playerNode.HackFarm);
     }
-    public Dictionary<string, NetworkNode> GenerateDNS(NetworkNode root) {
-        Dictionary<string, NetworkNode> output = new();
-        Queue<NetworkNode> queue = new([root]);
-        while (queue.Count > 0) {
-            NetworkNode node = queue.Dequeue();
-            if (output.ContainsKey(node.IP)) { return null; }
-            output.Add(node.IP, node);
-            foreach (NetworkNode child in node.ChildNode) { queue.Enqueue(child); }
+    string GetRandomIP() {
+        string IP = $"{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}";
+        while (DNS.ContainsKey(IP)) {
+            IP = $"{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}";
         }
-        return output;
+        return IP;
     }
-    
-    readonly Tuple<string, NetworkNodeType>[] nodeTypeData = [
+
+    static readonly Tuple<string, NetworkNodeType>[] nodeTypeData = [
         new Tuple<string, NetworkNodeType>("Person.txt", NetworkNodeType.PERSON),
         new Tuple<string, NetworkNodeType>("Rouge.txt", NetworkNodeType.ROUGE),
         new Tuple<string, NetworkNodeType>("Honeypot.txt", NetworkNodeType.HONEYPOT),
         new Tuple<string, NetworkNodeType>("Miner.txt", NetworkNodeType.MINER),
     ];
-    Tuple<NetworkNodeType, string, string>[][] ReadProvidedNodeName() {
+    static Tuple<NetworkNodeType, string, string>[][] ReadProvidedNodeName() {
         Tuple<NetworkNodeType, string, string>[][] output = new Tuple<NetworkNodeType, string, string>[nodeTypeData.Length][];
         for (int i = 0; i < nodeTypeData.Length; i++) { output[i] = ReadNodeNameOfType(nodeTypeData[i]); }
         return output;

@@ -6,7 +6,6 @@ public partial class Terminal : MarginContainer {
 	[Export] TextEdit terminalCommandField;
 	[Export] public NetworkManager networkManager;
 	[Export] Timer processTimer, updateProcessGraphicTimer, crackDurationTimer;
-	string userName;
 
 	bool isProcessing = false;
 	public override void _Ready() {

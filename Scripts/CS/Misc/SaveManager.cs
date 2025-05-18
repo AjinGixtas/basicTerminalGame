@@ -9,7 +9,7 @@ public partial class SaveManager : Node {
     }
     void SaveGame() {
         TerminalProcessor.Say("Saving game...");
-        NetworkNode network = overseer.terminal.networkManager.network;
+        NetworkNode network = overseer.terminal.networkManager.playerNode;
 
     }
 }

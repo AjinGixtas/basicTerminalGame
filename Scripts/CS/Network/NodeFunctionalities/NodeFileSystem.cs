@@ -42,8 +42,9 @@ public class NodeDirectory : NodeSystemItem {
         }
         return 1;
     }
-    // 0-Success; 1-Duplicate name found
+    // 0-Success; 1-Duplicate name found; 2-Attempted to add parent
     public int Add(NodeSystemItem item) {
+        if (item == Parent) return 2;
         foreach (NodeSystemItem children in Childrens) {
             if (item.Name == children.Name) { return 1; }
         }
@@ -51,6 +52,7 @@ public class NodeDirectory : NodeSystemItem {
         Childrens.Add(item);
         return 0;
     }
+    // 0-Success; 1-Duplicate name found
     public int AddFile(string name) {
         foreach (NodeSystemItem children in Childrens) {
             if (children.GetType() == typeof(NodeFile) && name == children.Name) { return 1; }

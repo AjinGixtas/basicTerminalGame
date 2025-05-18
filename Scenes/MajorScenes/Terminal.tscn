@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://ywm7rhxebeh4"]
 
-[ext_resource type="Script" uid="uid://mb8mpa63ad2n" path="res://Scripts/CS/UIs/Terminal.cs" id="1_q6j3v"]
+[ext_resource type="Script" uid="uid://mb8mpa63ad2n" path="res://Scripts/CS/Terminal/Terminal.cs" id="1_q6j3v"]
 [ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="2_tjxev"]
 [ext_resource type="CodeHighlighter" uid="uid://dfl78raux0p25" path="res://Utilities/Styling/CommandFieldHighlighter.tres" id="3_c8ipk"]
 [ext_resource type="Script" uid="uid://de88ixhijljw" path="res://Scripts/CS/Network/NetworkManager.cs" id="4_c8ipk"]

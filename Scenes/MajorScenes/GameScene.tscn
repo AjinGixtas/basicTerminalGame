@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=3 uid="uid://ccwqfx7w5pm3k"]
 
-[ext_resource type="Script" uid="uid://cruda7xtodutw" path="res://Scripts/CS/UIs/RuntimeDirector.cs" id="1_40tl5"]
-[ext_resource type="Script" uid="uid://b2ynbwrig2yqu" path="res://Scripts/CS/UIs/MenuManager.cs" id="2_rv8lf"]
+[ext_resource type="Script" uid="uid://cruda7xtodutw" path="res://Scripts/CS/Directors/RuntimeDirector.cs" id="1_40tl5"]
+[ext_resource type="Script" uid="uid://b2ynbwrig2yqu" path="res://Scripts/CS/Directors/MenuManager.cs" id="2_rv8lf"]
 [ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="3_0n3pm"]
 [ext_resource type="PackedScene" uid="uid://ywm7rhxebeh4" path="res://Scenes/MajorScenes/Terminal.tscn" id="4_rbu8k"]
 [ext_resource type="PackedScene" uid="uid://dsqh3owg3cspi" path="res://Scenes/MajorScenes/TextEditor.tscn" id="5_vnf3w"]

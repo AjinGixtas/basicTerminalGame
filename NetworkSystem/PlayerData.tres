@@ -1,6 +1,6 @@
 [gd_resource type="Resource" load_steps=2 format=3 uid="uid://nso20wnieods"]
 
-[ext_resource type="Script" uid="uid://dfbnxxpkoqyd1" path="res://Scripts/CS/Terminal/PlayerData.cs" id="1_vvttd"]
+[ext_resource type="Script" uid="uid://dfbnxxpkoqyd1" path="res://Scripts/CS/Terminal/PlayerDataManager.cs" id="1_vvttd"]
 
 [resource]
 script = ExtResource("1_vvttd")

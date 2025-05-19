@@ -4,20 +4,38 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-public partial class NetworkManager : Node {
-    public PlayerNode playerNode;
-    public NetworkNode currentNetwork;
-    public NetworkNode[] networks;
-    public Dictionary<string, NetworkNode> DNS;
-    public override void _Ready() {
+public static class NetworkManager {
+    public static PlayerNode playerNode;
+    public static NetworkNode currentNetwork;
+    public static NetworkNode[] networks;
+    static Dictionary<string, NetworkNode> DNS;
+	static List<HackFarm> PlayerHackFarm = new();
+    public static void Ready() {
         DNS = [];
-        string playerIP = GetRandomIP();
-        playerNode = new PlayerNode("home", "Player Terminal", playerIP, null) {
-            HackFarm = new HackFarm(1.0, 1.0, 1, 1, 1)
-        }; DNS[playerIP] = playerNode;
-        PlayerData.AddHackFarm(playerNode.HackFarm);
+        playerNode = new PlayerNode("home", "Player Terminal", GetRandomIP(), null) {
+            HackFarm = new HackFarm(1.0, 1.0, 255, 255, 255)
+        }; AssignDNS(playerNode);
+        PlayerHackFarm = [playerNode.HackFarm];
+
+        currentNetwork = playerNode;
     }
-    string GetRandomIP() {
+    public static void AddHackFarm(HackFarm hackFarm) { PlayerHackFarm.Add(hackFarm); }
+    public static void CollectHackFarmMoney(double delta) {
+        foreach (HackFarm h in PlayerHackFarm) {
+            PlayerDataManager.Deposit(h.Process(delta));
+        }
+    }
+
+    public static NetworkNode QueryDNS(string IP) {
+        if (!DNS.TryGetValue(IP, out NetworkNode value)) return null;
+        return value;
+    }
+    public static int AssignDNS(NetworkNode node) {
+        if (string.IsNullOrEmpty(node.IP)) return 1;
+        DNS[node.IP] = node;
+        return 0;
+    }
+    static string GetRandomIP() {
         string IP = $"{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}";
         while (DNS.ContainsKey(IP)) {
             IP = $"{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}";
@@ -83,7 +101,6 @@ public partial class NetworkManager : Node {
                             }
                             break;
                         }
-
                     case "Faction": {
                             FactionData factionData = GD.Load<FactionData>(filePath);
                             if (factionData != null) {
@@ -98,7 +115,6 @@ public partial class NetworkManager : Node {
                             }
                             break;
                         }
-
                     case "Business": {
                             BusinessData businessData = GD.Load<BusinessData>(filePath);
                             if (businessData != null) {
@@ -113,7 +129,6 @@ public partial class NetworkManager : Node {
                             }
                             break;
                         }
-
                     default:
                         GD.PrintErr($"Unknown category: {CATEGORY[i]}");
                         break;

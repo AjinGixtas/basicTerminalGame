@@ -61,4 +61,5 @@ public enum StrType {
     PARTIAL_SUCCESS = 18,
     FULL_SUCCESS = 19,
     CMD_ARG = 20,
+    UNKNOWN_ERROR = 21,
 }

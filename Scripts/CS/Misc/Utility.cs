@@ -1,9 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 public static class Util {
     public static T[] Shuffle<T>(T[] array) {
         for (int i = 0; i < array.Length; i++) {
@@ -128,11 +126,7 @@ public static class Util {
                     int lastSlash = input.LastIndexOf('/');
                     if (lastSlash == -1 || lastSlash == input.Length - 1)
                         return $"[color={Util.CC(Cc.G)}]{input}[/color]"; // fallback if no slash or only slash
-
-                    string dir = input[..(lastSlash + 1)];
-                    string file = input[(lastSlash + 1)..];
-
-                    return $"[color={Util.CC(Cc.C)}]{dir}[/color][color={Util.CC(Cc.G)}]{file}[/color]";
+                    return $"[color={Util.CC(Cc.C)}]{input[..(lastSlash + 1)]}[/color][color={Util.CC(Cc.G)}]{input[(lastSlash + 1)..]}[/color]";
                 }
             case StrType.CMD: {
                 string output = "";
@@ -202,6 +196,8 @@ public static class Util {
                 return $"[color={Util.CC(Cc.G)}]{input}[/color]";
             case StrType.CMD_ARG:
                 return $"[color={Util.CC(Cc.gR)}]{input}[/color]";
+            case StrType.UNKNOWN_ERROR:
+                return Util.Format($"Unknown error encountered{(addons.Length != 0 ? $" with {addons[0]}" : "")}. Error code: {input}", StrType.ERROR);
             default:
                 return input;
         }

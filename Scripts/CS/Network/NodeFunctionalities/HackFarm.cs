@@ -29,7 +29,7 @@ public class HackFarm {
             CurGrow = GetGrowValue(_growLvl);
         }
     }
-    public HackFarm(double indexRatio, double depthRatio, int HackLevel = 1, int TimeLevel = 1, int GrowLevel = 1) {
+    public HackFarm(double indexRatio, double depthRatio, int HackLvl = 1, int TimeLvl = 1, int GrowLvl = 1) {
         double MAX_GROW = 1_000 * 0.7958800173440752 * Math.Log10(indexRatio + .6);
         double MIN_TIME = 0.05;
         double MAX_HACK = MAX_GROW * MIN_TIME;
@@ -38,7 +38,7 @@ public class HackFarm {
         GrowFactor = +(MAX_GROW - BASE_GROW - SHIF_GROW * MAX_LVL) / Math.Pow(MAX_LVL, POWR_GROW);
 
         //this.HackLvl = HackLevel; this.TimeLvl = TimeLevel; this.GrowLvl = GrowLevel;
-        this.HackLvl = 255; this.TimeLvl = 255; this.GrowLvl = 255;
+        this.HackLvl = HackLvl; this.TimeLvl = TimeLvl; this.GrowLvl = GrowLvl;
         timeRemain = CurTime;
     }
     double currencyPile = 0, timeRemain = 0;

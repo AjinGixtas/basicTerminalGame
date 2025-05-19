@@ -9,8 +9,7 @@ public static class TerminalProcessor {
 	static RichTextLabel terminalOutputField; static RichTextLabel terminalCommandPrompt; 
 	static TextEdit terminalCommandField; 
 	static Timer processTimer, updateProcessGraphicTimer, crackDurationTimer;
-	static NetworkManager networkManager; public static NetworkManager NetworkManager { get { return networkManager; } }
-    static NetworkNode _currNode = null; static NodeDirectory _currDir = null;
+	static NetworkNode _currNode = null; static NodeDirectory _currDir = null;
 	public static NodeDirectory CurrDir { get { return _currDir; } set { _currDir = value; SetCommandPrompt(); } }
 	static NetworkNode CurrNode { get { return _currNode; } set { _currNode = value; SetCommandPrompt(); } }
 	static readonly List<string> commandHistory = []; static int _commandHistoryIndex = 0;
@@ -25,13 +24,12 @@ public static class TerminalProcessor {
 			}
 		}
 	}
-	public static void Intialize(
+	public static void IntializeInterface(
 		RuntimeDirector overseer, 
 		RichTextLabel terminalOutputField, 
 		RichTextLabel terminalCommandPrompt, 
 		TextEdit terminalCommandField, 
-		Timer processTimer, Timer updateProcessGraphicTimer, Timer crackDurationTimer, 
-		NetworkManager networkManager) {
+		Timer processTimer, Timer updateProcessGraphicTimer, Timer crackDurationTimer) {
 
 		// Assign provided parameters to static fields
 		TerminalProcessor.overseer = overseer;
@@ -39,28 +37,28 @@ public static class TerminalProcessor {
 		TerminalProcessor.terminalCommandPrompt = terminalCommandPrompt;
 		TerminalProcessor.terminalCommandField = terminalCommandField;
 		TerminalProcessor.processTimer = processTimer;
-        TerminalProcessor.updateProcessGraphicTimer = updateProcessGraphicTimer;
+		TerminalProcessor.updateProcessGraphicTimer = updateProcessGraphicTimer;
 		TerminalProcessor.crackDurationTimer = crackDurationTimer;
-		TerminalProcessor.networkManager = networkManager;
 
-		// Initialize the current node and directory
-        TerminalProcessor._currNode = networkManager.playerNode;
-        TerminalProcessor._currDir = PlayerData.fileSystem;
-
-        // Set the username and command prompt
+		// Set the username and command prompt
 		terminalCommandField.GrabFocus();
 
 		// Mark as initialized
 		terminalCommandField.ScrollFitContentHeight = true;
 		terminalCommandField.ScrollFitContentWidth = true;
+	}
+	public static void IntializeInternal() {
+		TerminalProcessor._currNode = NetworkManager.playerNode;
+		TerminalProcessor._currDir = PlayerFileManager.FileSystem;
 		TerminalProcessor.SetCommandPrompt();
-    }
+	}
+
 	static double minHeight = 18; // Hard coded for convenience, prob should be generate at init runtime instead.
 	public static void Process(double delta) {
 		HandleInput(delta);
 		ShowMoreChars(delta);
-		PlayerData.Process(delta);
-    }
+		NetworkManager.CollectHackFarmMoney(delta);
+	}
 	public static void HandleInput(double dela) {
 		if (terminalCommandField.HasFocus()) {
 			if (Input.IsActionJustPressed("moveDownHistory")) {
@@ -74,23 +72,22 @@ public static class TerminalProcessor {
 				terminalCommandField.Text = terminalCommandField.Text.Replace("\r", " ").Replace("\n", " ");
 				if(SubmitCommand(terminalCommandField.Text)) terminalCommandField.Text = "";
 			}
-        }
-		//GD.Print(terminalCommandField.Text.Length, ' ', terminalCommandField.HasFocus(), ' ', terminalCommandField);
-    }
+		}
+	}
 
-    static bool _isProcessing = false; static bool IsProcessing { get { return _isProcessing; } set { _isProcessing = value; } }
+	static bool _isProcessing = false; static bool IsProcessing { get { return _isProcessing; } set { _isProcessing = value; } }
 	static readonly string[] ProgressChars = [$"[color={Util.CC(Cc.RGB)}]>[/color]", $"[color={Util.CC(Cc.rgb)}]>[/color]"]; 
 	static int tick = 0;
 	static string[] queuedCommands = []; static Action<string[]> queuedAction = null;
-    static void StartProcess(double time) {
+	static void StartProcess(double time) {
 		if (IsProcessing) return;
 		IsProcessing = true; tick = 0;
 		Say("-n", $"   ");
 		processTimer.WaitTime = time;
 		processTimer.Start();
-        updateProcessGraphicTimer.WaitTime = Math.Max(.05, time / 17.0);
+		updateProcessGraphicTimer.WaitTime = Math.Max(.05, time / 17.0);
 		updateProcessGraphicTimer.Start();
-    }
+	}
 	public static void UpdateProcessingGraphic() {
 		if (!IsProcessing) return;
 		++tick; Say("-n", $"[color=#ffffff{Math.Clamp(tick*tick, 1, 255):X2}]>[/color]");
@@ -113,36 +110,36 @@ public static class TerminalProcessor {
 		}
 		string[] commands = newCommand.Split(';', StringSplitOptions.RemoveEmptyEntries);
 		Say("-n", $"{terminalCommandPrompt.Text.Replace("\r", "").Replace("\n", "")}{Util.Format(newCommand, StrType.CMD)}");
-        queuedAction = ExecuteCommands;
-        queuedCommands = commands;
+		queuedAction = ExecuteCommands;
+		queuedCommands = commands;
 		//StartProcess(Math.Max(.5 + GD.Randf() * .1, .05 * newCommand.Length));
 		StartProcess(1);
 		return true;
-        static void ExecuteCommands(string[] commands) {
-            for (int i = 0; i < commands.Length; i++) {
-                string[] components = Tokenize(commands[i]);
-                if (components.Length == 0) continue;
-                if (!ProcessCommand(components[0], components[1..])) break;
-            }
-        }
+		static void ExecuteCommands(string[] commands) {
+			for (int i = 0; i < commands.Length; i++) {
+				string[] components = Tokenize(commands[i]);
+				if (components.Length == 0) continue;
+				if (!ProcessCommand(components[0], components[1..])) break;
+			}
+		}
 		static string[] Tokenize(string input) {
-            var tokens = new List<string>();
+			var tokens = new List<string>();
 
-            // Regex: match quoted text or unquoted word
-            var matches = Regex.Matches(input, "\"([^\"]*)\"|(\\S+)");
+			// Regex: match quoted text or unquoted word
+			var matches = Regex.Matches(input, "\"([^\"]*)\"|(\\S+)");
 
-            foreach (Match match in matches) {
-                if (match.Groups[1].Success) {
-                    // Quoted group
-                    tokens.Add(match.Groups[1].Value);
-                } else {
-                    // Unquoted group
-                    tokens.Add(match.Groups[2].Value);
-                }
-            }
+			foreach (Match match in matches) {
+				if (match.Groups[1].Success) {
+					// Quoted group
+					tokens.Add(match.Groups[1].Value);
+				} else {
+					// Unquoted group
+					tokens.Add(match.Groups[2].Value);
+				}
+			}
 
-            return tokens.ToArray();
-        }
+			return tokens.ToArray();
+		}
 	}
 	static bool ProcessCommand(string command, string[] args) {
 		command = command.ToLower();
@@ -168,26 +165,9 @@ public static class TerminalProcessor {
 			case "connect": Connect(parsedArgs, positionalArgs); break; // Connect to node
 			case "analyze": Analyze(parsedArgs, positionalArgs); break; // Give data about a node
 			case "setusername": SetUsername(parsedArgs, positionalArgs); break; // Set the player's username
-            default: Say("-r", $"{command} is not a valid command."); break;
+			default: Say("-r", $"{command} is not a valid command."); break;
 		}
 		return true;
-	}
-
-	static void RmF(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
-		if (positionalArgs.Length == 0) { Say("-r", $"No file name provided."); return; }
-		NodeDirectory parentDirectory;
-		for (int i = 0; i < positionalArgs.Length; i++) {
-			string[] components = positionalArgs[i].Split('/', StringSplitOptions.RemoveEmptyEntries);
-			string fileName = components[^1], parentPath = string.Join('/', components[..^1]);
-			parentDirectory = CurrDir.GetDirectory(parentPath);
-			if (parentDirectory == null) { Say("-r", $"File not found: {parentPath}"); return; }
-			int result = parentDirectory.RemoveFile(positionalArgs[i]);
-			switch (result) {
-				case 0: break;
-				case 1: Say($"{positionalArgs[i]} was not found."); break;
-				default: Say("-r", $"{Util.Format(positionalArgs[i], StrType.FILE)} removal failed. Error code: {result}"); break;
-			}
-		}
 	}
 	static void LS(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		NodeDirectory targetDir = CurrDir;
@@ -212,6 +192,39 @@ public static class TerminalProcessor {
 	static void Pwd(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		Say($"{Util.Format(CurrDir.GetPath(), StrType.DIR)}");
 	}
+	static void RmF(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+		if (positionalArgs.Length == 0) { Say("-r", $"No file name provided."); return; }
+		NodeDirectory parentDirectory;
+		for (int i = 0; i < positionalArgs.Length; i++) {
+			string[] components = positionalArgs[i].Split('/', StringSplitOptions.RemoveEmptyEntries);
+			string fileName = components[^1], parentPath = string.Join('/', components[..^1]);
+			parentDirectory = CurrDir.GetDirectory(parentPath);
+			if (parentDirectory == null) { Say("-r", $"File not found: {parentPath}"); return; }
+			int result = parentDirectory.RemoveFile(positionalArgs[i]);
+			switch (result) {
+				case 0: break;
+				case 1: Say($"{positionalArgs[i]} was not found."); break;
+				default: Say("-r", $"{Util.Format(positionalArgs[i], StrType.FILE)} removal failed. Error code: {result}"); break;
+			}
+		}
+	}
+	static void MkF(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+		if (positionalArgs.Length == 0) { Say("-r", $"No file name provided."); return; }
+		NodeDirectory parentDirectory;
+		for (int i = 0; i < positionalArgs.Length; i++) {
+			string[] components = positionalArgs[i].Split('/', StringSplitOptions.RemoveEmptyEntries);
+			string fileName = components[^1], parentPath = string.Join('/', components[..^1]);
+
+			parentDirectory = CurrDir.GetDirectory(parentPath);
+			if (parentDirectory == null) { Say("-r", $"Directory not found: {Util.Format(parentPath, StrType.DIR)}"); return; }
+			int result = parentDirectory.AddFile(fileName);
+			switch (result) {
+				case 0: break;
+				case 1: Say($"{Util.Format(positionalArgs[i], StrType.FILE)} already exists. Skipped."); break;
+				default: Say("-r", $"{Util.Format(positionalArgs[i], StrType.FILE)} creation failed. Error code: ${result}"); break;
+			}
+		}
+	}
 	// It gets 2 since this one is REALLY close to standard, but since it's also called independently a lot, allow for seperate shorthand flag is way better.
 	static void Say(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		if (positionalArgs.Length == 0) { Say(""); return; }
@@ -222,15 +235,16 @@ public static class TerminalProcessor {
 		}
 		string text = string.Join(" ", positionalArgs);
 		if (parsedArgs.ContainsKey("-e")) text = Regex.Unescape(text); // handles \n, \t, etc.
-		if (parsedArgs.ContainsKey("-b")) text = EscapeBBCode(text);
+		if (!parsedArgs.ContainsKey("-b")) text = EscapeBBCode(text);
         if (parsedArgs.ContainsKey("-t")) text = text.TrimEnd('\n', '\r');
 		if (parsedArgs.ContainsKey("-l")) text = text.TrimStart('\n', '\r');
-        if (!parsedArgs.ContainsKey("-n")) text += "\n";
-        if (parsedArgs.ContainsKey("-r")) text = Util.Format(text, StrType.ERROR);
-        if (parsedArgs.ContainsKey("-w")) text = Util.Format(text, StrType.WARNING);
-        terminalOutputField.AppendText(text);
+		if (!parsedArgs.ContainsKey("-n")) text += "\n";
+		if (parsedArgs.ContainsKey("-r")) text = Util.Format(text, StrType.ERROR);
+		if (parsedArgs.ContainsKey("-w")) text = Util.Format(text, StrType.WARNING);
+		terminalOutputField.AppendText(text);
 	}
 	public static void Say(params string[] args) {
+		if (terminalOutputField == null) return;
 		if (args.Length == 0) { Say(""); return; }
 
 		string c = terminalOutputField.Text;
@@ -251,9 +265,9 @@ public static class TerminalProcessor {
 			escapeBBcode = flags.Contains('b');
 			makeRed = flags.Contains('r');
 			makeYellow = flags.Contains('y');
-            trimTrailingNewline = flags.Contains('t');
+			trimTrailingNewline = flags.Contains('t');
 			trimLeadingNewline = flags.Contains('l');
-            argStart = 1;
+			argStart = 1;
 		}
 
 		string text = string.Join(" ", args[argStart..]);
@@ -265,46 +279,46 @@ public static class TerminalProcessor {
 		if (makeRed) text = Util.Format(text, StrType.ERROR);
 		if (makeYellow) text = Util.Format(text, StrType.WARNING);
 
-        terminalOutputField.AppendText(text);
+		terminalOutputField.AppendText(text);
 	}
-    static string GetLastLinesUnderLimit(string text, int maxChars) {
-        var lines = text.AsSpan(); // Avoid allocating full array
-        var newline = '\n';
-        List<int> lineBreaks = new(); // Store line start indices
+	static string GetLastLinesUnderLimit(string text, int maxChars) {
+		var lines = text.AsSpan(); // Avoid allocating full array
+		var newline = '\n';
+		List<int> lineBreaks = new(); // Store line start indices
 
-        // Step 1: Find all newline positions
-        for (int i = 0; i < lines.Length; i++) {
-            if (lines[i] == newline)
-                lineBreaks.Add(i);
-        }
+		// Step 1: Find all newline positions
+		for (int i = 0; i < lines.Length; i++) {
+			if (lines[i] == newline)
+				lineBreaks.Add(i);
+		}
 
-        int totalChars = 0;
-        int startLineIndex = lineBreaks.Count;
+		int totalChars = 0;
+		int startLineIndex = lineBreaks.Count;
 
-        // Step 2: Walk backwards through line breaks
-        for (int i = lineBreaks.Count - 1; i >= 0; i--) {
-            int lineStart = (i == 0) ? 0 : lineBreaks[i - 1] + 1;
-            int lineEnd = lineBreaks[i] + 1; // include '\n'
-            int lineLength = lineEnd - lineStart;
+		// Step 2: Walk backwards through line breaks
+		for (int i = lineBreaks.Count - 1; i >= 0; i--) {
+			int lineStart = (i == 0) ? 0 : lineBreaks[i - 1] + 1;
+			int lineEnd = lineBreaks[i] + 1; // include '\n'
+			int lineLength = lineEnd - lineStart;
 
-            if (totalChars + lineLength > maxChars)
-                break;
+			if (totalChars + lineLength > maxChars)
+				break;
 
-            totalChars += lineLength;
-            startLineIndex = i;
-        }
+			totalChars += lineLength;
+			startLineIndex = i;
+		}
 
-        // Step 3: Slice the original span
-        int startChar = (startLineIndex == 0) ? 0 : lineBreaks[startLineIndex - 1] + 1;
-        return text.Substring(startChar);
-    }
-    static void Help(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+		// Step 3: Slice the original span
+		int startChar = (startLineIndex == 0) ? 0 : lineBreaks[startLineIndex - 1] + 1;
+		return text.Substring(startChar);
+	}
+	static void Help(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		string fileName = parsedArgs.ContainsKey("-v") ? "helpVerbose.txt" : "helpShort.txt";
 		FileAccess fileAccess = FileAccess.Open($"res://Utilities/TextFiles/CommandOutput/{fileName}", FileAccess.ModeFlags.Read);
 		Say(fileAccess.GetAsText());
 	}
 	static void Home(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
-		CurrNode = networkManager.playerNode;
+		CurrNode = NetworkManager.playerNode;
 	}
 	const int MAX_HISTORY_CHAR_SIZE = 65536, RESET_HISTORY_CHAR_SIZE = 16384;
 	static void Edit(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
@@ -318,23 +332,6 @@ public static class TerminalProcessor {
         }
 		Say($"{fileOpened} file(s) opened. See the editor.");
     }
-    static void MkF(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
-		if (positionalArgs.Length == 0) { Say("-r", $"No file name provided."); return; }
-		NodeDirectory parentDirectory;
-		for (int i = 0; i < positionalArgs.Length; i++) {
-			string[] components = positionalArgs[i].Split('/', StringSplitOptions.RemoveEmptyEntries);
-			string fileName = components[^1], parentPath = string.Join('/', components[..^1]);
-
-			parentDirectory = CurrDir.GetDirectory(parentPath);
-			if (parentDirectory == null) { Say("-r", $"Directory not found: {Util.Format(parentPath, StrType.DIR)}"); return; }
-			int result = parentDirectory.AddFile(fileName);
-			switch (result) {
-				case 0: break;
-				case 1: Say($"{Util.Format(positionalArgs[i], StrType.FILE)} already exists. Skipped."); break;
-				default: Say("-r", $"{Util.Format(positionalArgs[i], StrType.FILE)} creation failed. Error code: ${result}"); break;
-			}
-		}
-	}
 	static void Scan(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		string L = " └─── ", M = " ├─── ", T = "      ", E = " │    ";
 		Func<bool[], string> getTreePrefix = arr => string.Concat(arr.Select((b, i) => (i == arr.Length - 1 ? (b ? L : M) : (b ? T : E))));
@@ -387,7 +384,7 @@ public static class TerminalProcessor {
 		if ((showStatus || showUpgradeInfo) && doUpgrade) { Say("-r", "Cannot combine upgrade with status or upgrade info."); return; }
 
 		// Check node's ownership
-		if (CurrNode.CurrentOwner != networkManager.playerNode) { Say("-r", "You don't own this node's GC miner"); return; }
+		if (CurrNode.CurrentOwner != NetworkManager.playerNode) { Say("-r", "You don't own this node's GC miner"); return; }
 		// Status display
 		if (showStatus || showUpgradeInfo) {
 			int hackLvl = CurrNode.HackFarm.HackLvl, timeLvl = CurrNode.HackFarm.TimeLvl, growLvl = CurrNode.HackFarm.TimeLvl;
@@ -414,7 +411,7 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 			if (!isAuto && !hasLevel) { Say("-r", "You must specify either --auto or --level with --upgrade."); return; }
 			if (isAuto && hasLevel) { Say("-r", "You can not specify both --auto and --level with --upgrade."); return; }
 
-            if (hasLevel) {
+			if (hasLevel) {
 				if (!int.TryParse(parsedArgs.GetValueOrDefault("-l") ?? parsedArgs.GetValueOrDefault("--level"), out level) || level <= 0) { Say("-r", "Invalid level amount."); return; }
 			}
 
@@ -436,8 +433,8 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 		}
 	}
 	static void Stats(Dictionary<string, string> parsedArgs, string[] postionalArgs) {
-		Say($"Username: {PlayerData.Username}");
-		Say($"Balance:  {Util.Format(PlayerData.GC_Amount.ToString(), StrType.MONEY)}");
+		Say($"Username: {PlayerDataManager.Username}");
+		Say($"Balance:  {Util.Format(PlayerDataManager.GC_PublicDisplay.ToString(), StrType.MONEY)}");
 	}
 	static void Clear(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		terminalOutputField.Clear();
@@ -483,20 +480,20 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 	static int Crack(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		NetworkNode node = CurrNode;
 		if (parsedArgs.ContainsKey("--axe") && parsedArgs.ContainsKey("--flare")) {
-            Say("-r", "You can not use --axe and --flare at the same time.");
-            return 4;
-        }
+			Say("-r", "You can not use --axe and --flare at the same time.");
+			return 4;
+		}
 		if (parsedArgs.ContainsKey("--axe")) {
 			if (endEpoch < Time.GetUnixTimeFromSystem()) {
-                Say("-r", "Karaxe already deactivated.");
-                return 6;
-            }
-            endEpoch = Time.GetUnixTimeFromSystem();
+				Say("-r", "Karaxe already deactivated.");
+				return 6;
+			}
+			endEpoch = Time.GetUnixTimeFromSystem();
 			Say($"{Util.Format("Kraken tendrils axed", StrType.FULL_SUCCESS)}. Flare sequence exited. All [color={Util.CC(Cc.Y)}]lok[/color] closed.");
 			return 5;
 		}
-        if (parsedArgs.ContainsKey("--flare")) {
-            if (Time.GetUnixTimeFromSystem() < endEpoch) {
+		if (parsedArgs.ContainsKey("--flare")) {
+			if (Time.GetUnixTimeFromSystem() < endEpoch) {
 				Say("Karaxe already in effect.");
 				return 1;
 			}
@@ -512,8 +509,8 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 
 		int result = node.AttempCrackNode(parsedArgs, endEpoch);
 		if (result == 0) { 
-			node.TransferOwnership(networkManager.playerNode);
-			PlayerData.AddHackFarm(node.HackFarm);
+			node.TransferOwnership(NetworkManager.playerNode);
+			NetworkManager.AddHackFarm(node.HackFarm);
 		}
 		return 0;
 	}
@@ -522,7 +519,7 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 	}
 	static void Connect(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		if (positionalArgs.Length == 0) { Say("-r", $"No hostname provided."); return; }
-		if (networkManager.DNS.TryGetValue(positionalArgs[0], out NetworkNode value)) { CurrNode = value; return; }
+		if (NetworkManager.QueryDNS(positionalArgs[0]) != null) { CurrNode = NetworkManager.QueryDNS(positionalArgs[0]); return; }
 		if (CurrNode.ParentNode != null && CurrNode.ParentNode.HostName == positionalArgs[0] ||
 			(CurrNode.ParentNode is HoneypotNode && (CurrNode.ParentNode as HoneypotNode).fakeHostName == positionalArgs[0])) { CurrNode = CurrNode.ParentNode; return; }
 
@@ -555,7 +552,7 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 ");
 
 		// Honeypot node don't dare to impersonate actual organization or corporation.
-		if (analyzeNode.CurrentOwner != networkManager.playerNode || analyzeNode.GetType() == typeof(HoneypotNode)) {
+		if (analyzeNode.CurrentOwner != NetworkManager.playerNode || analyzeNode.GetType() == typeof(HoneypotNode)) {
 			Say($"Crack this node security system to get further access.");
 			return;
 		}
@@ -591,12 +588,12 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 		}
 	}
 	static void SetUsername(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
-        if (positionalArgs.Length == 0) { Say("-r", $"No username provided."); return; }
-        if (positionalArgs[0].Length > 20) { Say("-r", $"Username too long. Max length is 20 characters."); return; }
-        PlayerData.Username = positionalArgs[0];
-        SetCommandPrompt();
-    }
-    static (Dictionary<string, string>, string[]) ParseArgs(string[] args) {
+		if (positionalArgs.Length == 0) { Say("-r", $"No username provided."); return; }
+		if (positionalArgs[0].Length > 20) { Say("-r", $"Username too long. Max length is 20 characters."); return; }
+		PlayerDataManager.Username = positionalArgs[0];
+		SetCommandPrompt();
+	}
+	static (Dictionary<string, string>, string[]) ParseArgs(string[] args) {
 		Dictionary<string, string> parsedArgs = [];
 		List<string> positionalArgs = [];
 		for (int i = 0; i < args.Length; ++i) {
@@ -616,8 +613,8 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 		}
 		return (parsedArgs, positionalArgs.ToArray());
 	}
-	static void SetCommandPrompt() { 
-        terminalCommandPrompt.Text = $"{Util.Format(PlayerData.Username, StrType.USERNAME)}@{Util.Format(CurrNode.HostName, StrType.HOSTNAME)}:{Util.Format(CurrDir.GetPath(), StrType.DIR)}>";
+	static void SetCommandPrompt() {
+		terminalCommandPrompt.Text = $"{Util.Format(PlayerDataManager.Username, StrType.USERNAME)}@{Util.Format(CurrNode.HostName, StrType.HOSTNAME)}:{Util.Format(CurrDir.GetPath(), StrType.DIR)}>";
 	}
 	static string EscapeBBCode(string code) { return code.Replace("[", "[lb]"); }
 	public static void OnCommandFieldTextChanged() {
@@ -664,15 +661,15 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 	}
 	public static void OnCrackDurationTimerTimeout() {
 		Say($"{Util.Format("Flare sequence timeout", StrType.ERROR)}. All [color={Util.CC(Cc.Y)}]lok[/color] closed.");
-    }
+	}
 }
 public struct NodeAnalysis {
-    public string IP { get; init; }
-    public string HostName { get; init; }
-    public string DisplayName { get; init; }
-    public int DefLvl { get; init; }
-    public int SecLvl { get; init; }
-    public int RetLvl { get; init; }
-    public SecurityType SecType { get; init; }
-    public NetworkNodeType NodeType { get; init; }
+	public string IP { get; init; }
+	public string HostName { get; init; }
+	public string DisplayName { get; init; }
+	public int DefLvl { get; init; }
+	public int SecLvl { get; init; }
+	public int RetLvl { get; init; }
+	public SecurityType SecType { get; init; }
+	public NetworkNodeType NodeType { get; init; }
 }

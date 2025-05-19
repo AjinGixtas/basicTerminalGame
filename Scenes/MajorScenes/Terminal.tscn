@@ -1,14 +1,13 @@
-[gd_scene load_steps=7 format=3 uid="uid://ywm7rhxebeh4"]
+[gd_scene load_steps=6 format=3 uid="uid://ywm7rhxebeh4"]
 
 [ext_resource type="Script" uid="uid://mb8mpa63ad2n" path="res://Scripts/CS/Terminal/Terminal.cs" id="1_q6j3v"]
 [ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="2_tjxev"]
 [ext_resource type="CodeHighlighter" uid="uid://dfl78raux0p25" path="res://Utilities/Styling/CommandFieldHighlighter.tres" id="3_c8ipk"]
-[ext_resource type="Script" uid="uid://de88ixhijljw" path="res://Scripts/CS/Network/NetworkManager.cs" id="4_c8ipk"]
 [ext_resource type="Theme" uid="uid://befi50wkxv0ub" path="res://Utilities/Themes/TerminalSidebar.tres" id="4_oclfs"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_c8ipk"]
 
-[node name="Terminal" type="MarginContainer" node_paths=PackedStringArray("terminalOutputField", "terminalCommandPrompt", "terminalCommandField", "networkManager", "processTimer", "updateProcessGraphicTimer", "crackDurationTimer")]
+[node name="Terminal" type="MarginContainer" node_paths=PackedStringArray("terminalOutputField", "terminalCommandPrompt", "terminalCommandField", "processTimer", "updateProcessGraphicTimer", "crackDurationTimer")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -21,13 +20,9 @@ script = ExtResource("1_q6j3v")
 terminalOutputField = NodePath("TerminalSplitPart/TerminalZone/TerminalOutputArea")
 terminalCommandPrompt = NodePath("TerminalSplitPart/TerminalZone/TerminalCommandLine/CommandPrompt")
 terminalCommandField = NodePath("TerminalSplitPart/TerminalZone/TerminalCommandLine/CommandField")
-networkManager = NodePath("NetworkManager")
 processTimer = NodePath("TimersContainer/ProcessTimer")
 updateProcessGraphicTimer = NodePath("TimersContainer/UpdateProcessGraphicTimer")
 crackDurationTimer = NodePath("TimersContainer/CrackDurationTimer")
-
-[node name="NetworkManager" type="Node" parent="."]
-script = ExtResource("4_c8ipk")
 
 [node name="TerminalSplitPart" type="HSplitContainer" parent="."]
 layout_mode = 2
@@ -101,17 +96,17 @@ theme = ExtResource("2_tjxev")
 bbcode_enabled = true
 text = "[color=cyan]
 ___     /`>     ___
- \\\\\\\\◢█◤;  ;◥█◣///
-   \\╲◥=----=◤╱/
+ \\\\\\\\◢█◤;  ;◥█◣/// 
+   \\╲◥=----=◤╱/    
 
 
-// /\\\\      |/ ||\\
+// /\\\\      |/ ||\\ 
 || | =██◣▼▴▼◢█ || |
 || |  {--▾-▾-} || |
 
 
-  === __/| /|__ ──  
-==    \\◥ \"▴' ◤/==
+  === __/| /|__ ── 
+==    \\◥ \"▴' ◤/==  
   ─=─  \\ ═╵═ /=─  =
 
 

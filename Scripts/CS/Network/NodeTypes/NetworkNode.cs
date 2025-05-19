@@ -44,17 +44,20 @@ public abstract class NetworkNode {
     public int RetLvl {
         get => _retLvl;
     }
+    
     public NetworkNode(string hostName, string displayName, string IP, NetworkNodeType NodeType, NetworkNode parentNode) {
         HostName = hostName; DisplayName = displayName; this.IP = IP; this.NodeType = NodeType;
         CurrentOwner = this; ParentNode = parentNode; ChildNode = [];
         LockSystem = new();
     }
+    
     public virtual void Init(int SecLvl, int DefLvl, HackFarm HackFarm) {
         this.DefLvl = DefLvl; this.SecLvl = SecLvl; this.HackFarm = HackFarm;
     }
     public virtual (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {
         return (0, 0);
     }
+    
     public int GetDepth() {
         int output = 0;
         NetworkNode curNode = this;
@@ -94,6 +97,7 @@ public abstract class NetworkNode {
         node.Init(secLvl, defLvl, hackFarm);
         return node;
     }
+    
     NetworkNode _currentOwner = null;
     public NetworkNode CurrentOwner {
         get => _currentOwner;

@@ -8,7 +8,8 @@ public enum NetworkNodeType {
     FACTION =  4, //Money+Alliance
     HONEYPOT = 5, //Lore
     MINER =    6, //Money+Contestable
-    ROUGE =    7  //Money+Retaliation+Constestor
+    ROUGE =    7, //Money+Retaliation+Constestor
+    DRIFT = 8,    //One-time-hack
 }
 // NOSEC = [0, 1)
 // LOSEC = [1, 3)

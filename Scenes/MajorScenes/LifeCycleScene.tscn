@@ -1,8 +1,0 @@
-[gd_scene load_steps=3 format=3 uid="uid://rsj4u5eq3lmh"]
-
-[ext_resource type="Script" uid="uid://cu1u1d55xy2um" path="res://Scripts/CS/Directors/LifeCycleDirector.cs" id="1_t5xwl"]
-[ext_resource type="PackedScene" uid="uid://ccwqfx7w5pm3k" path="res://Scenes/MajorScenes/GameScene.tscn" id="2_10tej"]
-
-[node name="LifeCycleDirector" type="Node"]
-script = ExtResource("1_t5xwl")
-gameScene = ExtResource("2_10tej")

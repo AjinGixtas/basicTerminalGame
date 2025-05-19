@@ -173,7 +173,22 @@ public static class TerminalProcessor {
 		return true;
 	}
 
-
+	static void RmF(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+		if (positionalArgs.Length == 0) { Say("-r", $"No file name provided."); return; }
+		NodeDirectory parentDirectory;
+		for (int i = 0; i < positionalArgs.Length; i++) {
+			string[] components = positionalArgs[i].Split('/', StringSplitOptions.RemoveEmptyEntries);
+			string fileName = components[^1], parentPath = string.Join('/', components[..^1]);
+			parentDirectory = CurrDir.GetDirectory(parentPath);
+			if (parentDirectory == null) { Say("-r", $"File not found: {parentPath}"); return; }
+			int result = parentDirectory.RemoveFile(positionalArgs[i]);
+			switch (result) {
+				case 0: break;
+				case 1: Say($"{positionalArgs[i]} was not found."); break;
+				default: Say("-r", $"{Util.Format(positionalArgs[i], StrType.FILE)} removal failed. Error code: {result}"); break;
+			}
+		}
+	}
 	static void LS(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		NodeDirectory targetDir = CurrDir;
 		if (positionalArgs.Length != 0) {
@@ -194,40 +209,7 @@ public static class TerminalProcessor {
 		if (targetDir == null) { Say("-r", $"Directory not found: {Util.Format(positionalArgs[0], StrType.DIR)}"); return; }
 		CurrDir = targetDir;
 	}
-    static void MkF(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
-        if (positionalArgs.Length == 0) { Say("-r", $"No file name provided."); return; }
-        NodeDirectory parentDirectory;
-        for (int i = 0; i < positionalArgs.Length; i++) {
-            string[] components = positionalArgs[i].Split('/', StringSplitOptions.RemoveEmptyEntries);
-            string fileName = components[^1], parentPath = string.Join('/', components[..^1]);
-
-            parentDirectory = CurrDir.GetDirectory(parentPath);
-            if (parentDirectory == null) { Say("-r", $"Directory not found: {Util.Format(parentPath, StrType.DIR)}"); return; }
-            int result = parentDirectory.AddFile(fileName);
-            switch (result) {
-                case 0: break;
-                case 1: Say($"{Util.Format(positionalArgs[i], StrType.FILE)} already exists. Skipped."); break;
-                default: Say("-r", $"{Util.Format(positionalArgs[i], StrType.FILE)} creation failed. Error code: ${result}"); break;
-            }
-        }
-    }
-    static void RmF(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
-        if (positionalArgs.Length == 0) { Say("-r", $"No file name provided."); return; }
-        NodeDirectory parentDirectory;
-        for (int i = 0; i < positionalArgs.Length; i++) {
-            string[] components = positionalArgs[i].Split('/', StringSplitOptions.RemoveEmptyEntries);
-            string fileName = components[^1], parentPath = string.Join('/', components[..^1]);
-            parentDirectory = CurrDir.GetDirectory(parentPath);
-            if (parentDirectory == null) { Say("-r", $"File not found: {parentPath}"); return; }
-            int result = parentDirectory.RemoveFile(positionalArgs[i]);
-            switch (result) {
-                case 0: break;
-                case 1: Say($"{positionalArgs[i]} was not found."); break;
-                default: Say("-r", $"{Util.Format(positionalArgs[i], StrType.FILE)} removal failed. Error code: {result}"); break;
-            }
-        }
-    }
-    static void Pwd(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+	static void Pwd(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		Say($"{Util.Format(CurrDir.GetPath(), StrType.DIR)}");
 	}
 	// It gets 2 since this one is REALLY close to standard, but since it's also called independently a lot, allow for seperate shorthand flag is way better.
@@ -240,7 +222,7 @@ public static class TerminalProcessor {
 		}
 		string text = string.Join(" ", positionalArgs);
 		if (parsedArgs.ContainsKey("-e")) text = Regex.Unescape(text); // handles \n, \t, etc.
-		if (!parsedArgs.ContainsKey("-b")) text = EscapeBBCode(text);
+		if (parsedArgs.ContainsKey("-b")) text = EscapeBBCode(text);
         if (parsedArgs.ContainsKey("-t")) text = text.TrimEnd('\n', '\r');
 		if (parsedArgs.ContainsKey("-l")) text = text.TrimStart('\n', '\r');
         if (!parsedArgs.ContainsKey("-n")) text += "\n";
@@ -276,7 +258,7 @@ public static class TerminalProcessor {
 
 		string text = string.Join(" ", args[argStart..]);
 		if (interpretEscapes) text = Regex.Unescape(text); // handles \n, \t, etc.
-		if (!escapeBBcode) text = EscapeBBCode(text);
+		if (escapeBBcode) text = EscapeBBCode(text);
 		if (trimLeadingNewline) text = text.TrimStart('\n', '\r');
 		if (trimTrailingNewline) text = text.TrimEnd('\n', '\r');
 		if (!noNewline) text += "\n";
@@ -336,6 +318,23 @@ public static class TerminalProcessor {
         }
 		Say($"{fileOpened} file(s) opened. See the editor.");
     }
+    static void MkF(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+		if (positionalArgs.Length == 0) { Say("-r", $"No file name provided."); return; }
+		NodeDirectory parentDirectory;
+		for (int i = 0; i < positionalArgs.Length; i++) {
+			string[] components = positionalArgs[i].Split('/', StringSplitOptions.RemoveEmptyEntries);
+			string fileName = components[^1], parentPath = string.Join('/', components[..^1]);
+
+			parentDirectory = CurrDir.GetDirectory(parentPath);
+			if (parentDirectory == null) { Say("-r", $"Directory not found: {Util.Format(parentPath, StrType.DIR)}"); return; }
+			int result = parentDirectory.AddFile(fileName);
+			switch (result) {
+				case 0: break;
+				case 1: Say($"{Util.Format(positionalArgs[i], StrType.FILE)} already exists. Skipped."); break;
+				default: Say("-r", $"{Util.Format(positionalArgs[i], StrType.FILE)} creation failed. Error code: ${result}"); break;
+			}
+		}
+	}
 	static void Scan(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		string L = " └─── ", M = " ├─── ", T = "      ", E = " │    ";
 		Func<bool[], string> getTreePrefix = arr => string.Concat(arr.Select((b, i) => (i == arr.Length - 1 ? (b ? L : M) : (b ? T : E))));

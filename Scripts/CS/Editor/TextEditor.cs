@@ -20,7 +20,7 @@ Run {Util.Format("edit FILENAME", StrType.CMD)} to open that file here.";
 		tabContainer.AddChild(newTab, true);
 		newTab.Begin(nodeFile, this);
 		if (tabContainer.CurrentTab == 0) tabContainer.CurrentTab = 1;
-    }
+	}
 	public void SaveFile() {
 		if (tabBar.CurrentTab == -1) return; // No tab is selected
 		EditorTab tab = tabContainer.GetChild<EditorTab>(tabContainer.CurrentTab);
@@ -36,7 +36,7 @@ Run {Util.Format("edit FILENAME", StrType.CMD)} to open that file here.";
 			tabBar.CurrentTab = tabBar.TabCount - 1; 
 			tabContainer.CurrentTab = tabContainer.GetTabCount()  - 1;
 		}
-    }
+	}
 	public void ConfirmedClosing() {
 		CloseTab(true);
 	}

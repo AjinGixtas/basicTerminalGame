@@ -56,7 +56,7 @@ public partial class LifeCycleDirector : Node
         string userSaveFilePath = ProjectSettings.LocalizePath(saveFilePath);
 
         PlayerData.SavePlayerData(userSaveFilePath);
-        FileSystemSerializer.ExportToDisk(TerminalProcessor.NetworkManager.playerNode.nodeDirectory, Path.Combine(newSaveFolderPath, "FileSys")); // Export the virtual file system to disk
+        FileSystemSerializer.ExportToDisk(PlayerData.fileSystem, Path.Combine(newSaveFolderPath, "FileSys")); // Export the virtual file system to disk
         GD.Print($"Quick saved to {userSaveFilePath}");
     }
     static void QuickLoad(LifeCycleDirector lifeCycleDirector) {
@@ -83,8 +83,8 @@ public partial class LifeCycleDirector : Node
         lifeCycleDirector.RemakeScene();
         // Load instance data
         if (Directory.Exists(fileSystemPath)) {
-            TerminalProcessor.NetworkManager.playerNode.nodeDirectory = FileSystemSerializer.ImportFromDisk(fileSystemPath);
-            TerminalProcessor.CurrDir = TerminalProcessor.NetworkManager.playerNode.nodeDirectory;
+            PlayerData.fileSystem = FileSystemSerializer.ImportFromDisk(fileSystemPath);
+            TerminalProcessor.CurrDir = PlayerData.fileSystem;
             GD.Print(string.Join(" ", TerminalProcessor.CurrDir.Childrens.Select(x => x.Name)));
             GD.Print("Virtual file system restored.");
         } else {

@@ -45,7 +45,7 @@ public static class TerminalProcessor {
 
 		// Initialize the current node and directory
         TerminalProcessor._currNode = networkManager.playerNode;
-        TerminalProcessor._currDir = networkManager.playerNode.nodeDirectory;
+        TerminalProcessor._currDir = PlayerData.fileSystem;
 
         // Set the username and command prompt
 		terminalCommandField.GrabFocus();

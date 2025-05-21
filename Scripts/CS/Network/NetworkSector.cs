@@ -23,7 +23,7 @@ public class NetworkSector {
     public List<NetworkNode> GetSurfaceNodes() { return [.. SurfaceNodes]; }
     void GenerateBusNetwork() {
         if (_isIntialized) return;
-        int layer = GD.RandRange(2, 3), node = 3;
+        int layer = 3, node = 3;
         string nodeName = GenNodeName();
         DriftNode chainNode = NetworkNode.MakeNode(NodeType.DRIFT, nodeName, nodeName, 0, 0, null) as DriftNode;
         AddSurfaceNode(chainNode);
@@ -41,7 +41,7 @@ public class NetworkSector {
     }
     void GenerateStarNetwork() {
         if (_isIntialized) return;
-        int node = GD.RandRange(5, 10);
+        int node = 5;
         for (int i = 0; i < node; ++i) {
             string nodeName = GenNodeName();
             AddSurfaceNode(NetworkNode.MakeNode(NodeType.DRIFT, nodeName, nodeName, 0, 0, null));
@@ -49,9 +49,9 @@ public class NetworkSector {
     }
     void GenerateVineNetwork() {
         if (_isIntialized) return;
-        int vine = GD.RandRange(3, 5);
+        int vine = 2, node = 3;
         for(int i = 0; i < vine; ++i) {
-            int node = GD.RandRange(3, 5); string nodeName = GenNodeName();
+            string nodeName = GenNodeName();
             DriftNode chainNode = NetworkNode.MakeNode(NodeType.DRIFT, nodeName, nodeName, 0, 0, null) as DriftNode;
             AddSurfaceNode(chainNode);
             for (int j = 0; j < node; ++j) {

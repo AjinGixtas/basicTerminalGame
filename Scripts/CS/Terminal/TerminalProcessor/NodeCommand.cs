@@ -137,7 +137,7 @@ Grow +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(gr
         }
     }
     static double startEpoch = 0, endEpoch = 0, remainingTime = 0;
-    const double FLARE_TIME = 60.0;
+    const double FLARE_TIME = 120.0;
     static int Crack(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         NetworkNode node = CurrNode;
         if (parsedArgs.ContainsKey("--axe") && parsedArgs.ContainsKey("--flare")) {

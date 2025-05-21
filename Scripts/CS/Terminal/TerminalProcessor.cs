@@ -59,11 +59,12 @@ public static class TerminalProcessor {
 	}
 	public static void HandleInput(double dela) {
 		if (terminalCommandField.HasFocus()) {
-			if (Input.GetAxis("moveDownHistory", "moveUpHistory") != 0) CommandHistoryIndex += (int)Input.GetAxis("moveDownHistory", "moveUpHistory");
+			if (Input.IsActionJustPressed("moveDownHistory")) CommandHistoryIndex += 1;
+			if (Input.IsActionJustPressed("moveUpHistory")) CommandHistoryIndex -= 1;
 			if (Input.IsActionJustPressed("submitCommand")) {
 				if (terminalCommandField.Text.Length == 0) { return; }
 				terminalCommandField.Text = terminalCommandField.Text.Replace("\r", " ").Replace("\n", " ");
-				if(SubmitCommand(terminalCommandField.Text)) terminalCommandField.Text = "";
+				if(SubmitCommand(terminalCommandField.Text) == 0) terminalCommandField.Text = "";
 			}
 		}
 	}
@@ -94,20 +95,20 @@ public static class TerminalProcessor {
 	}
 
 	const int MAX_HISTORY_CMD_SIZE = 64;
-	static bool SubmitCommand(string newCommand) {
-		if (IsProcessing) return false;
+	static int SubmitCommand(string newCommand) {
+		if (IsProcessing) return 1;
 		if (commandHistory.Count == 0 || (commandHistory.Count > 0 && commandHistory[^1] != newCommand)) {
 			commandHistory.Add(newCommand);
 			while (commandHistory.Count > MAX_HISTORY_CMD_SIZE) { commandHistory.RemoveAt(0); }
-			CommandHistoryIndex = commandHistory.Count;
+			_commandHistoryIndex = commandHistory.Count;
 		}
 		string[] commands = StringExtensions.Split(newCommand, ";", false);
-		Say("-n", $"{terminalCommandPrompt.Text.Replace("\r", "").Replace("\n", "")}{Util.Format(Util.EscapeBBCode(newCommand), StrType.CMD)}");
+		Say("-n", $"{terminalCommandPrompt.Text.Replace("\r", "").Replace("\n", "")}{Util.Format(Util.EscapeBBCode(newCommand), StrType.CMD_FUL)}");
 		queuedAction = ExecuteCommands;
 		queuedCommands = commands;
 		//StartProcess(Math.Max(.5 + GD.Randf() * .1, .05 * newCommand.Length));
 		StartProcess(1);
-		return true;
+		return 0;
 		static void ExecuteCommands(string[] commands) {
 			for (int i = 0; i < commands.Length; i++) {
 				string[] components = Tokenize(commands[i]);
@@ -366,65 +367,103 @@ public static class TerminalProcessor {
 		Say("-n", output);
 	}
 	static void Farm(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+		foreach(KeyValuePair<string, string> pair in parsedArgs) {
+			GD.Print(pair.Key, ' ', parsedArgs[pair.Key]);
+        }
 		bool showStatus = parsedArgs.ContainsKey("-s") || parsedArgs.ContainsKey("--status");
-		bool showUpgradeInfo = parsedArgs.ContainsKey("--upgrad3info");
 
 		bool doUpgrade = parsedArgs.ContainsKey("-u") || parsedArgs.ContainsKey("--upgrade");
 		bool hasLevel = parsedArgs.ContainsKey("-l") || parsedArgs.ContainsKey("--level");
-		bool isAuto = parsedArgs.ContainsKey("-a") || parsedArgs.ContainsKey("--auto");
 
 		// Disallow mixing upgrade with status/info
-		if ((showStatus || showUpgradeInfo) && doUpgrade) { Say("-r", "Cannot combine upgrade with status or upgrade info."); return; }
+		if (showStatus && doUpgrade) { Say("-r", "Can not show status of a node and changing it at the same time."); return; }
 
 		// Check node's ownership
 		if (CurrNode.CurrentOwner != NetworkManager.playerNode) { Say("-r", "You don't own this node's GC miner"); return; }
 		// Status display
-		if (showStatus || showUpgradeInfo) {
+		if (showStatus) {
 			int hackLvl = CurrNode.HackFarm.HackLvl, timeLvl = CurrNode.HackFarm.TimeLvl, growLvl = CurrNode.HackFarm.TimeLvl;
-Say(@$"[ GC Farm Status for {CurrNode.DisplayName} ]
+			Say(@$"[ GC Farm Status for {CurrNode.DisplayName} ]
 Current GC in node: {Util.Format($"{CurrNode.HackFarm.CurrencyPile}", StrType.MONEY)}
-Hack  : Lv.{hackLvl} → {Util.Format(Util.Format($"{CurrNode.HackFarm.CurHack}", StrType.MONEY), StrType.UNIT, "/transfer")}
-Time  : Lv.{timeLvl} → {            Util.Format($"{CurrNode.HackFarm.CurTime}", StrType.UNIT, "s/tranfer")}
-Grow  : Lv.{growLvl} → {Util.Format(Util.Format($"{CurrNode.HackFarm.CurGrow}", StrType.MONEY), StrType.UNIT, "/s")}");
+Hack  : Lv.{Util.Format($"{hackLvl}", StrType.NUMBER)} -> {Util.Format(Util.Format($"{CurrNode.HackFarm.CurHack}", StrType.MONEY), StrType.UNIT, "/transfer")}
+Time  : Lv.{Util.Format($"{timeLvl}", StrType.NUMBER)} -> {Util.Format($"{CurrNode.HackFarm.CurTime}", StrType.UNIT, "s/tranfer")}
+Grow  : Lv.{Util.Format($"{growLvl}", StrType.NUMBER)} -> {Util.Format(Util.Format($"{CurrNode.HackFarm.CurGrow}", StrType.MONEY), StrType.UNIT, "/s")}");
 
-			if (showUpgradeInfo) {
-				Say(@$"[ Upgrade Info ]
-Hack +1 → {Util.Format($"{Enumerable.Range(hackLvl + 1, Mathf.Min(hackLvl + 2, 255) - hackLvl + 1).Sum(i => CurrNode.HackFarm.GetHackCost(i))}", StrType.MONEY)} | +10 → {Util.Format($"{Enumerable.Range(hackLvl + 1, Mathf.Min(hackLvl + 11, 255) - hackLvl + 1).Sum(i => CurrNode.HackFarm.GetHackCost(i))}", StrType.MONEY)}
-Time +1 → {Util.Format($"{Enumerable.Range(timeLvl + 1, Mathf.Min(hackLvl + 2, 255) - timeLvl + 1).Sum(i => CurrNode.HackFarm.GetTimeCost(i))}", StrType.MONEY)} | +10 → {Util.Format($"{Enumerable.Range(timeLvl + 1, Mathf.Min(timeLvl + 11, 255) - timeLvl + 1).Sum(i => CurrNode.HackFarm.GetTimeCost(i))}", StrType.MONEY)}
-Grow +1 → {Util.Format($"{Enumerable.Range(growLvl + 1, Mathf.Min(hackLvl + 2, 255) - growLvl + 1).Sum(i => CurrNode.HackFarm.GetGrowCost(i))}", StrType.MONEY)} | +10 → {Util.Format($"{Enumerable.Range(growLvl + 1, Mathf.Min(growLvl + 11, 255) - growLvl + 1).Sum(i => CurrNode.HackFarm.GetGrowCost(i))}", StrType.MONEY)}");
-			}
+			Say(@$"[ Upgrade Info ]
+Hack +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(hackLvl+1, 1).Sum(i => CurrNode.HackFarm.GetHackCost(i))}", StrType.MONEY)
+} | +{Util.Format($"10", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(hackLvl+1, 10).Sum(i => CurrNode.HackFarm.GetHackCost(i))}", StrType.MONEY)}
+Time +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(timeLvl+1, 1).Sum(i => CurrNode.HackFarm.GetTimeCost(i))}", StrType.MONEY)
+} | +{Util.Format($"10", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(timeLvl+1, 10).Sum(i => CurrNode.HackFarm.GetTimeCost(i))}", StrType.MONEY)}
+Grow +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(growLvl+1, 1).Sum(i => CurrNode.HackFarm.GetGrowCost(i))}", StrType.MONEY)
+} | +{Util.Format($"10", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(growLvl+1, 10).Sum(i => CurrNode.HackFarm.GetGrowCost(i))}", StrType.MONEY)}");
 			return;
 		}
-
 		// Upgrade path
 		if (doUpgrade) {
 			string upgradeType = parsedArgs.GetValueOrDefault("-u") ?? parsedArgs.GetValueOrDefault("--upgrade") ?? "";
 			int level = 1;
-
-			if (!isAuto && !hasLevel) { Say("-r", "You must specify either --auto or --level with --upgrade."); return; }
-			if (isAuto && hasLevel) { Say("-r", "You can not specify both --auto and --level with --upgrade."); return; }
-
-			if (hasLevel) {
-				if (!int.TryParse(parsedArgs.GetValueOrDefault("-l") ?? parsedArgs.GetValueOrDefault("--level"), out level) || level <= 0) { Say("-r", "Invalid level amount."); return; }
+			if (!new[] { "hack", "time", "grow" }.Contains(upgradeType)) {
+                Say("-r", $"Invalid upgrade type. Use: {
+					Util.Format("hack", StrType.CMD_ARG)}, {
+					Util.Format("time", StrType.CMD_ARG)}, or {
+					Util.Format("grow", StrType.CMD_ARG)}"); 
+				return;
+            }
+            if (!hasLevel) { Say("-r", $"Missing {Util.Format("--level", StrType.CMD_FLAG)}"); return; }
+			else {
+				if (!int.TryParse(parsedArgs.GetValueOrDefault("-l") ??
+					parsedArgs.GetValueOrDefault("--level"), out level) || level <= 0) { Say("-r", "Invalid level amount."); return; }
 			}
 
 			switch (upgradeType.ToLower()) {
-				case "hack":
-
-					break;
-				case "time":
-					break;
-				case "grow":
-					break;
+				case "hack":{
+						for(int i = 0; i < level; i++) {
+                            int result = CurrNode.HackFarm.UpgradeHackLevel();
+                            switch (result) {
+                                case 0: break;
+                                case 1: Say("-r", $"Upgrade cost invalid. Please report this bug!!!"); return;
+                                case 2: Say("-r", $"Not enough money."); return;
+                                case 3: Say($"{Util.Format("Max level reached.", StrType.FULL_SUCCESS)}"); return;
+                                default: Say("-r", $"Unknown error encountered. Error code: {result}"); return;
+                            }
+                        }
+                        break;
+					}
+				case "time": {
+						for (int i = 0; i < level; i++) {
+                            int result = CurrNode.HackFarm.UpgradeTimeLevel();
+                            switch (result) {
+                                case 0: break;
+                                case 1: Say("-r", $"Upgrade cost invalid. Please report this bug!!!"); return;
+                                case 2: Say("-r", $"Not enough money."); return;
+                                case 3: Say($"{Util.Format("Max level reached.", StrType.FULL_SUCCESS)}"); return;
+                                default: Say("-r", $"Unknown error encountered. Error code: {result}"); return;
+                            }
+                        }
+                        break;
+					}
+				case "grow": {
+						for (int i = 0; i < level; i++) {
+							int result = CurrNode.HackFarm.UpgradeTimeLevel();
+							switch (result) {
+                                case 0: break;
+                                case 1: Say("-r", $"Upgrade cost invalid. Please report this bug!!!"); return;
+                                case 2: Say("-r", $"Not enough money."); return;
+                                case 3: Say($"{Util.Format("Max level reached.", StrType.FULL_SUCCESS)}"); return;
+                                default: Say("-r", $"Unknown error encountered. Error code: {result}"); return;
+                            }
+                        }
+						break;
+					}
 				default:
-					Say("Unknown upgrade type. Use: hack, time, or grow.");
+					Say($"Unknown upgrade type. Use: {Util.Format("hack", StrType.CMD_ARG)}, {Util.Format("time", StrType.CMD_ARG)}, or {Util.Format("hack", StrType.CMD_ARG)}");
 					return;
 			}
 			Say("Upgrade complete.");
 		} else {
-			Say("No action specified. Use --status or --upgrade.");
-		}
-	}
+			Say("-r", $"No action specified. Use either {Util.Format("--status", StrType.CMD_FLAG)} or {Util.Format("--upgrade", StrType.CMD_FLAG)}."); return;
+        }
+    }
 	static void Stats(Dictionary<string, string> parsedArgs, string[] postionalArgs) {
 		Say($"Username: {Util.Format(PlayerDataManager.Username, StrType.USERNAME)}");
 		Say($"Balance:  {Util.Format($"{PlayerDataManager.GC_PublicDisplay}", StrType.MONEY)}");
@@ -496,7 +535,7 @@ Grow +1 → {Util.Format($"{Enumerable.Range(growLvl + 1, Mathf.Min(hackLvl + 2,
 			return 2;
 		}
 		if (Time.GetUnixTimeFromSystem() > endEpoch) {
-			Say($"{Util.Format("Kraken inactive", StrType.ERROR)}. Run {Util.Format("karaxe --flare", StrType.CMD)} to activate.");
+			Say($"{Util.Format("Kraken inactive", StrType.ERROR)}. Run {Util.Format("karaxe --flare", StrType.CMD_FUL)} to activate.");
 			return 3;
 		}
 

@@ -27,28 +27,28 @@ public class LockSystem {
 			for (int j = 0; j < flags.Length; ++j) {
 				if (ans.TryGetValue(flags[j], out string key)) {
 					if (key == "") {
-						TerminalProcessor.Say($"[{Util.Format("N0VALUE", StrType.ERROR)}] Denied access by {Util.Format(activeLocks[i].Name, StrType.CMD_ARG)}");
-						TerminalProcessor.Say("-r", $"Missing key for {Util.Format(flags[j], StrType.CMD_ARG)}");
+						TerminalProcessor.Say($"[{Util.Format("N0VALUE", StrType.ERROR)}] Denied access by {Util.Format(activeLocks[i].Name, StrType.CMD_FLAG)}");
+						TerminalProcessor.Say("-r", $"Missing key for {Util.Format(flags[j], StrType.CMD_FLAG)}");
 						if (activeLocks[i].Clue.Length > 0) { TerminalProcessor.Say($"[color={Util.CC(Cc.rgb)}]{activeLocks[i].Inp}"); }
 						return 2;
 					} else if (!activeLocks[i].UnlockAttempt(key, j)) {
-						TerminalProcessor.Say($"[{Util.Format("WRON6KY", StrType.ERROR)}] Denied access by {Util.Format(activeLocks[i].Name, StrType.CMD_ARG)}");
-						TerminalProcessor.Say("-r", $"Incorrect key for {Util.Format(flags[j], StrType.CMD_ARG)}");
+						TerminalProcessor.Say($"[{Util.Format("WRON6KY", StrType.ERROR)}] Denied access by {Util.Format(activeLocks[i].Name, StrType.CMD_FLAG)}");
+						TerminalProcessor.Say("-r", $"Incorrect key for {Util.Format(flags[j], StrType.CMD_FLAG)}");
 						if (activeLocks[i].Clue.Length > 0) { TerminalProcessor.Say($"[color={Util.CC(Cc.rgb)}]{activeLocks[i].Inp}"); }
 						return 3;
 					}
 					continue;
 				} else {
-					TerminalProcessor.Say($"[{Util.Format("MI55ING", StrType.ERROR)}] Denied access by {Util.Format(activeLocks[i].Name, StrType.CMD_ARG)}");
-					TerminalProcessor.Say("-r", $"Missing flag {Util.Format(flags[j], StrType.CMD_ARG)}");
+					TerminalProcessor.Say($"[{Util.Format("MI55ING", StrType.ERROR)}] Denied access by {Util.Format(activeLocks[i].Name, StrType.CMD_FLAG)}");
+					TerminalProcessor.Say("-r", $"Missing flag {Util.Format(flags[j], StrType.CMD_FLAG)}");
 					return 1;
 				}
 			}
-			TerminalProcessor.Say($"[{Util.Format("SUCCESS", StrType.PART_SUCCESS)}] {Util.Format("Bypassed", StrType.DECOR)} {Util.Format(activeLocks[i].Name, StrType.CMD_ARG)}");
+			TerminalProcessor.Say($"[{Util.Format("SUCCESS", StrType.PART_SUCCESS)}] {Util.Format("Bypassed", StrType.DECOR)} {Util.Format(activeLocks[i].Name, StrType.CMD_FLAG)}");
 		}
 		lockPool = []; activeLocks = []; // Destroy all security system
 		TerminalProcessor.Say($"{Util.Format("Node defense cracked.", StrType.FULL_SUCCESS)} All security system [color={Util.CC(Cc.gR)}]destroyed[/color].");
-		TerminalProcessor.Say($"Run {Util.Format("analyze", StrType.CMD)} for all new information.");
+		TerminalProcessor.Say($"Run {Util.Format("analyze", StrType.CMD_FUL)} for all new information.");
 		return 0;
 	}
 }

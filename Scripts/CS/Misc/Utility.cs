@@ -125,7 +125,7 @@ public static class Util {
                         return $"[color={Util.CC(Cc.G)}]{input}[/color]"; // fallback if no slash or only slash
                     return $"[color={Util.CC(Cc.C)}]{input[..(lastSlash + 1)]}[/color][color={Util.CC(Cc.G)}]{input[(lastSlash + 1)..]}[/color]";
                 }
-            case StrType.CMD: {
+            case StrType.CMD_FUL: {
                 string output = "";
                 string[] commands = input.Split(';');
                 for (int i = 0; i < commands.Length; i++) {
@@ -137,7 +137,9 @@ public static class Util {
                         if (j > 0) { output += ' '; }
                         if (tokens[j].Length == 0) { continue; }
 
-                        if (firstToken) { output += $"[color={Util.CC(Cc.C)}]{tokens[j]}[/color]"; firstToken = false; } else if (tokens[j].StartsWith('-')) { output += $"[color={Util.CC(Cc.gR)}]{tokens[j]}[/color]"; } else { output += $"[color={Util.CC(Cc.rgb)}]{tokens[j]}[/color]"; }
+                        if (firstToken) { output += $"{Util.Format(tokens[j], StrType.CMD_CMD)}"; firstToken = false; } 
+                        else if (tokens[j].StartsWith('-')) { output += $"{Util.Format(tokens[j], StrType.CMD_FLAG)}"; } 
+                        else { output += $"{Util.Format(tokens[j], StrType.CMD_ARG)}"; }
                     }
                 }
                 return output;
@@ -192,8 +194,12 @@ public static class Util {
                 return $"[color={Util.CC(Cc.C)}]{input}[/color]";
             case StrType.FULL_SUCCESS:
                 return $"[color={Util.CC(Cc.G)}]{input}[/color]";
-            case StrType.CMD_ARG:
+            case StrType.CMD_FLAG:
                 return $"[color={Util.CC(Cc.gR)}]{input}[/color]";
+            case StrType.CMD_ARG:
+                return $"[color={Util.CC(Cc.rgb)}]{input}[/color]";
+            case StrType.CMD_CMD:
+                return $"[color={Util.CC(Cc.C)}]{input}[/color]";
             case StrType.UNKNOWN_ERROR:
                 return Util.Format($"Unknown error encountered{(addons.Length != 0 ? $" with {addons[0]}" : "")}. Error code: {input}", StrType.ERROR);
             default:
@@ -230,6 +236,5 @@ public static class Util {
         }
         return art;
     }
-
     public static string EscapeBBCode(string code) { return code.Replace("[", "[lb]"); }
 }

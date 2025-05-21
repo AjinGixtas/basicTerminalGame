@@ -9,8 +9,8 @@ public partial class TextEditor : MarginContainer {
 		InitializeOnReadyVar();
 		noFileOpenedTab.Text =
 @$"No file opened.
-Run {Util.Format("mkf FILENAME", StrType.CMD)} to make a new file.
-Run {Util.Format("edit FILENAME", StrType.CMD)} to open that file here.";
+Run {Util.Format("mkf FILENAME", StrType.CMD_FUL)} to make a new file.
+Run {Util.Format("edit FILENAME", StrType.CMD_FUL)} to open that file here.";
 	}
 	void InitializeOnReadyVar() {
 	}

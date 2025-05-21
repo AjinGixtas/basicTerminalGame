@@ -13,18 +13,21 @@ public class HackFarm {
     int _growLvl = -1; double _curGrow; public double CurGrow { get => _curGrow; set => _curGrow = value; }
     public int HackLvl {
         get => _hackLvl; private set {
+            value = Mathf.Min(value, 255);
             if (_hackLvl == value) return; _hackLvl = value;
             CurHack = GetHackValue(_hackLvl);
         }
     }
     public int TimeLvl {
         get => _timeLvl; private set {
+            value = Mathf.Min(value, 255);
             if (_timeLvl == value) return; _timeLvl = value;
             CurTime = GetTimeValue(_timeLvl);
         }
     }
     public int GrowLvl {
         get => _growLvl; private set {
+            value = Mathf.Min(value, 255);
             if (_growLvl == value) return; _growLvl = value;
             CurGrow = GetGrowValue(_growLvl);
         }
@@ -50,7 +53,7 @@ public class HackFarm {
         if (timeRemain > 0) return 0;
         double totalHackAmount = 0;
         while (timeRemain < 0) {
-            double hackedAmount = Mathf.Max(currencyPile, CurHack);
+            double hackedAmount = Mathf.Min(currencyPile, CurHack);
             currencyPile -= hackedAmount;
             totalHackAmount += hackedAmount;
             timeRemain += CurTime;
@@ -58,13 +61,40 @@ public class HackFarm {
         return totalHackAmount; // Return the amount of money hacked
     }
 
-    public void UpgradeHackLevel() { ++HackLvl; }
-    public void UpgradeTimeLevel() { ++TimeLvl; }
-    public void UpgradeGrowLevel() { ++GrowLvl; }
+    public int UpgradeHackLevel() {
+        int status = PlayerDataManager.WithDraw(GetHackCost(HackLvl+1));
+        if (status != 0) return status;
+        if (HackLvl >= MAX_LVL) return 3; // Already at max level
+        ++HackLvl;
+        return 0;
+    }
+    public int UpgradeTimeLevel() {
+        int status = PlayerDataManager.WithDraw(GetTimeCost(TimeLvl+1));
+        if (status != 0) return status;
+        if (HackLvl >= MAX_LVL) return 3; // Already at max level
+        ++TimeLvl;
+        return 0;
+    }
+    public int UpgradeGrowLevel() {
+        int status = PlayerDataManager.WithDraw(GetGrowCost(GrowLvl));
+        if (status != 0) return status;
+        if (GrowLvl >= MAX_LVL) return 3; // Already at max level
+        ++GrowLvl;
+        return 0;
+    }
     public double GetHackValue(int level) { return BASE_HACK + HackFactor * Mathf.Pow(POWR_HACK, level) + .01; } // Add a hard coded amount to account for floaty error
     public double GetTimeValue(int level) { return BASE_TIME - TimeFactor * Mathf.Log(level) / Mathf.Log(2) + SHIF_TIME * level; }
     public double GetGrowValue(int level) { return BASE_GROW + GrowFactor * Mathf.Pow(level, POWR_GROW) + level * SHIF_GROW; }
-    public double GetHackCost(int level) { return BASE_COST_HACK * Mathf.Pow(1.10, level) + 44 * Mathf.Pow(level, 2.30); }
-    public double GetTimeCost(int level) { return BASE_COST_TIME * Mathf.Pow(1.09, level) + 30 * Mathf.Pow(level, 2.45); }
-    public double GetGrowCost(int level) { return BASE_COST_GROW * Mathf.Pow(1.08, level) + 25 * Mathf.Pow(level, 2.50); }
+    public double GetHackCost(int level) { 
+        if (level > MAX_LVL) return 0;
+        return BASE_COST_HACK * Mathf.Pow(1.10, level) + 44 * Mathf.Pow(level, 2.30);
+    }
+    public double GetTimeCost(int level) { 
+        if (level > MAX_LVL) return 0;
+        return BASE_COST_TIME * Mathf.Pow(1.09, level) + 30 * Mathf.Pow(level, 2.45); 
+    }
+    public double GetGrowCost(int level) {
+        if (level > MAX_LVL) return 0;
+        return BASE_COST_GROW * Mathf.Pow(1.08, level) + 25 * Mathf.Pow(level, 2.50); 
+    }
 }

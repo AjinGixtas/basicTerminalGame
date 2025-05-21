@@ -65,22 +65,19 @@ public class HackFarm {
         int status = PlayerDataManager.WithDraw(GetHackCost(HackLvl+1));
         if (status != 0) return status;
         if (HackLvl >= MAX_LVL) return 3; // Already at max level
-        ++HackLvl;
-        return 0;
+        ++HackLvl; return 0;
     }
     public int UpgradeTimeLevel() {
         int status = PlayerDataManager.WithDraw(GetTimeCost(TimeLvl+1));
         if (status != 0) return status;
         if (HackLvl >= MAX_LVL) return 3; // Already at max level
-        ++TimeLvl;
-        return 0;
+        ++TimeLvl; return 0;
     }
     public int UpgradeGrowLevel() {
         int status = PlayerDataManager.WithDraw(GetGrowCost(GrowLvl));
         if (status != 0) return status;
         if (GrowLvl >= MAX_LVL) return 3; // Already at max level
-        ++GrowLvl;
-        return 0;
+        ++GrowLvl; return 0;
     }
     public double GetHackValue(int level) { return BASE_HACK + HackFactor * Mathf.Pow(POWR_HACK, level) + .01; } // Add a hard coded amount to account for floaty error
     public double GetTimeValue(int level) { return BASE_TIME - TimeFactor * Mathf.Log(level) / Mathf.Log(2) + SHIF_TIME * level; }

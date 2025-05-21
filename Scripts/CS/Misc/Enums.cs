@@ -59,8 +59,9 @@ public enum StrType {
     MONEY = 15,
     USERNAME = 16,
     WARNING = 17,
-    PARTIAL_SUCCESS = 18,
+    PART_SUCCESS = 18,
     FULL_SUCCESS = 19,
     CMD_ARG = 20,
     UNKNOWN_ERROR = 21,
+    SEC_TYPE = 22,
 }

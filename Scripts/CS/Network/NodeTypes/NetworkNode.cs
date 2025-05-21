@@ -1,6 +1,5 @@
 using Godot;
 using System.Collections.Generic;
-using System;
 
 public abstract class NetworkNode {
     public string HostName { get; protected set; }
@@ -19,7 +18,7 @@ public abstract class NetworkNode {
     public int SecLvl {
         get => _secLvl;
         protected set {
-            value = Math.Clamp(value, 0, _defLvl);
+            value = Mathf.Clamp(value, 0, _defLvl);
             if (_secLvl == value) return;
             _secLvl = value;
             LockSystem.LockIntialization(_secLvl);
@@ -36,7 +35,7 @@ public abstract class NetworkNode {
     public int DefLvl {
         get => _defLvl;
         protected set {
-            value = Math.Clamp(value, 0, 10);
+            value = Mathf.Clamp(value, 0, 10);
             SecLvl += value - _defLvl;
             _defLvl = value;
         }
@@ -82,7 +81,7 @@ public abstract class NetworkNode {
     public static NetworkNode GenerateProceduralNode(NetworkNodeType nodeType, string hostName, string displayName, double indexRatio, double depthRatio, NetworkNode parentNode) {
         string IP = $"{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}";
         NetworkNode node = nodeType switch {
-            NetworkNodeType.PLAYER => throw new Exception("WHY ARE YOU GENERATING THE PLAYER NODE AGAIN?!!?!"),
+            NetworkNodeType.PLAYER => throw new System.Exception("Can't remake player node"),
             NetworkNodeType.PERSON => new PersonNode(hostName, displayName, IP, parentNode),
             NetworkNodeType.BUSINESS => new BusinessNode(hostName, displayName, IP, parentNode),
             NetworkNodeType.CORP => new CorpNode(hostName, displayName, IP, parentNode),
@@ -90,7 +89,8 @@ public abstract class NetworkNode {
             NetworkNodeType.HONEYPOT => new HoneypotNode(hostName, displayName, IP, parentNode),
             NetworkNodeType.MINER => new MinerNode(hostName, displayName, IP, parentNode),
             NetworkNodeType.ROUGE => new RougeNode(hostName, displayName, IP, parentNode),
-            _ => throw new Exception("Unknown node value")
+            NetworkNodeType.DRIFT => new DriftNode(hostName, displayName, IP, parentNode),
+            _ => throw new System.Exception("Invalid node type")
         };
         (int secLvl, int defLvl) = node.GenerateSecAndDef(indexRatio, depthRatio);
         HackFarm hackFarm = new(indexRatio, depthRatio);

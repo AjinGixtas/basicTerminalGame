@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://ywm7rhxebeh4"]
+[gd_scene load_steps=7 format=3 uid="uid://ywm7rhxebeh4"]
 
 [ext_resource type="Script" uid="uid://mb8mpa63ad2n" path="res://Scripts/CS/Terminal/Terminal.cs" id="1_q6j3v"]
 [ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="2_tjxev"]
 [ext_resource type="CodeHighlighter" uid="uid://dfl78raux0p25" path="res://Utilities/Styling/CommandFieldHighlighter.tres" id="3_c8ipk"]
 [ext_resource type="Theme" uid="uid://befi50wkxv0ub" path="res://Utilities/Themes/TerminalSidebar.tres" id="4_oclfs"]
+[ext_resource type="Script" uid="uid://dmd37osqwjq3y" path="res://Scripts/CS/Terminal/TerminalSidebar.cs" id="5_pn4ql"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_c8ipk"]
 
@@ -35,7 +36,7 @@ dragging_enabled = false
 dragger_visibility = 2
 
 [node name="TerminalOutputArea" type="RichTextLabel" parent="TerminalSplitPart/TerminalZone"]
-self_modulate = Color(16, 16, 16, 0.2)
+self_modulate = Color(16, 16, 16, 0.125)
 material = SubResource("ShaderMaterial_c8ipk")
 layout_mode = 2
 size_flags_vertical = 3
@@ -45,8 +46,6 @@ bbcode_enabled = true
 scroll_following = true
 vertical_alignment = 2
 selection_enabled = true
-visible_characters = 0
-visible_ratio = 0.0
 
 [node name="TerminalCommandLine" type="HSplitContainer" parent="TerminalSplitPart/TerminalZone"]
 layout_mode = 2
@@ -54,18 +53,20 @@ dragging_enabled = false
 dragger_visibility = 2
 
 [node name="CommandPrompt" type="RichTextLabel" parent="TerminalSplitPart/TerminalZone/TerminalCommandLine"]
-self_modulate = Color(16, 16, 16, 0.25)
+self_modulate = Color(16, 16, 16, 0.125)
 layout_mode = 2
 size_flags_horizontal = 4
+focus_mode = 2
 theme = ExtResource("2_tjxev")
 bbcode_enabled = true
 text = "[color=purple]UN1NTIALiZED_USER[/color]@[color=green]PURGRATORY[/color]:~/>
 "
 fit_content = true
 autowrap_mode = 0
+selection_enabled = true
 
 [node name="CommandField" type="CodeEdit" parent="TerminalSplitPart/TerminalZone/TerminalCommandLine"]
-self_modulate = Color(16, 16, 16, 0.25)
+self_modulate = Color(16, 16, 16, 0.125)
 clip_contents = false
 custom_minimum_size = Vector2(32, 0)
 layout_mode = 2
@@ -77,45 +78,36 @@ syntax_highlighter = ExtResource("3_c8ipk")
 indent_use_spaces = true
 auto_brace_completion_enabled = true
 
-[node name="Sidebar" type="MarginContainer" parent="TerminalSplitPart"]
+[node name="Sidebar" type="MarginContainer" parent="TerminalSplitPart" node_paths=PackedStringArray("statSwitchTimer", "artDiplayer", "playerStatDisplayer", "notePad")]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 theme = ExtResource("4_oclfs")
+script = ExtResource("5_pn4ql")
+statSwitchTimer = NodePath("../../TimersContainer/StatSwitchTimer")
+artDiplayer = NodePath("VSplitContainer/ArtDisplay")
+playerStatDisplayer = NodePath("VSplitContainer/PlayerStatDisplay")
+notePad = NodePath("VSplitContainer/NotePad")
 
-[node name="VSplitContainer" type="VSplitContainer" parent="TerminalSplitPart/Sidebar"]
+[node name="VSplitContainer" type="VBoxContainer" parent="TerminalSplitPart/Sidebar"]
 layout_mode = 2
-dragging_enabled = false
-dragger_visibility = 2
+
+[node name="ArtDisplay" type="RichTextLabel" parent="TerminalSplitPart/Sidebar/VSplitContainer"]
+layout_mode = 2
+theme = ExtResource("2_tjxev")
+bbcode_enabled = true
+fit_content = true
+horizontal_alignment = 1
 
 [node name="PlayerStatDisplay" type="RichTextLabel" parent="TerminalSplitPart/Sidebar/VSplitContainer"]
-self_modulate = Color(16, 16, 16, 0.1)
+self_modulate = Color(16, 16, 16, 0.125)
 layout_mode = 2
 size_flags_vertical = 3
 focus_mode = 2
 theme = ExtResource("2_tjxev")
 bbcode_enabled = true
-text = "[color=cyan]
-___     /`>     ___
- \\\\\\\\◢█◤;  ;◥█◣/// 
-   \\╲◥=----=◤╱/    
-
-
-// /\\\\      |/ ||\\ 
-|| | =██◣▼▴▼◢█ || |
-|| |  {--▾-▾-} || |
-
-
-  === __/| /|__ ── 
-==    \\◥ \"▴' ◤/==  
-  ─=─  \\ ═╵═ /=─  =
-
-
-/█◣◣──▲▲─,─▲▲──◢◢█\\
-█  ◥█◣b\\   /d◢█◤  █
-'▶    )  ╨  (    ◀'"
 selection_enabled = true
 
-[node name="ScratchPad" type="TextEdit" parent="TerminalSplitPart/Sidebar/VSplitContainer"]
+[node name="NotePad" type="TextEdit" parent="TerminalSplitPart/Sidebar/VSplitContainer"]
 self_modulate = Color(8, 8, 8, 0.2)
 layout_mode = 2
 size_flags_vertical = 3
@@ -134,7 +126,12 @@ one_shot = true
 [node name="CrackDurationTimer" type="Timer" parent="TimersContainer"]
 one_shot = true
 
+[node name="StatSwitchTimer" type="Timer" parent="TimersContainer"]
+wait_time = 2.0
+autostart = true
+
 [connection signal="text_changed" from="TerminalSplitPart/TerminalZone/TerminalCommandLine/CommandField" to="." method="OnCommandFieldTextChanged"]
 [connection signal="timeout" from="TimersContainer/ProcessTimer" to="." method="ProcessFinished"]
 [connection signal="timeout" from="TimersContainer/UpdateProcessGraphicTimer" to="." method="UpdateProcessingGraphic"]
 [connection signal="timeout" from="TimersContainer/CrackDurationTimer" to="." method="OnCrackDurationTimerTimeout"]
+[connection signal="timeout" from="TimersContainer/StatSwitchTimer" to="TerminalSplitPart/Sidebar" method="OnStatSwitchTimerTimeout"]

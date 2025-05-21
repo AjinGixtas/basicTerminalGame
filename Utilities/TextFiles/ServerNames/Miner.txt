@@ -8,4 +8,4 @@ submine-delta       SubMine Delta
 strataforge-1r      StrataForge 1R  
 veinripper-02       VeinRipper 02  
 cryptobore-ax       CryptoBore AX  
-driftcore-epsilon   DriftCore Epsilon  
+driftcore-epsilon   DriftCore Epsilon

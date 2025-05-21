@@ -1,9 +1,8 @@
 using Godot;
-using System;
 
 public class HoneypotNode : NetworkNode {
     double lastEpoch = 0;
-    public static Tuple<NetworkNodeType, string, string>[][] namePool;
+    public static (NetworkNodeType, string, string)[][] namePool;
     public HoneypotNode(string hostName, string displayName, string IP, NetworkNode parentNode)
         : base(hostName, displayName, IP, NetworkNodeType.HONEYPOT, parentNode) {
         GenerateFakeData();
@@ -18,7 +17,7 @@ public class HoneypotNode : NetworkNode {
         if (Time.GetUnixTimeFromSystem() - lastEpoch < 15) { return; }
         int chosenSection = GD.RandRange(0, namePool.GetLength(0) - 1);
         int chosenElement = GD.RandRange(0, namePool[chosenSection].GetLength(0) - 1);
-        Tuple<NetworkNodeType, string, string> name = namePool[chosenSection][chosenElement];
+        (NetworkNodeType, string, string) name = namePool[chosenSection][chosenElement];
         for (int i = 0; i < 10; ++i) {
             if (name.Item1 == NetworkNodeType.HONEYPOT) {
                 chosenSection = GD.RandRange(0, namePool.GetLength(0) - 1);

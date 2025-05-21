@@ -5,7 +5,8 @@ public class DriftNode : NetworkNode {
         : base(hostName, displayName, IP, NetworkNodeType.DRIFT, parentNode) {
     }
     public override (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {
-        int sec = (int)Mathf.Clamp(GD.Randfn(7, 2.5), 0, 10);
-        return (sec, GD.RandRange(0, sec));
+        int def = (int)Mathf.Clamp(GD.Randfn(8.4, 2.75), 1, 10);
+        int sec = (int)Mathf.Clamp(GD.Randfn(def/2+3.5, .33 * Mathf.E * Mathf.Pi), 1, def);
+        return (sec, def);
     }
 }

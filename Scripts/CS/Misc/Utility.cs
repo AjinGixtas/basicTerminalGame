@@ -1,7 +1,5 @@
 using Godot;
-using System;
 using System.Collections.Generic;
-using System.Text;
 public static class Util {
     public static T[] Shuffle<T>(T[] array) {
         for (int i = 0; i < array.Length; i++) {
@@ -82,40 +80,39 @@ public static class Util {
                     if (parts.Length < 2) { parts = [parts[0], "00"]; }
                     string integerPart = parts[0];
                     string decimalPart = parts[1].PadLeft(2, '0');
+                    if (addons.Length > 0 && addons[0][0] != '/') decimalPart = parts[1][..2];
                     return $"[color={Util.CC(Cc.rgb)}]{integerPart}.{decimalPart}[/color][color={Util.CC(Cc.RGB)}]{addons[0]}[/color]";
                 }
             case StrType.SEC_LVL: {
-                    string colorCode = "";
-                    if (addons.Length > 0) {
-                        colorCode = addons[0] switch {
-                            "0" or "1" or "2" or "3" => Util.CC(Cc.B),
-                            "4" or "5" or "6" or "7" => Util.CC(Cc.Y),
-                            "8" or "9" or "10" => Util.CC(Cc.R),
-                            _ => "_"
-                        };
-                    }
-                    if (colorCode == "_" || colorCode == "") {
-                        colorCode = input switch {
-                            "0" or "1" or "2" or "3" => Util.CC(Cc.B),
-                            "4" or "5" or "6" or "7" => Util.CC(Cc.Y),
-                            "8" or "9" or "10" => Util.CC(Cc.R),
-                            _ => Util.CC(Cc.R)
-                        };
-                    }
-                    return $"[color={colorCode}]{input}[/color]";
+                    return $"[color={input switch {
+                        "0" => Util.CC(Cc.C),
+                        "1" or "2" or "3" => Util.CC(Cc.B),
+                        "4" or "5" or "6" => Util.CC(Cc.Y),
+                        "7" or "8" or "9" => Util.CC(Cc.R),
+                        "10" => Util.CC(Cc.M),
+                        _ => Util.CC(Cc.M)
+                    }}]{input}[/color]";
+                }
+            case StrType.SEC_TYPE: {
+                    return $"[color={input switch {
+                        "NOSEC" => Util.CC(Cc.C),
+                        "LOSEC" => Util.CC(Cc.B),
+                        "MISEC" => Util.CC(Cc.Y),
+                        "HISEC" => Util.CC(Cc.R),
+                        "MASEC" => Util.CC(Cc.M),
+                        _ => Util.CC(Cc.M)
+                    }}]{input}[/color]";
                 }
             case StrType.DEF_LVL:
-                return $"[color={input switch { 
-                    "NOSEC" or "LOSEC" => Util.CC(Cc.R), 
-                    "MISEC" => Util.CC(Cc.Y), 
-                    "HISEC" or "MASEC" => Util.CC(Cc.B),
-                    // Fall back
-                    "0" or "1" or "2" or "3" => Util.CC(Cc.B),
-                    "4" or "5" or "6" or "7" => Util.CC(Cc.Y),
-                    "8" or "9" or "10" => Util.CC(Cc.R),
-                    // Final backup
-                    _ => Util.CC(Cc.R) }
-                }]{input}[/color]";
+                return $"[color={input switch {
+                    "0" => Util.CC(Cc.C),
+                    "1" or "2" or "3" => Util.CC(Cc.B),
+                    "4" or "5" or "6" => Util.CC(Cc.Y),
+                    "7" or "8" or "9" => Util.CC(Cc.R),
+                    "10" => Util.CC(Cc.M),
+                    _ => Util.CC(Cc.M)
+
+                }}]{input}[/color]";
             case StrType.NUMBER:
                 return $"[color={Util.CC(Cc.c)}]{input}[/color]";
             case StrType.IP:
@@ -161,36 +158,37 @@ public static class Util {
                     double[] divisors = [1e15, 1e12, 1e9 , 1e6 , 1e3 ];
                     Cc[] colors =       [Cc.R, Cc.M, Cc.G, Cc.B, Cc.C]; // Q, T, B, M, K
 
-                    StringBuilder sb = new();
+                    string sb = "";
                     double remainder = value;
 
                     for (int i = 0; i < units.Length; i++) {
                         if (remainder >= divisors[i]) {
-                            int unitValue = (int)Math.Floor(remainder / divisors[i]);
+                            int unitValue = (int)Mathf.Floor(remainder / divisors[i]);
                             remainder -= unitValue * divisors[i];
-                            sb.Append($"[color={Util.CC(Cc.RGB)}]{unitValue}[/color][color={Util.CC(colors[i])}]{units[i]}[/color]");
+                            sb += $"[color={Util.CC(Cc.rgb)}]{unitValue}[/color][color={Util.CC(colors[i])}]{units[i]}[/color]";
                         }
                     }
 
                     string gcValue;
                     if (value > 10_000) {
                         // Round up to the next integer if value is big
-                        gcValue = Math.Ceiling(remainder).ToString("F0");
+                        gcValue = Mathf.Ceil(remainder).ToString("F0");
                         if (gcValue == "000") { gcValue = ""; }
                     } else {
                         // Keep two decimals for small values
                         gcValue = remainder.ToString("N2").Replace(",", "");
                         if (gcValue == "000.00") { gcValue = ""; }
                     }
-                    sb.Append($"[color={Util.CC(Cc.RGB)}]{gcValue}[/color]");
-                    sb.Append($"[color={Util.CC(Cc.Y)}]GC[/color]");
+                    sb += $"[color={Util.CC(Cc.rgb)}]{gcValue}[/color]";
+                    sb += $"[color={Util.CC(Cc.Y)}]GC[/color]";
                     return sb.ToString();
                 }
             case StrType.USERNAME:
                 return $"[color={Util.CC(Cc.M)}]{input}[/color]";
             case StrType.WARNING:
-                throw new Exception("Not implemented!");
-            case StrType.PARTIAL_SUCCESS:
+                GD.PrintErr("Not implemented!");
+                return "";
+            case StrType.PART_SUCCESS:
                 return $"[color={Util.CC(Cc.C)}]{input}[/color]";
             case StrType.FULL_SUCCESS:
                 return $"[color={Util.CC(Cc.G)}]{input}[/color]";
@@ -202,21 +200,36 @@ public static class Util {
                 return input;
         }
     }
-    public static TEnum MapEnum<TEnum>(int securityPoint) where TEnum : Enum {
-        Type enumType = typeof(TEnum);
+    public static TEnum MapEnum<TEnum>(int value) where TEnum : System.Enum {
+        System.Type enumType = typeof(TEnum);
 
         if (enumType == typeof(SecurityType)) {
-            var result = securityPoint switch {
+            SecurityType result = value switch {
                 < 1 => SecurityType.NOSEC,
                 < 4 => SecurityType.LOSEC,
-                < 7 => SecurityType.MISEC,
+                < 8 => SecurityType.MISEC,
                 < 10 => SecurityType.HISEC,
-                _ => SecurityType.MASEC,
+                >= 10 => SecurityType.MASEC,
             };
 
             return (TEnum)(object)result;
         }
 
-        throw new NotSupportedException($"Enum type {enumType.Name} is not supported by MapEnum.");
+        GD.PrintErr($"Enum type {enumType.Name} is not supported by MapEnum.");
+        return default;
     }
+    public static string LoadUnicodeArt(string path, bool escapeBBcode=false) {
+        FileAccess fileAccess = FileAccess.Open(path, FileAccess.ModeFlags.Read);
+        string[] firstLine = StringExtensions.Split(fileAccess.GetLine(), " ", false);
+        (int h, int w) = (firstLine[0].ToInt(), firstLine[1].ToInt());
+        string art = "";
+        for(int i = 0; i < h; ++i) {
+            string line = fileAccess.GetLine();
+            line = line[..Mathf.Min(w, line.Length)];
+            art += line + "\n";
+        }
+        return art;
+    }
+
+    public static string EscapeBBCode(string code) { return code.Replace("[", "[lb]"); }
 }

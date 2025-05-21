@@ -1,5 +1,4 @@
 using Godot;
-using System;
 using System.Linq;
 
 public abstract class Lock {
@@ -213,7 +212,7 @@ public class M2 : Lock {
 
     public override void Intialize() {
         int upperBound = GD.RandRange(2, 256);
-        int root = Math.Sqrt(upperBound) == Math.Floor(Math.Sqrt(upperBound)) ? (int)Math.Sqrt(upperBound) - 1 : (int)Math.Floor(Math.Sqrt(upperBound));
+        int root = Mathf.Sqrt(upperBound) == Mathf.Floor(Mathf.Sqrt(upperBound)) ? (int)Mathf.Sqrt(upperBound) - 1 : (int)Mathf.Floor(Mathf.Sqrt(upperBound));
         ans = [$"{root * root}"];
         inp = $"{upperBound}";
         base.Intialize();
@@ -232,7 +231,7 @@ public class M3 : Lock {
 
     public override void Intialize() {
         int upperBound = GD.RandRange(2, 512);
-        int root = Math.Cbrt(upperBound) == Math.Floor(Math.Cbrt(upperBound)) ? (int)Math.Cbrt(upperBound) + 1 : (int)Math.Ceiling(Math.Cbrt(upperBound));
+        int root = Mathf.Pow(upperBound, 1.0/3.0) == Mathf.Floor(Mathf.Pow(upperBound, 1.0 / 3.0)) ? (int)Mathf.Pow(upperBound, 1.0 / 3.0) + 1 : (int)Mathf.Ceil(Mathf.Pow(upperBound, 1.0 / 3.0));
         ans = [$"{root * root * root}"];
         inp = $"{upperBound}";
         base.Intialize();

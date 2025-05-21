@@ -1,12 +1,8 @@
 using Godot;
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
 public static class NetworkManager {
     public static PlayerNode playerNode;
-    public static NetworkNode currentNetwork;
-    public static NetworkNode[] networks;
+    public static NetworkSector[] sectors;
     static Dictionary<string, NetworkNode> DNS;
 	static List<HackFarm> PlayerHackFarm = [];
     public static void Ready() {
@@ -15,32 +11,45 @@ public static class NetworkManager {
             HackFarm = new HackFarm(1.0, 1.0, 255, 255, 255)
         }; AssignDNS(playerNode);
         PlayerHackFarm = [playerNode.HackFarm];
-        currentNetwork = playerNode;
+        sectors = [GenerateDriftSector("DriftSector")]; // TODO: Generate sectors based on player progress
+        ConnectPlayerToSector(sectors[0]);
     }
     static readonly (NetworkNodeType, string, string)[][] BASIC_NODE_DATA = ReadBasicNodeName();
     static readonly NetworkNodeData[] SCRIPTED_NODE_DATA = ReadScriptedNodeData();
 
+    static int ConnectPlayerToSector(NetworkSector sector) {
+        if (sector == null) return 1;
+        foreach(NetworkNode node in sector.GetSurfaceNodes()) {
+            playerNode.ChildNode.Add(node);
+            node.ParentNode = playerNode;
+            AssignDNS(node);
+        }
+        return 0;
+    }
+    static int DisconnectPlayerFromSector(NetworkSector sector) {
+        if (sector == null) return 1;
+        foreach (NetworkNode node in sector.GetSurfaceNodes()) {
+            playerNode.ChildNode.Remove(node);
+            node.ParentNode = null;
+        }
+        return 0;
+    }
 
     static NetworkSector GenerateDriftSector(string baseName) {
         string fullName = baseName + GenerateRandomSuffix(6);
         NetworkSector sector = new(fullName);
-        sector.AddSurfaceNode(NetworkNode.GenerateProceduralNode(NetworkNodeType.PERSON, "haha", "LALA", 0, 0, null));
-        sector.AddSurfaceNode(NetworkNode.GenerateProceduralNode(NetworkNodeType.PERSON, "hehe", "LELE", 0, 0, null));
-        sector.AddSurfaceNode(NetworkNode.GenerateProceduralNode(NetworkNodeType.PERSON, "hihi", "LILI", 0, 0, null));
-        sector.AddSurfaceNode(NetworkNode.GenerateProceduralNode(NetworkNodeType.PERSON, "hoho", "LOLO", 0, 0, null));
-        sector.AddSurfaceNode(NetworkNode.GenerateProceduralNode(NetworkNodeType.PERSON, "huhu", "LULU", 0, 0, null));
+        for(int i = 0; i < 100; ++i)
         sector.MarkIntializationCompleted();
         return sector;
     }
 
-    static Random RNG = new();
     static string GenerateRandomSuffix(int length) {
         const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        StringBuilder sb = new(length);
+        string sb = "";
         for (int i = 0; i < length; i++) {
-            sb.Append(chars[RNG.Next(chars.Length)]);
+            sb += chars[GD.RandRange(0, chars.Length-1)];
         }
-        return sb.ToString();
+        return sb;
     }
 
     public static void AddHackFarm(HackFarm hackFarm) { PlayerHackFarm.Add(hackFarm); }
@@ -57,6 +66,7 @@ public static class NetworkManager {
     }
     static string GetRandomIP() {
         static string Generate() => $"{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}";
+        DNS ??= [];
         string ip;
         do ip = Generate();
         while (DNS.ContainsKey(ip));
@@ -78,14 +88,13 @@ public static class NetworkManager {
         return output;
 
         static (NetworkNodeType, string, string)[] ReadNodeNameOfType(string fileName, NetworkNodeType nodeType) {
-            string path = Path.Combine(Directory.GetCurrentDirectory(), "Utilities", "TextFiles", "ServerNames", fileName);
-            using StreamReader reader = new(File.OpenRead(path), Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: 128);
+            FileAccess fileAccess = FileAccess.Open($"res://Utilities/TextFiles/ServerNames/{fileName}", FileAccess.ModeFlags.Read);
 
-            int count = int.Parse(reader.ReadLine());
+            int count = int.Parse(fileAccess.GetLine());
             var output = new (NetworkNodeType, string, string)[count];
 
             for (int i = 0; i < count; ++i) {
-                string[] parts = reader.ReadLine().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                string[] parts = StringExtensions.Split(fileAccess.GetLine(), " ", false);
                 output[i] = (nodeType, parts[0], string.Join(" ", parts[1..]));
             }
 
@@ -96,17 +105,12 @@ public static class NetworkManager {
         string[] CATEGORY = [ "Corp", "Faction", "Business" ];
         List<NetworkNodeData> output = [];
         for (int i = 0; i < CATEGORY.Length; ++i) {
-            string folderPath = Path.Combine("res://Utilities/Resources/ScriptedNetworkNodes/", CATEGORY[i]);
-            DirAccess folder = DirAccess.Open(folderPath);
-            if (folder == null) {
-                GD.PrintErr($"Failed to open directory: {folderPath}");
-                continue;
-            }
+            DirAccess dirAccess = DirAccess.Open($"res://Utilities/Resources/ScriptedNetworkNodes/{CATEGORY[i]}");
 
-            string[] fileNames = folder.GetFiles();
+            string[] fileNames = dirAccess.GetFiles();
             foreach (string fileName in fileNames) {
-                string filePath = Path.Combine(folderPath, fileName);
-                string IP = $"{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}";
+                string filePath = $"res://Utilities/Resources/ScriptedNetworkNodes/{CATEGORY[i]}/{fileName}";
+                string IP = NetworkManager.GetRandomIP();
                 switch (CATEGORY[i]) {
                     case "Corp": {
                             CorpData corpData = GD.Load<CorpData>(filePath);

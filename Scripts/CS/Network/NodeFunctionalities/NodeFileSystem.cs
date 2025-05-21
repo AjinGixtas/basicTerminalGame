@@ -1,5 +1,5 @@
+using Godot;
 using System.Collections.Generic;
-using System;
 
 public abstract class NodeSystemItem {
     public string Name { get; set; }
@@ -71,7 +71,7 @@ public class NodeDirectory : NodeSystemItem {
     }
     // TerminalDirectory-Directory found; null-Directory not found
     public NodeDirectory GetDirectory(string name) {
-        string[] components = name.Split(['/'], StringSplitOptions.RemoveEmptyEntries);
+        string[] components = StringExtensions.Split(name, "/", false);
         NodeDirectory curDir = name.StartsWith('/') ? GetRoot() : this;
         foreach (string component in components) {
             if (component == "..") {
@@ -86,7 +86,7 @@ public class NodeDirectory : NodeSystemItem {
         return curDir;
     }
     public NodeFile GetFile(string name) {
-        string[] components = name.Split(['/'], StringSplitOptions.RemoveEmptyEntries);
+        string[] components = StringExtensions.Split(name, "/", false);
         NodeDirectory curDir = name.StartsWith('/') ? GetRoot() : this;
         string[] pathComponents = components[..^1]; string fileName = components[^1];
         foreach (string component in pathComponents) {

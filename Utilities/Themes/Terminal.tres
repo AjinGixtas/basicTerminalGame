@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=39 format=3 uid="uid://cu26m1463lwkc"]
+[gd_resource type="Theme" load_steps=40 format=3 uid="uid://cu26m1463lwkc"]
 
 [ext_resource type="FontFile" uid="uid://ffyfg5d0inth" path="res://Utilities/Fonts/DejaVuSansMono.ttf" id="1_w7sxo"]
 
@@ -210,6 +210,7 @@ bg_color = Color(0.0627451, 0.0980392, 0.160784, 0)
 draw_center = false
 border_color = Color(0.0705882, 0.529412, 0.360784, 1)
 corner_detail = 1
+expand_margin_bottom = 2.0
 anti_aliasing = false
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lo3al"]
@@ -226,7 +227,11 @@ border_color = Color(0, 0, 0, 1)
 corner_detail = 1
 anti_aliasing = false
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_dvumi"]
+content_margin_bottom = 1.0
+
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_spmd1"]
+content_margin_bottom = 1.0
 
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_w7sxo"]
 color = Color(0, 0, 0, 0.360784)
@@ -370,7 +375,7 @@ RichTextLabel/fonts/bold_italics_font = ExtResource("1_w7sxo")
 RichTextLabel/fonts/italics_font = ExtResource("1_w7sxo")
 RichTextLabel/fonts/mono_font = ExtResource("1_w7sxo")
 RichTextLabel/fonts/normal_font = ExtResource("1_w7sxo")
-RichTextLabel/styles/focus = SubResource("StyleBoxFlat_40dey")
+RichTextLabel/styles/focus = SubResource("StyleBoxEmpty_dvumi")
 RichTextLabel/styles/normal = SubResource("StyleBoxEmpty_spmd1")
 VSeparator/constants/separation = 8
 VSeparator/styles/separator = SubResource("StyleBoxLine_w7sxo")

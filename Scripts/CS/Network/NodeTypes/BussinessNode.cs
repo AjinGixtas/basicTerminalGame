@@ -1,5 +1,4 @@
 using Godot;
-using System;
 
 public class BusinessNode : NetworkNode {
     public Stock _stock;
@@ -10,7 +9,7 @@ public class BusinessNode : NetworkNode {
     // They're in it for the money, not to keep it
     public override (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {
         int seclvl = GD.RandRange(5, 9) + (int)(depthRatio * 2) + (int)(indexRatio * 3);
-        int deflvl = GD.RandRange((int)Math.Floor(seclvl * 0.6), seclvl);
+        int deflvl = GD.RandRange((int)Mathf.Floor(seclvl * 0.6), seclvl);
         return (seclvl, deflvl);
     }
 }

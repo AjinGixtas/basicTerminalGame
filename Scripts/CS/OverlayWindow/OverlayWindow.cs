@@ -5,7 +5,7 @@ public partial class OverlayWindow : Window {
 	public override void _Process(double delta) {
 		moneyDisplay.Text = 
 @$"Money 
-{Util.Format(PlayerDataManager.GC_PublicDisplay.ToString(), StrType.MONEY)}
+{Util.Format($"{PlayerDataManager.GC_PublicDisplay}", StrType.MONEY)}
 Production speed
 {"pootis"}";
 	}

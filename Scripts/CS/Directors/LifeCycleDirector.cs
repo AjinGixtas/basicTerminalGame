@@ -1,8 +1,5 @@
 using Godot;
-using System;
-using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 public partial class LifeCycleDirector : Node
@@ -30,13 +27,12 @@ public partial class LifeCycleDirector : Node
 	private const string SaveRoot = "user://Saves";
 	static void QuickSave() {
 		// Convert virtual path to real path
-		string realSaveRoot = ProjectSettings.GlobalizePath(SaveRoot);
 
 		// Ensure the save root directory exists
-		Directory.CreateDirectory(realSaveRoot);
+		DirAccess.MakeDirAbsolute(ProjectSettings.GlobalizePath(SaveRoot));
 
 		// Find existing save folders named like "Game_###"
-		var existingSaves = Directory.GetDirectories(realSaveRoot).Select(dir => {
+		var existingSaves = DirAccess.GetDirectoriesAt(SaveRoot).Select(dir => {
 			var match = Regex.Match(dir, @"Game_(\d+)$");
 			return match.Success ? int.Parse(match.Groups[1].Value) : 0;
 		}).Where(num => num > 0).ToList();
@@ -44,38 +40,38 @@ public partial class LifeCycleDirector : Node
 		// Pick next save number
 		int nextSaveNumber = existingSaves.Count == 0 ? 1 : existingSaves.Max() + 1;
 		string newSaveFolderName = $"Game_{nextSaveNumber:D3}";
-		string newSaveFolderPath = Path.Combine(realSaveRoot, newSaveFolderName);
+		string newSavePath = StringExtensions.PathJoin(SaveRoot, newSaveFolderName);
 
-		// Create new save directory
-		Directory.CreateDirectory(newSaveFolderPath);
-
+        // Create new save directory
+		DirAccess.MakeDirAbsolute(ProjectSettings.GlobalizePath(newSavePath));
 		// Save player data (convert back to user:// path for Godot API)
-		string finalPath = ProjectSettings.LocalizePath(newSaveFolderPath);
-		TerminalProcessor.Say($"Quick saving to {finalPath}");
+		TerminalProcessor.Say($"Quick saving to {newSavePath}");
+        TerminalProcessor.Say(PlayerDataManager.GetSaveStatusMsg(
+			PlayerDataManager.SavePlayerData(StringExtensions.PathJoin(newSavePath, "PlayerData.tres"))));
 		TerminalProcessor.Say(PlayerDataManager.GetSaveStatusMsg(
-			PlayerDataManager.SavePlayerData(Path.Combine(finalPath, "PlayerData.tres"))));
-		TerminalProcessor.Say(PlayerDataManager.GetSaveStatusMsg(
-			PlayerFileManager.SaveFileSysData(Path.Combine(finalPath, "FileSys"))));
+			PlayerFileManager.SaveFileSysData(StringExtensions.PathJoin(newSavePath, "FileSys"))));
 		TerminalProcessor.Say($"If there are any error related to save file, feel free to email {Util.Format("ajingixtascontact", StrType.USERNAME)}@{Util.Format("gmail.com", StrType.HOSTNAME)}");
 	}
 	static void QuickLoad(LifeCycleDirector lifeCycleDirector) {
-		string fullPath = ProjectSettings.GlobalizePath(SaveRoot);  // Convert Godot path to absolute system path
-		if (!Directory.Exists(fullPath)) { TerminalProcessor.Say("-r", "No previous record of user found. Intialize new user."); return; }
+		if (!DirAccess.DirExistsAbsolute(ProjectSettings.GlobalizePath(SaveRoot))) { TerminalProcessor.Say("-r", "No previous record of user found. Intialize new user."); return; }
 
 		// Find all save folders named like "Game_###"
-		var saveFolders = Directory.GetDirectories(fullPath).Where(dir => Regex.IsMatch(dir, @"Game_\d{3}$")).ToList();
+		var saveFolders = DirAccess.GetDirectoriesAt(SaveRoot).Where(dir => Regex.IsMatch(dir, @"Game_\d{3}$")).ToList();
 
 		if (saveFolders.Count == 0) { TerminalProcessor.Say("-r", "No previous record of user found. Intialize new user."); return; }
 
-		// Find the most recently updated one
-		string latestFolder = saveFolders.OrderByDescending(dir => Directory.GetLastWriteTime(Path.Combine(dir, "PlayerData.tres"))).First();
-		string finalPath = ProjectSettings.LocalizePath(latestFolder);
-
-		TerminalProcessor.Say($"Loading save from: {finalPath}");
+        // Find the most recently updated one
+		
+        string latestFolder = saveFolders
+            .Where(dir => FileAccess.FileExists(StringExtensions.PathJoin($"{SaveRoot}/{dir}", "PlayerData.tres")))
+            .OrderByDescending(dir => FileAccess.GetModifiedTime(StringExtensions.PathJoin($"{SaveRoot}/{dir}", "PlayerData.tres")))
+            .FirstOrDefault();
+		GD.Print(saveFolders[0]);
+		TerminalProcessor.Say($"Loading save from: {latestFolder}");
 		// Load global data
 		int[] statusCodes = [
-			PlayerDataManager.LoadPlayerData(ProjectSettings.LocalizePath(Path.Combine(finalPath, "PlayerData.tres"))),
-			PlayerFileManager.LoadFileSysData(ProjectSettings.LocalizePath(Path.Combine(finalPath, "FileSys"))),
+			PlayerDataManager.LoadPlayerData(StringExtensions.PathJoin($"{SaveRoot}/{latestFolder}", "PlayerData.tres")),
+			PlayerFileManager.LoadFileSysData(StringExtensions.PathJoin($"{SaveRoot}/{latestFolder}", "FileSys")),
 		];
 		// Wipe the slate clean
 		lifeCycleDirector.RemakeScene();

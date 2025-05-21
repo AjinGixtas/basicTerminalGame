@@ -1,5 +1,4 @@
 using Godot;
-using System;
 
 public static class PlayerDataManager {
 	static double GC_Max;
@@ -8,7 +7,7 @@ public static class PlayerDataManager {
 	static double GC_Accountant {
 		get => _gc_total;
 		set {
-			_gc_total = Math.Clamp(value, 0, GC_Max);
+			_gc_total = Mathf.Clamp(value, 0, GC_Max);
 			if (_gc_total <= GC_Max) { needWarn = false; warned = false; } else needWarn = true;
 			if (needWarn && !warned) {
 				TerminalProcessor.Say($"[color={Util.CC(Cc.gR)}]Warning:[/color] GC total is over the limit of {GC_Max}. Remaining GC lost.");
@@ -49,14 +48,14 @@ public static class PlayerDataManager {
 			Util.Format("File parse successfully yet doesn't get registered. Fall back to new user setting. Check for potentional file malfunction.", StrType.ERROR)
 		];
 		return (statusCode < LOAD_STATUS_MSG.Length) ? LOAD_STATUS_MSG[statusCode]
-			: Util.Format(statusCode.ToString(), StrType.UNKNOWN_ERROR, "loading player data");
+			: Util.Format($"{statusCode}", StrType.UNKNOWN_ERROR, "loading player data");
 	}
 	public static string GetSaveStatusMsg(int statusCode) {
 		string[] SAVE_STATUS_MSG = [
 			Util.Format("Saved player data successfully", StrType.FULL_SUCCESS),
 		];
 		return (statusCode < SAVE_STATUS_MSG.Length) ? SAVE_STATUS_MSG[statusCode]
-	: Util.Format(((Error)statusCode).ToString(), StrType.UNKNOWN_ERROR, "saving player data");
+	: Util.Format($"{((Error)statusCode)}", StrType.UNKNOWN_ERROR, "saving player data");
 	}
     
 	public static int LoadPlayerData(string filePath) {

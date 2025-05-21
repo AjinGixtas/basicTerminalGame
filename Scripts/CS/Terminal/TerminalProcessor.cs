@@ -1,5 +1,4 @@
 using Godot;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -16,7 +15,7 @@ public static class TerminalProcessor {
 	static int CommandHistoryIndex {
 		get => _commandHistoryIndex;
 		set {
-			value = Math.Clamp(value, 0, Math.Max(0, commandHistory.Count - 1));
+			value = Mathf.Clamp(value, 0, Mathf.Max(0, commandHistory.Count - 1));
 			_commandHistoryIndex = value;
 			if (_commandHistoryIndex < commandHistory.Count) {
 				terminalCommandField.Text = commandHistory[_commandHistoryIndex];
@@ -53,7 +52,6 @@ public static class TerminalProcessor {
 		TerminalProcessor.SetCommandPrompt();
 	}
 
-	static double minHeight = 18; // Hard coded for convenience, prob should be generate at init runtime instead.
 	public static void Process(double delta) {
 		HandleInput(delta);
 		ShowMoreChars(delta);
@@ -61,12 +59,7 @@ public static class TerminalProcessor {
 	}
 	public static void HandleInput(double dela) {
 		if (terminalCommandField.HasFocus()) {
-			if (Input.IsActionJustPressed("moveDownHistory")) {
-				if (minHeight >= terminalCommandField.Size.Y) CommandHistoryIndex += 1;
-			}
-			if (Input.IsActionJustPressed("moveUpHistory")) {
-				if (minHeight >= terminalCommandField.Size.Y) CommandHistoryIndex -= 1;
-			}
+			if (Input.GetAxis("moveDownHistory", "moveUpHistory") != 0) CommandHistoryIndex += (int)Input.GetAxis("moveDownHistory", "moveUpHistory");
 			if (Input.IsActionJustPressed("submitCommand")) {
 				if (terminalCommandField.Text.Length == 0) { return; }
 				terminalCommandField.Text = terminalCommandField.Text.Replace("\r", " ").Replace("\n", " ");
@@ -78,24 +71,24 @@ public static class TerminalProcessor {
 	static bool _isProcessing = false; static bool IsProcessing { get { return _isProcessing; } set { _isProcessing = value; } }
 	static readonly string[] ProgressChars = [$"[color={Util.CC(Cc.RGB)}]>[/color]", $"[color={Util.CC(Cc.rgb)}]>[/color]"]; 
 	static int tick = 0;
-	static string[] queuedCommands = []; static Action<string[]> queuedAction = null;
+	static string[] queuedCommands = []; static System.Action<string[]> queuedAction = null;
 	static void StartProcess(double time) {
 		if (IsProcessing) return;
 		IsProcessing = true; tick = 0;
 		Say("-n", $"   ");
 		processTimer.WaitTime = time;
 		processTimer.Start();
-		updateProcessGraphicTimer.WaitTime = Math.Max(.05, time / 17.0);
+		updateProcessGraphicTimer.WaitTime = Mathf.Max(.05, time / 17.0);
 		updateProcessGraphicTimer.Start();
 	}
 	public static void UpdateProcessingGraphic() {
 		if (!IsProcessing) return;
-		++tick; Say("-n", $"[color=#ffffff{Math.Clamp(tick*tick, 1, 255):X2}]>[/color]");
+		++tick; Say("-n", $"[color=#ffffff{Mathf.Clamp(tick*tick, 1, 255):X2}]>[/color]");
 		updateProcessGraphicTimer.Start();
 	}
 	public static void ProcessFinished() {
 		IsProcessing = false; terminalCommandField.Editable = true; terminalCommandField.GrabFocus();
-		for (int i = tick+1; i < 17; ++i) { Say("-n", $"[color=#ffffff{Math.Clamp(tick * tick, 1, 255):X2}]>[/color]"); } 
+		for (int i = tick+1; i < 17; ++i) { Say("-n", $"[color=#ffffff{Mathf.Clamp(tick * tick, 1, 255):X2}]>[/color]"); } 
 		tick = 0; Say("-n", $"\n");
 		queuedAction(queuedCommands);
 	}
@@ -108,8 +101,8 @@ public static class TerminalProcessor {
 			while (commandHistory.Count > MAX_HISTORY_CMD_SIZE) { commandHistory.RemoveAt(0); }
 			CommandHistoryIndex = commandHistory.Count;
 		}
-		string[] commands = newCommand.Split(';', StringSplitOptions.RemoveEmptyEntries);
-		Say("-n", $"{terminalCommandPrompt.Text.Replace("\r", "").Replace("\n", "")}{Util.Format(newCommand, StrType.CMD)}");
+		string[] commands = StringExtensions.Split(newCommand, ";", false);
+		Say("-n", $"{terminalCommandPrompt.Text.Replace("\r", "").Replace("\n", "")}{Util.Format(Util.EscapeBBCode(newCommand), StrType.CMD)}");
 		queuedAction = ExecuteCommands;
 		queuedCommands = commands;
 		//StartProcess(Math.Max(.5 + GD.Randf() * .1, .05 * newCommand.Length));
@@ -196,7 +189,7 @@ public static class TerminalProcessor {
 		if (positionalArgs.Length == 0) { Say("-r", $"No file name provided."); return; }
 		NodeDirectory parentDirectory;
 		for (int i = 0; i < positionalArgs.Length; i++) {
-			string[] components = positionalArgs[i].Split('/', StringSplitOptions.RemoveEmptyEntries);
+			string[] components = StringExtensions.Split(positionalArgs[i], "/", false);
 			string fileName = components[^1], parentPath = string.Join('/', components[..^1]);
 			parentDirectory = CurrDir.GetDirectory(parentPath);
 			if (parentDirectory == null) { Say("-r", $"File not found: {parentPath}"); return; }
@@ -212,7 +205,7 @@ public static class TerminalProcessor {
 		if (positionalArgs.Length == 0) { Say("-r", $"No file name provided."); return; }
 		NodeDirectory parentDirectory;
 		for (int i = 0; i < positionalArgs.Length; i++) {
-			string[] components = positionalArgs[i].Split('/', StringSplitOptions.RemoveEmptyEntries);
+			string[] components = StringExtensions.Split(positionalArgs[i], "/", false);
 			string fileName = components[^1], parentPath = string.Join('/', components[..^1]);
 
 			parentDirectory = CurrDir.GetDirectory(parentPath);
@@ -235,8 +228,8 @@ public static class TerminalProcessor {
 		}
 		string text = string.Join(" ", positionalArgs);
 		if (parsedArgs.ContainsKey("-e")) text = Regex.Unescape(text); // handles \n, \t, etc.
-		if (!parsedArgs.ContainsKey("-b")) text = EscapeBBCode(text);
-        if (parsedArgs.ContainsKey("-t")) text = text.TrimEnd('\n', '\r');
+		if (!parsedArgs.ContainsKey("-b")) text = Util.EscapeBBCode(text);
+		if (parsedArgs.ContainsKey("-t")) text = text.TrimEnd('\n', '\r');
 		if (parsedArgs.ContainsKey("-l")) text = text.TrimStart('\n', '\r');
 		if (!parsedArgs.ContainsKey("-n")) text += "\n";
 		if (parsedArgs.ContainsKey("-r")) text = Util.Format(text, StrType.ERROR);
@@ -272,19 +265,19 @@ public static class TerminalProcessor {
 
 		string text = string.Join(" ", args[argStart..]);
 		if (interpretEscapes) text = Regex.Unescape(text); // handles \n, \t, etc.
-		if (escapeBBcode) text = EscapeBBCode(text);
+		if (escapeBBcode) text = Util.EscapeBBCode(text);
 		if (trimLeadingNewline) text = text.TrimStart('\n', '\r');
 		if (trimTrailingNewline) text = text.TrimEnd('\n', '\r');
 		if (!noNewline) text += "\n";
 		if (makeRed) text = Util.Format(text, StrType.ERROR);
 		if (makeYellow) text = Util.Format(text, StrType.WARNING);
-
+		terminalOutputField.ScrollToLine(terminalOutputField.GetLineCount()-1);
 		terminalOutputField.AppendText(text);
 	}
 	static string GetLastLinesUnderLimit(string text, int maxChars) {
-		var lines = text.AsSpan(); // Avoid allocating full array
+		var lines = text;
 		var newline = '\n';
-		List<int> lineBreaks = new(); // Store line start indices
+		List<int> lineBreaks = new();
 
 		// Step 1: Find all newline positions
 		for (int i = 0; i < lines.Length; i++) {
@@ -310,7 +303,7 @@ public static class TerminalProcessor {
 
 		// Step 3: Slice the original span
 		int startChar = (startLineIndex == 0) ? 0 : lineBreaks[startLineIndex - 1] + 1;
-		return text.Substring(startChar);
+		return text[startChar..];
 	}
 	static void Help(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		string fileName = parsedArgs.ContainsKey("-v") ? "helpVerbose.txt" : "helpShort.txt";
@@ -329,13 +322,13 @@ public static class TerminalProcessor {
 			if (file == null) {
 				Say("-r", $"File not found: {Util.Format(positionalArgs[i], StrType.FILE)}");
 			} else { overseer.textEditor.OpenNewFile(CurrNode.HostName, file); ++fileOpened; }
-        }
+		}
 		Say($"{fileOpened} file(s) opened. See the editor.");
-    }
+	}
 	static void Scan(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		string L = " └─── ", M = " ├─── ", T = "      ", E = " │    ";
-		Func<bool[], string> getTreePrefix = arr => string.Concat(arr.Select((b, i) => (i == arr.Length - 1 ? (b ? L : M) : (b ? T : E))));
-		Func<bool[], string> getDescPrefix = arr => string.Concat(arr.Select((b, i) => (b ? T : E)));
+		System.Func<bool[], string> getTreePrefix = arr => string.Concat(arr.Select((b, i) => (i == arr.Length - 1 ? (b ? L : M) : (b ? T : E))));
+        System.Func<bool[], string> getDescPrefix = arr => string.Concat(arr.Select((b, i) => (b ? T : E)));
 		if (!parsedArgs.TryGetValue("-d", out string value)) { value = "1"; parsedArgs["-d"] = value; }
 		if (!int.TryParse(value, out int MAX_DEPTH)) { Say("-r", $"Invalid depth: {Util.Format(value, StrType.NUMBER)}"); return; }
 
@@ -351,8 +344,8 @@ public static class TerminalProcessor {
 			if (parsedArgs.ContainsKey("-v")) {
 				string descPrefix = getDescPrefix(depthMarks) + ((depth == MAX_DEPTH ? 0 : ((node.ParentNode != null ? 0 : -1) + node.ChildNode.Count)) > 0 ? " │" : "  ");
 				output += $"{Util.Format(descPrefix, StrType.DECOR)}  Display Name: {Util.Format(analyzeResult.DisplayName, StrType.DISPLAY_NAME)}\n";
-				output += $"{Util.Format(descPrefix, StrType.DECOR)}  Node Type:    {Util.Format(analyzeResult.NodeType.ToString(), StrType.SYMBOL)}\n";
-				output += $"{Util.Format(descPrefix, StrType.DECOR)}  Defense:      {Util.Format(analyzeResult.DefLvl.ToString(), StrType.DEF_LVL)}  Security: {Util.Format(Util.MapEnum<SecurityType>(analyzeResult.SecLvl).ToString(), StrType.SEC_LVL, analyzeResult.RetLvl.ToString())}\n";
+				output += $"{Util.Format(descPrefix, StrType.DECOR)}  Node Type:    {Util.Format($"{analyzeResult.NodeType}", StrType.SYMBOL)}\n";
+				output += $"{Util.Format(descPrefix, StrType.DECOR)}  Defense:      {Util.Format($"{analyzeResult.DefLvl}", StrType.DEF_LVL)}  Security: {Util.Format($"{analyzeResult.SecType}", StrType.SEC_TYPE)}\n";
 				if (!string.IsNullOrWhiteSpace(descPrefix))
 					output += $"{Util.Format(descPrefix, StrType.DECOR)}\n";
 			}
@@ -389,16 +382,16 @@ public static class TerminalProcessor {
 		if (showStatus || showUpgradeInfo) {
 			int hackLvl = CurrNode.HackFarm.HackLvl, timeLvl = CurrNode.HackFarm.TimeLvl, growLvl = CurrNode.HackFarm.TimeLvl;
 Say(@$"[ GC Farm Status for {CurrNode.DisplayName} ]
-Current GC in node: {Util.Format(CurrNode.HackFarm.CurrencyPile.ToString(), StrType.MONEY)}
-Hack  : Lv.{hackLvl} → {Util.Format(Util.Format(CurrNode.HackFarm.CurHack.ToString(), StrType.MONEY), StrType.UNIT, "/transfer")}
-Time  : Lv.{timeLvl} → {            Util.Format(CurrNode.HackFarm.CurTime.ToString(), StrType.UNIT, "s/tranfer")}
-Grow  : Lv.{growLvl} → {Util.Format(Util.Format(CurrNode.HackFarm.CurGrow.ToString(), StrType.MONEY), StrType.UNIT, "/s")}");
+Current GC in node: {Util.Format($"{CurrNode.HackFarm.CurrencyPile}", StrType.MONEY)}
+Hack  : Lv.{hackLvl} → {Util.Format(Util.Format($"{CurrNode.HackFarm.CurHack}", StrType.MONEY), StrType.UNIT, "/transfer")}
+Time  : Lv.{timeLvl} → {            Util.Format($"{CurrNode.HackFarm.CurTime}", StrType.UNIT, "s/tranfer")}
+Grow  : Lv.{growLvl} → {Util.Format(Util.Format($"{CurrNode.HackFarm.CurGrow}", StrType.MONEY), StrType.UNIT, "/s")}");
 
 			if (showUpgradeInfo) {
 				Say(@$"[ Upgrade Info ]
-Hack +1 → {Util.Format(Enumerable.Range(hackLvl + 1, Math.Min(hackLvl + 2, 255) - hackLvl + 1).Sum(i => CurrNode.HackFarm.GetHackCost(i)).ToString(), StrType.MONEY)} | +10 → {Util.Format(Enumerable.Range(hackLvl + 1, Math.Min(hackLvl + 11, 255) - hackLvl + 1).Sum(i => CurrNode.HackFarm.GetHackCost(i)).ToString(), StrType.MONEY)}
-Time +1 → {Util.Format(Enumerable.Range(timeLvl + 1, Math.Min(hackLvl + 2, 255) - timeLvl + 1).Sum(i => CurrNode.HackFarm.GetTimeCost(i)).ToString(), StrType.MONEY)} | +10 → {Util.Format(Enumerable.Range(timeLvl + 1, Math.Min(timeLvl + 11, 255) - timeLvl + 1).Sum(i => CurrNode.HackFarm.GetTimeCost(i)).ToString(), StrType.MONEY)}
-Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255) - growLvl + 1).Sum(i => CurrNode.HackFarm.GetGrowCost(i)).ToString(), StrType.MONEY)} | +10 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(growLvl + 11, 255) - growLvl + 1).Sum(i => CurrNode.HackFarm.GetGrowCost(i)).ToString(), StrType.MONEY)}");
+Hack +1 → {Util.Format($"{Enumerable.Range(hackLvl + 1, Mathf.Min(hackLvl + 2, 255) - hackLvl + 1).Sum(i => CurrNode.HackFarm.GetHackCost(i))}", StrType.MONEY)} | +10 → {Util.Format($"{Enumerable.Range(hackLvl + 1, Mathf.Min(hackLvl + 11, 255) - hackLvl + 1).Sum(i => CurrNode.HackFarm.GetHackCost(i))}", StrType.MONEY)}
+Time +1 → {Util.Format($"{Enumerable.Range(timeLvl + 1, Mathf.Min(hackLvl + 2, 255) - timeLvl + 1).Sum(i => CurrNode.HackFarm.GetTimeCost(i))}", StrType.MONEY)} | +10 → {Util.Format($"{Enumerable.Range(timeLvl + 1, Mathf.Min(timeLvl + 11, 255) - timeLvl + 1).Sum(i => CurrNode.HackFarm.GetTimeCost(i))}", StrType.MONEY)}
+Grow +1 → {Util.Format($"{Enumerable.Range(growLvl + 1, Mathf.Min(hackLvl + 2, 255) - growLvl + 1).Sum(i => CurrNode.HackFarm.GetGrowCost(i))}", StrType.MONEY)} | +10 → {Util.Format($"{Enumerable.Range(growLvl + 1, Mathf.Min(growLvl + 11, 255) - growLvl + 1).Sum(i => CurrNode.HackFarm.GetGrowCost(i))}", StrType.MONEY)}");
 			}
 			return;
 		}
@@ -433,8 +426,8 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 		}
 	}
 	static void Stats(Dictionary<string, string> parsedArgs, string[] postionalArgs) {
-		Say($"Username: {PlayerDataManager.Username}");
-		Say($"Balance:  {Util.Format(PlayerDataManager.GC_PublicDisplay.ToString(), StrType.MONEY)}");
+		Say($"Username: {Util.Format(PlayerDataManager.Username, StrType.USERNAME)}");
+		Say($"Balance:  {Util.Format($"{PlayerDataManager.GC_PublicDisplay}", StrType.MONEY)}");
 	}
 	static void Clear(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		terminalOutputField.Clear();
@@ -443,7 +436,7 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 		if (positionalArgs.Length == 0) { Say("-r", $"No directory name provided."); return; }
 		NodeDirectory parentDirectory;
 		for (int i = 0; i < positionalArgs.Length; i++) {
-			string[] components = positionalArgs[i].Split('/', StringSplitOptions.RemoveEmptyEntries);
+			string[] components = StringExtensions.Split(positionalArgs[i], "/", false);
 			string dirName = components[^1], parentPath = string.Join('/', components[..^1]);
 
 			parentDirectory = CurrDir.GetDirectory(parentPath);
@@ -548,7 +541,7 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 {Util.Format("▶ Classification", StrType.HEADER)}
 {Util.Format("Node type:", StrType.DECOR)}      {Util.Format($"{analyzeNode.NodeType}", StrType.SYMBOL)}
 {Util.Format("Defense level:", StrType.DECOR)}  {Util.Format($"{analyzeNode.DefLvl}", StrType.DEF_LVL)}
-{Util.Format("Security level:", StrType.DECOR)} {Util.Format($"{analyzeNode.SecType}", StrType.SEC_LVL, $"{analyzeNode.RetLvl}")}
+{Util.Format("Security level:", StrType.DECOR)} {Util.Format($"{analyzeNode.SecType}", StrType.SEC_TYPE)}
 ");
 
 		// Honeypot node don't dare to impersonate actual organization or corporation.
@@ -558,9 +551,9 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 		}
 		Say("-tl", $@"
 {Util.Format("▶ GC miner detail", StrType.HEADER)}
-{Util.Format("Transfer batch:", StrType.DECOR)} {Util.Format(analyzeNode.HackFarm.HackLvl.ToString(), StrType.NUMBER)} ({Util.Format(analyzeNode.HackFarm.CurHack.ToString("F2"), StrType.MONEY)})
-{Util.Format("Transfer speed:", StrType.DECOR)} {Util.Format(analyzeNode.HackFarm.TimeLvl.ToString(), StrType.NUMBER)} ({Util.Format(analyzeNode.HackFarm.CurTime.ToString("F2"), StrType.UNIT, "s")})
-{Util.Format("Mining speed:", StrType.DECOR)}   {Util.Format(analyzeNode.HackFarm.GrowLvl.ToString(), StrType.NUMBER)} ({Util.Format(analyzeNode.HackFarm.CurGrow.ToString("F2"), StrType.UNIT, "GC/s")})
+{Util.Format("Transfer batch:", StrType.DECOR)} {Util.Format($"{analyzeNode.HackFarm.HackLvl}", StrType.NUMBER)} ({Util.Format($"{analyzeNode.HackFarm.CurHack}", StrType.MONEY)})
+{Util.Format("Transfer speed:", StrType.DECOR)} {Util.Format($"{analyzeNode.HackFarm.TimeLvl}", StrType.NUMBER)} ({Util.Format($"{analyzeNode.HackFarm.CurTime}", StrType.UNIT, "s")})
+{Util.Format("Mining speed:", StrType.DECOR)}   {Util.Format($"{analyzeNode.HackFarm.GrowLvl}", StrType.NUMBER)} ({Util.Format(Util.Format($"{analyzeNode.HackFarm.CurGrow}", StrType.MONEY), StrType.UNIT, "/s")})
 ");
 		if (analyzeNode is FactionNode) {
 			Say("-tl", $@"
@@ -608,7 +601,7 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 					if (i + 1 < args.Length && !args[i + 1].StartsWith('-')) parsedArgs[args[i]] = args[i + 1];
 					else parsedArgs[args[i]] = "";
 					++i; 
-				} else for (int j = 1; j < args[i].Length; ++j) { parsedArgs[('-' + args[i][j]).ToString()] = ""; }
+				} else for (int j = 1; j < args[i].Length; ++j) { parsedArgs[$"-{args[i][j]}"] = ""; }
 			} else { positionalArgs.Add(args[i]); }
 		}
 		return (parsedArgs, positionalArgs.ToArray());
@@ -616,7 +609,6 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 	static void SetCommandPrompt() {
 		terminalCommandPrompt.Text = $"{Util.Format(PlayerDataManager.Username, StrType.USERNAME)}@{Util.Format(CurrNode.HostName, StrType.HOSTNAME)}:{Util.Format(CurrDir.GetPath(), StrType.DIR)}>";
 	}
-	static string EscapeBBCode(string code) { return code.Replace("[", "[lb]"); }
 	public static void OnCommandFieldTextChanged() {
 		int pastCaretPos = terminalCommandField.GetCaretColumn();
 		terminalCommandField.Text = terminalCommandField.Text.Replace("\n", "").Replace("\r", "");
@@ -638,7 +630,7 @@ Grow +1 → {Util.Format(Enumerable.Range(growLvl + 1, Math.Min(hackLvl + 2, 255
 		// Get total and current visible lines
 		int allLines = lines.Length; int curLines = CountVisibleLines(lines, curChar);
 		int lineDelta = 0;
-		if (allLines - curLines > INSTA_FILL_MARGIN) { lineDelta += (int)Math.Ceiling((allLines - curLines - INSTA_FILL_MARGIN) * .1); }
+		if (allLines - curLines > INSTA_FILL_MARGIN) { lineDelta += (int)Mathf.Ceil((allLines - curLines - INSTA_FILL_MARGIN) * .1); }
 		timeLeft -= delta;
 		if (timeLeft < 0) { timeLeft += TIME_TIL_NEXT_LINE; lineDelta += 1; }
 		int newLineIndex = curLines + lineDelta;

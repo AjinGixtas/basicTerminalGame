@@ -1,5 +1,3 @@
-using Godot;
-using System;
 using System.Collections.Generic;
 
 public class LockSystem {
@@ -46,7 +44,7 @@ public class LockSystem {
 					return 1;
 				}
 			}
-			TerminalProcessor.Say($"[{Util.Format("SUCCESS", StrType.PARTIAL_SUCCESS)}] {Util.Format("Bypassed", StrType.DECOR)} {Util.Format(activeLocks[i].Name, StrType.CMD_ARG)}");
+			TerminalProcessor.Say($"[{Util.Format("SUCCESS", StrType.PART_SUCCESS)}] {Util.Format("Bypassed", StrType.DECOR)} {Util.Format(activeLocks[i].Name, StrType.CMD_ARG)}");
 		}
 		lockPool = []; activeLocks = []; // Destroy all security system
 		TerminalProcessor.Say($"{Util.Format("Node defense cracked.", StrType.FULL_SUCCESS)} All security system [color={Util.CC(Cc.gR)}]destroyed[/color].");

@@ -2,7 +2,7 @@ using Godot;
 
 public class MinerNode : NetworkNode {
     public MinerNode(string hostName, string displayName, string IP, NetworkNode parentNode)
-        : base(hostName, displayName, IP, NetworkNodeType.MINER, parentNode) {
+        : base(hostName, displayName, IP, NodeType.MINER, parentNode) {
     }
     // Kind of whatever, they're for production anyway.
     public override (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {

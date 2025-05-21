@@ -4,7 +4,7 @@ public class BusinessNode : NetworkNode {
     public Stock _stock;
     public Stock Stock { get => _stock; set { _stock ??= value; } }
     public BusinessNode(string hostName, string displayName, string IP, NetworkNode parentNode)
-        : base(hostName, displayName, IP, NetworkNodeType.BUSINESS, parentNode) {
+        : base(hostName, displayName, IP, NodeType.BUSINESS, parentNode) {
     }
     // They're in it for the money, not to keep it
     public override (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {

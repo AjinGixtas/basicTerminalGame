@@ -8,10 +8,16 @@ public abstract class NetworkNode {
     // ^ cosmetic info
     int _secLvl, _defLvl, _retLvl; // Defense = Sec+Ret
     public SecurityType SecType { get; protected set; }
-    public NetworkNodeType NodeType { get; protected set; }
+    public NodeType NodeType { get; protected set; }
 
     NetworkNode _parentNode; HackFarm _hackFarm;
-    public NetworkNode ParentNode { get => _parentNode; set { _parentNode ??= value; } }
+    public NetworkNode ParentNode { 
+        get => _parentNode; 
+        set { 
+            _parentNode?.ChildNode.Remove(this);
+            value?.ChildNode.Add(this);
+        }
+    }
     public HackFarm HackFarm { get => _hackFarm; set { _hackFarm ??= value; } }
     public List<NetworkNode> ChildNode { get; init; }
     public LockSystem LockSystem { get; private set; }
@@ -44,7 +50,7 @@ public abstract class NetworkNode {
         get => _retLvl;
     }
     
-    public NetworkNode(string hostName, string displayName, string IP, NetworkNodeType NodeType, NetworkNode parentNode) {
+    public NetworkNode(string hostName, string displayName, string IP, NodeType NodeType, NetworkNode parentNode) {
         HostName = hostName; DisplayName = displayName; this.IP = IP; this.NodeType = NodeType;
         CurrentOwner = this; ParentNode = parentNode; ChildNode = [];
         LockSystem = new();
@@ -78,23 +84,24 @@ public abstract class NetworkNode {
             NodeType = NodeType
         };
     }
-    public static NetworkNode GenerateProceduralNode(NetworkNodeType nodeType, string hostName, string displayName, double indexRatio, double depthRatio, NetworkNode parentNode) {
+    public static NetworkNode MakeNode(NodeType nodeType, string hostName, string displayName, double indexRatio, double depthRatio, NetworkNode parentNode) {
         string IP = $"{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}";
         NetworkNode node = nodeType switch {
-            NetworkNodeType.PLAYER => throw new System.Exception("Can't remake player node"),
-            NetworkNodeType.PERSON => new PersonNode(hostName, displayName, IP, parentNode),
-            NetworkNodeType.BUSINESS => new BusinessNode(hostName, displayName, IP, parentNode),
-            NetworkNodeType.CORP => new CorpNode(hostName, displayName, IP, parentNode),
-            NetworkNodeType.FACTION => new FactionNode(hostName, displayName, IP, parentNode),
-            NetworkNodeType.HONEYPOT => new HoneypotNode(hostName, displayName, IP, parentNode),
-            NetworkNodeType.MINER => new MinerNode(hostName, displayName, IP, parentNode),
-            NetworkNodeType.ROUGE => new RougeNode(hostName, displayName, IP, parentNode),
-            NetworkNodeType.DRIFT => new DriftNode(hostName, displayName, IP, parentNode),
+            NodeType.PLAYER => throw new System.Exception("Can't remake player node"),
+            NodeType.PERSON => new PersonNode(hostName, displayName, IP, parentNode),
+            NodeType.BUSINESS => new BusinessNode(hostName, displayName, IP, parentNode),
+            NodeType.CORP => new CorpNode(hostName, displayName, IP, parentNode),
+            NodeType.FACTION => new FactionNode(hostName, displayName, IP, parentNode),
+            NodeType.HONEYPOT => new HoneypotNode(hostName, displayName, IP, parentNode),
+            NodeType.MINER => new MinerNode(hostName, displayName, IP, parentNode),
+            NodeType.ROUGE => new RougeNode(hostName, displayName, IP, parentNode),
+            NodeType.DRIFT => new DriftNode(hostName, displayName, IP, parentNode),
             _ => throw new System.Exception("Invalid node type")
         };
         (int secLvl, int defLvl) = node.GenerateSecAndDef(indexRatio, depthRatio);
         HackFarm hackFarm = new(indexRatio, depthRatio);
         node.Init(secLvl, defLvl, hackFarm);
+        NetworkManager.AssignDNS(node);
         return node;
     }
     

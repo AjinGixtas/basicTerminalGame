@@ -11,52 +11,39 @@ public static class NetworkManager {
             HackFarm = new HackFarm(1.0, 1.0, 255, 255, 255)
         }; AssignDNS(playerNode);
         PlayerHackFarm = [playerNode.HackFarm];
-        sectors = [GenerateDriftSector("DriftSector")]; // TODO: Generate sectors based on player progress
+        sectors = [GenerateDriftSector()]; // TODO: Generate sectors based on player progress
         ConnectPlayerToSector(sectors[0]);
     }
-    static readonly (NetworkNodeType, string, string)[][] BASIC_NODE_DATA = ReadBasicNodeName();
+    static readonly (NodeType, string, string)[][] BASIC_NODE_DATA = ReadBasicNodeName();
     static readonly NetworkNodeData[] SCRIPTED_NODE_DATA = ReadScriptedNodeData();
 
     static int ConnectPlayerToSector(NetworkSector sector) {
         if (sector == null) return 1;
         foreach(NetworkNode node in sector.GetSurfaceNodes()) {
-            playerNode.ChildNode.Add(node);
             node.ParentNode = playerNode;
-            AssignDNS(node);
         }
         return 0;
     }
     static int DisconnectPlayerFromSector(NetworkSector sector) {
         if (sector == null) return 1;
         foreach (NetworkNode node in sector.GetSurfaceNodes()) {
-            playerNode.ChildNode.Remove(node);
             node.ParentNode = null;
         }
         return 0;
     }
 
-    static NetworkSector GenerateDriftSector(string baseName) {
-        string fullName = baseName + GenerateRandomSuffix(6);
-        NetworkSector sector = new(fullName);
-        for(int i = 0; i < 100; ++i)
-        sector.MarkIntializationCompleted();
-        return sector;
+    static NetworkSector GenerateDriftSector() {
+        return new();
     }
 
-    static string GenerateRandomSuffix(int length) {
-        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        string sb = "";
-        for (int i = 0; i < length; i++) {
-            sb += chars[GD.RandRange(0, chars.Length-1)];
-        }
-        return sb;
-    }
 
-    public static void AddHackFarm(HackFarm hackFarm) { PlayerHackFarm.Add(hackFarm); }
+
+    public static void AddHackFarm(HackFarm hackFarm) { 
+        PlayerHackFarm.Add(hackFarm); 
+    }
     public static void CollectHackFarmMoney(double delta) {
         foreach (HackFarm h in PlayerHackFarm) { PlayerDataManager.Deposit(h.Process(delta)); }
     }
-
     public static NetworkNode QueryDNS(string IP) {
         return DNS.TryGetValue(IP, out var node) ? node : null; ;
     }
@@ -64,7 +51,7 @@ public static class NetworkManager {
         if (string.IsNullOrEmpty(node.IP)) return 1;
         DNS[node.IP] = node; return 0;
     }
-    static string GetRandomIP() {
+    public static string GetRandomIP() {
         static string Generate() => $"{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}";
         DNS ??= [];
         string ip;
@@ -72,26 +59,24 @@ public static class NetworkManager {
         while (DNS.ContainsKey(ip));
         return ip;
     }
-
-
-    static (NetworkNodeType, string, string)[][] ReadBasicNodeName() {
-        (string, NetworkNodeType)[] nodeTypeData = [
-            ("Person.txt", NetworkNodeType.PERSON),
-            ("Rouge.txt", NetworkNodeType.ROUGE),
-            ("Honeypot.txt", NetworkNodeType.HONEYPOT),
-            ("Miner.txt", NetworkNodeType.MINER),
+    static (NodeType, string, string)[][] ReadBasicNodeName() {
+        (string, NodeType)[] nodeTypeData = [
+            ("Person.txt", NodeType.PERSON),
+            ("Rouge.txt", NodeType.ROUGE),
+            ("Honeypot.txt", NodeType.HONEYPOT),
+            ("Miner.txt", NodeType.MINER),
         ];
-        (NetworkNodeType, string, string)[][] output = new (NetworkNodeType, string, string)[nodeTypeData.Length][];
+        (NodeType, string, string)[][] output = new (NodeType, string, string)[nodeTypeData.Length][];
         for (int i = 0; i < nodeTypeData.Length; i++) {
             output[i] = ReadNodeNameOfType(nodeTypeData[i].Item1, nodeTypeData[i].Item2);
         }
         return output;
 
-        static (NetworkNodeType, string, string)[] ReadNodeNameOfType(string fileName, NetworkNodeType nodeType) {
+        static (NodeType, string, string)[] ReadNodeNameOfType(string fileName, NodeType nodeType) {
             FileAccess fileAccess = FileAccess.Open($"res://Utilities/TextFiles/ServerNames/{fileName}", FileAccess.ModeFlags.Read);
 
             int count = int.Parse(fileAccess.GetLine());
-            var output = new (NetworkNodeType, string, string)[count];
+            var output = new (NodeType, string, string)[count];
 
             for (int i = 0; i < count; ++i) {
                 string[] parts = StringExtensions.Split(fileAccess.GetLine(), " ", false);

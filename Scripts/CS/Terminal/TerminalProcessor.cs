@@ -344,9 +344,9 @@ public static class TerminalProcessor {
 
 			if (parsedArgs.ContainsKey("-v")) {
 				string descPrefix = getDescPrefix(depthMarks) + ((depth == MAX_DEPTH ? 0 : ((node.ParentNode != null ? 0 : -1) + node.ChildNode.Count)) > 0 ? " │" : "  ");
-				output += $"{Util.Format(descPrefix, StrType.DECOR)}  Display Name: {Util.Format(analyzeResult.DisplayName, StrType.DISPLAY_NAME)}\n";
-				output += $"{Util.Format(descPrefix, StrType.DECOR)}  Node Type:    {Util.Format($"{analyzeResult.NodeType}", StrType.SYMBOL)}\n";
-				output += $"{Util.Format(descPrefix, StrType.DECOR)}  Defense:      {Util.Format($"{analyzeResult.DefLvl}", StrType.DEF_LVL)}  Security: {Util.Format($"{analyzeResult.SecType}", StrType.SEC_TYPE)}\n";
+				output += $"{Util.Format(descPrefix, StrType.DECOR)}   Display Name:    {Util.Format(analyzeResult.DisplayName, StrType.DISPLAY_NAME)}\n";
+				output += $"{Util.Format(descPrefix, StrType.DECOR)}   Node Type:       {Util.Format($"{analyzeResult.NodeType}", StrType.SYMBOL)}\n";
+				output += $"{Util.Format(descPrefix, StrType.DECOR)}   Firewall rating: {Util.Format($"{analyzeResult.DefLvl}", StrType.DEF_LVL)}  Security: {Util.Format($"{analyzeResult.SecType}", StrType.SEC_TYPE)}\n";
 				if (!string.IsNullOrWhiteSpace(descPrefix))
 					output += $"{Util.Format(descPrefix, StrType.DECOR)}\n";
 			}
@@ -572,15 +572,16 @@ Grow +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(gr
 		if (CurrNode.ChildNode.FindLast(s => s.HostName == positionalArgs[0]) != null) analyzeNode = CurrNode.ChildNode.FindLast(s => s.HostName == positionalArgs[0]);
 		else if (CurrNode.ParentNode != null && CurrNode.ParentNode.HostName == positionalArgs[0]) analyzeNode = CurrNode.ParentNode;
 		else if (CurrNode.HostName == positionalArgs[0]) analyzeNode = CurrNode;
+		int globalWidth = 17;
 		Say("-tl", $@"
 {Util.Format("▶ Node Info", StrType.HEADER)}
-{Util.Format("Host name:", StrType.DECOR)}      {Util.Format(analyzeNode.HostName, StrType.HOSTNAME)}
-{Util.Format("IP address:", StrType.DECOR)}     {Util.Format(analyzeNode.IP, StrType.IP)}
-{Util.Format("Display name:", StrType.DECOR)}   {Util.Format(analyzeNode.DisplayName, StrType.DISPLAY_NAME)}
+{Util.Format("Host name:", StrType.DECOR),17}{Util.Format(analyzeNode.HostName, StrType.HOSTNAME)}
+{Util.Format("IP address:", StrType.DECOR),17}{Util.Format(analyzeNode.IP, StrType.IP)}
+{Util.Format("Display name:", StrType.DECOR),17}{Util.Format(analyzeNode.DisplayName, StrType.DISPLAY_NAME)}
 {Util.Format("▶ Classification", StrType.HEADER)}
-{Util.Format("Node type:", StrType.DECOR)}      {Util.Format($"{analyzeNode.NodeType}", StrType.SYMBOL)}
-{Util.Format("Defense level:", StrType.DECOR)}  {Util.Format($"{analyzeNode.DefLvl}", StrType.DEF_LVL)}
-{Util.Format("Security level:", StrType.DECOR)} {Util.Format($"{analyzeNode.SecType}", StrType.SEC_TYPE)}
+{Util.Format("Node type:", StrType.DECOR),17}{Util.Format($"{analyzeNode.NodeType}", StrType.SYMBOL)}
+{Util.Format("Firewall rating:", StrType.DECOR),17}{Util.Format($"{analyzeNode.DefLvl}", StrType.DEF_LVL)}
+{Util.Format("Security level:", StrType.DECOR),17}{Util.Format($"{analyzeNode.SecType}", StrType.SEC_TYPE)}
 ");
 
 		// Honeypot node don't dare to impersonate actual organization or corporation.
@@ -590,32 +591,32 @@ Grow +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(gr
 		}
 		Say("-tl", $@"
 {Util.Format("▶ GC miner detail", StrType.HEADER)}
-{Util.Format("Transfer batch:", StrType.DECOR)} {Util.Format($"{analyzeNode.HackFarm.HackLvl}", StrType.NUMBER)} ({Util.Format($"{analyzeNode.HackFarm.CurHack}", StrType.MONEY)})
-{Util.Format("Transfer speed:", StrType.DECOR)} {Util.Format($"{analyzeNode.HackFarm.TimeLvl}", StrType.NUMBER)} ({Util.Format($"{analyzeNode.HackFarm.CurTime}", StrType.UNIT, "s")})
-{Util.Format("Mining speed:", StrType.DECOR)}   {Util.Format($"{analyzeNode.HackFarm.GrowLvl}", StrType.NUMBER)} ({Util.Format(Util.Format($"{analyzeNode.HackFarm.CurGrow}", StrType.MONEY), StrType.UNIT, "/s")})
+{Util.Format("Transfer batch:", StrType.DECOR),17}{Util.Format($"{analyzeNode.HackFarm.HackLvl}", StrType.NUMBER)} ({Util.Format($"{analyzeNode.HackFarm.CurHack}", StrType.MONEY)})
+{Util.Format("Transfer speed:", StrType.DECOR),17}{Util.Format($"{analyzeNode.HackFarm.TimeLvl}", StrType.NUMBER)} ({Util.Format($"{analyzeNode.HackFarm.CurTime}", StrType.UNIT, "s")})
+{Util.Format("Mining speed:", StrType.DECOR),17}{Util.Format($"{analyzeNode.HackFarm.GrowLvl}", StrType.NUMBER)} ({Util.Format(Util.Format($"{analyzeNode.HackFarm.CurGrow}", StrType.MONEY), StrType.UNIT, "/s")})
 ");
 		if (analyzeNode is FactionNode) {
 			Say("-tl", $@"
 {Util.Format("▶ Faction detail", StrType.HEADER)}
-{Util.Format("Name:", StrType.DECOR)}           {Util.Format(Util.Obfuscate((analyzeNode as FactionNode).Faction.Name), StrType.DISPLAY_NAME)}
-{Util.Format("Description:", StrType.DECOR)}    {Util.Format(Util.Obfuscate((analyzeNode as FactionNode).Faction.Desc), StrType.DESC)}
+{Util.Format("Name:", StrType.DECOR),17}{Util.Format(Util.Obfuscate((analyzeNode as FactionNode).Faction.Name), StrType.DISPLAY_NAME)}
+{Util.Format("Description:", StrType.DECOR),17}{Util.Format(Util.Obfuscate((analyzeNode as FactionNode).Faction.Desc), StrType.DESC)}
 ");
 		}
 		if (analyzeNode is BusinessNode) {
 			Say("-tl", $@"
 {Util.Format("▶ Business detail", StrType.HEADER)}
-{Util.Format("Stock:", StrType.DECOR)}          {Util.Format((analyzeNode as BusinessNode).Stock.Name, StrType.DISPLAY_NAME)}
-{Util.Format("Value:", StrType.DECOR)}          {Util.Format((analyzeNode as BusinessNode).Stock.Price.ToString("F2"), StrType.MONEY)}
+{Util.Format("Stock:", StrType.DECOR),17}{Util.Format((analyzeNode as BusinessNode).Stock.Name, StrType.DISPLAY_NAME)}
+{Util.Format("Value:", StrType.DECOR),17}{Util.Format((analyzeNode as BusinessNode).Stock.Price.ToString("F2"), StrType.MONEY)}
 ");
 		}
 		if (analyzeNode is CorpNode) {
 			Say("-tl", $@"
 {Util.Format("▶ Faction detail", StrType.HEADER)}
-{Util.Format("Name:", StrType.DECOR)}           {Util.Format(Util.Obfuscate((analyzeNode as CorpNode).Faction.Name), StrType.DISPLAY_NAME)}
-{Util.Format("Description:", StrType.DECOR)}    {Util.Format(Util.Obfuscate((analyzeNode as CorpNode).Faction.Desc), StrType.DESC)}
+{Util.Format("Name:", StrType.DECOR),17}{Util.Format(Util.Obfuscate((analyzeNode as CorpNode).Faction.Name), StrType.DISPLAY_NAME)}
+{Util.Format("Description:", StrType.DECOR),17}{Util.Format(Util.Obfuscate((analyzeNode as CorpNode).Faction.Desc), StrType.DESC)}
 {Util.Format("▶ Business detail", StrType.HEADER)}
-{Util.Format("Stock:", StrType.DECOR)}          {Util.Format((analyzeNode as CorpNode).Stock.Name, StrType.DISPLAY_NAME)}
-{Util.Format("Value:", StrType.DECOR)}          {Util.Format((analyzeNode as CorpNode).Stock.Price.ToString("F2"), StrType.MONEY)}
+{Util.Format("Stock:", StrType.DECOR),17}{Util.Format((analyzeNode as CorpNode).Stock.Name, StrType.DISPLAY_NAME)}
+{Util.Format("Value:", StrType.DECOR),17}{Util.Format((analyzeNode as CorpNode).Stock.Price.ToString("F2"), StrType.MONEY)}
 ");
 		}
 	}
@@ -702,5 +703,5 @@ public struct NodeAnalysis {
 	public int SecLvl { get; init; }
 	public int RetLvl { get; init; }
 	public SecurityType SecType { get; init; }
-	public NetworkNodeType NodeType { get; init; }
+	public NodeType NodeType { get; init; }
 }

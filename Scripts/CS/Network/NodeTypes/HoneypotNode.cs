@@ -2,9 +2,9 @@ using Godot;
 
 public class HoneypotNode : NetworkNode {
     double lastEpoch = 0;
-    public static (NetworkNodeType, string, string)[][] namePool;
+    public static (NodeType, string, string)[][] namePool;
     public HoneypotNode(string hostName, string displayName, string IP, NetworkNode parentNode)
-        : base(hostName, displayName, IP, NetworkNodeType.HONEYPOT, parentNode) {
+        : base(hostName, displayName, IP, NodeType.HONEYPOT, parentNode) {
         GenerateFakeData();
     }
     public override (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {
@@ -12,14 +12,14 @@ public class HoneypotNode : NetworkNode {
     }
     public string fakeHostName, fakeDisplayName;
     public int fakeDefLvl = 0, fakeSecLvl = 0, fakeRetLvl = 0;
-    SecurityType fakeSecType; NetworkNodeType fakeNodeType;
+    SecurityType fakeSecType; NodeType fakeNodeType;
     public void GenerateFakeData() {
         if (Time.GetUnixTimeFromSystem() - lastEpoch < 15) { return; }
         int chosenSection = GD.RandRange(0, namePool.GetLength(0) - 1);
         int chosenElement = GD.RandRange(0, namePool[chosenSection].GetLength(0) - 1);
-        (NetworkNodeType, string, string) name = namePool[chosenSection][chosenElement];
+        (NodeType, string, string) name = namePool[chosenSection][chosenElement];
         for (int i = 0; i < 10; ++i) {
-            if (name.Item1 == NetworkNodeType.HONEYPOT) {
+            if (name.Item1 == NodeType.HONEYPOT) {
                 chosenSection = GD.RandRange(0, namePool.GetLength(0) - 1);
                 chosenElement = GD.RandRange(0, namePool[chosenSection].GetLength(0) - 1);
                 name = namePool[chosenSection][chosenElement];

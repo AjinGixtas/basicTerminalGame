@@ -2,7 +2,7 @@ using Godot;
 
 public class PersonNode : NetworkNode {
     public PersonNode(string hostName, string displayName, string IP, NetworkNode parentNode)
-        : base(hostName, displayName, IP, NetworkNodeType.PERSON, parentNode) {
+        : base(hostName, displayName, IP, NodeType.PERSON, parentNode) {
         // Kind of just stupid in general...
     }
     public override (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {

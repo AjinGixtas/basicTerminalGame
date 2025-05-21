@@ -1,6 +1,6 @@
 using System;
 [Flags]
-public enum NetworkNodeType {
+public enum NodeType {
     PLAYER =   0, //Player
     PERSON =   1, //Money
     BUSINESS = 2, //Money+Stock

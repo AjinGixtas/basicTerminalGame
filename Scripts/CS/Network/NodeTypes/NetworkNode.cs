@@ -16,6 +16,7 @@ public abstract class NetworkNode {
         set { 
             _parentNode?.ChildNode.Remove(this);
             value?.ChildNode.Add(this);
+            _parentNode = value;
         }
     }
     public HackFarm HackFarm { get => _hackFarm; set { _hackFarm ??= value; } }

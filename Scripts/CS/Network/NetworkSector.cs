@@ -7,8 +7,6 @@ public class NetworkSector {
     public NetworkSector() {
         Name = GenSectorName();
         int type = GD.RandRange(0, 2);
-        GenerateBusNetwork();
-        return;
         switch (type) {
             case 0: GenerateBusNetwork(); break;
             case 1: GenerateStarNetwork(); break;

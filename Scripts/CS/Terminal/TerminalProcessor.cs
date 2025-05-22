@@ -7,8 +7,8 @@ public static partial class TerminalProcessor {
 	static TextEdit terminalCommandField; 
 	static Timer crackDurationTimer;
 	static NetworkNode _currNode = null; static NodeDirectory _currDir = null;
-	public static NodeDirectory CurrDir { get { return _currDir; } set { _currDir = value; SetCommandPrompt(); } }
-	static NetworkNode CurrNode { get { return _currNode; } set { _currNode = value; SetCommandPrompt(); } }
+	public static NodeDirectory CurrDir { get { return _currDir; } private set { _currDir = value; SetCommandPrompt(); } }
+	public static NetworkNode CurrNode { get { return _currNode; } private set { _currNode = value; SetCommandPrompt(); } }
 	static readonly List<string> commandHistory = []; static int _commandHistoryIndex = 0;
 	static int CommandHistoryIndex {
 		get => _commandHistoryIndex;
@@ -41,7 +41,7 @@ public static partial class TerminalProcessor {
 		terminalCommandField.ScrollFitContentWidth = true;
 	}
 	public static void IntializeInternal() {
-		TerminalProcessor._currNode = NetworkManager.playerNode;
+		TerminalProcessor._currNode = NetworkManager.PlayerNode;
 		TerminalProcessor._currDir = PlayerFileManager.FileSystem;
 		TerminalProcessor.SetCommandPrompt();
 	}

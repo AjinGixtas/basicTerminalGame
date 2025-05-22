@@ -66,4 +66,5 @@ public enum StrType {
     SEC_TYPE = 22,
     CMD_ARG = 23,
     CMD_CMD = 24,
+    SECTOR = 25
 }

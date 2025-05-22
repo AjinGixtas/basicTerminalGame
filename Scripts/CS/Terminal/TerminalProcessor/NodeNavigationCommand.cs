@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 public static partial class TerminalProcessor {
     static void Home(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
-        CurrNode = NetworkManager.playerNode;
+        Home();
     }
     static void Scan(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         string L = " └─── ", M = " ├─── ", T = "      ", E = " │    ";
@@ -81,7 +81,7 @@ public static partial class TerminalProcessor {
 ");
 
         // Honeypot node don't dare to impersonate actual organization or corporation.
-        if (analyzeNode.CurrentOwner != NetworkManager.playerNode || analyzeNode.GetType() == typeof(HoneypotNode)) {
+        if (analyzeNode.CurrentOwner != NetworkManager.PlayerNode || analyzeNode.GetType() == typeof(HoneypotNode)) {
             Say($"Crack this node security system to get further access.");
             return;
         }
@@ -115,5 +115,41 @@ public static partial class TerminalProcessor {
 {Util.Format("Value:", StrType.DECOR),padLength}{Util.Format((analyzeNode as CorpNode).Stock.Price.ToString("F2"), StrType.MONEY)}
 ");
         }
+    }
+    static void Sector(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+        string[] sectorNames = NetworkManager.GetSectorNames();
+        string output = "";
+        for (int i = 0; i < sectorNames.Length; ++i) {
+            if (sectorNames[i] == null) { continue; }
+            output += $"{Util.Format(sectorNames[i], StrType.SECTOR)}";
+        }
+        Say(output);
+    }
+    static void Link(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+        for (int i = 0; i < positionalArgs.Length; ++i) { 
+            int status = NetworkManager.ConnectToSector(positionalArgs[i]);
+            string msg = status switch {
+                0 => $"Connected to sector: {Util.Format(positionalArgs[i], StrType.SECTOR)}",
+                1 => $"Failed to connect to sector: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Sector not found.",
+                2 => $"Failed to connect to sector: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Already connected.",
+                _ => $"Unknown error code: {status}. Failed to connect to sector: {Util.Format(positionalArgs[i], StrType.SECTOR)}",
+            };
+            if (status == 0) { Say(msg); } else { Say("-r", msg); }
+        }
+    }
+    static void Unlink(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+        for (int i = 0; i < positionalArgs.Length; ++i) {
+            int status = NetworkManager.DisconnectFromSector(positionalArgs[i]);
+            string msg = status switch {
+                0 => $"Disconnected from sector: {Util.Format(positionalArgs[i], StrType.SECTOR)}",
+                1 => $"Failed to disconnect from sector: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Sector not found.",
+                2 => $"Failed to disconnect from sector: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Not connected.",
+                _ => $"Unknown error code: {status}. Failed to disconnect from sector: {Util.Format(positionalArgs[i], StrType.SECTOR)}",
+            };
+            if (status == 0) { Say(msg); } else { Say("-r", msg); }
+        }
+    }
+    public static void Home() {
+        CurrNode = NetworkManager.PlayerNode;
     }
 }

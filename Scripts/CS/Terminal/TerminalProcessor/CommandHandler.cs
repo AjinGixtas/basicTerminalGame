@@ -52,21 +52,26 @@ public static partial class TerminalProcessor {
             case "mkf": MkF(parsedArgs, positionalArgs); break; // Make file
             case "rmf": RmF(parsedArgs, positionalArgs); break; // Remove file
             case "pwd": Pwd(parsedArgs, positionalArgs); break; // List current folder path
-            case "say": Say(parsedArgs, positionalArgs); break; // Output to terminal
+            case "say" or "echo": Say(parsedArgs, positionalArgs); break; // Output to terminal
             case "help": Help(parsedArgs, positionalArgs); break; // List how commands work
             case "home": Home(parsedArgs, positionalArgs); break; // Go to the player's node
-            case "edit": Edit(parsedArgs, positionalArgs); break; // Open a file for edit
-            case "scan": Scan(parsedArgs, positionalArgs); break; // Scan neighbouring node
+            case "edit" or "nano" or "vim": Edit(parsedArgs, positionalArgs); break; // Open a file for edit
+            case "scan" or "nmap": Scan(parsedArgs, positionalArgs); break; // Scan neighbouring node
             case "farm": Farm(parsedArgs, positionalArgs); break; // Interact with a node's HackFarm (GCminer)
+            case "link": Link(parsedArgs, positionalArgs); break; // Connect to sector(s)
             case "stats": Stats(parsedArgs, positionalArgs); break;
             case "clear": Clear(parsedArgs, positionalArgs); break; // Clear all text on the terminal
             case "mkdir": MkDir(parsedArgs, positionalArgs); break; // Make folder
             case "rmdir": RmDir(parsedArgs, positionalArgs); break; // Remove folder
-            case "karaxe": Crack(parsedArgs, positionalArgs); break; // Interact with the rush hacking system
+            case "sector": Sector(parsedArgs, positionalArgs); break; // List out sectors
+            case "karaxe": Karaxe(parsedArgs, positionalArgs); break; // Interact with the rush hacking system
+            case "unlink": Unlink(parsedArgs, positionalArgs); break; // Disconnect from sector(s)
             case "inspect": Inspect(parsedArgs, positionalArgs); break; // Doesn't do anything yet
             case "connect": Connect(parsedArgs, positionalArgs); break; // Connect to node
             case "analyze": Analyze(parsedArgs, positionalArgs); break; // Give data about a node
             case "setusername": SetUsername(parsedArgs, positionalArgs); break; // Set the player's username
+
+            case "regenerate": NetworkManager.GenerateDriftSector(); break; // Regenerate the drift sector
             default: Say("-r", $"{command} is not a valid command."); break;
         }
         return true;

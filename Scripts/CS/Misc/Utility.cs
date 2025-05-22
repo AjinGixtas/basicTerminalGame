@@ -156,9 +156,9 @@ public static class Util {
                         return $"[color={Util.CC(Cc.y)}]{input}[/color][color={Util.CC(Cc.y)}]GC[/color]";
 
                     // Define units and their values
-                    string[] units =    ["Q" , "T" , "B" , "M" , "K" ];
-                    double[] divisors = [1e15, 1e12, 1e9 , 1e6 , 1e3 ];
-                    Cc[] colors =       [Cc.R, Cc.M, Cc.G, Cc.B, Cc.C]; // Q, T, B, M, K
+                    string[] units =    ["S" , "Q" , "T" , "B" , "M" , "K" ];
+                    double[] divisors = [1e21, 1e15, 1e12, 1e9 , 1e6 , 1e3 ];
+                    Cc[] colors =       [Cc.R, Cc.Y, Cc.M, Cc.G, Cc.B, Cc.C]; // Q, T, B, M, K
 
                     string sb = "";
                     double remainder = value;
@@ -202,6 +202,8 @@ public static class Util {
                 return $"[color={Util.CC(Cc.C)}]{input}[/color]";
             case StrType.UNKNOWN_ERROR:
                 return Util.Format($"Unknown error encountered{(addons.Length != 0 ? $" with {addons[0]}" : "")}. Error code: {input}", StrType.ERROR);
+            case StrType.SECTOR:
+                return $"[color={Util.CC(Cc.RGB)}]{input, -16}[/color]";
             default:
                 return input;
         }

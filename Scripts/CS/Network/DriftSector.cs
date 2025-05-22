@@ -1,16 +1,17 @@
 using Godot;
 using System.Collections.Generic;
 
-public class NetworkSector {
+public class DriftSector {
     static readonly string[] DRIFT_NODE_NAMES = StringExtensions.Split(FileAccess.Open("res://Utilities/TextFiles/ServerNames/DriftNode.txt", FileAccess.ModeFlags.Read).GetAsText(), "\n", false);
     static readonly string[] DRIFT_SECTOR_NAMES = StringExtensions.Split(FileAccess.Open("res://Utilities/TextFiles/ServerNames/DriftSector.txt", FileAccess.ModeFlags.Read).GetAsText(), "\n", false);
-    public NetworkSector() {
+    public DriftSector() {
         Name = GenSectorName();
-        int type = GD.RandRange(0, 2);
+        int type = GD.RandRange(0, 3);
         switch (type) {
             case 0: GenerateBusNetwork(); break;
             case 1: GenerateStarNetwork(); break;
             case 2: GenerateVineNetwork(); break;
+            case 3: GenerateTreeNetwork(); break;
             default: GD.PrintErr("Invalid network type"); break;
         }
         MarkIntializationCompleted();
@@ -31,7 +32,7 @@ public class NetworkSector {
             (displayName, hostName) = GenNodeName();
             AddSurfaceNode(NetworkNode.MakeNode(NodeType.DRIFT, hostName, displayName, 0, 0, null));
         }
-        for (int i = 0; i < layer; i++) {
+        for (int i = 0; i < layer-1; i++) {
             for (int j = 0; j < node; j++) {
                 (displayName, hostName) = GenNodeName();
                 NetworkNode.MakeNode(NodeType.DRIFT, hostName, displayName, 0, 0, chainNode);
@@ -54,9 +55,27 @@ public class NetworkSector {
             (string displayName, string hostName) = GenNodeName();
             DriftNode chainNode = NetworkNode.MakeNode(NodeType.DRIFT, hostName, displayName, 0, 0, null) as DriftNode;
             AddSurfaceNode(chainNode);
-            for (int j = 0; j < node; ++j) {
+            for (int j = 0; j < node-1; ++j) {
                 (displayName, hostName) = GenNodeName();
                 chainNode = NetworkNode.MakeNode(NodeType.DRIFT, hostName, displayName, 0, 0, chainNode) as DriftNode;
+            }
+        }
+    }
+    void GenerateTreeNetwork() {
+        if (_isIntialized) return;
+        int layer = 3, node = 2;
+        for(int i = 0; i < node; ++i) {
+            (string displayName, string hostName) = GenNodeName();
+            DriftNode surfaceNode = NetworkNode.MakeNode(NodeType.DRIFT, hostName, displayName, 0, 0, null) as DriftNode;
+            GenerateTree(surfaceNode, 1, layer, node);
+            AddSurfaceNode(surfaceNode);
+        }
+        void GenerateTree(DriftNode node, int depth, int maxDepth, int childCount) {
+            if (depth >= maxDepth) return;
+            for (int i = 0; i < childCount; ++i) {
+                (string displayName, string hostName) = GenNodeName();
+                DriftNode childNode = NetworkNode.MakeNode(NodeType.DRIFT, hostName, displayName, 0, 0, node) as DriftNode;
+                GenerateTree(childNode, depth + 1, maxDepth, childCount);
             }
         }
     }

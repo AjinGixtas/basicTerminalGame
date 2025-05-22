@@ -16,7 +16,7 @@ public static partial class TerminalProcessor {
         if (showStatus && doUpgrade) { Say("-r", "Can not show status of a node and changing it at the same time."); return; }
 
         // Check node's ownership
-        if (CurrNode.CurrentOwner != NetworkManager.playerNode) { Say("-r", "You don't own this node's GC miner"); return; }
+        if (CurrNode.CurrentOwner != NetworkManager.PlayerNode) { Say("-r", "You don't own this node's GC miner"); return; }
         // Status display
         if (showStatus) {
             int hackLvl = CurrNode.HackFarm.HackLvl, timeLvl = CurrNode.HackFarm.TimeLvl, growLvl = CurrNode.HackFarm.TimeLvl;
@@ -96,7 +96,7 @@ Grow +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(gr
     }
     const double FLARE_TIME = 120.0;
     static double startEpoch = 0, endEpoch = 0, remainingTime = 0;
-    static int Crack(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+    static int Karaxe(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         NetworkNode node = CurrNode;
         if (parsedArgs.ContainsKey("--axe") && parsedArgs.ContainsKey("--flare")) {
             Say("-r", "You can not use --axe and --flare at the same time.");
@@ -128,7 +128,7 @@ Grow +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(gr
 
         int result = node.AttempCrackNode(parsedArgs, endEpoch);
         if (result == 0) {
-            node.TransferOwnership(NetworkManager.playerNode);
+            node.TransferOwnership(NetworkManager.PlayerNode);
             NetworkManager.AddHackFarm(node.HackFarm);
         }
         return 0;

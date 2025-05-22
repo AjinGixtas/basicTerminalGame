@@ -1,42 +1,123 @@
 using Godot;
 using System.Collections.Generic;
-public static class NetworkManager {
-    public static PlayerNode playerNode;
-    public static NetworkSector[] sectors;
+public static partial class NetworkManager {
+    static PlayerNode _playerNode;
+    public static PlayerNode PlayerNode { get => _playerNode; private set { _playerNode = value; } }
+    static List<DriftSector> connectedSectors;
+    static List<DriftSector> driftSectors;
     static Dictionary<string, NetworkNode> DNS;
 	static List<HackFarm> PlayerHackFarm = [];
+    const int DRIFT_SECTOR_COUNT = 128;
     public static void Ready() {
-        DNS = [];
-        playerNode = new PlayerNode("home", "Player Terminal", GetRandomIP(), null) {
+        DNS = []; driftSectors = []; connectedSectors = [];
+        PlayerNode = new PlayerNode("home", "Player Terminal", GetRandomIP(), null) {
             HackFarm = new HackFarm(1.0, 1.0, 255, 255, 255)
-        }; AssignDNS(playerNode);
-        PlayerHackFarm = [playerNode.HackFarm];
-        sectors = [GenerateDriftSector()]; // TODO: Generate sectors based on player progress
-        ConnectPlayerToSector(sectors[0]);
+        }; AssignDNS(PlayerNode);
+        PlayerHackFarm = [PlayerNode.HackFarm];
+        for (int i = 0; i < DRIFT_SECTOR_COUNT; ++i) {
+            driftSectors.Add(new DriftSector());
+        }
     }
+
+    public static string[] GetSectorNames() {
+        string[] names = new string[driftSectors.Count];
+        for (int i = 0; i < driftSectors.Count; ++i) {
+            if (driftSectors[i] == null) { driftSectors.Remove(driftSectors[i]); }
+            names[i] = driftSectors[i].Name;
+        }
+        return names;
+    }
+    public static void GenerateDriftSector() {
+        connectedSectors.RemoveAll(item => typeof(DriftSector) == item.GetType());
+        driftSectors = [];
+        for (int i = 0; i < DRIFT_SECTOR_COUNT; ++i) {
+            driftSectors.Add(new DriftSector());
+        }
+    }
+
     static readonly (NodeType, string, string)[][] BASIC_NODE_DATA = ReadBasicNodeName();
     static readonly NetworkNodeData[] SCRIPTED_NODE_DATA = ReadScriptedNodeData();
 
-    static int ConnectPlayerToSector(NetworkSector sector) {
-        if (sector == null) return 1;
-        foreach(NetworkNode node in sector.GetSurfaceNodes()) {
-            node.ParentNode = playerNode;
+    public static int ConnectToSector(string sectorName) {
+        foreach (DriftSector sector in driftSectors) {
+            if (sector == null) driftSectors.Remove(sector);
+            if (sector.Name != sectorName) { continue; }
+            return ConnectToSector(sector);
         }
-        return 0;
+        return 3;
     }
-    static int DisconnectPlayerFromSector(NetworkSector sector) {
+    public static int DisconnectFromSector(string sectorName) {
+        foreach (DriftSector sector in driftSectors) {
+            if (sector == null) driftSectors.Remove(sector);
+            if (sector.Name != sectorName) { continue; }
+            return DisconnectFromSector(sector);
+        }
+        return 3;
+    }
+
+    public static int ConnectToSector(DriftSector sector) {
         if (sector == null) return 1;
+        if (connectedSectors.Contains(sector)) return 2;
+
+        foreach (NetworkNode node in sector.GetSurfaceNodes()) node.ParentNode = PlayerNode;
+        connectedSectors.Add(sector); return 0;
+    }
+    public static int DisconnectFromSector(DriftSector sector) {
+        if (sector == null) return 1;
+        if (!connectedSectors.Contains(sector)) return 2;
+
+        // Disconnect player if currently in this sector
         foreach (NetworkNode node in sector.GetSurfaceNodes()) {
+            if (IsNodeOrDescendant(TerminalProcessor.CurrNode, node)) {
+                TerminalProcessor.Home();
+                break;
+            }
             node.ParentNode = null;
         }
+
+        connectedSectors.Remove(sector);
         return 0;
     }
 
-    static NetworkSector GenerateDriftSector() {
-        return new();
+    static bool IsNodeOrDescendant(NetworkNode target, NetworkNode node) {
+        // Helper: recursively checks if target is node or any of its descendants
+        if (target == null || node == null) return false;
+        if (target == node) return true;
+        foreach (NetworkNode child in node.ChildNode) {
+            if (IsNodeOrDescendant(target, child)) return true;
+        }
+        return false;
     }
 
+    public static int RemoveSector(string sectorName) {
+        foreach (DriftSector sector in driftSectors) {
+            if (sector == null) driftSectors.Remove(sector);
+            if (sector.Name != sectorName) { continue; }
+            return RemoveSector(sector);
+        }
+        return 3;
+    }
+    public static int RemoveSector(DriftSector sector) {
+        if (sector == null) return 1;
+        if (!driftSectors.Contains(sector)) return 2;
+        // Recursively remove all nodes in the sector from DNS
+        foreach (NetworkNode node in sector.GetSurfaceNodes()) {
+            RemoveNodeAndChildrenFromDNS(node); node.ParentNode = null;
+        }
+        driftSectors.Remove(sector);
+        return 0;
+    }
 
+    // Helper method to recursively remove a node and its children from DNS
+    static void RemoveNodeAndChildrenFromDNS(NetworkNode node) {
+        if (node == null) return;
+        if (!string.IsNullOrEmpty(node.IP)) {
+            DNS.Remove(node.IP);
+        }
+        foreach (var child in node.ChildNode) {
+            RemoveNodeAndChildrenFromDNS(child);
+        }
+    }
 
     public static void AddHackFarm(HackFarm hackFarm) { 
         PlayerHackFarm.Add(hackFarm); 

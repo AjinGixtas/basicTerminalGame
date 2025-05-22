@@ -24,17 +24,17 @@ public class NetworkSector {
     void GenerateBusNetwork() {
         if (_isIntialized) return;
         int layer = 3, node = 3;
-        string nodeName = GenNodeName();
-        DriftNode chainNode = NetworkNode.MakeNode(NodeType.DRIFT, nodeName, nodeName, 0, 0, null) as DriftNode;
+        (string displayName, string hostName) = GenNodeName();
+        DriftNode chainNode = NetworkNode.MakeNode(NodeType.DRIFT, hostName, displayName, 0, 0, null) as DriftNode;
         AddSurfaceNode(chainNode);
         for (int i = 0; i < node-1; ++i) {
-            nodeName = GenNodeName();
-            AddSurfaceNode(NetworkNode.MakeNode(NodeType.DRIFT, nodeName, nodeName, 0, 0, null));
+            (displayName, hostName) = GenNodeName();
+            AddSurfaceNode(NetworkNode.MakeNode(NodeType.DRIFT, hostName, displayName, 0, 0, null));
         }
         for (int i = 0; i < layer; i++) {
             for (int j = 0; j < node; j++) {
-                nodeName = GenNodeName();
-                NetworkNode.MakeNode(NodeType.DRIFT, nodeName, nodeName, 0, 0, chainNode);
+                (displayName, hostName) = GenNodeName();
+                NetworkNode.MakeNode(NodeType.DRIFT, hostName, displayName, 0, 0, chainNode);
             }
             chainNode = chainNode.ChildNode[0] as DriftNode;
         }
@@ -43,20 +43,20 @@ public class NetworkSector {
         if (_isIntialized) return;
         int node = 5;
         for (int i = 0; i < node; ++i) {
-            string nodeName = GenNodeName();
-            AddSurfaceNode(NetworkNode.MakeNode(NodeType.DRIFT, nodeName, nodeName, 0, 0, null));
+            (string displayName, string hostName) = GenNodeName();
+            AddSurfaceNode(NetworkNode.MakeNode(NodeType.DRIFT, hostName, displayName, 0, 0, null));
         }
     }
     void GenerateVineNetwork() {
         if (_isIntialized) return;
         int vine = 2, node = 3;
         for(int i = 0; i < vine; ++i) {
-            string nodeName = GenNodeName();
-            DriftNode chainNode = NetworkNode.MakeNode(NodeType.DRIFT, nodeName, nodeName, 0, 0, null) as DriftNode;
+            (string displayName, string hostName) = GenNodeName();
+            DriftNode chainNode = NetworkNode.MakeNode(NodeType.DRIFT, hostName, displayName, 0, 0, null) as DriftNode;
             AddSurfaceNode(chainNode);
             for (int j = 0; j < node; ++j) {
-                nodeName = GenNodeName();
-                chainNode = NetworkNode.MakeNode(NodeType.DRIFT, nodeName, nodeName, 0, 0, chainNode) as DriftNode;
+                (displayName, hostName) = GenNodeName();
+                chainNode = NetworkNode.MakeNode(NodeType.DRIFT, hostName, displayName, 0, 0, chainNode) as DriftNode;
             }
         }
     }
@@ -64,17 +64,20 @@ public class NetworkSector {
     static string GenSectorName() {
         const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         string sb = DRIFT_SECTOR_NAMES[GD.RandRange(0, DRIFT_SECTOR_NAMES.Length - 1)] + "_";
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 4; i++) {
             sb += chars[GD.RandRange(0, chars.Length - 1)];
         }
         return sb;
     }
-    static string GenNodeName() {
+    static (string, string) GenNodeName() {
+        string baseName = DRIFT_NODE_NAMES[GD.RandRange(0, DRIFT_NODE_NAMES.Length - 1)], suffix = GetSuffix(3);
+        return ($"{char.ToUpper(baseName[0])}{baseName[1..]} {suffix.ToUpper()}", $"{baseName}_{suffix}");
+    }
+    static string GetSuffix(int length) {
         const string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-        string sb = DRIFT_NODE_NAMES[GD.RandRange(0, DRIFT_NODE_NAMES.Length - 1)] + "_";
-        for (int i = 0; i < 6; i++) {
+        string sb = "";
+        for (int i = 0; i < length; i++) {
             sb += chars[GD.RandRange(0, chars.Length - 1)];
-        }
-        return sb;
+        } return sb;
     }
 }

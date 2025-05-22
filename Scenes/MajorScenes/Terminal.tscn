@@ -8,7 +8,7 @@
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_c8ipk"]
 
-[node name="Terminal" type="MarginContainer" node_paths=PackedStringArray("terminalOutputField", "terminalCommandPrompt", "terminalCommandField", "processTimer", "updateProcessGraphicTimer", "crackDurationTimer")]
+[node name="Terminal" type="MarginContainer" node_paths=PackedStringArray("terminalOutputField", "terminalCommandPrompt", "terminalCommandField", "crackDurationTimer")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -21,8 +21,6 @@ script = ExtResource("1_q6j3v")
 terminalOutputField = NodePath("TerminalSplitPart/TerminalZone/TerminalOutputArea")
 terminalCommandPrompt = NodePath("TerminalSplitPart/TerminalZone/TerminalCommandLine/CommandPrompt")
 terminalCommandField = NodePath("TerminalSplitPart/TerminalZone/TerminalCommandLine/CommandField")
-processTimer = NodePath("TimersContainer/ProcessTimer")
-updateProcessGraphicTimer = NodePath("TimersContainer/UpdateProcessGraphicTimer")
 crackDurationTimer = NodePath("TimersContainer/CrackDurationTimer")
 
 [node name="TerminalSplitPart" type="HSplitContainer" parent="."]
@@ -116,13 +114,6 @@ caret_multiple = false
 
 [node name="TimersContainer" type="Node" parent="."]
 
-[node name="ProcessTimer" type="Timer" parent="TimersContainer"]
-one_shot = true
-
-[node name="UpdateProcessGraphicTimer" type="Timer" parent="TimersContainer"]
-wait_time = 0.25
-one_shot = true
-
 [node name="CrackDurationTimer" type="Timer" parent="TimersContainer"]
 one_shot = true
 
@@ -131,7 +122,5 @@ wait_time = 2.0
 autostart = true
 
 [connection signal="text_changed" from="TerminalSplitPart/TerminalZone/TerminalCommandLine/CommandField" to="." method="OnCommandFieldTextChanged"]
-[connection signal="timeout" from="TimersContainer/ProcessTimer" to="." method="ProcessFinished"]
-[connection signal="timeout" from="TimersContainer/UpdateProcessGraphicTimer" to="." method="UpdateProcessingGraphic"]
 [connection signal="timeout" from="TimersContainer/CrackDurationTimer" to="." method="OnCrackDurationTimerTimeout"]
 [connection signal="timeout" from="TimersContainer/StatSwitchTimer" to="TerminalSplitPart/Sidebar" method="OnStatSwitchTimerTimeout"]

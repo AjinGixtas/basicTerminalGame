@@ -1,0 +1,136 @@
+using Godot;
+using System.Collections.Generic;
+using System.Linq;
+
+public static partial class TerminalProcessor {
+    static void Farm(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+        foreach (KeyValuePair<string, string> pair in parsedArgs) {
+            GD.Print(pair.Key, ' ', parsedArgs[pair.Key]);
+        }
+        bool showStatus = parsedArgs.ContainsKey("-s") || parsedArgs.ContainsKey("--status");
+
+        bool doUpgrade = parsedArgs.ContainsKey("-u") || parsedArgs.ContainsKey("--upgrade");
+        bool hasLevel = parsedArgs.ContainsKey("-l") || parsedArgs.ContainsKey("--level");
+
+        // Disallow mixing upgrade with status/info
+        if (showStatus && doUpgrade) { Say("-r", "Can not show status of a node and changing it at the same time."); return; }
+
+        // Check node's ownership
+        if (CurrNode.CurrentOwner != NetworkManager.playerNode) { Say("-r", "You don't own this node's GC miner"); return; }
+        // Status display
+        if (showStatus) {
+            int hackLvl = CurrNode.HackFarm.HackLvl, timeLvl = CurrNode.HackFarm.TimeLvl, growLvl = CurrNode.HackFarm.TimeLvl;
+            Say(@$"[ GC Farm Status for {CurrNode.DisplayName} ]
+Current GC in node: {Util.Format($"{CurrNode.HackFarm.CurrencyPile}", StrType.MONEY)}
+Hack  : Lv.{Util.Format($"{hackLvl}", StrType.NUMBER)} -> {Util.Format(Util.Format($"{CurrNode.HackFarm.CurHack}", StrType.MONEY), StrType.UNIT, "/transfer")}
+Time  : Lv.{Util.Format($"{timeLvl}", StrType.NUMBER)} -> {Util.Format($"{CurrNode.HackFarm.CurTime}", StrType.UNIT, "s/tranfer")}
+Grow  : Lv.{Util.Format($"{growLvl}", StrType.NUMBER)} -> {Util.Format(Util.Format($"{CurrNode.HackFarm.CurGrow}", StrType.MONEY), StrType.UNIT, "/s")}");
+
+            Say(@$"[ Upgrade Info ]
+Hack +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(hackLvl + 1, 1).Sum(i => CurrNode.HackFarm.GetHackCost(i))}", StrType.MONEY)} | +{Util.Format($"10", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(hackLvl + 1, 10).Sum(i => CurrNode.HackFarm.GetHackCost(i))}", StrType.MONEY)}
+Time +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(timeLvl + 1, 1).Sum(i => CurrNode.HackFarm.GetTimeCost(i))}", StrType.MONEY)} | +{Util.Format($"10", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(timeLvl + 1, 10).Sum(i => CurrNode.HackFarm.GetTimeCost(i))}", StrType.MONEY)}
+Grow +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(growLvl + 1, 1).Sum(i => CurrNode.HackFarm.GetGrowCost(i))}", StrType.MONEY)} | +{Util.Format($"10", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(growLvl + 1, 10).Sum(i => CurrNode.HackFarm.GetGrowCost(i))}", StrType.MONEY)}");
+            return;
+        }
+        // Upgrade path
+        if (doUpgrade) {
+            string upgradeType = parsedArgs.GetValueOrDefault("-u") ?? parsedArgs.GetValueOrDefault("--upgrade") ?? "";
+            int level = 1;
+            if (!new[] { "hack", "time", "grow" }.Contains(upgradeType)) {
+                Say("-r", $"Invalid upgrade type. Use: {Util.Format("hack", StrType.CMD_ARG)}, {Util.Format("time", StrType.CMD_ARG)}, or {Util.Format("grow", StrType.CMD_ARG)}");
+                return;
+            }
+            if (!hasLevel) { Say("-r", $"Missing {Util.Format("--level", StrType.CMD_FLAG)}"); return; } else {
+                if (!int.TryParse(parsedArgs.GetValueOrDefault("-l") ??
+                    parsedArgs.GetValueOrDefault("--level"), out level) || level <= 0) { Say("-r", "Invalid level amount."); return; }
+            }
+
+            switch (upgradeType.ToLower()) {
+                case "hack": {
+                        for (int i = 0; i < level; i++) {
+                            int result = CurrNode.HackFarm.UpgradeHackLevel();
+                            switch (result) {
+                                case 0: break;
+                                case 1: Say("-r", $"Upgrade cost invalid. Please report this bug!!!"); return;
+                                case 2: Say("-r", $"Not enough money."); return;
+                                case 3: Say($"{Util.Format("Max level reached.", StrType.FULL_SUCCESS)}"); return;
+                                default: Say("-r", $"Unknown error encountered. Error code: {result}"); return;
+                            }
+                        }
+                        break;
+                    }
+                case "time": {
+                        for (int i = 0; i < level; i++) {
+                            int result = CurrNode.HackFarm.UpgradeTimeLevel();
+                            switch (result) {
+                                case 0: break;
+                                case 1: Say("-r", $"Upgrade cost invalid. Please report this bug!!!"); return;
+                                case 2: Say("-r", $"Not enough money."); return;
+                                case 3: Say($"{Util.Format("Max level reached.", StrType.FULL_SUCCESS)}"); return;
+                                default: Say("-r", $"Unknown error encountered. Error code: {result}"); return;
+                            }
+                        }
+                        break;
+                    }
+                case "grow": {
+                        for (int i = 0; i < level; i++) {
+                            int result = CurrNode.HackFarm.UpgradeTimeLevel();
+                            switch (result) {
+                                case 0: break;
+                                case 1: Say("-r", $"Upgrade cost invalid. Please report this bug!!!"); return;
+                                case 2: Say("-r", $"Not enough money."); return;
+                                case 3: Say($"{Util.Format("Max level reached.", StrType.FULL_SUCCESS)}"); return;
+                                default: Say("-r", $"Unknown error encountered. Error code: {result}"); return;
+                            }
+                        }
+                        break;
+                    }
+                default:
+                    Say($"Unknown upgrade type. Use: {Util.Format("hack", StrType.CMD_ARG)}, {Util.Format("time", StrType.CMD_ARG)}, or {Util.Format("hack", StrType.CMD_ARG)}");
+                    return;
+            }
+            Say("Upgrade complete.");
+        } else {
+            Say("-r", $"No action specified. Use either {Util.Format("--status", StrType.CMD_FLAG)} or {Util.Format("--upgrade", StrType.CMD_FLAG)}."); return;
+        }
+    }
+    const double FLARE_TIME = 120.0;
+    static double startEpoch = 0, endEpoch = 0, remainingTime = 0;
+    static int Crack(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+        NetworkNode node = CurrNode;
+        if (parsedArgs.ContainsKey("--axe") && parsedArgs.ContainsKey("--flare")) {
+            Say("-r", "You can not use --axe and --flare at the same time.");
+            return 4;
+        }
+        if (parsedArgs.ContainsKey("--axe")) {
+            if (endEpoch < Time.GetUnixTimeFromSystem()) {
+                Say("-r", "Karaxe already deactivated.");
+                return 6;
+            }
+            endEpoch = Time.GetUnixTimeFromSystem();
+            Say($"{Util.Format("Kraken tendrils axed", StrType.FULL_SUCCESS)}. Flare sequence exited. All [color={Util.CC(Cc.Y)}]lok[/color] closed.");
+            return 5;
+        }
+        if (parsedArgs.ContainsKey("--flare")) {
+            if (Time.GetUnixTimeFromSystem() < endEpoch) {
+                Say("Karaxe already in effect.");
+                return 1;
+            }
+            startEpoch = Time.GetUnixTimeFromSystem(); remainingTime = FLARE_TIME; endEpoch = startEpoch + remainingTime;
+            crackDurationTimer.Start(FLARE_TIME);
+            Say($"{Util.Format("Kraken activated", StrType.FULL_SUCCESS)}. All node [color={Util.CC(Cc.Y)}]lok[/color] system {Util.Format("~=EXP0SED=~", StrType.ERROR)}");
+            return 2;
+        }
+        if (Time.GetUnixTimeFromSystem() > endEpoch) {
+            Say($"{Util.Format("Kraken inactive", StrType.ERROR)}. Run {Util.Format("karaxe --flare", StrType.CMD_FUL)} to activate.");
+            return 3;
+        }
+
+        int result = node.AttempCrackNode(parsedArgs, endEpoch);
+        if (result == 0) {
+            node.TransferOwnership(NetworkManager.playerNode);
+            NetworkManager.AddHackFarm(node.HackFarm);
+        }
+        return 0;
+    }
+}

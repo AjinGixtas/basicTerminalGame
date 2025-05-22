@@ -15,8 +15,7 @@ public static partial class TerminalProcessor {
         Say("-n", $"{terminalCommandPrompt.Text.Replace("\r", "").Replace("\n", "")}{Util.Format(Util.EscapeBBCode(newCommand), StrType.CMD_FUL)}");
         queuedAction = ExecuteCommands;
         queuedCommands = commands;
-        //StartProcess(Math.Max(.5 + GD.Randf() * .1, .05 * newCommand.Length));
-        StartProcess(1);
+        StartProcess(Mathf.Clamp(.1 * Mathf.Pow(1.02, newCommand.Length), .1, 1.0));
         return 0;
         static void ExecuteCommands(string[] commands) {
             for (int i = 0; i < commands.Length; i++) {

@@ -59,6 +59,7 @@ public static partial class TerminalProcessor {
         if (makeYellow) text = Util.Format(text, StrType.WARNING);
         terminalOutputField.ScrollToLine(terminalOutputField.GetLineCount() - 1);
         terminalOutputField.AppendText(text);
+        GD.Print(text);
     }
     static void Help(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         string fileName = parsedArgs.ContainsKey("-v") ? "helpVerbose.txt" : "helpShort.txt";

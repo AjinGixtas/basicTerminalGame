@@ -86,21 +86,21 @@ public class I13 : Lock {
     }
 }
 public class P16 : Lock {
-    public override string[] Flag => ["--p16", "--16xtract"];
+    public override string[] Flag => ["--p16", "--4xtract"];
     public override int Cost => 1;
     public override int MinLvl => 9;
 
     readonly string[] intPool = ["2", "3", "5", "7", "11", "13", "17", "19", "23", "29", "31", "37", "41", "43", "47", "53"];
-    readonly string[] actionPool = ["2bin", "fl1p", "der3f", "bl4nk"];
+    readonly string[] actionPool = ["fl1p", "2bin", "der3f", "bl4nk"];
     public P16() {
-        name = "P16";
+        name = "P2X4";
         clue = "Gates only yield to those with indivisible will. Fight them all; the resolute will answer";
-        help = $"{Flag} [int]";
+        help = $"{Flag[0]} [int] {Flag[1]} [string]";
         inp = "";
     }
 
     public override void Intialize() {
-        ans = [$"{intPool[GD.RandRange(0, 16)]}", actionPool[GD.RandRange(0, actionPool.Length - 1)]];
+        ans = [$"{intPool[GD.RandRange(0, 15)]}", actionPool[GD.RandRange(0, actionPool.Length - 1)]];
         base.Intialize();
     }
 }
@@ -110,18 +110,21 @@ public class C0 : Lock {
     public override int MinLvl => 1;
 
     readonly string[] colors = ["red", "cyan", "green", "yellow", "blue", "magenta", "white", "black"];
-    readonly string[,] colorOpPairs = { { "red", "cyan" }, { "green", "yellow" }, { "blue", "magenta" }, { "white", "black" } };
+    readonly (string,string)[] colorPairs = [("red","cyan"), ("green","magenta"), ("blue","yellow"), ("white","black")];
 
     public C0() {
         name = "C0";
         clue = "In the spectrum\'s reflection, the answer is hidden—opposite yet bound.";
-        help = $"{Flag} [{colors.Join("|")}]";
+        help = $"{Flag} [string]";
     }
 
     public override void Intialize() {
-        int pairIndex = GD.RandRange(0, 3), elementIndex = GD.RandRange(0, 1);
-        ans = [colorOpPairs[pairIndex, elementIndex]];
-        inp = colorOpPairs[pairIndex, 1 - elementIndex];
+        int pairIndex = GD.RandRange(0, 3); bool swapped = GD.RandRange(0, 1) == 0;
+        ans = [colorPairs[pairIndex].Item1];
+        inp = colorPairs[pairIndex].Item2;
+        if (swapped) {
+            (colorPairs[pairIndex].Item2, colorPairs[pairIndex].Item1) = (colorPairs[pairIndex].Item1, colorPairs[pairIndex].Item2);
+        }
         err = $"{inp}";
         base.Intialize();
     }
@@ -141,7 +144,7 @@ public class C1 : Lock {
     public C1() {
         name = "C1";
         clue = "Most colors align with orders known. One strays—quietly dissonant.";
-        help = $"{Flag} [{colors.Join("|")}]";
+        help = $"{Flag} [string]";
     }
 
     public override void Intialize() {
@@ -177,7 +180,7 @@ public class C3 : Lock {
     public C3() {
         name = "C3";
         clue = "From scattered hues, seek the harmony—find which order they almost obey.";
-        help = $"{Flag} [{groupNames.Join("|")}]";
+        help = $"{Flag} [string]";
     }
 
     public override void Intialize() {

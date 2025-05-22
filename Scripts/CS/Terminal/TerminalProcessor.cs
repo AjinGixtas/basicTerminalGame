@@ -5,7 +5,7 @@ public static partial class TerminalProcessor {
 	static RuntimeDirector overseer;
 	static RichTextLabel terminalOutputField; static RichTextLabel terminalCommandPrompt; 
 	static TextEdit terminalCommandField; 
-	static Timer processTimer, updateProcessGraphicTimer, crackDurationTimer;
+	static Timer crackDurationTimer;
 	static NetworkNode _currNode = null; static NodeDirectory _currDir = null;
 	public static NodeDirectory CurrDir { get { return _currDir; } set { _currDir = value; SetCommandPrompt(); } }
 	static NetworkNode CurrNode { get { return _currNode; } set { _currNode = value; SetCommandPrompt(); } }
@@ -24,15 +24,13 @@ public static partial class TerminalProcessor {
 	public static void IntializeInterface(
 		RuntimeDirector overseer, RichTextLabel terminalOutputField, 
 		RichTextLabel terminalCommandPrompt, TextEdit terminalCommandField, 
-		Timer processTimer, Timer updateProcessGraphicTimer, Timer crackDurationTimer) {
+		Timer crackDurationTimer) {
 
 		// Assign provided parameters to static fields
 		TerminalProcessor.overseer = overseer;
 		TerminalProcessor.terminalOutputField = terminalOutputField;
 		TerminalProcessor.terminalCommandPrompt = terminalCommandPrompt;
 		TerminalProcessor.terminalCommandField = terminalCommandField;
-		TerminalProcessor.processTimer = processTimer;
-		TerminalProcessor.updateProcessGraphicTimer = updateProcessGraphicTimer;
 		TerminalProcessor.crackDurationTimer = crackDurationTimer;
 
 		// Set the username and command prompt
@@ -50,6 +48,7 @@ public static partial class TerminalProcessor {
 	public static void Process(double delta) {
 		HandleInput(delta);
 		ShowMoreChars(delta);
+		UpdateProcessingGraphic(delta);
 		NetworkManager.CollectHackFarmMoney(delta);
 	}
 	public static void HandleInput(double dela) {

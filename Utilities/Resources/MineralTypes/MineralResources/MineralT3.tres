@@ -1,0 +1,7 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://c3uywbx2iu6os"]
+
+[ext_resource type="Script" uid="uid://cwhc46neois7q" path="res://Utilities/Resources/MineralTypes/MineralProfile.cs" id="1_srw4m"]
+
+[resource]
+script = ExtResource("1_srw4m")
+Name = "If-bloc"

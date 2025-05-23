@@ -42,11 +42,11 @@ public partial class LifeCycleDirector : Node
 		string newSaveFolderName = $"Game_{nextSaveNumber:D3}";
 		string newSavePath = StringExtensions.PathJoin(SaveRoot, newSaveFolderName);
 
-        // Create new save directory
+		// Create new save directory
 		DirAccess.MakeDirAbsolute(ProjectSettings.GlobalizePath(newSavePath));
 		// Save player data (convert back to user:// path for Godot API)
 		TerminalProcessor.Say($"Quick saving to {newSavePath}");
-        TerminalProcessor.Say(PlayerDataManager.GetSaveStatusMsg(
+		TerminalProcessor.Say(PlayerDataManager.GetSaveStatusMsg(
 			PlayerDataManager.SavePlayerData(StringExtensions.PathJoin(newSavePath, "PlayerData.tres"))));
 		TerminalProcessor.Say(PlayerDataManager.GetSaveStatusMsg(
 			PlayerFileManager.SaveFileSysData(StringExtensions.PathJoin(newSavePath, "FileSys"))));
@@ -60,12 +60,12 @@ public partial class LifeCycleDirector : Node
 
 		if (saveFolders.Count == 0) { TerminalProcessor.Say("-r", "No previous record of user found. Intialize new user."); return; }
 
-        // Find the most recently updated one
+		// Find the most recently updated one
 		
-        string latestFolder = saveFolders
-            .Where(dir => FileAccess.FileExists(StringExtensions.PathJoin($"{SaveRoot}/{dir}", "PlayerData.tres")))
-            .OrderByDescending(dir => FileAccess.GetModifiedTime(StringExtensions.PathJoin($"{SaveRoot}/{dir}", "PlayerData.tres")))
-            .FirstOrDefault();
+		string latestFolder = saveFolders
+			.Where(dir => FileAccess.FileExists(StringExtensions.PathJoin($"{SaveRoot}/{dir}", "PlayerData.tres")))
+			.OrderByDescending(dir => FileAccess.GetModifiedTime(StringExtensions.PathJoin($"{SaveRoot}/{dir}", "PlayerData.tres")))
+			.FirstOrDefault();
 		GD.Print(saveFolders[0]);
 		TerminalProcessor.Say($"Loading save from: {latestFolder}");
 		// Load global data

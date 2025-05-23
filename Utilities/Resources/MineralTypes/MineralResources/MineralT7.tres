@@ -1,0 +1,7 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://d0stb12makr5c"]
+
+[ext_resource type="Script" uid="uid://cwhc46neois7q" path="res://Utilities/Resources/MineralTypes/MineralProfile.cs" id="1_thvdn"]
+
+[resource]
+script = ExtResource("1_thvdn")
+Name = "Lambda-bloc"

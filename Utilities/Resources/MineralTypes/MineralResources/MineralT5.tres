@@ -1,0 +1,7 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://squ6ww0g2138"]
+
+[ext_resource type="Script" uid="uid://cwhc46neois7q" path="res://Utilities/Resources/MineralTypes/MineralProfile.cs" id="1_jsjwa"]
+
+[resource]
+script = ExtResource("1_jsjwa")
+Name = "Object"

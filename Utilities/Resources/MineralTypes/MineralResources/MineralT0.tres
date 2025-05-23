@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="MineralProfile" load_steps=2 format=3 uid="uid://vtofxv5g1pu7"]
+
+[ext_resource type="Script" uid="uid://cwhc46neois7q" path="res://Utilities/Resources/MineralTypes/MineralProfile.cs" id="1_ojl2l"]
+
+[resource]
+script = ExtResource("1_ojl2l")
+Name = "Bit"

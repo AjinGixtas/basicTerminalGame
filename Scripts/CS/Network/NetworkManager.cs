@@ -33,9 +33,6 @@ public static partial class NetworkManager {
         }
     }
 
-    static readonly (NodeType, string, string)[][] BASIC_NODE_DATA = ReadBasicNodeName();
-    static readonly NetworkNodeData[] SCRIPTED_NODE_DATA = ReadScriptedNodeData();
-
     public static int ConnectToSector(string sectorName) {
         foreach (DriftSector sector in driftSectors) {
             if (sector == null) driftSectors.Remove(sector);
@@ -138,92 +135,4 @@ public static partial class NetworkManager {
         while (DNS.ContainsKey(ip));
         return ip;
     }
-    static (NodeType, string, string)[][] ReadBasicNodeName() {
-        (string, NodeType)[] nodeTypeData = [
-            ("Person.txt", NodeType.PERSON),
-            ("Rouge.txt", NodeType.ROUGE),
-            ("Honeypot.txt", NodeType.HONEYPOT),
-            ("Miner.txt", NodeType.MINER),
-        ];
-        (NodeType, string, string)[][] output = new (NodeType, string, string)[nodeTypeData.Length][];
-        for (int i = 0; i < nodeTypeData.Length; i++) {
-            output[i] = ReadNodeNameOfType(nodeTypeData[i].Item1, nodeTypeData[i].Item2);
-        }
-        return output;
-
-        static (NodeType, string, string)[] ReadNodeNameOfType(string fileName, NodeType nodeType) {
-            FileAccess fileAccess = FileAccess.Open($"res://Utilities/TextFiles/ServerNames/{fileName}", FileAccess.ModeFlags.Read);
-
-            int count = int.Parse(fileAccess.GetLine());
-            var output = new (NodeType, string, string)[count];
-
-            for (int i = 0; i < count; ++i) {
-                string[] parts = StringExtensions.Split(fileAccess.GetLine(), " ", false);
-                output[i] = (nodeType, parts[0], string.Join(" ", parts[1..]));
-            }
-
-            return output;
-        }
-    }
-    static NetworkNodeData[] ReadScriptedNodeData() {
-        string[] CATEGORY = [ "Corp", "Faction", "Business" ];
-        List<NetworkNodeData> output = [];
-        for (int i = 0; i < CATEGORY.Length; ++i) {
-            DirAccess dirAccess = DirAccess.Open($"res://Utilities/Resources/ScriptedNetworkNodes/{CATEGORY[i]}");
-
-            string[] fileNames = dirAccess.GetFiles();
-            foreach (string fileName in fileNames) {
-                string filePath = $"res://Utilities/Resources/ScriptedNetworkNodes/{CATEGORY[i]}/{fileName}";
-                string IP = NetworkManager.GetRandomIP();
-                switch (CATEGORY[i]) {
-                    case "Corp": {
-                            CorpData corpData = GD.Load<CorpData>(filePath);
-                            if (corpData != null) { break; }
-                            output.Add(new(
-                                corpData.minDepth, corpData.maxDepth,
-                                new CorpNode(corpData.hostName, corpData.displayName, IP, null) {
-                                    Faction = new Faction(corpData.f_name, corpData.f_desc, 0, 0),
-                                    Stock = new(corpData.s_symbol, corpData.s_price, corpData.s_drift, corpData.s_volatility, 0)
-                                }
-                            ));
-                            GD.Print($"Loaded CorpData: {corpData.hostName}, {corpData.displayName}");
-                            break;
-                        }
-                    case "Faction": {
-                            FactionData factionData = GD.Load<FactionData>(filePath);
-                            if (factionData == null) { break; }
-                            output.Add(new(
-                                factionData.minDepth, factionData.maxDepth,
-                                new FactionNode(factionData.hostName, factionData.displayName, IP, null) {
-                                    Faction = new(factionData.f_name, factionData.f_desc, 0, 0)
-                                }
-                            ));
-                            GD.Print($"Loaded FactionData: {factionData.hostName}, {factionData.displayName}");
-                            break;
-                        }
-                    case "Business": {
-                            BusinessData businessData = GD.Load<BusinessData>(filePath);
-                            if (businessData != null) { break; }
-                            output.Add(new(
-                                businessData.minDepth, businessData.maxDepth,
-                                new BusinessNode(businessData.hostName, businessData.displayName, IP, null) {
-                                    Stock = new(businessData.symbol, businessData.price, businessData.drift, businessData.volatility, 0)
-                                }
-                            ));
-                            GD.Print($"Loaded BusinessData: {businessData.hostName}, {businessData.displayName}");
-                            break;
-                        }
-                    default:
-                        GD.PrintErr($"Unknown category: {CATEGORY[i]}");
-                        break;
-                }
-            }
-        }
-
-        return [.. output];
-    }
-}
-public struct NetworkNodeData (int minDepth, int maxDepth, NetworkNode network) {
-    public int minDepth = minDepth, maxDepth = maxDepth;
-    public NetworkNode networkNode = network;
 }

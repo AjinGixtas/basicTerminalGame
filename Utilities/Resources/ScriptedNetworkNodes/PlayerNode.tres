@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="NodeData" load_steps=5 format=3 uid="uid://5t0ftaaqn4rj"]
+
+[ext_resource type="Script" uid="uid://b5e7b5k5tgoxy" path="res://Utilities/Resources/ScriptedNetworkNodes/NodeScript/NodeData.cs" id="1_ehhie"]
+[ext_resource type="Resource" uid="uid://vtofxv5g1pu7" path="res://Utilities/Resources/MineralTypes/MineralResources/MineralT0.tres" id="1_n3337"]
+[ext_resource type="Script" uid="uid://65e3mbb2130e" path="res://Utilities/Resources/MineralTypes/MiningWeight.cs" id="2_kuy6e"]
+
+[sub_resource type="Resource" id="Resource_ty0ra"]
+script = ExtResource("2_kuy6e")
+mineralProfile = ExtResource("1_n3337")
+weight = 1.0
+metadata/_custom_type_script = "uid://65e3mbb2130e"
+
+[resource]
+script = ExtResource("1_ehhie")
+MiningWeights = Array[Object]([SubResource("Resource_ty0ra")])
+ChildNodes = null

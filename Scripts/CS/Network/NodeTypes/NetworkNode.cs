@@ -30,13 +30,7 @@ public abstract class NetworkNode {
             _secLvl = value;
             LockSystem.LockIntialization(_secLvl);
             _retLvl = _defLvl - _secLvl;
-            SecType = _secLvl switch {
-                < 1 => SecurityType.NOSEC,
-                < 4 => SecurityType.LOSEC,
-                < 8 => SecurityType.MISEC,
-                < 10 => SecurityType.HISEC,
-                _ => SecurityType.MASEC
-            };
+            SecType = Util.MapEnum<SecurityType>(_secLvl);
         }
     }
     public int DefLvl {
@@ -57,10 +51,10 @@ public abstract class NetworkNode {
         LockSystem = new();
     }
     
-    public virtual void Init(int SecLvl, int DefLvl, HackFarm HackFarm) {
+    public virtual void Init(int DefLvl, int SecLvl, HackFarm HackFarm) {
         this.DefLvl = DefLvl; this.SecLvl = SecLvl; this.HackFarm = HackFarm;
     }
-    public virtual (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {
+    public virtual (int, int) GenerateDefAndSec(double indexRatio, double depthRatio) {
         return (0, 0);
     }
     
@@ -86,22 +80,22 @@ public abstract class NetworkNode {
         };
     }
     public static NetworkNode MakeNode(NodeType nodeType, string hostName, string displayName, double indexRatio, double depthRatio, NetworkNode parentNode) {
-        string IP = $"{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}";
+        string IP = NetworkManager.GetRandomIP();
         NetworkNode node = nodeType switch {
-            NodeType.PLAYER => throw new System.Exception("Can't remake player node"),
-            NodeType.PERSON => new PersonNode(hostName, displayName, IP, parentNode),
+            NodeType.PLAYER => throw new System.Exception("Can't remake player node."),
+            NodeType.PERSON =>   new PersonNode  (hostName, displayName, IP, parentNode),
             NodeType.BUSINESS => new BusinessNode(hostName, displayName, IP, parentNode),
-            NodeType.CORP => new CorpNode(hostName, displayName, IP, parentNode),
-            NodeType.FACTION => new FactionNode(hostName, displayName, IP, parentNode),
+            NodeType.CORP =>     new CorpNode    (hostName, displayName, IP, parentNode),
+            NodeType.FACTION =>  new FactionNode (hostName, displayName, IP, parentNode),
             NodeType.HONEYPOT => new HoneypotNode(hostName, displayName, IP, parentNode),
-            NodeType.MINER => new MinerNode(hostName, displayName, IP, parentNode),
-            NodeType.ROUGE => new RougeNode(hostName, displayName, IP, parentNode),
-            NodeType.DRIFT => new DriftNode(hostName, displayName, IP, parentNode),
+            NodeType.MINER =>    new MinerNode   (hostName, displayName, IP, parentNode),
+            NodeType.ROUGE =>    new RougeNode   (hostName, displayName, IP, parentNode),
+            NodeType.DRIFT =>    throw new System.Exception("Node type unsupported."),
             _ => throw new System.Exception("Invalid node type")
         };
-        (int secLvl, int defLvl) = node.GenerateSecAndDef(indexRatio, depthRatio);
+        (int defLvl, int secLvl) = node.GenerateDefAndSec(indexRatio, depthRatio);
         HackFarm hackFarm = new(indexRatio, depthRatio);
-        node.Init(secLvl, defLvl, hackFarm);
+        node.Init(defLvl, secLvl, hackFarm);
         NetworkManager.AssignDNS(node);
         return node;
     }

@@ -71,7 +71,7 @@ public static partial class TerminalProcessor {
             case "analyze": Analyze(parsedArgs, positionalArgs); break; // Give data about a node
             case "setusername": SetUsername(parsedArgs, positionalArgs); break; // Set the player's username
 
-            case "regenerate": NetworkManager.GenerateDriftSector(); break; // Regenerate the drift sector
+            case "regenerate": NetworkManager.RegenerateDriftSector(); break; // Regenerate the drift sector
             default: Say("-r", $"{command} is not a valid command."); break;
         }
         return true;

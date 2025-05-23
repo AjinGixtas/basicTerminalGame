@@ -228,10 +228,8 @@ corner_detail = 1
 anti_aliasing = false
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_dvumi"]
-content_margin_bottom = 1.0
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_spmd1"]
-content_margin_bottom = 1.0
 
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_w7sxo"]
 color = Color(0, 0, 0, 0.360784)

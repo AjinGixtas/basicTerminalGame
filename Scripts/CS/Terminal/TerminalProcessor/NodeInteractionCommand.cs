@@ -96,21 +96,14 @@ Grow +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(gr
     }
     const double FLARE_TIME = 120.0;
     static double startEpoch = 0, endEpoch = 0, remainingTime = 0;
+    static List<DriftSector> sectorQueuedForRemoval = [];
     static int Karaxe(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
-        NetworkNode node = CurrNode;
+        NetworkNode targetNode = CurrNode;
         if (parsedArgs.ContainsKey("--axe") && parsedArgs.ContainsKey("--flare")) {
             Say("-r", "You can not use --axe and --flare at the same time.");
             return 4;
         }
-        if (parsedArgs.ContainsKey("--axe")) {
-            if (endEpoch < Time.GetUnixTimeFromSystem()) {
-                Say("-r", "Karaxe already deactivated.");
-                return 6;
-            }
-            endEpoch = Time.GetUnixTimeFromSystem();
-            Say($"{Util.Format("Kraken tendrils axed", StrType.FULL_SUCCESS)}. Flare sequence exited. All [color={Util.CC(Cc.Y)}]lok[/color] closed.");
-            return 5;
-        }
+        
         if (parsedArgs.ContainsKey("--flare")) {
             if (Time.GetUnixTimeFromSystem() < endEpoch) {
                 Say("Karaxe already in effect.");
@@ -121,16 +114,41 @@ Grow +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(gr
             Say($"{Util.Format("Kraken activated", StrType.FULL_SUCCESS)}. All node [color={Util.CC(Cc.Y)}]lok[/color] system {Util.Format("~=EXP0SED=~", StrType.ERROR)}");
             return 2;
         }
+
+        if (parsedArgs.ContainsKey("--axe")) {
+            if (Time.GetUnixTimeFromSystem() > endEpoch) {
+                Say("-r", "Karaxe already deactivated.");
+                return 6;
+            }
+            Say($"{Util.Format("Kraken deactivated", StrType.FULL_SUCCESS)}. Flare sequence exited. All [color={Util.CC(Cc.Y)}]lock[/color] closed.");
+            EndFlare();
+            return 5;
+        }
         if (Time.GetUnixTimeFromSystem() > endEpoch) {
             Say($"{Util.Format("Kraken inactive", StrType.ERROR)}. Run {Util.Format("karaxe --flare", StrType.CMD_FUL)} to activate.");
+            EndFlare();
             return 3;
         }
 
-        int result = node.AttempCrackNode(parsedArgs, endEpoch);
-        if (result == 0) {
-            node.TransferOwnership(NetworkManager.PlayerNode);
-            NetworkManager.AddHackFarm(node.HackFarm);
+        int result = targetNode.AttempCrackNode(parsedArgs, endEpoch);
+        if (targetNode.GetType() == typeof(DriftNode)) {
+            sectorQueuedForRemoval.Add((targetNode as DriftNode).Sector);
+        }
+        if (result == 0 && targetNode.GetType() != typeof(DriftNode)) {
+            targetNode.TransferOwnership(NetworkManager.PlayerNode);
+            NetworkManager.AddHackFarm(targetNode.HackFarm);
         }
         return 0;
+        static void EndFlare() {
+            endEpoch = 0;
+            crackDurationTimer.Stop();
+            if (sectorQueuedForRemoval.Count > 0) {
+                foreach (DriftSector sector in sectorQueuedForRemoval) {
+                    NetworkManager.DisconnectFromSector(sector);
+                    NetworkManager.RemoveSector(sector);
+                }
+                sectorQueuedForRemoval.Clear();
+            }
+        }
     }
 }

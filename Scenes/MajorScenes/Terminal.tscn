@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://ywm7rhxebeh4"]
+[gd_scene load_steps=9 format=3 uid="uid://ywm7rhxebeh4"]
 
 [ext_resource type="Script" uid="uid://mb8mpa63ad2n" path="res://Scripts/CS/Terminal/Terminal.cs" id="1_q6j3v"]
 [ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="2_tjxev"]
@@ -7,6 +7,12 @@
 [ext_resource type="Script" uid="uid://dmd37osqwjq3y" path="res://Scripts/CS/Terminal/TerminalSidebar.cs" id="5_pn4ql"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_c8ipk"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_pn4ql"]
+content_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_bmejy"]
+content_margin_bottom = 3.0
 
 [node name="Terminal" type="MarginContainer" node_paths=PackedStringArray("terminalOutputField", "terminalCommandPrompt", "terminalCommandField", "crackDurationTimer")]
 anchors_preset = 15
@@ -40,6 +46,8 @@ layout_mode = 2
 size_flags_vertical = 3
 focus_mode = 2
 theme = ExtResource("2_tjxev")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_pn4ql")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_bmejy")
 bbcode_enabled = true
 scroll_following = true
 autowrap_mode = 2

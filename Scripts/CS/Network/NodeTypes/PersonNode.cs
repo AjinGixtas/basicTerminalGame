@@ -5,7 +5,7 @@ public class PersonNode : NetworkNode {
         : base(hostName, displayName, IP, NodeType.PERSON, parentNode) {
         // Kind of just stupid in general...
     }
-    public override (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {
+    public override (int, int) GenerateDefAndSec(double indexRatio, double depthRatio) {
         return (GD.RandRange(1, 3) + (int)Mathf.Ceil(depthRatio * 4) + (int)Mathf.Ceil(indexRatio * 30),
             GD.RandRange(0, 1) + (int)Mathf.Ceil(depthRatio * 6) + (int)Mathf.Ceil(indexRatio * 4));
     }

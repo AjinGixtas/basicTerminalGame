@@ -7,7 +7,7 @@ public class HoneypotNode : NetworkNode {
         : base(hostName, displayName, IP, NodeType.HONEYPOT, parentNode) {
         GenerateFakeData();
     }
-    public override (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {
+    public override (int, int) GenerateDefAndSec(double indexRatio, double depthRatio) {
         return (0, 10);
     }
     public string fakeHostName, fakeDisplayName;

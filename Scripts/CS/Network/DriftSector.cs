@@ -17,25 +17,26 @@ public class DriftSector {
         MarkIntializationCompleted();
     }
     public string Name;
-    readonly List<NetworkNode> SurfaceNodes = [];
+    readonly List<DriftNode> SurfaceNodes = [];
     bool _isIntialized = false;
-    int AddSurfaceNode(NetworkNode node) { if (_isIntialized) return 1; SurfaceNodes.Add(node); return 0; }
+    int AddSurfaceNode(DriftNode node) { if (_isIntialized) return 1; 
+        SurfaceNodes.Add(node); return 0; }
     public int MarkIntializationCompleted() { _isIntialized = true; return 0; }
     public List<NetworkNode> GetSurfaceNodes() { return [.. SurfaceNodes]; }
     void GenerateBusNetwork() {
         if (_isIntialized) return;
         int layer = 3, node = 3;
         (string displayName, string hostName) = GenNodeName();
-        DriftNode chainNode = NetworkNode.MakeNode(NodeType.DRIFT, hostName, displayName, 0, 0, null) as DriftNode;
+        DriftNode chainNode = new(hostName, displayName, NetworkManager.GetRandomIP(), null, this);
         AddSurfaceNode(chainNode);
         for (int i = 0; i < node-1; ++i) {
             (displayName, hostName) = GenNodeName();
-            AddSurfaceNode(NetworkNode.MakeNode(NodeType.DRIFT, hostName, displayName, 0, 0, null));
+            AddSurfaceNode(new(hostName, displayName, NetworkManager.GetRandomIP(), null, this));
         }
         for (int i = 0; i < layer-1; i++) {
             for (int j = 0; j < node; j++) {
                 (displayName, hostName) = GenNodeName();
-                NetworkNode.MakeNode(NodeType.DRIFT, hostName, displayName, 0, 0, chainNode);
+                new DriftNode(hostName, displayName, NetworkManager.GetRandomIP(), chainNode, this);
             }
             chainNode = chainNode.ChildNode[0] as DriftNode;
         }
@@ -45,7 +46,7 @@ public class DriftSector {
         int node = 5;
         for (int i = 0; i < node; ++i) {
             (string displayName, string hostName) = GenNodeName();
-            AddSurfaceNode(NetworkNode.MakeNode(NodeType.DRIFT, hostName, displayName, 0, 0, null));
+            AddSurfaceNode(new(hostName, displayName, NetworkManager.GetRandomIP(), null, this));
         }
     }
     void GenerateVineNetwork() {
@@ -53,11 +54,11 @@ public class DriftSector {
         int vine = 2, node = 3;
         for(int i = 0; i < vine; ++i) {
             (string displayName, string hostName) = GenNodeName();
-            DriftNode chainNode = NetworkNode.MakeNode(NodeType.DRIFT, hostName, displayName, 0, 0, null) as DriftNode;
+            DriftNode chainNode = new(hostName, displayName, NetworkManager.GetRandomIP(), null, this);
             AddSurfaceNode(chainNode);
             for (int j = 0; j < node-1; ++j) {
                 (displayName, hostName) = GenNodeName();
-                chainNode = NetworkNode.MakeNode(NodeType.DRIFT, hostName, displayName, 0, 0, chainNode) as DriftNode;
+                chainNode = new(hostName, displayName, NetworkManager.GetRandomIP(), chainNode, this);
             }
         }
     }
@@ -66,7 +67,7 @@ public class DriftSector {
         int layer = 3, node = 2;
         for(int i = 0; i < node; ++i) {
             (string displayName, string hostName) = GenNodeName();
-            DriftNode surfaceNode = NetworkNode.MakeNode(NodeType.DRIFT, hostName, displayName, 0, 0, null) as DriftNode;
+            DriftNode surfaceNode = new(hostName, displayName, NetworkManager.GetRandomIP(), null, this);
             GenerateTree(surfaceNode, 1, layer, node);
             AddSurfaceNode(surfaceNode);
         }
@@ -74,7 +75,7 @@ public class DriftSector {
             if (depth >= maxDepth) return;
             for (int i = 0; i < childCount; ++i) {
                 (string displayName, string hostName) = GenNodeName();
-                DriftNode childNode = NetworkNode.MakeNode(NodeType.DRIFT, hostName, displayName, 0, 0, node) as DriftNode;
+                DriftNode childNode = new(hostName, displayName, NetworkManager.GetRandomIP(), node, this);
                 GenerateTree(childNode, depth + 1, maxDepth, childCount);
             }
         }

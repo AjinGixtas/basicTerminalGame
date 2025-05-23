@@ -5,7 +5,7 @@ public class CorpNode : NetworkNode {
     public CorpNode(string hostName, string displayName, string IP, NetworkNode parentNode)
         : base(hostName, displayName, IP, NodeType.CORP, parentNode) {
     }
-    public override (int, int) GenerateSecAndDef(double indexRatio, double depthRatio) {
+    public override (int, int) GenerateDefAndSec(double indexRatio, double depthRatio) {
         return (10, 10);
     }
 }

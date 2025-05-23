@@ -14,9 +14,7 @@ public static partial class NetworkManager {
             HackFarm = new HackFarm(1.0, 1.0, 255, 255, 255)
         }; AssignDNS(PlayerNode);
         PlayerHackFarm = [PlayerNode.HackFarm];
-        for (int i = 0; i < DRIFT_SECTOR_COUNT; ++i) {
-            driftSectors.Add(new DriftSector());
-        }
+        RegenerateDriftSector();
     }
 
     public static string[] GetSectorNames() {
@@ -27,7 +25,7 @@ public static partial class NetworkManager {
         }
         return names;
     }
-    public static void GenerateDriftSector() {
+    public static void RegenerateDriftSector() {
         connectedSectors.RemoveAll(item => typeof(DriftSector) == item.GetType());
         driftSectors = [];
         for (int i = 0; i < DRIFT_SECTOR_COUNT; ++i) {

@@ -34,11 +34,11 @@ public static partial class TerminalProcessor {
 		TerminalProcessor.crackDurationTimer = crackDurationTimer;
 
 		// Set the username and command prompt
-		terminalCommandField.GrabFocus();
+		TerminalProcessor.terminalCommandField.GrabFocus();
 
-		// Mark as initialized
-		terminalCommandField.ScrollFitContentHeight = true;
-		terminalCommandField.ScrollFitContentWidth = true;
+        // Mark as initialized
+        TerminalProcessor.terminalCommandField.ScrollFitContentHeight = true;
+		TerminalProcessor.terminalCommandField.ScrollFitContentWidth = true;
 	}
 	public static void IntializeInternal() {
 		TerminalProcessor._currNode = NetworkManager.PlayerNode;
@@ -49,7 +49,7 @@ public static partial class TerminalProcessor {
 		HandleInput(delta);
 		ShowMoreChars(delta);
 		UpdateProcessingGraphic(delta);
-		NetworkManager.CollectHackFarmMoney(delta);
+		NetworkManager.CollectHackFarmMinerals(delta);
 	}
 	public static void HandleInput(double dela) {
 		if (terminalCommandField.HasFocus()) {

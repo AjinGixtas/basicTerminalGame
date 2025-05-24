@@ -5,3 +5,4 @@
 [resource]
 script = ExtResource("1_ojl2l")
 Name = "Bit"
+Index = 0

@@ -4,8 +4,9 @@ using System.Linq;
 
 public static partial class TerminalProcessor {
     static void Farm(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
-        foreach (KeyValuePair<string, string> pair in parsedArgs) {
-            GD.Print(pair.Key, ' ', parsedArgs[pair.Key]);
+        if (CurrNode is not ScriptedNetworkNode) { 
+            Say("-r", "This node does not have a GC miner installed.");
+            return; 
         }
         bool showStatus = parsedArgs.ContainsKey("-s") || parsedArgs.ContainsKey("--status");
 
@@ -16,20 +17,21 @@ public static partial class TerminalProcessor {
         if (showStatus && doUpgrade) { Say("-r", "Can not show status of a node and changing it at the same time."); return; }
 
         // Check node's ownership
-        if (CurrNode.CurrentOwner != NetworkManager.PlayerNode) { Say("-r", "You don't own this node's GC miner"); return; }
+        if (!CurrNode.OwnedByPlayer) { Say("-r", "You don't own this node's GC miner"); return; }
         // Status display
+        ScriptedNetworkNode sNode = CurrNode as ScriptedNetworkNode;
         if (showStatus) {
-            int hackLvl = CurrNode.HackFarm.HackLvl, timeLvl = CurrNode.HackFarm.TimeLvl, growLvl = CurrNode.HackFarm.TimeLvl;
-            Say(@$"[ GC Farm Status for {CurrNode.DisplayName} ]
-Current GC in node: {Util.Format($"{CurrNode.HackFarm.CurrencyPile}", StrType.MONEY)}
-Hack  : Lv.{Util.Format($"{hackLvl}", StrType.NUMBER)} -> {Util.Format(Util.Format($"{CurrNode.HackFarm.CurHack}", StrType.MONEY), StrType.UNIT, "/transfer")}
-Time  : Lv.{Util.Format($"{timeLvl}", StrType.NUMBER)} -> {Util.Format($"{CurrNode.HackFarm.CurTime}", StrType.UNIT, "s/tranfer")}
-Grow  : Lv.{Util.Format($"{growLvl}", StrType.NUMBER)} -> {Util.Format(Util.Format($"{CurrNode.HackFarm.CurGrow}", StrType.MONEY), StrType.UNIT, "/s")}");
+            int hackLvl = sNode.HackFarm.HackLvl, timeLvl = sNode.HackFarm.TimeLvl, growLvl = sNode.HackFarm.TimeLvl;
+            Say(@$"[ GC Farm Status for {sNode.DisplayName} ]
+Current GC in node: {Util.Format($"{sNode.HackFarm.CurrencyPile}", StrType.MONEY)}
+Hack  : Lv.{Util.Format($"{hackLvl}", StrType.NUMBER)} -> {Util.Format(Util.Format($"{sNode.HackFarm.CurHack}", StrType.MONEY), StrType.UNIT, "/transfer")}
+Time  : Lv.{Util.Format($"{timeLvl}", StrType.NUMBER)} -> {Util.Format($"{sNode.HackFarm.CurTime}", StrType.UNIT, "s/tranfer")}
+Grow  : Lv.{Util.Format($"{growLvl}", StrType.NUMBER)} -> {Util.Format(Util.Format($"{sNode.HackFarm.CurGrow}", StrType.MONEY), StrType.UNIT, "/s")}");
 
             Say(@$"[ Upgrade Info ]
-Hack +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(hackLvl + 1, 1).Sum(i => CurrNode.HackFarm.GetHackCost(i))}", StrType.MONEY)} | +{Util.Format($"10", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(hackLvl + 1, 10).Sum(i => CurrNode.HackFarm.GetHackCost(i))}", StrType.MONEY)}
-Time +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(timeLvl + 1, 1).Sum(i => CurrNode.HackFarm.GetTimeCost(i))}", StrType.MONEY)} | +{Util.Format($"10", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(timeLvl + 1, 10).Sum(i => CurrNode.HackFarm.GetTimeCost(i))}", StrType.MONEY)}
-Grow +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(growLvl + 1, 1).Sum(i => CurrNode.HackFarm.GetGrowCost(i))}", StrType.MONEY)} | +{Util.Format($"10", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(growLvl + 1, 10).Sum(i => CurrNode.HackFarm.GetGrowCost(i))}", StrType.MONEY)}");
+Hack +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(hackLvl + 1, 1).Sum(i => sNode.HackFarm.GetHackCost(i))}", StrType.MONEY)} | +{Util.Format($"10", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(hackLvl + 1, 10).Sum(i => sNode.HackFarm.GetHackCost(i))}", StrType.MONEY)}
+Time +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(timeLvl + 1, 1).Sum(i => sNode.HackFarm.GetTimeCost(i))}", StrType.MONEY)} | +{Util.Format($"10", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(timeLvl + 1, 10).Sum(i => sNode.HackFarm.GetTimeCost(i))}", StrType.MONEY)}
+Grow +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(growLvl + 1, 1).Sum(i => sNode.HackFarm.GetGrowCost(i))}", StrType.MONEY)} | +{Util.Format($"10", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(growLvl + 1, 10).Sum(i => sNode.HackFarm.GetGrowCost(i))}", StrType.MONEY)}");
             return;
         }
         // Upgrade path
@@ -48,7 +50,7 @@ Grow +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(gr
             switch (upgradeType.ToLower()) {
                 case "hack": {
                         for (int i = 0; i < level; i++) {
-                            int result = CurrNode.HackFarm.UpgradeHackLevel();
+                            int result = sNode.HackFarm.UpgradeHackLevel();
                             switch (result) {
                                 case 0: break;
                                 case 1: Say("-r", $"Upgrade cost invalid. Please report this bug!!!"); return;
@@ -61,7 +63,7 @@ Grow +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(gr
                     }
                 case "time": {
                         for (int i = 0; i < level; i++) {
-                            int result = CurrNode.HackFarm.UpgradeTimeLevel();
+                            int result = sNode.HackFarm.UpgradeTimeLevel();
                             switch (result) {
                                 case 0: break;
                                 case 1: Say("-r", $"Upgrade cost invalid. Please report this bug!!!"); return;
@@ -74,7 +76,7 @@ Grow +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(gr
                     }
                 case "grow": {
                         for (int i = 0; i < level; i++) {
-                            int result = CurrNode.HackFarm.UpgradeTimeLevel();
+                            int result = sNode.HackFarm.UpgradeTimeLevel();
                             switch (result) {
                                 case 0: break;
                                 case 1: Say("-r", $"Upgrade cost invalid. Please report this bug!!!"); return;
@@ -135,8 +137,9 @@ Grow +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(gr
             sectorQueuedForRemoval.Add((targetNode as DriftNode).Sector);
         }
         if (result == 0 && targetNode.GetType() != typeof(DriftNode)) {
-            targetNode.TransferOwnership(NetworkManager.PlayerNode);
-            NetworkManager.AddHackFarm(targetNode.HackFarm);
+            targetNode.TransferOwnership();
+            if (targetNode is ScriptedNetworkNode)
+            NetworkManager.AddHackFarm((targetNode as ScriptedNetworkNode).HackFarm);
         }
         return 0;
         static void EndFlare() {

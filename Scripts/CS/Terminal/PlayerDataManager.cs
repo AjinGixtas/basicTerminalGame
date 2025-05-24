@@ -3,6 +3,7 @@ using Godot;
 public static class PlayerDataManager {
 	static double GC_Max;
 	static double _gc_total;
+	static double[] MineralInventory = new double[10];
 	public static double GC_PublicDisplay {
 		get { return _gc_total; }
 	}
@@ -15,15 +16,14 @@ public static class PlayerDataManager {
 		GC_Max = 2_000_000; _gc_total = 0; Username = "UN1NTIALiZED_USER";
     }
 
-	public static int WithDraw(double amount) { // 0-Successful withdraw; 1-Invalid amount; 2-Not enough money
+	public static int WithdrawGC(double amount) { // 0-Successful withdraw; 1-Invalid amount; 2-Not enough money
         if (amount < 0) { return 1; }
 		if (amount > _gc_total) { return 2; }
 		_gc_total -= amount;
 		return 0;
 	}
-
 	static bool needWarn = false, warned = false;
-	public static int Deposit(double amount) { // 0-Successful deposit; 1-Invalid amount
+	public static int DepositGC(double amount) { // 0-Successful deposit; 1-Invalid amount
         if (amount <= 0) { return 1; }
 		_gc_total += amount;
 
@@ -35,7 +35,34 @@ public static class PlayerDataManager {
         return 0;
 	}
 
-	public static string GetLoadStatusMsg(int statusCode) {
+	public static int WithdrawMineral(double[] amounts) {
+        if (amounts.Length != MineralInventory.Length) return 1; // Invalid amount
+        for (int i = 0; i < amounts.Length; ++i) {
+            if (amounts[i] < 0 || amounts[i] > MineralInventory[i]) return 2; // Invalid amount
+        }
+		for (int i = 0; i < amounts.Length; ++i) {
+			MineralInventory[i] -= amounts[i];
+		}   
+		return 0;
+    }
+	public static int DepositMineral(double[] amounts) {
+        if (amounts.Length != MineralInventory.Length) return 1; // Invalid amount
+        for (int i = 0; i < amounts.Length; ++i) {
+            if (amounts[i] < 0) return 2; // Invalid amount
+        }
+        for (int i = 0; i < amounts.Length; ++i) {
+            MineralInventory[i] += amounts[i];
+        }
+        return 0;
+    }
+	public static int DepositMineral(int type, double amount) {
+        if (type < 0 || type >= MineralInventory.Length) return 1; // Invalid type
+        if (amount < 0) return 2; // Invalid amount
+        MineralInventory[type] += amount;
+        return 0;
+    }
+
+    public static string GetLoadStatusMsg(int statusCode) {
 		string[] LOAD_STATUS_MSG = [
 			Util.Format("Loaded player data successfully", StrType.FULL_SUCCESS),
 			Util.Format("No player data file found in save. Fall back to new user setting.", StrType.ERROR),
@@ -63,10 +90,11 @@ public static class PlayerDataManager {
 		GC_Max = data.GC_max;
         _gc_total = data.GC_total;
         Username = data.username;
+        MineralInventory = data.mineralInventory;
         return 0;
     }
     public static int SavePlayerData(string filePath) {
-        PlayerDataSaveResource data = new() { GC_max = GC_Max, GC_total = _gc_total, username = Username };
+        PlayerDataSaveResource data = new() { GC_max = GC_Max, GC_total = _gc_total, username = Username, mineralInventory = MineralInventory };
         Error error = ResourceSaver.Save(data, filePath);
 		return (int)error;
 	}

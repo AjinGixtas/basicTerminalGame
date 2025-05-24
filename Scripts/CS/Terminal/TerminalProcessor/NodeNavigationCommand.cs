@@ -52,14 +52,14 @@ public static partial class TerminalProcessor {
         if (IsIPv4(positionalArgs[0])) { // Check if the input is a valid IPv4 address
             NetworkNode nodeDNS = NetworkManager.QueryDNS(positionalArgs[0]);
             if (nodeDNS != null) {
-                if (nodeDNS.CurrentOwner == NetworkManager.PlayerNode) {
+                if (!nodeDNS.OwnedByPlayer) {
                     Say("-r", "Node not owned by you. Cannot connect to it."); return;
                 }
                 CurrNode = NetworkManager.QueryDNS(positionalArgs[0]); return;
             } else { Say("-r", $"IP not found: {Util.Format(positionalArgs[0], StrType.HOSTNAME)}"); return;  }
         }
         
-        if (CurrNode.CurrentOwner != NetworkManager.PlayerNode) {
+        if (!CurrNode.OwnedByPlayer) {
             Say("-r", "This node is not owned by you. Cannot hop beyond it."); return;
         }
         NetworkNode parentNode = CurrNode.ParentNode;
@@ -99,18 +99,23 @@ public static partial class TerminalProcessor {
 {Util.Format("Firewall rating:", StrType.DECOR),padLength}{Util.Format($"{analyzeNode.DefLvl}", StrType.DEF_LVL)}
 {Util.Format("Security level:", StrType.DECOR),padLength}{Util.Format($"{analyzeNode.SecType}", StrType.SEC_TYPE)}
 ");
-
-        // Honeypot node don't dare to impersonate actual organization or corporation.
-        if (analyzeNode.CurrentOwner != NetworkManager.PlayerNode) {
+        if (analyzeNode is DriftNode) {
+            Say("This node is part of a temporal sector. There is nothing useful long term.");
+            return;
+        }
+        if (!analyzeNode.OwnedByPlayer) {
             Say($"Crack this node security system to get further access.");
             return;
         }
-        Say("-tl", $@"
+        if (analyzeNode is ScriptedNetworkNode) {
+            ScriptedNetworkNode sNode = analyzeNode as ScriptedNetworkNode;
+            Say("-tl", $@"
 {Util.Format("▶ GC miner detail", StrType.HEADER)}
-{Util.Format("Transfer batch:", StrType.DECOR),padLength}{Util.Format($"{analyzeNode.HackFarm.HackLvl}", StrType.NUMBER)} ({Util.Format($"{analyzeNode.HackFarm.CurHack}", StrType.MONEY)})
-{Util.Format("Transfer speed:", StrType.DECOR),padLength}{Util.Format($"{analyzeNode.HackFarm.TimeLvl}", StrType.NUMBER)} ({Util.Format($"{analyzeNode.HackFarm.CurTime}", StrType.UNIT, "s")})
-{Util.Format("Mining speed:", StrType.DECOR),padLength}{Util.Format($"{analyzeNode.HackFarm.GrowLvl}", StrType.NUMBER)} ({Util.Format(Util.Format($"{analyzeNode.HackFarm.CurGrow}", StrType.MONEY), StrType.UNIT, "/s")})
+{Util.Format("Transfer batch:", StrType.DECOR),padLength}{Util.Format($"{sNode.HackFarm.HackLvl}", StrType.NUMBER)} ({Util.Format($"{sNode.HackFarm.CurHack}", StrType.MONEY)})
+{Util.Format("Transfer speed:", StrType.DECOR),padLength}{Util.Format($"{sNode.HackFarm.TimeLvl}", StrType.NUMBER)} ({Util.Format($"{sNode.HackFarm.CurTime}", StrType.UNIT, "s")})
+{Util.Format("Mining speed:", StrType.DECOR),padLength}{Util.Format($"{sNode.HackFarm.GrowLvl}", StrType.NUMBER)} ({Util.Format(Util.Format($"{sNode.HackFarm.CurGrow}", StrType.MONEY), StrType.UNIT, "/s")})
 ");
+        }
         if (analyzeNode is FactionNode) {
             Say("-tl", $@"
 {Util.Format("▶ Faction detail", StrType.HEADER)}

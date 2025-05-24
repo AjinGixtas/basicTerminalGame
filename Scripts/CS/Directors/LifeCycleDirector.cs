@@ -25,9 +25,9 @@ public partial class LifeCycleDirector : Node
 		}
 	}
 	private const string SaveRoot = "user://Saves";
+	
+	
 	static void QuickSave() {
-		// Convert virtual path to real path
-
 		// Ensure the save root directory exists
 		DirAccess.MakeDirAbsolute(ProjectSettings.GlobalizePath(SaveRoot));
 
@@ -52,7 +52,9 @@ public partial class LifeCycleDirector : Node
 			PlayerFileManager.SaveFileSysData(StringExtensions.PathJoin(newSavePath, "FileSys"))));
 		TerminalProcessor.Say($"If there are any error related to save file, feel free to email {Util.Format("ajingixtascontact", StrType.USERNAME)}@{Util.Format("gmail.com", StrType.HOSTNAME)}");
 	}
+
 	static void QuickLoad(LifeCycleDirector lifeCycleDirector) {
+		lifeCycleDirector.RemakeScene();
 		if (!DirAccess.DirExistsAbsolute(ProjectSettings.GlobalizePath(SaveRoot))) { TerminalProcessor.Say("-r", "No previous record of user found. Intialize new user."); return; }
 
 		// Find all save folders named like "Game_###"

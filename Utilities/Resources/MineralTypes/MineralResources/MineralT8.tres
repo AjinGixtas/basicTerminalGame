@@ -5,3 +5,4 @@
 [resource]
 script = ExtResource("1_28k0v")
 Name = "Port"
+Index = 8

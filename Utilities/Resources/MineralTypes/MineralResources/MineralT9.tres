@@ -5,3 +5,4 @@
 [resource]
 script = ExtResource("1_a6gv3")
 Name = "Crypto"
+Index = 9

@@ -5,3 +5,4 @@
 [resource]
 script = ExtResource("1_thvdn")
 Name = "Thread"
+Index = 7

@@ -10,10 +10,10 @@ public static partial class NetworkManager {
     const int DRIFT_SECTOR_COUNT = 128;
     public static void Ready() {
         DNS = []; driftSectors = []; connectedSectors = [];
-        PlayerNode = new PlayerNode("home", "Player Terminal", GetRandomIP(), null) {
-            HackFarm = new HackFarm(1.0, 1.0, 255, 255, 255)
-        }; AssignDNS(PlayerNode);
+        PlayerNode = new PlayerNode("home", "Player Terminal", GetRandomIP(), null, new HackFarm(1.0, 1.0, 255, 255, 255)); 
         PlayerHackFarm = [PlayerNode.HackFarm];
+
+        AssignDNS(PlayerNode);
         RegenerateDriftSector();
     }
 
@@ -117,8 +117,14 @@ public static partial class NetworkManager {
     public static void AddHackFarm(HackFarm hackFarm) { 
         PlayerHackFarm.Add(hackFarm); 
     }
-    public static void CollectHackFarmMoney(double delta) {
-        foreach (HackFarm h in PlayerHackFarm) { PlayerDataManager.Deposit(h.Process(delta)); }
+    public static void CollectHackFarmMinerals(double delta) {
+        foreach (HackFarm h in PlayerHackFarm) {
+            var minerals = h.ProcessMinerals(delta);
+            for (int i = 0; i < minerals.Length; ++i) {
+                // You need to implement this method to deposit minerals by type.
+                PlayerDataManager.DepositMineral(i, minerals[i]);
+            }
+        }
     }
     public static NetworkNode QueryDNS(string IP) {
         return DNS.TryGetValue(IP, out var node) ? node : null; ;

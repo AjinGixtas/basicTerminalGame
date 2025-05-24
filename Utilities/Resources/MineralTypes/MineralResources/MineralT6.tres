@@ -5,3 +5,4 @@
 [resource]
 script = ExtResource("1_32ufw")
 Name = "Lambda-bloc"
+Index = 6

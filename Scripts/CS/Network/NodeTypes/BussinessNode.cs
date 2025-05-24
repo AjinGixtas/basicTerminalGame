@@ -1,10 +1,10 @@
 using Godot;
 
-public class BusinessNode : NetworkNode {
+public class BusinessNode : ScriptedNetworkNode {
     public Stock _stock;
     public Stock Stock { get => _stock; set { _stock ??= value; } }
-    public BusinessNode(string hostName, string displayName, string IP, NetworkNode parentNode)
-        : base(hostName, displayName, IP, NodeType.BUSINESS, parentNode) {
+    public BusinessNode(string hostName, string displayName, string IP, NetworkNode parentNode, HackFarm hackFarm)
+        : base(hostName, displayName, IP, NodeType.BUSINESS, parentNode, hackFarm) {
     }
     // They're in it for the money, not to keep it
     public override (int, int) GenerateDefAndSec(double indexRatio, double depthRatio) {

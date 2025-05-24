@@ -32,7 +32,7 @@ public class HackFarm {
             CurGrow = GetGrowValue(_growLvl);
         }
     }
-    public HackFarm(double indexRatio, double depthRatio, int HackLvl = 1, int TimeLvl = 1, int GrowLvl = 1) {
+    public HackFarm(double indexRatio, double depthRatio, int HackLvl = 1, int TimeLvl = 1, int GrowLvl = 1, MiningWeight[] miningWeights = null) {
         double MAX_GROW = 1_000 * 0.7958800173440752 * Mathf.Log(indexRatio + .6) / Mathf.Log(10);
         double MIN_TIME = 0.05;
         double MAX_HACK = MAX_GROW * MIN_TIME;
@@ -43,14 +43,14 @@ public class HackFarm {
         //this.HackLvl = HackLevel; this.TimeLvl = TimeLevel; this.GrowLvl = GrowLevel;
         this.HackLvl = HackLvl; this.TimeLvl = TimeLvl; this.GrowLvl = GrowLvl;
         timeRemain = CurTime;
+        MiningWeights = miningWeights ?? [];
     }
+    public MiningWeight[] MiningWeights { get; set; }
     double currencyPile = 0, timeRemain = 0;
     public double CurrencyPile { get => currencyPile; }
-    public double Process(double delta) {
-        // Time related mechanism
+    public double[] ProcessMinerals(double delta) {
         timeRemain -= delta; currencyPile += CurGrow * delta;
-        // Hack related mechanism
-        if (timeRemain > 0) return 0;
+        if (timeRemain > 0) return new double[MiningWeights.Length];
         double totalHackAmount = 0;
         while (timeRemain < 0) {
             double hackedAmount = Mathf.Min(currencyPile, CurHack);
@@ -58,23 +58,28 @@ public class HackFarm {
             totalHackAmount += hackedAmount;
             timeRemain += CurTime;
         }
-        return totalHackAmount; // Return the amount of money hacked
+        // Distribute totalHackAmount according to MiningWeights
+        double[] minerals = new double[MiningWeights.Length];
+        for (int i = 0; i < MiningWeights.Length; ++i) {
+            minerals[i] = totalHackAmount * MiningWeights[i].weight;
+        }
+        return minerals;
     }
 
     public int UpgradeHackLevel() {
-        int status = PlayerDataManager.WithDraw(GetHackCost(HackLvl+1));
+        int status = PlayerDataManager.WithdrawGC(GetHackCost(HackLvl+1));
         if (status != 0) return status;
         if (HackLvl >= MAX_LVL) return 3; // Already at max level
         ++HackLvl; return 0;
     }
     public int UpgradeTimeLevel() {
-        int status = PlayerDataManager.WithDraw(GetTimeCost(TimeLvl+1));
+        int status = PlayerDataManager.WithdrawGC(GetTimeCost(TimeLvl+1));
         if (status != 0) return status;
         if (HackLvl >= MAX_LVL) return 3; // Already at max level
         ++TimeLvl; return 0;
     }
     public int UpgradeGrowLevel() {
-        int status = PlayerDataManager.WithDraw(GetGrowCost(GrowLvl));
+        int status = PlayerDataManager.WithdrawGC(GetGrowCost(GrowLvl));
         if (status != 0) return status;
         if (GrowLvl >= MAX_LVL) return 3; // Already at max level
         ++GrowLvl; return 0;

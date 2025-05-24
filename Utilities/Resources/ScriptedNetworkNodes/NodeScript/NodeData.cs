@@ -8,7 +8,8 @@ public partial class NodeData : Resource
 	private LockType _locks;
 	private int _defLvl, _secLvl, _retLvl;
 	private float _gcDeposit;
-	[Export] public int DefLvl {
+	public static NodeType NodeType => NodeType.DRIFT; 
+    [Export] public int DefLvl {
 		get => _defLvl;
 		set {
 			_defLvl = value;
@@ -73,7 +74,6 @@ public partial class NodeData : Resource
 		}
 		return properties;
 	}
-
 	public override Variant _Get(StringName property)
 	{
 		string propertyName = property.ToString();
@@ -91,7 +91,6 @@ public partial class NodeData : Resource
 		}
 		return default;
 	}
-
 	public override bool _Set(StringName property, Variant value)
 	{
 		string propertyName = property.ToString();

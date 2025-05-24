@@ -3,10 +3,43 @@ using Godot.Collections;
 [GlobalClass]
 public partial class NodeData : Resource
 {
-	private int _numberCount;
 	private Array<MiningWeight> _miningWeights;
 	private Array<NodeData> _childNodes;
-	[Export] public Array<MiningWeight> MiningWeights {
+	private LockType _locks;
+	private int _defLvl, _secLvl, _retLvl;
+	private float _gcDeposit;
+	[Export] public int DefLvl {
+		get => _defLvl;
+		set {
+			_defLvl = value;
+		}
+	}
+	[Export] public int SecLvl {
+		get => _secLvl;
+		set {
+			_secLvl = value;
+		}
+	}
+	[Export] public int RetLvl {
+		get => _retLvl;
+        set {
+            _retLvl = value;
+        }
+    }
+	[Export] public float GcDeposit {
+        get => _gcDeposit;
+        set {
+            _gcDeposit = value;
+        }
+    }
+    [Export] public LockType Locks {
+		get => _locks;
+		set {
+			_locks = value;
+			NotifyPropertyListChanged();
+		}
+    }
+    [Export] public Array<MiningWeight> MiningWeights {
 		get => _miningWeights;
 		set {
 			_miningWeights = value;
@@ -22,7 +55,7 @@ public partial class NodeData : Resource
 	}
 	public override Array<Dictionary> _GetPropertyList() {
 		Array<Dictionary> properties = [];
-		for (int i = 0; i < _miningWeights.Count; i++) {
+        for (int i = 0; i < _miningWeights.Count; i++) {
 			properties.Add(new Dictionary() {
 				{ "name", $"miningweights/{i}" },
 				{ "type", (int)Variant.Type.Object },

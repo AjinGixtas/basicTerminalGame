@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="NodeData" load_steps=3 format=3 uid="uid://ddg5avlykvy61"]
+
+[ext_resource type="Resource" uid="uid://clag4rfar1lv8" path="res://Utilities/Resources/ScriptedNetworkNodes/TutorialNetwork/Node11.tres" id="1_8dg1k"]
+[ext_resource type="Script" uid="uid://b5e7b5k5tgoxy" path="res://Utilities/Resources/ScriptedNetworkNodes/NodeScript/NodeData.cs" id="2_m6cl5"]
+
+[resource]
+script = ExtResource("2_m6cl5")
+DefLvl = 0
+SecLvl = 0
+RetLvl = 0
+GcDeposit = 0.0
+Locks = 0
+MiningWeights = null
+ChildNodes = Array[Object]([ExtResource("1_8dg1k")])
+metadata/_custom_type_script = "uid://b5e7b5k5tgoxy"

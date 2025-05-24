@@ -79,26 +79,6 @@ public abstract class NetworkNode {
             NodeType = NodeType
         };
     }
-    public static NetworkNode MakeNode(NodeType nodeType, string hostName, string displayName, double indexRatio, double depthRatio, NetworkNode parentNode) {
-        string IP = NetworkManager.GetRandomIP();
-        NetworkNode node = nodeType switch {
-            NodeType.PLAYER => throw new System.Exception("Can't remake player node."),
-            NodeType.PERSON =>   new PersonNode  (hostName, displayName, IP, parentNode),
-            NodeType.BUSINESS => new BusinessNode(hostName, displayName, IP, parentNode),
-            NodeType.CORP =>     new CorpNode    (hostName, displayName, IP, parentNode),
-            NodeType.FACTION =>  new FactionNode (hostName, displayName, IP, parentNode),
-            NodeType.HONEYPOT => new HoneypotNode(hostName, displayName, IP, parentNode),
-            NodeType.MINER =>    new MinerNode   (hostName, displayName, IP, parentNode),
-            NodeType.ROUGE =>    new RougeNode   (hostName, displayName, IP, parentNode),
-            NodeType.DRIFT =>    throw new System.Exception("Node type unsupported."),
-            _ => throw new System.Exception("Invalid node type")
-        };
-        (int defLvl, int secLvl) = node.GenerateDefAndSec(indexRatio, depthRatio);
-        HackFarm hackFarm = new(indexRatio, depthRatio);
-        node.Init(defLvl, secLvl, hackFarm);
-        NetworkManager.AssignDNS(node);
-        return node;
-    }
     
     NetworkNode _currentOwner = null;
     public NetworkNode CurrentOwner {

@@ -1,7 +1,7 @@
-[gd_resource type="Resource" load_steps=2 format=3 uid="uid://bbvac4tj805ss"]
+[gd_resource type="Resource" script_class="MineralProfile" load_steps=2 format=3 uid="uid://bbvac4tj805ss"]
 
 [ext_resource type="Script" uid="uid://cwhc46neois7q" path="res://Utilities/Resources/MineralTypes/MineralProfile.cs" id="1_28k0v"]
 
 [resource]
 script = ExtResource("1_28k0v")
-Name = "Thread"
+Name = "Port"

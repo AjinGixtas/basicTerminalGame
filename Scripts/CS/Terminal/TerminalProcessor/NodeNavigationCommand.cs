@@ -1,6 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 public static partial class TerminalProcessor {
     static void Home(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         Home();
@@ -47,14 +48,33 @@ public static partial class TerminalProcessor {
     }
     static void Connect(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         if (positionalArgs.Length == 0) { Say("-r", $"No hostname provided."); return; }
-        if (NetworkManager.QueryDNS(positionalArgs[0]) != null) { CurrNode = NetworkManager.QueryDNS(positionalArgs[0]); return; }
-        if (CurrNode.ParentNode != null && CurrNode.ParentNode.HostName == positionalArgs[0] ||
-            (CurrNode.ParentNode is HoneypotNode && (CurrNode.ParentNode as HoneypotNode).fakeHostName == positionalArgs[0])) { CurrNode = CurrNode.ParentNode; return; }
+        
+        if (IsIPv4(positionalArgs[0])) { // Check if the input is a valid IPv4 address
+            NetworkNode nodeDNS = NetworkManager.QueryDNS(positionalArgs[0]);
+            if (nodeDNS != null) {
+                if (nodeDNS.CurrentOwner == NetworkManager.PlayerNode) {
+                    Say("-r", "Node not owned by you. Cannot connect to it."); return;
+                }
+                CurrNode = NetworkManager.QueryDNS(positionalArgs[0]); return;
+            } else { Say("-r", $"IP not found: {Util.Format(positionalArgs[0], StrType.HOSTNAME)}"); return;  }
+        }
+        
+        if (CurrNode.CurrentOwner != NetworkManager.PlayerNode) {
+            Say("-r", "This node is not owned by you. Cannot hop beyond it."); return;
+        }
+        NetworkNode parentNode = CurrNode.ParentNode;
+        if (parentNode != null && parentNode.HostName == positionalArgs[0]) {
+
+            CurrNode = parentNode; return; 
+        }
 
         NetworkNode node = CurrNode.ChildNode.FindLast(s => s.HostName == positionalArgs[0]);
-        NetworkNode fnode = CurrNode.ChildNode.FindLast(s => s is HoneypotNode && (s as HoneypotNode).fakeHostName == positionalArgs[0]);
-        if (node == null && fnode == null) { Say("-r", $"Host not found: {Util.Format(positionalArgs[0], StrType.HOSTNAME)}"); return; }
-        CurrNode = (node ?? fnode);
+        if (node == null) { Say("-r", $"Host not found: {Util.Format(positionalArgs[0], StrType.HOSTNAME)}"); return; }
+        
+        CurrNode = node;
+        static bool IsIPv4(string ip) {
+            return IPAddress.TryParse(ip, out var address) && address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork;
+        }
     }
     static void Analyze(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         if (positionalArgs.Length == 0) { positionalArgs = [CurrNode.HostName]; }
@@ -81,7 +101,7 @@ public static partial class TerminalProcessor {
 ");
 
         // Honeypot node don't dare to impersonate actual organization or corporation.
-        if (analyzeNode.CurrentOwner != NetworkManager.PlayerNode || analyzeNode.GetType() == typeof(HoneypotNode)) {
+        if (analyzeNode.CurrentOwner != NetworkManager.PlayerNode) {
             Say($"Crack this node security system to get further access.");
             return;
         }

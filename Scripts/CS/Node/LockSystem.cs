@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 public class LockSystem {
 	List<Lock> activeLocks = [];
-	List<Lock> lockPool = [new I5(), new P23(), new I13(), new P16(), new C0(), new C1(), new C3(), new M2(), new M3()];
+	List<Lock> lockPool = [new I4X(), new P90(), new I16(), new P16X(), new C0(), new C1(), new C3(), new M2(), new M3()];
 	public LockSystem() { }
 	public int LockIntialization(int secLvl) {
 		activeLocks.Clear(); int usedLvl = 0;

@@ -8,7 +8,7 @@ public class StaticSector : Sector {
         _sectorData = sectorData;
         Name = sectorData.SectorName;
         if (sectorData.Nodes != null) {
-            foreach (var nodeData in sectorData.Nodes) {
+            foreach (NodeData nodeData in sectorData.Nodes) {
                 ScriptedNetworkNode node = CreateNodeRecursive(nodeData, null);
                 if (node is ScriptedNetworkNode scriptedNode)
                     SurfaceNodes.Add(scriptedNode);
@@ -18,7 +18,10 @@ public class StaticSector : Sector {
     }
 
     private ScriptedNetworkNode CreateNodeRecursive(NodeData nodeData, NetworkNode parent) {
-        ScriptedNetworkNode node = new ScriptedNetworkNode(nodeData, parent);
+        ScriptedNetworkNode node;
+        if (nodeData.HostName == "tutorial") { // Special case for tutorial node
+            node = new TutorialNetworkNode(nodeData, parent);
+        } else  node = new ScriptedNetworkNode(nodeData, parent);
         if (nodeData.ChildNodes != null) {
             foreach (NodeData childData in nodeData.ChildNodes) {
                 ScriptedNetworkNode childNode = CreateNodeRecursive(childData, node);

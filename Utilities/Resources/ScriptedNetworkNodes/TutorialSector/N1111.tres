@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_xgrsq")
 NodeType = 64
-HostName = "for"
+HostName = "tutorial"
 DisplayName = "vm4"
 DefLvl = 2
 SecLvl = 1

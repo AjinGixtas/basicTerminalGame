@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="NodeData" load_steps=3 format=3 uid="uid://ddg5avlykvy61"]
+
+[ext_resource type="Resource" uid="uid://clag4rfar1lv8" path="res://Utilities/Resources/ScriptedNetworkNodes/TutorialSector/N11.tres" id="1_6s72h"]
+[ext_resource type="Script" uid="uid://b5e7b5k5tgoxy" path="res://Utilities/Resources/ScriptedNetworkNodes/NodeScript/NodeData.cs" id="2_mmse7"]
+
+[resource]
+script = ExtResource("2_mmse7")
+NodeType = 64
+HostName = "foo"
+DisplayName = "vm1"
+DefLvl = 0
+SecLvl = 0
+RetLvl = 0
+GcDeposit = 2.0
+Locks = 0
+MiningWeights = Array[Object]([])
+MAX_GROW_MINING = 0.0
+ChildNodes = Array[Object]([ExtResource("1_6s72h")])
+OwnedByPlayer = false
+metadata/_custom_type_script = "uid://b5e7b5k5tgoxy"

@@ -44,9 +44,9 @@ public abstract class NetworkNode {
 		get => _retLvl;
 	}
 	
-	public NetworkNode(string hostName, string displayName, string IP, NodeType NodeType, NetworkNode parentNode) {
+	public NetworkNode(string hostName, string displayName, string IP, NodeType NodeType, NetworkNode parentNode, bool ownedByPlayer) {
 		HostName = hostName; DisplayName = displayName; this.IP = IP; this.NodeType = NodeType;
-		OwnedByPlayer = false; ParentNode = parentNode; ChildNode = [];
+		OwnedByPlayer = ownedByPlayer; ParentNode = parentNode; ChildNode = [];
 		LockSystem = new();
 	}
 	
@@ -82,10 +82,10 @@ public abstract class NetworkNode {
 	bool ownedByPlayer = false;
 	public bool OwnedByPlayer {
 		get => ownedByPlayer;
-		private set => ownedByPlayer = value;
+		protected set => ownedByPlayer = value;
 	}
-	bool _isSecure = true; bool IsSecure { get => _isSecure; set => _isSecure = value; }
-	public int AttempCrackNode(Dictionary<string, string> ans, double timeStamp) {
+	bool _isSecure = true; protected bool IsSecure { get => _isSecure; set => _isSecure = value; }
+	public virtual int AttempCrackNode(Dictionary<string, string> ans, double timeStamp) {
 		if (LockSystem == null) { return 5; } // No lock system, cannot crack
 		int result = LockSystem.CrackAttempt(ans, timeStamp);
 		if (result == 0) {
@@ -94,7 +94,7 @@ public abstract class NetworkNode {
 		}
 		return result;
 	}
-	public int TransferOwnership() {
+	public virtual int TransferOwnership() {
 		if (IsSecure) return 1; // Node secured, transfer impossible
 		OwnedByPlayer = true; return 0; // Transfer successful
 	}

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="SectorData" load_steps=3 format=3 uid="uid://doc7jj2njk8tj"]
+
+[ext_resource type="Script" uid="uid://cyg6db23gnd2b" path="res://Utilities/Resources/ScriptedNetworkNodes/NodeScript/SectorData.cs" id="1_lu3tm"]
+[ext_resource type="Resource" uid="uid://ddg5avlykvy61" path="res://Utilities/Resources/ScriptedNetworkNodes/TutorialSector/N1.tres" id="1_s55nl"]
+
+[resource]
+script = ExtResource("1_lu3tm")
+SectorName = "PURGATORY"
+Nodes = Array[Object]([ExtResource("1_s55nl")])
+metadata/_custom_type_script = "uid://cyg6db23gnd2b"

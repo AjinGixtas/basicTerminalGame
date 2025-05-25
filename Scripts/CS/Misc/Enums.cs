@@ -6,6 +6,7 @@ public enum NodeType {
     CORP =     1<<3, //Money+Stock+Alliance
     FACTION =  1<<4, //Money+Alliance
     DRIFT =    1<<5, //One-time-hack
+    VM =       1<<6, //Virtual Machine
 }
 // NOSEC = [0, 1)
 // LOSEC = [1, 3)

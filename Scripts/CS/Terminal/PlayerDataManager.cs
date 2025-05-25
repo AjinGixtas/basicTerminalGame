@@ -1,64 +1,99 @@
 using Godot;
 
 public static class PlayerDataManager {
-	static double GC_Max;
-	static double _gc_total;
-	static double[] MineralInventory = new double[10];
-	public static double GC_PublicDisplay {
-		get { return _gc_total; }
+	static PlayerDataSaveResource saveObj;
+	public static double[] MineInv => _mineInv;
+    public static double GC_Cur => _gc_cur;
+	public static double GC_Max => _gc_max;
+    public static bool CompletedTutorial {
+        get => saveObj.CompletedTutorial;
+        set => saveObj.CompletedTutorial = value;
+    }
+    public static int tutorialProgress = 0;
+    public static string Username {
+        get => _username;
+        set => _username = value;
+    }
+    static double _gc_cur {
+		get => saveObj.GC_cur;
+        set {
+            saveObj.GC_cur = Mathf.Clamp(value, 0, GC_Max);
+        }
+    }
+	static double _gc_max {
+		get => saveObj.GC_max;
+		set {
+			saveObj.GC_max = Mathf.Max(value, 0);
+        }
 	}
-	static string _username; public static string Username { 
-		get => _username; 
-		set { _username = value; }
-	}
+    static string _username {
+        get => saveObj.username;
+        set { saveObj.username = value; }
+    }
+    static double[] _mineInv {
+        get => saveObj.MineralInventory;
+        set {
+            if (value.Length != MineInv.Length) {
+                GD.PushError("Invalid mineral inventory length.");
+                return;
+            }
+            for (int i = 0; i < value.Length; i++) {
+                if (value[i] < 0) {
+                    GD.PushError($"Invalid mineral amount for type {i}: {value[i]}");
+                    return;
+                }
+            }
+            saveObj.MineralInventory = value;
+        }
+    }
 
 	public static void Ready() {
-		GC_Max = 2_000_000; _gc_total = 0; Username = "UN1NTIALiZED_USER";
+        saveObj = new();
     }
 
 	public static int WithdrawGC(double amount) { // 0-Successful withdraw; 1-Invalid amount; 2-Not enough money
         if (amount < 0) { return 1; }
-		if (amount > _gc_total) { return 2; }
-		_gc_total -= amount;
+		if (amount > _gc_max) { return 2; }
+		_gc_cur -= amount;
 		return 0;
 	}
 	static bool needWarn = false, warned = false;
 	public static int DepositGC(double amount) { // 0-Successful deposit; 1-Invalid amount
         if (amount <= 0) { return 1; }
-		_gc_total += amount;
+		_gc_cur += amount;
 
-        if (_gc_total <= GC_Max) { needWarn = false; warned = false; } else needWarn = true;
+        if (_gc_cur <= GC_Max) { needWarn = false; warned = false; } else needWarn = true;
         if (needWarn && !warned) {
-            TerminalProcessor.Say($"[color={Util.CC(Cc.gR)}]Warning:[/color] GC total is over the limit of {GC_Max}. Remaining GC lost.");
+            TerminalProcessor.Say($"[color={Util.CC(Cc.gR)}]Warning:[/color] GC total is over the limit of {_gc_max}. Remaining GC lost.");
             warned = true;
         }
         return 0;
 	}
 
 	public static int WithdrawMineral(double[] amounts) {
-        if (amounts.Length != MineralInventory.Length) return 1; // Invalid amount
+        if (amounts.Length != _mineInv.Length) return 1; // Invalid amount
         for (int i = 0; i < amounts.Length; ++i) {
-            if (amounts[i] < 0 || amounts[i] > MineralInventory[i]) return 2; // Invalid amount
+            if (amounts[i] < 0 || amounts[i] > _mineInv[i]) return 2; // Invalid amount
         }
 		for (int i = 0; i < amounts.Length; ++i) {
-			MineralInventory[i] -= amounts[i];
+			_mineInv[i] -= amounts[i];
 		}   
 		return 0;
     }
 	public static int DepositMineral(double[] amounts) {
-        if (amounts.Length != MineralInventory.Length) return 1; // Invalid amount
+        if (amounts.Length != _mineInv.Length) return 1; // Invalid amount
         for (int i = 0; i < amounts.Length; ++i) {
             if (amounts[i] < 0) return 2; // Invalid amount
         }
         for (int i = 0; i < amounts.Length; ++i) {
-            MineralInventory[i] += amounts[i];
+            _mineInv[i] += amounts[i];
         }
         return 0;
     }
 	public static int DepositMineral(int type, double amount) {
-        if (type < 0 || type >= MineralInventory.Length) return 1; // Invalid type
+        if (type < 0 || type >= _mineInv.Length) return 1; // Invalid type
         if (amount < 0) return 2; // Invalid amount
-        MineralInventory[type] += amount;
+        _mineInv[type] += amount;
         return 0;
     }
 
@@ -81,20 +116,17 @@ public static class PlayerDataManager {
 	}
     
 	public static int LoadPlayerData(string filePath) {
-		GC_Max = 2_000_000; _gc_total = 0; Username = "UN1NTIALiZED_USER";
+        saveObj = new();
 		needWarn = false; warned = false;
         if (!FileAccess.FileExists(filePath)) { return 1; }
 		PlayerDataSaveResource data;
         try { data = GD.Load<PlayerDataSaveResource>(filePath); } catch { return 2; }
         if (data == null) { return 3; }
-		GC_Max = data.GC_max;
-        _gc_total = data.GC_total;
-        Username = data.username;
-        MineralInventory = data.mineralInventory;
+        saveObj = data;
         return 0;
     }
     public static int SavePlayerData(string filePath) {
-        PlayerDataSaveResource data = new() { GC_max = GC_Max, GC_total = _gc_total, username = Username, mineralInventory = MineralInventory };
+        PlayerDataSaveResource data = saveObj;
         Error error = ResourceSaver.Save(data, filePath);
 		return (int)error;
 	}

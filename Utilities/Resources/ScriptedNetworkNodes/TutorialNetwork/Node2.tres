@@ -1,9 +1,0 @@
-[gd_resource type="Resource" script_class="NodeData" load_steps=2 format=3 uid="uid://tx8ew6u4y6cp"]
-
-[ext_resource type="Script" uid="uid://b5e7b5k5tgoxy" path="res://Utilities/Resources/ScriptedNetworkNodes/NodeScript/NodeData.cs" id="1_pfadf"]
-
-[resource]
-script = ExtResource("1_pfadf")
-MiningWeights = null
-ChildNodes = null
-metadata/_custom_type_script = "uid://b5e7b5k5tgoxy"

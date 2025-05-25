@@ -25,7 +25,7 @@ public static partial class TerminalProcessor {
             Say(@$"[ GC Farm Status for {sNode.DisplayName} ]
 Current GC in node: {Util.Format($"{sNode.HackFarm.CurrencyPile}", StrType.MONEY)}
 Hack  : Lv.{Util.Format($"{hackLvl}", StrType.NUMBER)} -> {Util.Format(Util.Format($"{sNode.HackFarm.CurHack}", StrType.MONEY), StrType.UNIT, "/transfer")}
-Time  : Lv.{Util.Format($"{timeLvl}", StrType.NUMBER)} -> {Util.Format($"{sNode.HackFarm.CurTime}", StrType.UNIT, "s/tranfer")}
+Time  : Lv.{Util.Format($"{timeLvl}", StrType.NUMBER)} -> {Util.Format($"{            sNode.HackFarm.CurTime}", StrType.UNIT, "s/tranfer")}
 Grow  : Lv.{Util.Format($"{growLvl}", StrType.NUMBER)} -> {Util.Format(Util.Format($"{sNode.HackFarm.CurGrow}", StrType.MONEY), StrType.UNIT, "/s")}");
 
             Say(@$"[ Upgrade Info ]
@@ -136,7 +136,7 @@ Grow +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(gr
         if (targetNode.GetType() == typeof(DriftNode)) {
             sectorQueuedForRemoval.Add((targetNode as DriftNode).Sector);
         }
-        if (result == 0 && targetNode.GetType() != typeof(DriftNode)) {
+        if (result == 0 && !targetNode.OwnedByPlayer && targetNode.GetType() != typeof(DriftNode)) {
             targetNode.TransferOwnership();
             if (targetNode is ScriptedNetworkNode)
             NetworkManager.AddHackFarm((targetNode as ScriptedNetworkNode).HackFarm);

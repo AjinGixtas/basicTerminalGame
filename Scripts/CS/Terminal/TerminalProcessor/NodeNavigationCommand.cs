@@ -1,10 +1,9 @@
-using Godot;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 public static partial class TerminalProcessor {
     static void Home(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
-        Home();
+        ToHome();
     }
     static void Scan(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         string L = " └─── ", M = " ├─── ", T = "      ", E = " │    ";
@@ -60,7 +59,7 @@ public static partial class TerminalProcessor {
         }
         
         if (!CurrNode.OwnedByPlayer) {
-            Say("-r", "This node is not owned by you. Cannot hop beyond it."); return;
+            Say("-r", $"{Util.Format(CurrNode.HostName, StrType.HOSTNAME)} node is not owned by you. Cannot hop beyond it."); return;
         }
         NetworkNode parentNode = CurrNode.ParentNode;
         if (parentNode != null && parentNode.HostName == positionalArgs[0]) {
@@ -73,7 +72,7 @@ public static partial class TerminalProcessor {
         
         CurrNode = node;
         static bool IsIPv4(string ip) {
-            return IPAddress.TryParse(ip, out var address) && address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork;
+            return IPAddress.TryParse(ip, out IPAddress address) && address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork;
         }
     }
     static void Analyze(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
@@ -116,30 +115,6 @@ public static partial class TerminalProcessor {
 {Util.Format("Mining speed:", StrType.DECOR),padLength}{Util.Format($"{sNode.HackFarm.GrowLvl}", StrType.NUMBER)} ({Util.Format(Util.Format($"{sNode.HackFarm.CurGrow}", StrType.MONEY), StrType.UNIT, "/s")})
 ");
         }
-        if (analyzeNode is FactionNode) {
-            Say("-tl", $@"
-{Util.Format("▶ Faction detail", StrType.HEADER)}
-{Util.Format("Name:", StrType.DECOR),padLength}{Util.Format(Util.Obfuscate((analyzeNode as FactionNode).Faction.Name), StrType.DISPLAY_NAME)}
-{Util.Format("Description:", StrType.DECOR),padLength}{Util.Format(Util.Obfuscate((analyzeNode as FactionNode).Faction.Desc), StrType.DESC)}
-");
-        }
-        if (analyzeNode is BusinessNode) {
-            Say("-tl", $@"
-{Util.Format("▶ Business detail", StrType.HEADER)}
-{Util.Format("Stock:", StrType.DECOR),padLength}{Util.Format((analyzeNode as BusinessNode).Stock.Name, StrType.DISPLAY_NAME)}
-{Util.Format("Value:", StrType.DECOR),padLength}{Util.Format((analyzeNode as BusinessNode).Stock.Price.ToString("F2"), StrType.MONEY)}
-");
-        }
-        if (analyzeNode is CorpNode) {
-            Say("-tl", $@"
-{Util.Format("▶ Faction detail", StrType.HEADER)}
-{Util.Format("Name:", StrType.DECOR),padLength}{Util.Format(Util.Obfuscate((analyzeNode as CorpNode).Faction.Name), StrType.DISPLAY_NAME)}
-{Util.Format("Description:", StrType.DECOR),padLength}{Util.Format(Util.Obfuscate((analyzeNode as CorpNode).Faction.Desc), StrType.DESC)}
-{Util.Format("▶ Business detail", StrType.HEADER)}
-{Util.Format("Stock:", StrType.DECOR),padLength}{Util.Format((analyzeNode as CorpNode).Stock.Name, StrType.DISPLAY_NAME)}
-{Util.Format("Value:", StrType.DECOR),padLength}{Util.Format((analyzeNode as CorpNode).Stock.Price.ToString("F2"), StrType.MONEY)}
-");
-        }
     }
     static void Sector(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         string[] sectorNames = NetworkManager.GetSectorNames();
@@ -174,7 +149,7 @@ public static partial class TerminalProcessor {
             if (status == 0) { Say(msg); } else { Say("-r", msg); }
         }
     }
-    public static void Home() {
+    public static void ToHome() {
         CurrNode = NetworkManager.PlayerNode;
     }
 }

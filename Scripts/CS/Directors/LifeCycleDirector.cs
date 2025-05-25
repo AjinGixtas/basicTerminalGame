@@ -10,10 +10,11 @@ public partial class LifeCycleDirector : Node
 		// Load the game scene
 		if (gameScene != null) {
 			// Intialize default state
-			NetworkManager.Ready();
-			PlayerFileManager.Ready();
 			PlayerDataManager.Ready();
+			PlayerFileManager.Ready();
+			NetworkManager.Ready();
 			QuickLoad(this);
+			TerminalProcessor.Ready();
 		} else { GD.PrintErr("Game scene not set in LifeCycleDirector."); }
 	}
 	public override void _Process(double delta) {

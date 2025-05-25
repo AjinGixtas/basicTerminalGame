@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="NodeData" load_steps=2 format=3 uid="uid://dqfe2os6ekeep"]
+
+[ext_resource type="Script" uid="uid://b5e7b5k5tgoxy" path="res://Utilities/Resources/ScriptedNetworkNodes/NodeScript/NodeData.cs" id="1_xgrsq"]
+
+[resource]
+script = ExtResource("1_xgrsq")
+NodeType = 64
+HostName = "for"
+DisplayName = "vm4"
+DefLvl = 2
+SecLvl = 1
+RetLvl = 1
+GcDeposit = 512.0
+Locks = 2
+MiningWeights = null
+MAX_GROW_MINING = 0.0
+ChildNodes = Array[Object]([])
+OwnedByPlayer = false
+metadata/_custom_type_script = "uid://b5e7b5k5tgoxy"

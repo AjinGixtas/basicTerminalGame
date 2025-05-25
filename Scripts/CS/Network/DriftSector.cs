@@ -1,7 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 
-public class DriftSector {
+public class DriftSector : Sector {
     static readonly string[] DRIFT_NODE_NAMES = StringExtensions.Split(FileAccess.Open("res://Utilities/TextFiles/ServerNames/DriftNode.txt", FileAccess.ModeFlags.Read).GetAsText(), "\n", false);
     static readonly string[] DRIFT_SECTOR_NAMES = StringExtensions.Split(FileAccess.Open("res://Utilities/TextFiles/ServerNames/DriftSector.txt", FileAccess.ModeFlags.Read).GetAsText(), "\n", false);
     public DriftSector() {
@@ -16,9 +16,6 @@ public class DriftSector {
         }
         MarkIntializationCompleted();
     }
-    public string Name;
-    readonly List<DriftNode> SurfaceNodes = [];
-    bool _isIntialized = false;
     int AddSurfaceNode(DriftNode node) { if (_isIntialized) return 1; 
         SurfaceNodes.Add(node); return 0; }
     public int MarkIntializationCompleted() { _isIntialized = true; return 0; }

@@ -3,8 +3,9 @@ using Godot;
 public class DriftNode : NetworkNode {
     public DriftSector Sector { get; init; }
     public DriftNode(string hostName, string displayName, string IP, NetworkNode parentNode, DriftSector sector)
-        : base(hostName, displayName, IP, NodeType.DRIFT, parentNode) {
+        : base(hostName, displayName, IP, NodeType.DRIFT, parentNode, false) {
         Sector = sector;
+        NetworkManager.AssignDNS(this);
         (DefLvl, SecLvl) = GenerateDefAndSec(0, 0);
     }
     public override (int, int) GenerateDefAndSec(double indexRatio, double depthRatio) {

@@ -3,12 +3,14 @@ using Godot.Collections;
 [GlobalClass]
 public partial class NodeData : Resource
 {
-	private Array<MiningWeight> _miningWeights;
-	private Array<NodeData> _childNodes;
+	private MiningWeight[] _miningWeights;
+	private NodeData[] _childNodes;
 	private LockType _locks;
 	private int _defLvl, _secLvl, _retLvl;
 	private float _gcDeposit;
-	public static NodeType NodeType => NodeType.DRIFT; 
+	[Export] public NodeType NodeType;
+	[Export] public string HostName;
+    [Export] public string DisplayName;
     [Export] public int DefLvl {
 		get => _defLvl;
 		set {
@@ -40,23 +42,26 @@ public partial class NodeData : Resource
 			NotifyPropertyListChanged();
 		}
     }
-    [Export] public Array<MiningWeight> MiningWeights {
+    [Export] public MiningWeight[] MiningWeights {
 		get => _miningWeights;
 		set {
 			_miningWeights = value;
 			NotifyPropertyListChanged();
 		}
 	}
-	[Export] public Array<NodeData> ChildNodes {
+	[Export] public double MAX_GROW_MINING;
+	[Export] public NodeData[] ChildNodes {
 		get => _childNodes;
 		set {
 			_childNodes = value;
 			NotifyPropertyListChanged();
 		}
 	}
-	public override Array<Dictionary> _GetPropertyList() {
+	[Export] public bool OwnedByPlayer { get; set; }
+
+    public override Array<Dictionary> _GetPropertyList() {
 		Array<Dictionary> properties = [];
-        for (int i = 0; i < _miningWeights.Count; i++) {
+        for (int i = 0; i < _miningWeights.Length; i++) {
 			properties.Add(new Dictionary() {
 				{ "name", $"miningweights/{i}" },
 				{ "type", (int)Variant.Type.Object },
@@ -64,7 +69,7 @@ public partial class NodeData : Resource
 				{ "hint_string", nameof(MiningWeight) },
 			});
 		}
-		for (int i = 0; i < _childNodes.Count; i++) {
+		for (int i = 0; i < _childNodes.Length; i++) {
 			properties.Add(new Dictionary() {
 				{ "name", $"childnodes/{i}" },
 				{ "type", (int)Variant.Type.Object },
@@ -79,13 +84,13 @@ public partial class NodeData : Resource
 		string propertyName = property.ToString();
 		if (propertyName.StartsWith("miningweights")) {
 			int index = int.Parse(propertyName.Split('/')[1]);
-			if (index >= 0 && index < _miningWeights.Count) {
+			if (index >= 0 && index < _miningWeights.Length) {
 				return _miningWeights[index];
 			}
 		}
 		if (propertyName.StartsWith("childnodes")) {
 			int index = int.Parse(propertyName.Split('/')[1]);
-			if (index >= 0 && index < _childNodes.Count) {
+			if (index >= 0 && index < _childNodes.Length) {
 				return _childNodes[index];
 			}
 		}
@@ -96,14 +101,14 @@ public partial class NodeData : Resource
 		string propertyName = property.ToString();
 		if (propertyName.StartsWith("miningweights")) {
 			int index = int.Parse(propertyName.Split('/')[1]);
-			if (index >= 0 && index < _miningWeights.Count) {
+			if (index >= 0 && index < _miningWeights.Length) {
 				_miningWeights[index] = value.As<MiningWeight>();
 				return true;
 			}
 		}
 		if (propertyName.StartsWith("childnodes")) {
 			int index = int.Parse(propertyName.Split('/')[1]);
-			if (index >= 0 && index < _childNodes.Count) {
+			if (index >= 0 && index < _childNodes.Length) {
 				_childNodes[index] = value.As<NodeData>();
 				return true;
 			}

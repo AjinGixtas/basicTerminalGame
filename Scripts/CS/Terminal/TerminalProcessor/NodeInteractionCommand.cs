@@ -132,18 +132,13 @@ Grow +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(gr
             return 3;
         }
 
-        if (!parsedArgs.ContainsKey("--attack")) {
-            Say("-r", "Missing --attack flag. Use: karaxe --attack [--flag1] [value1] [--flag2] [value2] [--flage3] [value3] ... [--flagN] [valueN]");
-            return 7;
-        }
-
         int result = targetNode.AttempCrackNode(parsedArgs, endEpoch);
         if (targetNode.GetType() == typeof(DriftNode)) {
             sectorQueuedForRemoval.Add((targetNode as DriftNode).Sector);
         }
         if (result == 0 && !targetNode.OwnedByPlayer && targetNode.GetType() != typeof(DriftNode)) {
             targetNode.TransferOwnership();
-            if (targetNode is ScriptedNetworkNode && targetNode.GetType() != typeof(TutorialNetworkNode))
+            if (targetNode is ScriptedNetworkNode)
             NetworkManager.AddHackFarm((targetNode as ScriptedNetworkNode).HackFarm);
         }
         return 0;

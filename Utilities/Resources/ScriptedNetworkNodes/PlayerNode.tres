@@ -13,8 +13,8 @@ metadata/_custom_type_script = "uid://65e3mbb2130e"
 [resource]
 script = ExtResource("1_ehhie")
 NodeType = 2
-HostName = "home"
-DisplayName = "Home"
+HostName = "PURGATORY"
+DisplayName = "PURGATORY"
 DefLvl = 0
 SecLvl = 0
 RetLvl = 0
@@ -23,4 +23,4 @@ Locks = 0
 MiningWeights = Array[Object]([SubResource("Resource_n3337")])
 MAX_GROW_MINING = 300.0
 ChildNodes = null
-OwnedByPlayer = false
+OwnedByPlayer = true

@@ -47,14 +47,10 @@ public static partial class TerminalProcessor {
 	}
 	public static void Ready() {
         if (!PlayerDataManager.CompletedTutorial) {
-            TerminalProcessor.Say(
-@$"Type {Util.Format("help", StrType.CMD_FUL)} to see the basic.
-Please do it, I'm too dumb to make a proper tutorial.
-
-To begin, gain access to your own node by running {Util.Format("karaxe --flare", StrType.CMD_FUL)}.
-Then run {Util.Format("karaxe --attack", StrType.CMD_FUL)}
-And then {Util.Format("karaxe --axe", StrType.CMD_FUL)}, in that order.
-REMEMBER! DO NOT MESS IT UP!!!");
+            TerminalProcessor.Say(@$"Welcome to the terminal! Type {Util.Format("help", StrType.CMD_FUL)} to see available commands.
+You can also type {Util.Format("scan", StrType.CMD_FUL)} to see the network nodes around you.
+Type {Util.Format("connect <hostname>", StrType.CMD_FUL)} to connect to a node.
+Type {Util.Format("home", StrType.CMD_FUL)} to return to your home node.");
         }
     }
 	public static void Process(double delta) {

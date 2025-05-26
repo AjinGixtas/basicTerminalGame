@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("2_mmse7")
 NodeType = 64
-HostName = "tutorial"
+HostName = "foo"
 DisplayName = "vm1"
 DefLvl = 0
 SecLvl = 0

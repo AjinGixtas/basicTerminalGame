@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("2_57jug")
 NodeType = 64
-HostName = "tutorial"
+HostName = "bar"
 DisplayName = "vm2"
 DefLvl = 1
 SecLvl = 1

@@ -7,7 +7,7 @@ public class F8X : Lock {
     readonly string[] intPool = ["1", "2", "3", "5", "8", "13", "21", "34"];
     readonly string[] actionPool = ["fl1p", "2bin", "der3f", "bl4nk"];
     public F8X() {
-        name = "F55";
+        name = "F8";
         clue = "In this world, growth follows memory. From the flicker to the fire storm, each step remembers the two before it.";
         help = $"{Flag[0]} [int] {Flag[1]} [string]";
         inp = "";

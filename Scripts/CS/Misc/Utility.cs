@@ -1,6 +1,6 @@
 using Godot;
 using System.Collections.Generic;
-public static class Util {
+public static partial class Util {
     public static T[] Shuffle<T>(T[] array) {
         for (int i = 0; i < array.Length; i++) {
             int j = GD.RandRange(0, array.Length - 1); 
@@ -203,7 +203,7 @@ public static class Util {
             case StrType.UNKNOWN_ERROR:
                 return Util.Format($"Unknown error encountered{(addons.Length != 0 ? $" with {addons[0]}" : "")}. Error code: {input}", StrType.ERROR);
             case StrType.SECTOR:
-                return $"[color={Util.CC(Cc.RGB)}]{input, -16}[/color]";
+                return $"[color={Util.CC(Cc.RGB)}]{input}[/color]";
             default:
                 return input;
         }

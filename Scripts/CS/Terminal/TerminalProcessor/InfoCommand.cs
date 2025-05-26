@@ -63,42 +63,7 @@ public static partial class TerminalProcessor {
     static void Help(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         string fileName = parsedArgs.ContainsKey("-v") ? "helpVerbose.txt" : "helpShort.txt";
         FileAccess fileAccess = FileAccess.Open($"res://Utilities/TextFiles/CommandOutput/{fileName}", FileAccess.ModeFlags.Read);
-        if (PlayerDataManager.CompletedTutorial) Say(fileAccess.GetAsText());
-        else {
-            Say(
-@$"Welcome! All command can be seen when you complete this tutorial. But you can always use them ;)
-{Util.Format("help", StrType.CMD_FUL)} to see available commands. (not now though)
-{Util.Format("scan [--depth INT_DEPTH] [--verbose]", StrType.CMD_FUL)} 
-    See the network nodes around you.
-{Util.Format("connect <hostname>", StrType.CMD_FUL)} 
-    Connect to a node.
-{Util.Format("home", StrType.CMD_FUL)} 
-    Return to your home node.");
-            if (PlayerDataManager.tutorialProgress == 0) {
-                Say(
-@$"{Util.Format("karaxe ( --flare | lock_flags | --axe )", StrType.CMD_FUL)} 
-    {Util.Format("--flare", StrType.CMD_FLAG)} begin the flare sequence and make node crackable.
-    {Util.Format("lock_flags", StrType.CMD_FLAG)} can be whatever the node defense require.
-    {Util.Format("--axe", StrType.CMD_FLAG)} end the flare sequence.");
-            }
-            if (PlayerDataManager.tutorialProgress == 0) {
-                Say(
-@$"{Util.Format("farm { --status | --upgrade <type> --level <int> }", StrType.CMD_FUL)} 
-    Interact with a node's GCminer.");
-            }
-            if (PlayerDataManager.tutorialProgress == 0) {
-                Say(
-@$"{Util.Format("link <sector_name>", StrType.CMD_FUL)}
-    Connect to sector(s).
-{Util.Format("unlink <sector_name>", StrType.CMD_FUL)}
-    Disconnect from sector(s)");
-            } 
-            if (PlayerDataManager.tutorialProgress == 0) {
-                Say(
-@$"{Util.Format("stats", StrType.CMD_FUL)} 
-    See your stats.");
-            }
-        }
+        Say(fileAccess.GetAsText());
     }
     static void Stats(Dictionary<string, string> parsedArgs, string[] postionalArgs) {
         Say($"Username: {Util.Format(PlayerDataManager.Username, StrType.USERNAME)}");

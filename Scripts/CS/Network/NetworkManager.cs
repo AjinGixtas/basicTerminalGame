@@ -29,6 +29,12 @@ public static partial class NetworkManager {
             if (sector != null) names.Add(sector.Name);
         return [.. names];
     }
+    public static string[] GetConnectedSectorNames() {
+        List<string> names = [];
+        foreach (var sector in connectedSectors)
+            if (sector != null) names.Add(sector.Name);
+        return [.. names];
+    }
 
     public static void RegenerateDriftSector() {
         connectedSectors.RemoveAll(item => item is DriftSector);
@@ -43,16 +49,20 @@ public static partial class NetworkManager {
         string[] sectorPaths = DirAccess.GetFilesAt("res://Utilities/Resources/ScriptedNetworkNodes/Sectors/");
         foreach (string path in sectorPaths) {
             SectorData sectorData = GD.Load<SectorData>($"res://Utilities/Resources/ScriptedNetworkNodes/Sectors/{path}");
-            if (sectorData != null) {
-                StaticSector sector = new(sectorData);
-                if (sector.Name != "PURGATORY") staticSectors.Add(sector);
-                else if (!PlayerDataManager.CompletedTutorial) {
-                    // Purgatory is a special sector that should not be added to the list
-                    // unless the player has completed the tutorial.
-                    ConnectToSector(sector);
-                }
-            }
+            if (sectorData == null) continue;
+            StaticSector sector = new(sectorData);
+            staticSectors.Add(sector);
         }
+    }
+    public static int PrepareTutorial() {
+        if (PlayerDataManager.CompletedTutorial) return 1;
+        SectorData tutorialSecData = GD.Load<SectorData>($"res://Utilities/Resources/ScriptedNetworkNodes/Sectors/tutorialSector.tres");
+        if (tutorialSecData == null) return 2;
+
+        StaticSector tutorialSec = new(tutorialSecData);
+        foreach(Sector sector in connectedSectors) DisconnectFromSector(sector);
+        ConnectToSector(tutorialSec);
+        return 0;
     }
 
     public static int ConnectToSector(string sectorName) {
@@ -68,7 +78,6 @@ public static partial class NetworkManager {
         }
         return 3;
     }
-
     public static int DisconnectFromSector(string sectorName) {
         foreach (DriftSector sector in driftSectors) {
             if (sector == null) continue;
@@ -83,39 +92,14 @@ public static partial class NetworkManager {
         return 3;
     }
 
-    public static int ConnectToSector(DriftSector sector) {
+    public static int ConnectToSector(Sector sector) {
         if (sector == null) return 1;
         if (connectedSectors.Contains(sector)) return 2;
 
         foreach (NetworkNode node in sector.GetSurfaceNodes()) node.ParentNode = PlayerNode;
         connectedSectors.Add(sector); return 0;
     }
-
-    public static int ConnectToSector(StaticSector sector) {
-        if (sector == null) return 1;
-        if (connectedSectors.Contains(sector)) return 2;
-
-        foreach (NetworkNode node in sector.GetSurfaceNodes()) node.ParentNode = PlayerNode;
-        connectedSectors.Add(sector); return 0;
-    }
-
-    public static int DisconnectFromSector(DriftSector sector) {
-        if (sector == null) return 1;
-        if (!connectedSectors.Contains(sector)) return 2;
-
-        foreach (NetworkNode node in sector.GetSurfaceNodes()) {
-            if (IsNodeOrDescendant(TerminalProcessor.CurrNode, node)) {
-                TerminalProcessor.ToHome();
-                break;
-            }
-            node.ParentNode = null;
-        }
-
-        connectedSectors.Remove(sector);
-        return 0;
-    }
-
-    public static int DisconnectFromSector(StaticSector sector) {
+    public static int DisconnectFromSector(Sector sector) {
         if (sector == null) return 1;
         if (!connectedSectors.Contains(sector)) return 2;
 
@@ -153,7 +137,6 @@ public static partial class NetworkManager {
         }
         return 3;
     }
-
     public static int RemoveSector(DriftSector sector) {
         if (sector == null) return 1;
         if (!driftSectors.Contains(sector)) return 2;
@@ -163,7 +146,6 @@ public static partial class NetworkManager {
         driftSectors.Remove(sector);
         return 0;
     }
-
     public static int RemoveSector(StaticSector sector) {
         if (sector == null) return 1;
         if (!staticSectors.Contains(sector)) return 2;
@@ -189,7 +171,7 @@ public static partial class NetworkManager {
     }
     public static void CollectHackFarmMinerals(double delta) {
         foreach (HackFarm h in PlayerHackFarm) {
-            var minerals = h.ProcessMinerals(delta);
+            double[] minerals = h.ProcessMinerals(delta);
             for (int i = 0; i < minerals.Length; ++i) {
                 PlayerDataManager.DepositMineral(i, minerals[i]);
             }

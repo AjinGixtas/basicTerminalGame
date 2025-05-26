@@ -10,11 +10,12 @@ public class ScriptedNetworkNode : NetworkNode {
             nodeData != null ? nodeData.HostName    : "Unknown",
             NetworkManager.GetRandomIP(),
             nodeData != null ? nodeData.NodeType : NodeType.VM,
-            parent, nodeData.OwnedByPlayer) {
+            parent, nodeData.OwnedByPlayer, (int)nodeData.Locks) {
         
         NodeData = nodeData;
+        GD.Print(nodeData.Locks.GetType(), ' ', (int)nodeData.Locks);
         if (NodeData != null) {
-            _hackFarm = new HackFarm(NodeData.MAX_GROW_MINING, 1, 1, 1, NodeData.MiningWeights);
+            _hackFarm = new HackFarm(NodeData.MAX_GROW_MINING, nodeData.hackLvl, nodeData.timeLvl, nodeData.growLvl, NodeData.MiningWeights);
             Init(NodeData.DefLvl, NodeData.SecLvl);
         }
     }

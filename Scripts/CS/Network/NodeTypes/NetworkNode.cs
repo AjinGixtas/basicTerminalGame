@@ -44,10 +44,10 @@ public abstract class NetworkNode {
 		get => _retLvl;
 	}
 	
-	public NetworkNode(string hostName, string displayName, string IP, NodeType NodeType, NetworkNode parentNode, bool ownedByPlayer) {
+	public NetworkNode(string hostName, string displayName, string IP, NodeType NodeType, NetworkNode parentNode, bool ownedByPlayer, int lockCode=0) {
 		HostName = hostName; DisplayName = displayName; this.IP = IP; this.NodeType = NodeType;
 		OwnedByPlayer = ownedByPlayer; ParentNode = parentNode; ChildNode = [];
-		LockSystem = new();
+		LockSystem = new(lockCode);
 	}
 	
 	public virtual void Init(int DefLvl, int SecLvl) {

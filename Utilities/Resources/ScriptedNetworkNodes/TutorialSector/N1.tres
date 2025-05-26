@@ -5,9 +5,10 @@
 
 [resource]
 script = ExtResource("2_mmse7")
-NodeType = 64
+NodeType = 96
 HostName = "foo"
 DisplayName = "vm1"
+ChildNodes = Array[Object]([ExtResource("1_6s72h")])
 DefLvl = 0
 SecLvl = 0
 RetLvl = 0
@@ -15,6 +16,8 @@ GcDeposit = 2.0
 Locks = 0
 MiningWeights = Array[Object]([])
 MAX_GROW_MINING = 0.0
-ChildNodes = Array[Object]([ExtResource("1_6s72h")])
 OwnedByPlayer = false
+hackLvl = 0
+growLvl = 0
+timeLvl = 0
 metadata/_custom_type_script = "uid://b5e7b5k5tgoxy"

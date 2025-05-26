@@ -8,7 +8,7 @@ public class I4X : Lock {
     readonly string[] intPool = ["1", "2", "3", "4"];
     readonly string[] actionPool = ["fl1p", "2bin", "der3f", "bl4nk"];
     public I4X() {
-        name = "I5";
+        name = "I4X";
         clue = "Among the crowd will be knights and heroes. But only one dare rise to our blade.";
         help = $"{Flag[0]} [int] {Flag[1]} [string]";
         inp = "";

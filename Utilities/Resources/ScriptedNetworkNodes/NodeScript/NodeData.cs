@@ -8,9 +8,18 @@ public partial class NodeData : Resource
 	private LockType _locks;
 	private int _defLvl, _secLvl, _retLvl;
 	private float _gcDeposit;
-	[Export] public NodeType NodeType;
+	[ExportGroup("Node Info")]
+    [Export] public NodeType NodeType;
 	[Export] public string HostName;
     [Export] public string DisplayName;
+	[Export] public NodeData[] ChildNodes {
+		get => _childNodes;
+		set {
+			_childNodes = value;
+			NotifyPropertyListChanged();
+		}
+	}
+	[ExportGroup("Node Stats")]
     [Export] public int DefLvl {
 		get => _defLvl;
 		set {
@@ -29,6 +38,7 @@ public partial class NodeData : Resource
             _retLvl = value;
         }
     }
+	[ExportGroup("Node security sys")]
 	[Export] public float GcDeposit {
         get => _gcDeposit;
         set {
@@ -42,6 +52,7 @@ public partial class NodeData : Resource
 			NotifyPropertyListChanged();
 		}
     }
+	[ExportGroup("Mining stats")]
     [Export] public MiningWeight[] MiningWeights {
 		get => _miningWeights;
 		set {
@@ -50,14 +61,8 @@ public partial class NodeData : Resource
 		}
 	}
 	[Export] public double MAX_GROW_MINING;
-	[Export] public NodeData[] ChildNodes {
-		get => _childNodes;
-		set {
-			_childNodes = value;
-			NotifyPropertyListChanged();
-		}
-	}
 	[Export] public bool OwnedByPlayer { get; set; }
+	[Export] public int hackLvl, growLvl, timeLvl;
 
     public override Array<Dictionary> _GetPropertyList() {
 		Array<Dictionary> properties = [];

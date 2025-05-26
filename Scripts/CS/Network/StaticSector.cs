@@ -32,8 +32,4 @@ public class StaticSector : Sector {
         _isIntialized = true;
         return 0;
     }
-
-    public List<NetworkNode> GetSurfaceNodes() {
-        return [.. SurfaceNodes];
-    }
 }

@@ -5,9 +5,10 @@
 
 [resource]
 script = ExtResource("2_57jug")
-NodeType = 64
+NodeType = 96
 HostName = "bar"
 DisplayName = "vm2"
+ChildNodes = Array[Object]([ExtResource("1_7dctg")])
 DefLvl = 1
 SecLvl = 1
 RetLvl = 0
@@ -15,6 +16,8 @@ GcDeposit = 8.0
 Locks = 2
 MiningWeights = null
 MAX_GROW_MINING = 0.0
-ChildNodes = Array[Object]([ExtResource("1_7dctg")])
 OwnedByPlayer = false
+hackLvl = 0
+growLvl = 0
+timeLvl = 0
 metadata/_custom_type_script = "uid://b5e7b5k5tgoxy"

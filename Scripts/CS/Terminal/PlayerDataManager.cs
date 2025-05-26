@@ -1,6 +1,6 @@
 using Godot;
 
-public static class PlayerDataManager {
+public static partial class PlayerDataManager {
 	static PlayerDataSaveResource saveObj;
 	public static double[] MineInv => _mineInv;
     public static double GC_Cur => _gc_cur;

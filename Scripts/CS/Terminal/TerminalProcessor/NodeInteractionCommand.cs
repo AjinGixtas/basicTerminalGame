@@ -131,7 +131,10 @@ Grow +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(gr
             EndFlare();
             return 3;
         }
-
+        if (!parsedArgs.ContainsKey("--attack")) {
+            Say("-r", $"Missing {Util.Format("--attack", StrType.CMD_FLAG)} flag. Use {Util.Format("--attack", StrType.CMD_FLAG)} to attack a node.");
+            return 7;
+        }
         int result = targetNode.AttempCrackNode(parsedArgs, endEpoch);
         if (targetNode.GetType() == typeof(DriftNode)) {
             sectorQueuedForRemoval.Add((targetNode as DriftNode).Sector);

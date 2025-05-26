@@ -5,4 +5,7 @@ public abstract class Sector {
     public string Name;
     protected bool _isIntialized = false;
     protected readonly List<NetworkNode> SurfaceNodes = [];
+    public List<NetworkNode> GetSurfaceNodes() {
+        return [.. SurfaceNodes];
+    }
 }

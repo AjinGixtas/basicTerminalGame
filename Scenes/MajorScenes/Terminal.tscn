@@ -24,9 +24,9 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme = ExtResource("2_tjxev")
 script = ExtResource("1_q6j3v")
-terminalOutputField = NodePath("TerminalSplitPart/TerminalZone/TerminalOutputArea")
-terminalCommandPrompt = NodePath("TerminalSplitPart/TerminalZone/TerminalCommandLine/CommandPrompt")
-terminalCommandField = NodePath("TerminalSplitPart/TerminalZone/TerminalCommandLine/CommandField")
+terminalOutputField = NodePath("TerminalSplitPart/TerminalZone/OutputArea")
+terminalCommandPrompt = NodePath("TerminalSplitPart/TerminalZone/CommandLine/CommandPrompt")
+terminalCommandField = NodePath("TerminalSplitPart/TerminalZone/CommandLine/CommandField")
 crackDurationTimer = NodePath("TimersContainer/CrackDurationTimer")
 
 [node name="TerminalSplitPart" type="HSplitContainer" parent="."]
@@ -39,7 +39,7 @@ size_flags_vertical = 3
 dragging_enabled = false
 dragger_visibility = 2
 
-[node name="TerminalOutputArea" type="RichTextLabel" parent="TerminalSplitPart/TerminalZone"]
+[node name="OutputArea" type="RichTextLabel" parent="TerminalSplitPart/TerminalZone"]
 self_modulate = Color(16, 16, 16, 0.125)
 material = SubResource("ShaderMaterial_c8ipk")
 layout_mode = 2
@@ -54,12 +54,12 @@ autowrap_mode = 2
 vertical_alignment = 2
 selection_enabled = true
 
-[node name="TerminalCommandLine" type="HSplitContainer" parent="TerminalSplitPart/TerminalZone"]
+[node name="CommandLine" type="HSplitContainer" parent="TerminalSplitPart/TerminalZone"]
 layout_mode = 2
 dragging_enabled = false
 dragger_visibility = 2
 
-[node name="CommandPrompt" type="RichTextLabel" parent="TerminalSplitPart/TerminalZone/TerminalCommandLine"]
+[node name="CommandPrompt" type="RichTextLabel" parent="TerminalSplitPart/TerminalZone/CommandLine"]
 self_modulate = Color(16, 16, 16, 0.125)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -72,7 +72,7 @@ fit_content = true
 autowrap_mode = 0
 selection_enabled = true
 
-[node name="CommandField" type="CodeEdit" parent="TerminalSplitPart/TerminalZone/TerminalCommandLine"]
+[node name="CommandField" type="CodeEdit" parent="TerminalSplitPart/TerminalZone/CommandLine"]
 self_modulate = Color(16, 16, 16, 0.125)
 clip_contents = false
 custom_minimum_size = Vector2(32, 0)
@@ -130,6 +130,6 @@ one_shot = true
 wait_time = 2.0
 autostart = true
 
-[connection signal="text_changed" from="TerminalSplitPart/TerminalZone/TerminalCommandLine/CommandField" to="." method="OnCommandFieldTextChanged"]
+[connection signal="text_changed" from="TerminalSplitPart/TerminalZone/CommandLine/CommandField" to="." method="OnCommandFieldTextChanged"]
 [connection signal="timeout" from="TimersContainer/CrackDurationTimer" to="." method="OnCrackDurationTimerTimeout"]
 [connection signal="timeout" from="TimersContainer/StatSwitchTimer" to="TerminalSplitPart/Sidebar" method="OnStatSwitchTimerTimeout"]

@@ -5,9 +5,10 @@
 
 [resource]
 script = ExtResource("2_8cop7")
-NodeType = 64
+NodeType = 96
 HostName = "far"
 DisplayName = "vm3"
+ChildNodes = Array[Object]([ExtResource("1_gudjg")])
 DefLvl = 2
 SecLvl = 2
 RetLvl = 0
@@ -15,6 +16,8 @@ GcDeposit = 512.0
 Locks = 6
 MiningWeights = null
 MAX_GROW_MINING = 0.0
-ChildNodes = Array[Object]([ExtResource("1_gudjg")])
 OwnedByPlayer = false
+hackLvl = 0
+growLvl = 0
+timeLvl = 0
 metadata/_custom_type_script = "uid://b5e7b5k5tgoxy"

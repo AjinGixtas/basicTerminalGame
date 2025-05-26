@@ -1,12 +1,12 @@
 using System;
 [Flags]
 public enum NodeType {
-    PLAYER =   1<<1, //Player
-    BUSINESS = 1<<2, //Money+Stock
-    CORP =     1<<3, //Money+Stock+Alliance
-    FACTION =  1<<4, //Money+Alliance
-    DRIFT =    1<<5, //One-time-hack
-    VM =       1<<6, //Virtual Machine
+    PLAYER =   1<<0, //Player
+    BUSINESS = 1<<1, //Money+Stock
+    CORP =     1<<2, //Money+Stock+Alliance
+    FACTION =  1<<3, //Money+Alliance
+    DRIFT =    1<<4, //One-time-hack
+    VM =       1<<5, //Virtual Machine
 }
 // NOSEC = [0, 1)
 // LOSEC = [1, 3)
@@ -67,14 +67,14 @@ public enum StrType {
 }
 [Flags]
 public enum LockType {
-    I4X = 1<<1, 
-    F8X = 1<<2, 
-    I16 = 1<<3, 
-    P16X= 1<<4, 
-    P90 = 1<<5, 
-    M2  = 1<<6, 
-    M3  = 1<<7, 
-    C0  = 1<<8, 
-    C1  = 1<<9, 
-    C3  = 1<<10
+    I4X = 1<<0,
+    F8X = 1<<1,
+    I16 = 1<<2,
+    P16X= 1<<3,
+    P90 = 1<<4,
+    M2  = 1<<5,
+    M3  = 1<<6,
+    C0  = 1<<7,
+    C1  = 1<<8,
+    C3  = 1<<9
 }

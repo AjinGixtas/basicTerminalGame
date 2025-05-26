@@ -6,10 +6,10 @@ public static partial class TerminalProcessor {
     static void SetCommandPrompt() {
         terminalCommandPrompt.Text = $"{Util.Format(PlayerDataManager.Username, StrType.USERNAME)}@{Util.Format(CurrNode.HostName, StrType.HOSTNAME)}:{Util.Format(CurrDir.GetPath(), StrType.DIR)}>";
     }
-    const double TIME_TIL_NEXT_LINE = .05; 
+    const double TIME_TIL_NEXT_LINE = .4; 
     static double timeLeft = TIME_TIL_NEXT_LINE;
     static void ShowMoreChars(double delta) {
-        const int INSTA_FILL_MARGIN = 10;
+        const int INSTA_FILL_MARGIN = 0;
         // Get current number of visible characters
         int curChar = terminalOutputField.VisibleCharacters;
         int allChar = terminalOutputField.GetTotalCharacterCount();
@@ -22,7 +22,7 @@ public static partial class TerminalProcessor {
         // Get total and current visible lines
         int allLines = lines.Length; int curLines = CountVisibleLines(lines, curChar);
         int lineDelta = 0;
-        if (allLines - curLines > INSTA_FILL_MARGIN) { lineDelta += (int)Mathf.Ceil((allLines - curLines - INSTA_FILL_MARGIN) * .1); }
+        if (allLines - curLines > INSTA_FILL_MARGIN) { lineDelta += (int)Mathf.Ceil((allLines - curLines - INSTA_FILL_MARGIN) * .1 * delta); }
         timeLeft -= delta;
         if (timeLeft < 0) { timeLeft += TIME_TIL_NEXT_LINE; lineDelta += 1; }
         int newLineIndex = curLines + lineDelta;

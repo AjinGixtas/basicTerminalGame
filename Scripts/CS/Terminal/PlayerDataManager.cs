@@ -33,7 +33,7 @@ public static partial class PlayerDataManager {
     static double[] _mineInv {
         get => saveObj.MineralInventory;
         set {
-            if (value.Length != MineInv.Length) {
+            if (value.Length != saveObj.MineralInventory.Length) {
                 GD.PushError("Invalid mineral inventory length.");
                 return;
             }

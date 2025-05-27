@@ -7,11 +7,12 @@ public partial class NodeData : Resource
 	private NodeData[] _childNodes;
 	private LockType _locks;
 	private int _defLvl, _secLvl, _retLvl;
-	private float _gcDeposit;
+	private double _gcDeposit;
 	[ExportGroup("Node Info")]
     [Export] public NodeType NodeType;
 	[Export] public string HostName;
     [Export] public string DisplayName;
+	[Export] public NodeData ParentNode;
 	[Export] public NodeData[] ChildNodes {
 		get => _childNodes;
 		set {
@@ -39,13 +40,14 @@ public partial class NodeData : Resource
         }
     }
 	[ExportGroup("Node security sys")]
-	[Export] public float GcDeposit {
+	[Export] public double GcDeposit {
         get => _gcDeposit;
         set {
             _gcDeposit = value;
         }
     }
-    [Export] public LockType Locks {
+	[Export] public double[] MineralsDeposit;    
+	[Export] public LockType Locks {
 		get => _locks;
 		set {
 			_locks = value;
@@ -120,4 +122,15 @@ public partial class NodeData : Resource
 		}
 		return false;
 	}
+	public NodeData() : this([], [], new double[10]) { }
+    public NodeData(NodeData[] childNodes, MiningWeight[] miningWeights, double[] mineralDeposit, 
+		LockType locks = 0, NodeType type = NodeType.VM, 
+		string hostName = "HOST_NOT_FOUND", string displayName = "HOST_NOT_FOUND", 
+		double gcDeposit = 0, int hacklvl = 1, int growlvl = 1, int timelvl = 1) {
+
+		ChildNodes = childNodes; MiningWeights = miningWeights; MineralsDeposit = mineralDeposit;
+        Locks = locks; NodeType = type;
+        HostName = hostName; DisplayName = displayName;
+        GcDeposit = gcDeposit; hackLvl = hacklvl; timeLvl = timelvl; growLvl = growlvl;
+    }
 }

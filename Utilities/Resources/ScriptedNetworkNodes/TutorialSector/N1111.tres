@@ -12,6 +12,7 @@ DefLvl = 2
 SecLvl = 1
 RetLvl = 1
 GcDeposit = 512.0
+MineralsDeposit = PackedFloat64Array()
 Locks = 2
 MiningWeights = null
 MAX_GROW_MINING = 0.0

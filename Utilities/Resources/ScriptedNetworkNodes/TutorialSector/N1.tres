@@ -13,6 +13,7 @@ DefLvl = 0
 SecLvl = 0
 RetLvl = 0
 GcDeposit = 2.0
+MineralsDeposit = PackedFloat64Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 Locks = 0
 MiningWeights = Array[Object]([])
 MAX_GROW_MINING = 0.0

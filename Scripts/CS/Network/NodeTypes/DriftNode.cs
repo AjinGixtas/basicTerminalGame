@@ -2,15 +2,11 @@ using Godot;
 
 public class DriftNode : NetworkNode {
     public DriftSector Sector { get; init; }
-    public DriftNode(string hostName, string displayName, string IP, NetworkNode parentNode, DriftSector sector)
-        : base(hostName, displayName, IP, NodeType.DRIFT, parentNode, false) {
+    public DriftNode(string hostName, string displayName, string IP, NetworkNode parentNode, DriftSector sector, int secLvl) : 
+        base(hostName, displayName, IP, NodeType.DRIFT, parentNode, false, 0){
         Sector = sector;
         NetworkManager.AssignDNS(this);
-        (DefLvl, SecLvl) = GenerateDefAndSec(0, 0);
-    }
-    public override (int, int) GenerateDefAndSec(double indexRatio, double depthRatio) {
-        int def = (int)Mathf.Clamp(GD.Randfn(8.4, 2.75), 1, 10);
-        int sec = (int)Mathf.Clamp(GD.Randfn(def/2+3.5, .33 * Mathf.E * Mathf.Pi), 1, def);
-        return (def, sec);
+        DefLvl = (int)Mathf.Clamp(GD.Randfn(secLvl + .5, 2.75), 1, 10);
+        SecLvl = (int)Mathf.Clamp(GD.Randfn(DefLvl/2+3.5, .33 * Mathf.E * Mathf.Pi), 1, DefLvl);
     }
 }

@@ -7,11 +7,12 @@ public class DriftSector : Sector {
 	public DriftSector() {
 		Name = GenSectorName();
 		int type = GD.RandRange(0, 3);
+		int secLvl = GD.RandRange(1, 3) * 3;
 		switch (type) {
-			case 0: GenerateBusNetwork(); break;
-			case 1: GenerateStarNetwork(); break;
-			case 2: GenerateVineNetwork(); break;
-			case 3: GenerateTreeNetwork(); break;
+			case 0: GenerateBusNetwork(secLvl); break;
+			case 1: GenerateStarNetwork(secLvl); break;
+			case 2: GenerateVineNetwork(secLvl); break;
+			case 3: GenerateTreeNetwork(secLvl); break;
 			default: GD.PrintErr("Invalid network type"); break;
 		}
 		MarkIntializationCompleted();
@@ -19,51 +20,51 @@ public class DriftSector : Sector {
 	int AddSurfaceNode(DriftNode node) { if (_isIntialized) return 1; 
 		SurfaceNodes.Add(node); return 0; }
 	public int MarkIntializationCompleted() { _isIntialized = true; return 0; }
-	void GenerateBusNetwork() {
+	void GenerateBusNetwork(int secLvl) {
 		if (_isIntialized) return;
 		int layer = 3, node = 3;
 		(string displayName, string hostName) = GenNodeName();
-		DriftNode chainNode = new(hostName, displayName, NetworkManager.GetRandomIP(), null, this);
+		DriftNode chainNode = new(hostName, displayName, NetworkManager.GetRandomIP(), null, this, secLvl);
 		AddSurfaceNode(chainNode);
 		for (int i = 0; i < node-1; ++i) {
 			(displayName, hostName) = GenNodeName();
-			AddSurfaceNode(new(hostName, displayName, NetworkManager.GetRandomIP(), null, this));
+			AddSurfaceNode(new(hostName, displayName, NetworkManager.GetRandomIP(), null, this, secLvl));
 		}
 		for (int i = 0; i < layer-1; i++) {
 			for (int j = 0; j < node; j++) {
 				(displayName, hostName) = GenNodeName();
-				new DriftNode(hostName, displayName, NetworkManager.GetRandomIP(), chainNode, this);
+				new DriftNode(hostName, displayName, NetworkManager.GetRandomIP(), chainNode, this, secLvl);
 			}
 			chainNode = chainNode.ChildNode[0] as DriftNode;
 		}
 	}
-	void GenerateStarNetwork() {
+	void GenerateStarNetwork(int secLvl) {
 		if (_isIntialized) return;
 		int node = 5;
 		for (int i = 0; i < node; ++i) {
 			(string displayName, string hostName) = GenNodeName();
-			AddSurfaceNode(new(hostName, displayName, NetworkManager.GetRandomIP(), null, this));
+			AddSurfaceNode(new(hostName, displayName, NetworkManager.GetRandomIP(), null, this, secLvl));
 		}
 	}
-	void GenerateVineNetwork() {
+	void GenerateVineNetwork(int secLvl) {
 		if (_isIntialized) return;
 		int vine = 2, node = 3;
 		for(int i = 0; i < vine; ++i) {
 			(string displayName, string hostName) = GenNodeName();
-			DriftNode chainNode = new(hostName, displayName, NetworkManager.GetRandomIP(), null, this);
+			DriftNode chainNode = new(hostName, displayName, NetworkManager.GetRandomIP(), null, this, secLvl);
 			AddSurfaceNode(chainNode);
 			for (int j = 0; j < node-1; ++j) {
 				(displayName, hostName) = GenNodeName();
-				chainNode = new(hostName, displayName, NetworkManager.GetRandomIP(), chainNode, this);
+				chainNode = new(hostName, displayName, NetworkManager.GetRandomIP(), chainNode, this, secLvl);
 			}
 		}
 	}
-	void GenerateTreeNetwork() {
+	void GenerateTreeNetwork(int secLvl) {
 		if (_isIntialized) return;
 		int layer = 3, node = 2;
 		for(int i = 0; i < node; ++i) {
 			(string displayName, string hostName) = GenNodeName();
-			DriftNode surfaceNode = new(hostName, displayName, NetworkManager.GetRandomIP(), null, this);
+			DriftNode surfaceNode = new(hostName, displayName, NetworkManager.GetRandomIP(), null, this, secLvl);
 			GenerateTree(surfaceNode, 1, layer, node);
 			AddSurfaceNode(surfaceNode);
 		}
@@ -71,7 +72,7 @@ public class DriftSector : Sector {
 			if (depth >= maxDepth) return;
 			for (int i = 0; i < childCount; ++i) {
 				(string displayName, string hostName) = GenNodeName();
-				DriftNode childNode = new(hostName, displayName, NetworkManager.GetRandomIP(), node, this);
+				DriftNode childNode = new(hostName, displayName, NetworkManager.GetRandomIP(), node, this, secLvl);
 				GenerateTree(childNode, depth + 1, maxDepth, childCount);
 			}
 		}

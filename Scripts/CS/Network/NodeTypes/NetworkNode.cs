@@ -44,7 +44,7 @@ public abstract class NetworkNode {
 		get => _retLvl;
 	}
 	
-	public NetworkNode(string hostName, string displayName, string IP, NodeType NodeType, NetworkNode parentNode, bool ownedByPlayer, int lockCode=0) {
+	public NetworkNode(string hostName, string displayName, string IP, NodeType NodeType, NetworkNode parentNode, bool ownedByPlayer, int lockCode = 0) {
 		HostName = hostName; DisplayName = displayName; this.IP = IP; this.NodeType = NodeType;
 		OwnedByPlayer = ownedByPlayer; ParentNode = parentNode; ChildNode = [];
 		LockSystem = new(lockCode);
@@ -52,9 +52,6 @@ public abstract class NetworkNode {
 	
 	public virtual void Init(int DefLvl, int SecLvl) {
 		this.DefLvl = DefLvl; this.SecLvl = SecLvl;
-	}
-	public virtual (int, int) GenerateDefAndSec(double indexRatio, double depthRatio) {
-		return (0, 0);
 	}
 	
 	public int GetDepth() {
@@ -79,12 +76,32 @@ public abstract class NetworkNode {
 		};
 	}
 	
-	bool ownedByPlayer = false;
-	public bool OwnedByPlayer {
-		get => ownedByPlayer;
-		protected set => ownedByPlayer = value;
+	bool _ownedByPlayer = false; public bool OwnedByPlayer {
+		get => _ownedByPlayer;
+		protected set => _ownedByPlayer = value;
 	}
-	bool _isSecure = true; protected bool IsSecure { get => _isSecure; set => _isSecure = value; }
+	double _gcDeposit = 0; public double GCdeposit { get => _gcDeposit;
+		set {
+			if (_gcDeposit != 0) return;
+			_gcDeposit = value;
+		}
+	}
+	double[] _mineralDeposit = new double[10]; public double[] MineralDeposit {
+		get => _mineralDeposit;
+		set {
+			if (value.Length != MineralDeposit.Length) { GD.PrintErr("Different length was submitted"); return; }
+			_mineralDeposit = value;
+		}
+	}
+	bool _isSecure = true; protected bool IsSecure { get => _isSecure; 
+		set {
+			if (_isSecure == true && value == false) {
+				PlayerDataManager.DepositGC(GCdeposit);
+				PlayerDataManager.DepositMineral(MineralDeposit);
+            }
+            _isSecure = value;
+		}
+	}
 	public virtual int AttempCrackNode(Dictionary<string, string> ans, double timeStamp) {
 		if (LockSystem == null) { return 5; } // No lock system, cannot crack
 		int result = LockSystem.CrackAttempt(ans, timeStamp);

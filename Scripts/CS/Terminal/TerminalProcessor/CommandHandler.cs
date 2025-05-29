@@ -72,6 +72,7 @@ public static partial class TerminalProcessor {
             case "setusername": SetUsername(parsedArgs, positionalArgs); break; // Set the player's username
 
             case "regenerate": NetworkManager.RegenerateDriftSector(); break; // Regenerate the drift sector
+            case "seecolor": SeeColor(parsedArgs, positionalArgs); break;
             default: Say("-r", $"{command} is not a valid command."); break;
         }
         return true;
@@ -84,7 +85,6 @@ public static partial class TerminalProcessor {
                 if (i + 1 < args.Length && !args[i + 1].StartsWith('-')) { parsedArgs[args[i]] = args[i + 1]; ++i; } else parsedArgs[args[i]] = "";
                 continue;
             }
-            // if it's only one short flag, allow it to take in arg, otherwise, no arg.
             if (args[i].StartsWith('-')) {
                 if (args[i].Length == 2) {
                     if (i + 1 < args.Length && !args[i + 1].StartsWith('-')) parsedArgs[args[i]] = args[i + 1];

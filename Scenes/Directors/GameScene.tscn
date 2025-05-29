@@ -95,7 +95,6 @@ metadata/_tab_index = 1
 
 [node name="OverlayWindow" parent="." instance=ExtResource("6_1de4d")]
 position = Vector2i(427, 64)
-visible = false
 
 [connection signal="button_down" from="MenuDirector/MenuButtons/TerminalButton" to="MenuDirector" method="TerminalButtonPressed"]
 [connection signal="button_down" from="MenuDirector/MenuButtons/EditorButton" to="MenuDirector" method="EditorButtonPressed"]

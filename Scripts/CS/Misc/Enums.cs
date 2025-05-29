@@ -63,7 +63,8 @@ public enum StrType {
     SEC_TYPE = 22,
     CMD_ARG = 23,
     CMD_CMD = 24,
-    SECTOR = 25
+    SECTOR = 25,
+    MINERAL = 26
 }
 [Flags]
 public enum LockType {

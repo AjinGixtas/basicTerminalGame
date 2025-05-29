@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="NodeData" load_steps=2 format=3 uid="uid://cc2227tj8p0io"]
+
+[ext_resource type="Script" uid="uid://b5e7b5k5tgoxy" path="res://Utilities/Resources/ScriptedNetworkNodes/NodeScript/NodeData.cs" id="1_yqfxr"]
+
+[resource]
+script = ExtResource("1_yqfxr")
+NodeType = 2
+HostName = "curryup"
+DisplayName = "Curry Up Restaurant"
+ChildNodes = null
+DefLvl = 0
+SecLvl = 0
+RetLvl = 0
+GcDeposit = 0.0
+MineralsDeposit = PackedFloat64Array()
+Locks = 0
+MiningWeights = null
+MAX_GROW_MINING = 0.0
+OwnedByPlayer = false
+hackLvl = 0
+growLvl = 0
+timeLvl = 0
+metadata/_custom_type_script = "uid://b5e7b5k5tgoxy"

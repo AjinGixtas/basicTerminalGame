@@ -1,5 +1,6 @@
 using Godot;
 using System.Collections.Generic;
+using System.Linq;
 public static partial class Util {
     public static T[] Shuffle<T>(T[] array) {
         for (int i = 0; i < array.Length; i++) {
@@ -150,19 +151,11 @@ public static partial class Util {
                 return $"[color={Util.CC(Cc.gR)}]{input}[/color]";
             case StrType.MONEY: { // GC is short for Gold Coin. That's all. lol
                     if (string.IsNullOrWhiteSpace(input)) return "";
-
-                    // Parse the input as a decimal number
-                    if (!double.TryParse(input, out double value))
-                        return $"[color={Util.CC(Cc.y)}]{input}[/color][color={Util.CC(Cc.y)}]GC[/color]";
-
-                    // Define units and their values
+                    if (!double.TryParse(input, out double value)) return $"[color={Util.CC(Cc.y)}]{input}[/color][color={Util.CC(Cc.y)}]GC[/color]";
                     string[] units =    ["S" , "Q" , "T" , "B" , "M" , "K" ];
                     double[] divisors = [1e21, 1e15, 1e12, 1e9 , 1e6 , 1e3 ];
-                    Cc[] colors =       [Cc.R, Cc.Y, Cc.M, Cc.G, Cc.B, Cc.C]; // Q, T, B, M, K
-
-                    string sb = "";
-                    double remainder = value;
-
+                    Cc[] colors =       [Cc.R, Cc.Y, Cc.M, Cc.G, Cc.B, Cc.C];
+                    string sb = ""; double remainder = value;
                     for (int i = 0; i < units.Length; i++) {
                         if (remainder >= divisors[i]) {
                             int unitValue = (int)Mathf.Floor(remainder / divisors[i]);
@@ -170,7 +163,6 @@ public static partial class Util {
                             sb += $"[color={Util.CC(Cc.rgb)}]{unitValue}[/color][color={Util.CC(colors[i])}]{units[i]}[/color]";
                         }
                     }
-
                     string gcValue;
                     if (value > 10_000) {
                         // Round up to the next integer if value is big
@@ -181,9 +173,28 @@ public static partial class Util {
                         gcValue = remainder.ToString("N2").Replace(",", "");
                         if (gcValue == "000.00") { gcValue = ""; }
                     }
-                    sb += $"[color={Util.CC(Cc.rgb)}]{gcValue}[/color]";
-                    sb += $"[color={Util.CC(Cc.Y)}]GC[/color]";
-                    return sb.ToString();
+                    return sb + $"[color={Util.CC(Cc.rgb)}]{gcValue}[/color][color={Util.CC(Cc.Y)}]GC[/color]";
+                }
+            case StrType.MINERAL: {
+                    if (string.IsNullOrWhiteSpace(input)) return "";
+                    if (!double.TryParse(input, out double value))
+                        return $"[color={Util.CC(Cc.y)}]{input}[/color][color={Util.CC(Cc.y)}]GC[/color]";
+                    int index = int.Parse(addons[0]);
+                    MineralProfile profile = MINERAL_PROFILES[index];
+                    string[] units    = [ "S",  "Q",  "T",  "B",  "M",  "K"];
+                    double[] divisors = [1e21, 1e15, 1e12,  1e9,  1e6,  1e3];
+                    Cc[] unitColors   = [Cc.R, Cc.Y, Cc.M, Cc.G, Cc.B, Cc.C];
+                    Cc[] mineralColor = [Cc.LG, Cc.C, Cc.bR, Cc.gR, Cc.RGB, Cc.LB, Cc.r, Cc.LC, Cc.M, Cc.Y];
+                    for (int i = 0; i < units.Length; i++) {
+                        if (value >= divisors[i]) {
+                            double unitValue = value / divisors[i];
+                            string formatted = unitValue.ToString("0.0");
+                            return $"[color={Util.CC(Cc.rgb)}]{formatted}[/color][color={Util.CC(unitColors[i])}]{units[i]}[/color][color={Util.CC(mineralColor[index])}]{profile.Name}[/color]";
+                        }
+                    }
+                    // If less than 1K, just show the number with GC
+                    string formattedValue = Mathf.Floor(value).ToString("0.##");
+                    return $"[color={Util.CC(Cc.rgb)}]{formattedValue}[/color][color={Util.CC(mineralColor[index])}]{profile.Name}[/color]";
                 }
             case StrType.USERNAME:
                 return $"[color={Util.CC(Cc.M)}]{input}[/color]";
@@ -239,4 +250,11 @@ public static partial class Util {
         return art;
     }
     public static string EscapeBBCode(string code) { return code.Replace("[", "[lb]"); }
+    static readonly MineralProfile[] MINERAL_PROFILES =
+    [.. Enumerable.Range(0, 10).Select(i =>
+            ResourceLoader.Load<MineralProfile>(
+                $"res://Utilities/Resources/MineralTypes/MineralResources/MineralT{i}.tres"
+                )
+            ).Where(m => m != null)
+    ];
 }

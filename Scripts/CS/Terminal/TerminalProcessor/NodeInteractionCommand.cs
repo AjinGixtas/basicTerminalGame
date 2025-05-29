@@ -29,9 +29,9 @@ Time  : Lv.{Util.Format($"{timeLvl}", StrType.NUMBER)} -> {Util.Format($"{      
 Grow  : Lv.{Util.Format($"{growLvl}", StrType.NUMBER)} -> {Util.Format(Util.Format($"{sNode.HackFarm.CurGrow}", StrType.MONEY), StrType.UNIT, "/s")}");
 
             Say(@$"[ Upgrade Info ]
-Hack +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(hackLvl + 1, 1).Sum(i => sNode.HackFarm.GetHackCost(i))}", StrType.MONEY)} | +{Util.Format($"10", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(hackLvl + 1, 10).Sum(i => sNode.HackFarm.GetHackCost(i))}", StrType.MONEY)}
-Time +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(timeLvl + 1, 1).Sum(i => sNode.HackFarm.GetTimeCost(i))}", StrType.MONEY)} | +{Util.Format($"10", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(timeLvl + 1, 10).Sum(i => sNode.HackFarm.GetTimeCost(i))}", StrType.MONEY)}
-Grow +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(growLvl + 1, 1).Sum(i => sNode.HackFarm.GetGrowCost(i))}", StrType.MONEY)} | +{Util.Format($"10", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(growLvl + 1, 10).Sum(i => sNode.HackFarm.GetGrowCost(i))}", StrType.MONEY)}");
+Hack +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(hackLvl + 1, 1).Sum(i => HackFarm.GetHackCost(i))}", StrType.MONEY)} | +{Util.Format($"10", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(hackLvl + 1, 10).Sum(i => HackFarm.GetHackCost(i))}", StrType.MONEY)}
+Time +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(timeLvl + 1, 1).Sum(i => HackFarm.GetTimeCost(i))}", StrType.MONEY)} | +{Util.Format($"10", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(timeLvl + 1, 10).Sum(i => HackFarm.GetTimeCost(i))}", StrType.MONEY)}
+Grow +{Util.Format($"1", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(growLvl + 1, 1).Sum(i => HackFarm.GetGrowCost(i))}", StrType.MONEY)} | +{Util.Format($"10", StrType.NUMBER)} -> {Util.Format($"{Enumerable.Range(growLvl + 1, 10).Sum(i => HackFarm.GetGrowCost(i))}", StrType.MONEY)}");
             return;
         }
         // Upgrade path

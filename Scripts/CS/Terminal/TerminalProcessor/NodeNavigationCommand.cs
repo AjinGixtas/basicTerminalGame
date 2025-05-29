@@ -94,7 +94,6 @@ public static partial class TerminalProcessor {
 {Util.Format("IP address:", StrType.DECOR),padLength}{Util.Format(analyzeNode.IP, StrType.IP)}
 {Util.Format("Display name:", StrType.DECOR),padLength}{Util.Format(analyzeNode.DisplayName, StrType.DISPLAY_NAME)}
 {Util.Format("▶ Classification", StrType.HEADER)}
-{Util.Format("Node type:", StrType.DECOR),padLength}{Util.Format($"{analyzeNode.NodeType}", StrType.SYMBOL)}
 {Util.Format("Firewall rating:", StrType.DECOR),padLength}{Util.Format($"{analyzeNode.DefLvl}", StrType.DEF_LVL)}
 {Util.Format("Security level:", StrType.DECOR),padLength}{Util.Format($"{analyzeNode.SecType}", StrType.SEC_TYPE)}
 ");

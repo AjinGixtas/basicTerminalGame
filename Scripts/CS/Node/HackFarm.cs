@@ -86,16 +86,16 @@ public class HackFarm {
     public double GetHackValue(int level) { return BASE_HACK + HackFactor * Mathf.Pow(POWR_HACK, level); } 
     public double GetTimeValue(int level) { return BASE_TIME - TimeFactor * Mathf.Log(level) / Mathf.Log(2) + SHIF_TIME * level; }
     public double GetGrowValue(int level) { return (BASE_GROW + GrowFactor * Mathf.Pow(level, POWR_GROW) + level * SHIF_GROW) / 10; }
-    public double GetHackCost(int level) { 
+    public static double GetHackCost(int level) { 
         if (level > MAX_LVL) return 0;
-        return BASE_COST_HACK * Mathf.Pow(1.10, level) + 44 * Mathf.Pow(level, 2.30);
+        return BASE_COST_HACK * (Mathf.Pow(1.10, level) + 44 * Mathf.Pow(level, 2.30)) * .5;
     }
-    public double GetTimeCost(int level) { 
+    public static double GetTimeCost(int level) { 
         if (level > MAX_LVL) return 0;
-        return BASE_COST_TIME * Mathf.Pow(1.09, level) + 30 * Mathf.Pow(level, 2.45); 
+        return BASE_COST_TIME * (Mathf.Pow(1.09, level) + 30 * Mathf.Pow(level, 2.45)) * .5; 
     }
-    public double GetGrowCost(int level) {
+    public static double GetGrowCost(int level) {
         if (level > MAX_LVL) return 0;
-        return BASE_COST_GROW * Mathf.Pow(1.08, level) + 25 * Mathf.Pow(level, 2.50); 
+        return BASE_COST_GROW * (Mathf.Pow(1.08, level) + 25 * Mathf.Pow(level, 2.50)) * .5; 
     }
 }

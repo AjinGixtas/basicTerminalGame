@@ -9,7 +9,6 @@ public partial class MenuDirector : HBoxContainer {
 			value = Mathf.Clamp(value, 0, menuWindowContainer.GetTabCount()-1);
 			if (menuWindowContainer.CurrentTab == value) return;
 			menuWindowContainer.CurrentTab = value;
-			overlayWindow.Visible = menuWindowContainer.CurrentTab != TERMINAL_INDEX;
 		}
 	}
 	public override void _Ready() {

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="SectorData" load_steps=2 format=3 uid="uid://br442cvpru3xu"]
+
+[ext_resource type="Script" uid="uid://cyg6db23gnd2b" path="res://Utilities/Resources/ScriptedNetworkNodes/NodeScript/SectorData.cs" id="1_27uas"]
+
+[resource]
+script = ExtResource("1_27uas")
+SectorName = "internet"
+Nodes = Array[Object]([null, null, null])
+metadata/_custom_type_script = "uid://cyg6db23gnd2b"

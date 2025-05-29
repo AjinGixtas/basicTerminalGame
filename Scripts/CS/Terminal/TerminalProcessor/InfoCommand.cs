@@ -68,7 +68,8 @@ public static partial class TerminalProcessor {
     static void Stats(Dictionary<string, string> parsedArgs, string[] postionalArgs) {
         Say($"Username: {Util.Format(PlayerDataManager.Username, StrType.USERNAME)}");
         Say($"Balance:  {Util.Format($"{PlayerDataManager.GC_Cur}", StrType.MONEY)}");
-        Say($"Resouces: {Util.Format($"{PlayerDataManager.MineInv[0]} {Util.Format("Iron", StrType.SYMBOL)}", StrType.MONEY)}");
+        
+        Say($"Resouces: {Util.Format($"{PlayerDataManager.MineInv[0]}", StrType.MINERAL, "0")}");
     }
     static void Clear(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         terminalOutputField.Clear();
@@ -81,5 +82,42 @@ public static partial class TerminalProcessor {
         if (positionalArgs[0].Length > 20) { Say("-r", $"Username too long. Max length is 20 characters."); return; }
         PlayerDataManager.Username = positionalArgs[0];
         SetCommandPrompt();
+    }
+    static void SeeColor(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+        var colorNames = new (Cc, string)[] {
+        (Cc.___, "Black"),
+        (Cc.rgb, "Dark Gray"),
+        (Cc.RGB, "White"),
+        (Cc.R, "Bright Red"),
+        (Cc.G, "Bright Green"),
+        (Cc.B, "Bright Blue"),
+        (Cc.C, "Bright Cyan"),
+        (Cc.M, "Bright Magenta"),
+        (Cc.Y, "Bright Yellow"),
+        (Cc.r, "Deep Red"),
+        (Cc.g, "Deep Green"),
+        (Cc.b, "Deep Blue"),
+        (Cc.c, "Dark Teal"),
+        (Cc.m, "Deep Magenta"),
+        (Cc.y, "Olive Yellow"),
+        (Cc.gB, "Aqua Blue"),
+        (Cc.rB, "Violet"),
+        (Cc.rG, "Lime Green"),
+        (Cc.bG, "Mint Green"),
+        (Cc.bR, "Hot Pink"),
+        (Cc.gR, "Amber"),
+        (Cc.LB, "Periwinkle"),
+        (Cc.LG, "Light Green"),
+        (Cc.LC, "Light Cyan"),
+        (Cc.LR, "Light Coral"),
+        (Cc.LM, "Light Magenta"),
+        (Cc.LY, "Light Yellow"),
+    };
+
+        string output = "";
+        foreach (var (cc, name) in colorNames) {
+            output += $"[color={Util.CC(cc)}]{name}[/color]\n";
+        }
+        Say(output.TrimEnd('\n'));
     }
 }

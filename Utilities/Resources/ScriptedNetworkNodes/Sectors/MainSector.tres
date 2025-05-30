@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="SectorData" load_steps=3 format=3 uid="uid://br442cvpru3xu"]
+
+[ext_resource type="Resource" uid="uid://crp51nj6ajagj" path="res://Utilities/Resources/ScriptedNetworkNodes/NA_Nodes/WokHere.tres" id="1_8r7xb"]
+[ext_resource type="Script" uid="uid://cyg6db23gnd2b" path="res://Utilities/Resources/ScriptedNetworkNodes/NodeScript/SectorData.cs" id="1_27uas"]
+
+[resource]
+script = ExtResource("1_27uas")
+SectorName = "internet"
+Nodes = Array[Object]([ExtResource("1_8r7xb")])
+metadata/_custom_type_script = "uid://cyg6db23gnd2b"

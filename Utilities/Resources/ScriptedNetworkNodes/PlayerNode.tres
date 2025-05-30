@@ -13,8 +13,8 @@ metadata/_custom_type_script = "uid://65e3mbb2130e"
 [resource]
 script = ExtResource("1_ehhie")
 NodeType = 1
-HostName = "PURGATORY"
-DisplayName = "PURGATORY"
+HostName = "home"
+DisplayName = "Home"
 ChildNodes = null
 DefLvl = 0
 SecLvl = 0

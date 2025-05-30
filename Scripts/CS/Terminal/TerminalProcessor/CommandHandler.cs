@@ -1,5 +1,6 @@
 using Godot;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 
 public static partial class TerminalProcessor {
@@ -11,7 +12,7 @@ public static partial class TerminalProcessor {
             while (commandHistory.Count > MAX_HISTORY_CMD_SIZE) { commandHistory.RemoveAt(0); }
             _commandHistoryIndex = commandHistory.Count;
         }
-        string[] commands = StringExtensions.Split(newCommand, ";", false);
+        string[] commands = SplitCommands(newCommand);
         Say("-n", $"{terminalCommandPrompt.Text.Replace("\r", "").Replace("\n", "")}{Util.Format(Util.EscapeBBCode(newCommand), StrType.CMD_FUL)}");
         queuedAction = ExecuteCommands;
         queuedCommands = commands;
@@ -25,22 +26,84 @@ public static partial class TerminalProcessor {
             }
         }
         static string[] Tokenize(string input) {
-            var tokens = new List<string>();
+            var args = new List<string>();
+            var current = new StringBuilder();
+            bool inQuotes = false;
+            char quoteChar = '\0';
+            bool escape = false;
 
-            // Regex: match quoted text or unquoted word
-            var matches = Regex.Matches(input, "\"([^\"]*)\"|(\\S+)");
-
-            foreach (Match match in matches) {
-                if (match.Groups[1].Success) {
-                    // Quoted group
-                    tokens.Add(match.Groups[1].Value);
+            foreach (char c in input) {
+                if (escape) {
+                    current.Append(c);
+                    escape = false;
+                } else if (c == '\\') {
+                    escape = true;
+                } else if (inQuotes) {
+                    if (c == quoteChar) {
+                        inQuotes = false;
+                    } else {
+                        current.Append(c);
+                    }
                 } else {
-                    // Unquoted group
-                    tokens.Add(match.Groups[2].Value);
+                    if (char.IsWhiteSpace(c)) {
+                        if (current.Length > 0) {
+                            args.Add(current.ToString());
+                            current.Clear();
+                        }
+                    } else if (c == '"' || c == '\'') {
+                        inQuotes = true;
+                        quoteChar = c;
+                    } else {
+                        current.Append(c);
+                    }
                 }
             }
 
-            return tokens.ToArray();
+            if (current.Length > 0)
+                args.Add(current.ToString());
+
+            return [..args];
+        }
+        static string[] SplitCommands(string input) {
+            var commands = new List<string>();
+            var current = new StringBuilder();
+            bool inQuotes = false;
+            char quoteChar = '\0';
+            bool escape = false;
+
+            foreach (char c in input) {
+                if (escape) {
+                    current.Append(c);
+                    escape = false;
+                } else if (c == '\\') {
+                    escape = true;
+                } else if (inQuotes) {
+                    if (c == quoteChar) {
+                        inQuotes = false;
+                    }
+                    current.Append(c);
+                } else {
+                    if (c == '"' || c == '\'') {
+                        inQuotes = true;
+                        quoteChar = c;
+                        current.Append(c);
+                    } else if (c == ';') {
+                        // semicolon outside quotes means split here
+                        var cmd = current.ToString().Trim();
+                        if (cmd.Length > 0)
+                            commands.Add(cmd);
+                        current.Clear();
+                    } else {
+                        current.Append(c);
+                    }
+                }
+            }
+
+            var lastCmd = current.ToString().Trim();
+            if (lastCmd.Length > 0)
+                commands.Add(lastCmd);
+
+            return [..commands];
         }
     }
     static bool ProcessCommand(string command, string[] args) {

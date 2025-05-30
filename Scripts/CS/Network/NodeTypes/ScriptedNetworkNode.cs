@@ -6,8 +6,8 @@ public class ScriptedNetworkNode : NetworkNode {
     public HackFarm HackFarm { get => _hackFarm; }
     public ScriptedNetworkNode(NodeData nodeData, NetworkNode parent)
         : base(
-            nodeData != null ? nodeData.DisplayName : "Unknown",
             nodeData != null ? nodeData.HostName    : "Unknown",
+            nodeData != null ? nodeData.DisplayName : "Unknown",
             NetworkManager.GetRandomIP(),
             nodeData != null ? nodeData.NodeType : NodeType.VM,
             parent, nodeData.OwnedByPlayer, (int)nodeData.Locks) {

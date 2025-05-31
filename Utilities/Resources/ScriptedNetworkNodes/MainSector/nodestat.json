@@ -1,0 +1,898 @@
+[
+  {
+	"id": "D0",
+	"efficiency": 640000,
+	"distribution": [
+	  {
+		"type": "A",
+		"fraction": 1.0
+	  }
+	],
+	"deflvl": 3,
+	"seclvl": 1
+  },
+  {
+	"id": "A0",
+	"efficiency": 104800,
+	"distribution": [
+	  {
+		"type": "A",
+		"fraction": 0.85
+	  },
+	  {
+		"type": "B",
+		"fraction": 0.15
+	  }
+	],
+	"deflvl": 4,
+	"seclvl": 1
+  },
+  {
+	"id": "B0",
+	"efficiency": 800000,
+	"distribution": [
+	  {
+		"type": "A",
+		"fraction": 0.75
+	  },
+	  {
+		"type": "B",
+		"fraction": 0.25
+	  }
+	],
+	"deflvl": 9,
+	"seclvl": 9
+  },
+  {
+	"id": "C0",
+	"efficiency": 409600,
+	"distribution": [
+	  {
+		"type": "A",
+		"fraction": 0.7
+	  },
+	  {
+		"type": "B",
+		"fraction": 0.2
+	  },
+	  {
+		"type": "C",
+		"fraction": 0.1
+	  }
+	],
+	"deflvl": 7,
+	"seclvl": 7
+  },
+  {
+	"id": "E1",
+	"efficiency": 512000,
+	"distribution": [
+	  {
+		"type": "A",
+		"fraction": 0.6
+	  },
+	  {
+		"type": "B",
+		"fraction": 0.3
+	  },
+	  {
+		"type": "C",
+		"fraction": 0.1
+	  }
+	],
+	"deflvl": 10,
+	"seclvl": 7
+  },
+  {
+	"id": "B1",
+	"efficiency": 512000,
+	"distribution": [
+	  {
+		"type": "B",
+		"fraction": 1.0
+	  }
+	],
+	"deflvl": 6,
+	"seclvl": 5
+  },
+  {
+	"id": "A1",
+	"efficiency": 640000,
+	"distribution": [
+	  {
+		"type": "B",
+		"fraction": 0.7
+	  },
+	  {
+		"type": "A",
+		"fraction": 0.2
+	  },
+	  {
+		"type": "C",
+		"fraction": 0.1
+	  }
+	],
+	"deflvl": 10,
+	"seclvl": 10
+  },
+  {
+	"id": "C1",
+	"efficiency": 800000,
+	"distribution": [
+	  {
+		"type": "B",
+		"fraction": 0.65
+	  },
+	  {
+		"type": "C",
+		"fraction": 0.3
+	  },
+	  {
+		"type": "A",
+		"fraction": 0.05
+	  }
+	],
+	"deflvl": 10,
+	"seclvl": 10
+  },
+  {
+	"id": "D1",
+	"efficiency": 104800,
+	"distribution": [
+	  {
+		"type": "B",
+		"fraction": 0.5
+	  },
+	  {
+		"type": "C",
+		"fraction": 0.3
+	  },
+	  {
+		"type": "D",
+		"fraction": 0.2
+	  }
+	],
+	"deflvl": 7,
+	"seclvl": 5
+  },
+  {
+	"id": "B2",
+	"efficiency": 409600,
+	"distribution": [
+	  {
+		"type": "B",
+		"fraction": 0.6
+	  },
+	  {
+		"type": "C",
+		"fraction": 0.3
+	  },
+	  {
+		"type": "D",
+		"fraction": 0.1
+	  }
+	],
+	"deflvl": 8,
+	"seclvl": 6
+  },
+  {
+	"id": "C2",
+	"efficiency": 640000,
+	"distribution": [
+	  {
+		"type": "C",
+		"fraction": 1.0
+	  }
+	],
+	"deflvl": 6,
+	"seclvl": 4
+  },
+  {
+	"id": "A2",
+	"efficiency": 104800,
+	"distribution": [
+	  {
+		"type": "C",
+		"fraction": 0.7
+	  },
+	  {
+		"type": "B",
+		"fraction": 0.2
+	  },
+	  {
+		"type": "D",
+		"fraction": 0.1
+	  }
+	],
+	"deflvl": 1,
+	"seclvl": 1
+  },
+  {
+	"id": "E3",
+	"efficiency": 800000,
+	"distribution": [
+	  {
+		"type": "C",
+		"fraction": 0.6
+	  },
+	  {
+		"type": "D",
+		"fraction": 0.3
+	  },
+	  {
+		"type": "E",
+		"fraction": 0.1
+	  }
+	],
+	"deflvl": 8,
+	"seclvl": 7
+  },
+  {
+	"id": "B3",
+	"efficiency": 409600,
+	"distribution": [
+	  {
+		"type": "C",
+		"fraction": 0.4
+	  },
+	  {
+		"type": "D",
+		"fraction": 0.4
+	  },
+	  {
+		"type": "E",
+		"fraction": 0.2
+	  }
+	],
+	"deflvl": 8,
+	"seclvl": 8
+  },
+  {
+	"id": "C3",
+	"efficiency": 512000,
+	"distribution": [
+	  {
+		"type": "C",
+		"fraction": 0.5
+	  },
+	  {
+		"type": "D",
+		"fraction": 0.3
+	  },
+	  {
+		"type": "E",
+		"fraction": 0.2
+	  }
+	],
+	"deflvl": 10,
+	"seclvl": 9
+  },
+  {
+	"id": "A3",
+	"efficiency": 512000,
+	"distribution": [
+	  {
+		"type": "D",
+		"fraction": 1.0
+	  }
+	],
+	"deflvl": 5,
+	"seclvl": 4
+  },
+  {
+	"id": "D3",
+	"efficiency": 640000,
+	"distribution": [
+	  {
+		"type": "D",
+		"fraction": 0.7
+	  },
+	  {
+		"type": "C",
+		"fraction": 0.2
+	  },
+	  {
+		"type": "E",
+		"fraction": 0.1
+	  }
+	],
+	"deflvl": 3,
+	"seclvl": 2
+  },
+  {
+	"id": "C4",
+	"efficiency": 800000,
+	"distribution": [
+	  {
+		"type": "D",
+		"fraction": 0.6
+	  },
+	  {
+		"type": "E",
+		"fraction": 0.3
+	  },
+	  {
+		"type": "C",
+		"fraction": 0.1
+	  }
+	],
+	"deflvl": 7,
+	"seclvl": 4
+  },
+  {
+	"id": "D4",
+	"efficiency": 104800,
+	"distribution": [
+	  {
+		"type": "D",
+		"fraction": 0.8
+	  },
+	  {
+		"type": "E",
+		"fraction": 0.2
+	  }
+	],
+	"deflvl": 10,
+	"seclvl": 8
+  },
+  {
+	"id": "A4",
+	"efficiency": 409600,
+	"distribution": [
+	  {
+		"type": "D",
+		"fraction": 0.6
+	  },
+	  {
+		"type": "E",
+		"fraction": 0.3
+	  },
+	  {
+		"type": "F",
+		"fraction": 0.1
+	  }
+	],
+	"deflvl": 6,
+	"seclvl": 6
+  },
+  {
+	"id": "B4",
+	"efficiency": 640000,
+	"distribution": [
+	  {
+		"type": "E",
+		"fraction": 1.0
+	  }
+	],
+	"deflvl": 9,
+	"seclvl": 8
+  },
+  {
+	"id": "A5",
+	"efficiency": 800000,
+	"distribution": [
+	  {
+		"type": "E",
+		"fraction": 0.7
+	  },
+	  {
+		"type": "D",
+		"fraction": 0.2
+	  },
+	  {
+		"type": "F",
+		"fraction": 0.1
+	  }
+	],
+	"deflvl": 10,
+	"seclvl": 10
+  },
+  {
+	"id": "B5",
+	"efficiency": 104800,
+	"distribution": [
+	  {
+		"type": "E",
+		"fraction": 0.6
+	  },
+	  {
+		"type": "F",
+		"fraction": 0.3
+	  },
+	  {
+		"type": "G",
+		"fraction": 0.1
+	  }
+	],
+	"deflvl": 2,
+	"seclvl": 1
+  },
+  {
+	"id": "C5",
+	"efficiency": 409600,
+	"distribution": [
+	  {
+		"type": "E",
+		"fraction": 0.5
+	  },
+	  {
+		"type": "F",
+		"fraction": 0.3
+	  },
+	  {
+		"type": "G",
+		"fraction": 0.2
+	  }
+	],
+	"deflvl": 2,
+	"seclvl": 2
+  },
+  {
+	"id": "D5",
+	"efficiency": 512000,
+	"distribution": [
+	  {
+		"type": "F",
+		"fraction": 0.7
+	  },
+	  {
+		"type": "G",
+		"fraction": 0.2
+	  },
+	  {
+		"type": "E",
+		"fraction": 0.1
+	  }
+	],
+	"deflvl": 5,
+	"seclvl": 5
+  },
+  {
+	"id": "A6",
+	"efficiency": 800000,
+	"distribution": [
+	  {
+		"type": "F",
+		"fraction": 1.0
+	  }
+	],
+	"deflvl": 8,
+	"seclvl": 5
+  },
+  {
+	"id": "A7",
+	"efficiency": 104800,
+	"distribution": [
+	  {
+		"type": "F",
+		"fraction": 0.7
+	  },
+	  {
+		"type": "E",
+		"fraction": 0.2
+	  },
+	  {
+		"type": "G",
+		"fraction": 0.1
+	  }
+	],
+	"deflvl": 4,
+	"seclvl": 1
+  },
+  {
+	"id": "B7",
+	"efficiency": 512000,
+	"distribution": [
+	  {
+		"type": "F",
+		"fraction": 0.6
+	  },
+	  {
+		"type": "G",
+		"fraction": 0.2
+	  },
+	  {
+		"type": "H",
+		"fraction": 0.2
+	  }
+	],
+	"deflvl": 6,
+	"seclvl": 3
+  },
+  {
+	"id": "B8",
+	"efficiency": 409600,
+	"distribution": [
+	  {
+		"type": "G",
+		"fraction": 0.7
+	  },
+	  {
+		"type": "F",
+		"fraction": 0.2
+	  },
+	  {
+		"type": "H",
+		"fraction": 0.1
+	  }
+	],
+	"deflvl": 4,
+	"seclvl": 4
+  },
+  {
+	"id": "C8",
+	"efficiency": 640000,
+	"distribution": [
+	  {
+		"type": "G",
+		"fraction": 0.5
+	  },
+	  {
+		"type": "H",
+		"fraction": 0.4
+	  },
+	  {
+		"type": "F",
+		"fraction": 0.1
+	  }
+	],
+	"deflvl": 7,
+	"seclvl": 7
+  },
+  {
+	"id": "A8",
+	"efficiency": 640000,
+	"distribution": [
+	  {
+		"type": "G",
+		"fraction": 1.0
+	  }
+	],
+	"deflvl": 8,
+	"seclvl": 7
+  },
+  {
+	"id": "D8",
+	"efficiency": 800000,
+	"distribution": [
+	  {
+		"type": "G",
+		"fraction": 0.5
+	  },
+	  {
+		"type": "H",
+		"fraction": 0.4
+	  },
+	  {
+		"type": "I",
+		"fraction": 0.1
+	  }
+	],
+	"deflvl": 10,
+	"seclvl": 10
+  },
+  {
+	"id": "C9",
+	"efficiency": 104800,
+	"distribution": [
+	  {
+		"type": "H",
+		"fraction": 0.7
+	  },
+	  {
+		"type": "G",
+		"fraction": 0.2
+	  },
+	  {
+		"type": "I",
+		"fraction": 0.1
+	  }
+	],
+	"deflvl": 6,
+	"seclvl": 5
+  },
+  {
+	"id": "A9",
+	"efficiency": 409600,
+	"distribution": [
+	  {
+		"type": "H",
+		"fraction": 0.6
+	  },
+	  {
+		"type": "I",
+		"fraction": 0.3
+	  },
+	  {
+		"type": "G",
+		"fraction": 0.1
+	  }
+	],
+	"deflvl": 8,
+	"seclvl": 8
+  },
+  {
+	"id": "B9",
+	"efficiency": 512000,
+	"distribution": [
+	  {
+		"type": "H",
+		"fraction": 0.5
+	  },
+	  {
+		"type": "I",
+		"fraction": 0.5
+	  }
+	],
+	"deflvl": 4,
+	"seclvl": 1
+  },
+  {
+	"id": "D9",
+	"efficiency": 104800,
+	"distribution": [
+	  {
+		"type": "H",
+		"fraction": 0.4
+	  },
+	  {
+		"type": "I",
+		"fraction": 0.4
+	  },
+	  {
+		"type": "J",
+		"fraction": 0.2
+	  }
+	],
+	"deflvl": 5,
+	"seclvl": 2
+  },
+  {
+	"id": "B10",
+	"efficiency": 640000,
+	"distribution": [
+	  {
+		"type": "I",
+		"fraction": 1.0
+	  }
+	],
+	"deflvl": 2,
+	"seclvl": 1
+  },
+  {
+	"id": "A10",
+	"efficiency": 800000,
+	"distribution": [
+	  {
+		"type": "I",
+		"fraction": 0.7
+	  },
+	  {
+		"type": "J",
+		"fraction": 0.3
+	  }
+	],
+	"deflvl": 4,
+	"seclvl": 2
+  },
+  {
+	"id": "C10",
+	"efficiency": 104800,
+	"distribution": [
+	  {
+		"type": "I",
+		"fraction": 0.6
+	  },
+	  {
+		"type": "J",
+		"fraction": 0.4
+	  }
+	],
+	"deflvl": 2,
+	"seclvl": 2
+  },
+  {
+	"id": "E10",
+	"efficiency": 409600,
+	"distribution": [
+	  {
+		"type": "I",
+		"fraction": 0.5
+	  },
+	  {
+		"type": "J",
+		"fraction": 0.5
+	  }
+	],
+	"deflvl": 10,
+	"seclvl": 8
+  },
+  {
+	"id": "D10",
+	"efficiency": 409600,
+	"distribution": [
+	  {
+		"type": "J",
+		"fraction": 1.0
+	  }
+	],
+	"deflvl": 5,
+	"seclvl": 2
+  },
+  {
+	"id": "C11",
+	"efficiency": 512000,
+	"distribution": [
+	  {
+		"type": "J",
+		"fraction": 0.8
+	  },
+	  {
+		"type": "I",
+		"fraction": 0.2
+	  }
+	],
+	"deflvl": 2,
+	"seclvl": 1
+  },
+  {
+	"id": "A11",
+	"efficiency": 104800,
+	"distribution": [
+	  {
+		"type": "J",
+		"fraction": 0.6
+	  },
+	  {
+		"type": "I",
+		"fraction": 0.2
+	  },
+	  {
+		"type": "H",
+		"fraction": 0.2
+	  }
+	],
+	"deflvl": 8,
+	"seclvl": 7
+  },
+  {
+	"id": "B11",
+	"efficiency": 640000,
+	"distribution": [
+	  {
+		"type": "J",
+		"fraction": 0.5
+	  },
+	  {
+		"type": "I",
+		"fraction": 0.3
+	  },
+	  {
+		"type": "H",
+		"fraction": 0.2
+	  }
+	],
+	"deflvl": 3,
+	"seclvl": 3
+  },
+  {
+	"id": "D11",
+	"efficiency": 800000,
+	"distribution": [
+	  {
+		"type": "J",
+		"fraction": 0.5
+	  },
+	  {
+		"type": "H",
+		"fraction": 0.3
+	  },
+	  {
+		"type": "I",
+		"fraction": 0.2
+	  }
+	],
+	"deflvl": 5,
+	"seclvl": 5
+  },
+  {
+	"id": "A12",
+	"efficiency": 800000,
+	"distribution": [
+	  {
+		"type": "J",
+		"fraction": 0.6
+	  },
+	  {
+		"type": "I",
+		"fraction": 0.3
+	  },
+	  {
+		"type": "H",
+		"fraction": 0.1
+	  }
+	],
+	"deflvl": 8,
+	"seclvl": 7
+  },
+  {
+	"id": "B12",
+	"efficiency": 104800,
+	"distribution": [
+	  {
+		"type": "J",
+		"fraction": 0.5
+	  },
+	  {
+		"type": "I",
+		"fraction": 0.25
+	  },
+	  {
+		"type": "H",
+		"fraction": 0.25
+	  }
+	],
+	"deflvl": 8,
+	"seclvl": 8
+  },
+  {
+	"id": "C12",
+	"efficiency": 512000,
+	"distribution": [
+	  {
+		"type": "J",
+		"fraction": 0.5
+	  },
+	  {
+		"type": "I",
+		"fraction": 0.3
+	  },
+	  {
+		"type": "H",
+		"fraction": 0.2
+	  }
+	],
+	"deflvl": 10,
+	"seclvl": 10
+  },
+  {
+	"id": "D12",
+	"efficiency": 409600,
+	"distribution": [
+	  {
+		"type": "J",
+		"fraction": 0.6
+	  },
+	  {
+		"type": "I",
+		"fraction": 0.3
+	  },
+	  {
+		"type": "H",
+		"fraction": 0.1
+	  }
+	],
+	"deflvl": 5,
+	"seclvl": 5
+  },
+  {
+	"id": "E12",
+	"efficiency": 640000,
+	"distribution": [
+	  {
+		"type": "J",
+		"fraction": 0.5
+	  },
+	  {
+		"type": "I",
+		"fraction": 0.3
+	  },
+	  {
+		"type": "H",
+		"fraction": 0.2
+	  }
+	],
+	"deflvl": 6,
+	"seclvl": 4
+  }
+]

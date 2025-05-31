@@ -7,7 +7,7 @@ public class DriftSector : Sector {
 	public DriftSector() {
 		Name = GenSectorName();
 		int type = GD.RandRange(0, 3);
-		int secLvl = GD.RandRange(1, 3) * 3;
+		int secLvl = GD.RandRange(1, 10);
 		switch (type) {
 			case 0: GenerateBusNetwork(secLvl); break;
 			case 1: GenerateStarNetwork(secLvl); break;
@@ -17,8 +17,8 @@ public class DriftSector : Sector {
 		}
 		MarkIntializationCompleted();
 	}
-	int AddSurfaceNode(DriftNode node) { if (_isIntialized) return 1; 
-		SurfaceNodes.Add(node); return 0; }
+	
+	int AddSurfaceNode(DriftNode node) { if (_isIntialized) return 1; SurfaceNodes.Add(node); return 0; }
 	public int MarkIntializationCompleted() { _isIntialized = true; return 0; }
 	void GenerateBusNetwork(int secLvl) {
 		if (_isIntialized) return;

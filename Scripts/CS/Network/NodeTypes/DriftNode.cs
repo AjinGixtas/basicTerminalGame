@@ -6,7 +6,7 @@ public class DriftNode : NetworkNode {
         base(hostName, displayName, IP, NodeType.DRIFT, parentNode, false, 0){
         Sector = sector;
         NetworkManager.AssignDNS(this);
-        DefLvl = (int)Mathf.Clamp(GD.Randfn(secLvl + .5, 2.75), 1, 10);
-        SecLvl = (int)Mathf.Clamp(GD.Randfn(DefLvl/2+3.5, .33 * Mathf.E * Mathf.Pi), 1, DefLvl);
+        DefLvl = (int)Mathf.Clamp(GD.Randfn(secLvl + .5, Mathf.E), 1, 10);
+        SecLvl = (int)Mathf.Clamp(GD.Randfn(DefLvl/2+3.5, .2 * Mathf.E * Mathf.Pi), 1, DefLvl);
     }
 }

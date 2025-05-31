@@ -1,6 +1,6 @@
 [
 	{ "id":"E1" , "hostname": "bank",           "displayName": "Bank" },
-	{ "id":"B11", "hostname": "cwcwcw",         "displayName": "Commonwealth Central Wealth Commission of Cural West" },
+	{ "id":"B11", "hostname": "cwcwcw",         "displayName": "Central Wealth Commission of the West Cural Commonwealth" },
 	{ "id":"D1" , "hostname": "trustus",        "displayName": "Trust my bank TM" },
 	{ "id":"A0" , "hostname": "infeido",        "displayName": "Infeido Trade & Finance LLC" },
 	{ "id":"C8" , "hostname": "vaulton",        "displayName": "Vaulton Financial Services" },
@@ -36,7 +36,7 @@
 	{ "id":"C3" , "hostname": "thr33",          "displayName": "We are three too" },
 	{ "id":"B2" , "hostname": ".",              "displayName": "dot" },
 	{ "id":"E3" , "hostname": ",",              "displayName": "Commasense" },
-	{ "id":"C2" , "hostname": ";",              "displayName": "Wow ok smart boy -_- (nosec with 1BGC bec you were such a clever cookie)" },
+	{ "id":"C2" , "hostname": ";",              "displayName": "Wow nice job clever cookie ._." },
 	{ "id":"B7" , "hostname": "hone",           "displayName": "Name Squatter" },
 	{ "id":"C5" , "hostname": "ISO3103",        "displayName": "See Brits:Annoying" },
 	{ "id":"D0" , "hostname": "cw-uni",         "displayName": "Commonwealth University of Cural West" },

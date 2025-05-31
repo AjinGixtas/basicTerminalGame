@@ -18,7 +18,6 @@ public static partial class NetworkManager {
 
         AssignDNS(PlayerNode);
         RegenerateDriftSector();
-        LoadStaticSector();
     }
 
     public static string[] GetSectorNames() {
@@ -45,6 +44,7 @@ public static partial class NetworkManager {
     }
 
     public static void LoadStaticSector() {
+        GD.Print("No static sector"); return;
         staticSectors = [];
         string[] sectorPaths = DirAccess.GetFilesAt("res://Utilities/Resources/ScriptedNetworkNodes/Sectors/");
         foreach (string path in sectorPaths) {

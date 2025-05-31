@@ -138,6 +138,21 @@ public static partial class TerminalProcessor {
 		}
 	}
 	static void Unlink(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+		if (positionalArgs[0] == "*") {
+			// Disconnect from all sectors
+			while (NetworkManager.GetConnectedSectorNames().Length > 0) {
+				int i = 0;
+				int status = NetworkManager.DisconnectFromSector(NetworkManager.GetConnectedSectorNames()[i]);
+				string msg = status switch {
+					0 => $"Disconnected from sector: {Util.Format(NetworkManager.GetConnectedSectorNames()[i], StrType.SECTOR)}",
+					1 => $"Failed to disconnect from sector: {Util.Format(NetworkManager.GetConnectedSectorNames()[i], StrType.SECTOR)}. Sector not found.",
+					2 => $"Failed to disconnect from sector: {Util.Format(NetworkManager.GetConnectedSectorNames()[i], StrType.SECTOR)}. Not connected.",
+					_ => $"Unknown error code: {status}. Failed to disconnect from sector: {Util.Format(NetworkManager.GetConnectedSectorNames()[i], StrType.SECTOR)}",
+				};
+                if (status == 0) { Say(msg); } else { Say("-r", msg); }
+            }
+			return;
+		}
 		for (int i = 0; i < positionalArgs.Length; ++i) {
 			int status = NetworkManager.DisconnectFromSector(positionalArgs[i]);
 			string msg = status switch {

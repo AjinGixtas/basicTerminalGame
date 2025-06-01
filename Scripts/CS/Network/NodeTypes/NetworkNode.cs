@@ -102,9 +102,9 @@ public abstract class NetworkNode {
             _isSecure = value;
 		}
 	}
-	public virtual int AttempCrackNode(Dictionary<string, string> ans, double timeStamp) {
+	public virtual int AttempCrackNode(Dictionary<string, string> ans, double endEpoch) {
 		if (LockSystem == null) { return 5; } // No lock system, cannot crack
-		int result = LockSystem.CrackAttempt(ans, timeStamp);
+		int result = LockSystem.CrackAttempt(ans, endEpoch);
 		if (result == 0) {
 			IsSecure = false; LockSystem = null;
 			SecLvl = 0; DefLvl = 0;

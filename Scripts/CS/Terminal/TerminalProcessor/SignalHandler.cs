@@ -3,12 +3,12 @@ public static partial class TerminalProcessor {
         Say($"{Util.Format("Flare sequence timeout", StrType.ERROR)}. All [color={Util.CC(Cc.Y)}]lok[/color] closed.");
         endEpoch = 0;
         crackDurationTimer.Stop();
-        if (sectorQueuedForRemoval.Count > 0) {
-            foreach (DriftSector sector in sectorQueuedForRemoval) {
+        if (sectorAttacked.Count > 0) {
+            foreach (DriftSector sector in sectorAttacked) {
                 NetworkManager.DisconnectFromSector(sector);
                 NetworkManager.RemoveSector(sector);
             }
-            sectorQueuedForRemoval.Clear();
+            sectorAttacked.Clear();
         }
     }
     public static void OnCommandFieldTextChanged() {

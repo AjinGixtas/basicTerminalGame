@@ -8,13 +8,12 @@ public static partial class NetworkManager {
     static List<DriftSector> driftSectors;
     static List<StaticSector> staticSectors;
     static Dictionary<string, NetworkNode> DNS;
-    static List<HackFarm> PlayerHackFarm = [];
+    static List<HackFarm> BotNet = [];
     const int DRIFT_SECTOR_COUNT = 128;
 
     public static void Ready() {
         DNS = []; driftSectors = []; connectedSectors = []; staticSectors = [];
         PlayerNode = new PlayerNode(GD.Load<NodeData>("res://Utilities/Resources/ScriptedNetworkNodes/PlayerNode.tres"));
-        PlayerHackFarm = [PlayerNode.HackFarm];
 
         AssignDNS(PlayerNode);
         RegenerateDriftSector();
@@ -167,10 +166,10 @@ public static partial class NetworkManager {
     }
 
     public static void AddHackFarm(HackFarm hackFarm) {
-        PlayerHackFarm.Add(hackFarm);
+        BotNet.Add(hackFarm);
     }
     public static void CollectHackFarmMinerals(double delta) {
-        foreach (HackFarm h in PlayerHackFarm) {
+        foreach (HackFarm h in BotNet) {
             double[] minerals = h.ProcessMinerals(delta);
             for (int i = 0; i < minerals.Length; ++i) {
                 PlayerDataManager.DepositMineral(i, minerals[i]);

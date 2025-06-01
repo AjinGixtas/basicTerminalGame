@@ -26,11 +26,11 @@ public class LockSystem {
 		lockPool.Clear();
 		return 0;
 	}
-	double timeStamp = -1;
+	double endEpoch = -1;
 	// 0 - Success; 1 - Missing flag; 2 - Missing key; 3 - Incorrect key; 4 - Timeout
-	public int CrackAttempt(Dictionary<string, string> ans, double timeStamp) {
-		if (this.timeStamp != timeStamp) { 
-			this.timeStamp = timeStamp;
+	public int CrackAttempt(Dictionary<string, string> ans, double endEpoch) {
+		if (this.endEpoch != endEpoch) { 
+			this.endEpoch = endEpoch;
 			for (int i = 0; i < activeLocks.Count; ++i) { activeLocks[i].Intialize(); }
 		}
 		for (int i = 0; i < activeLocks.Count; i++) {

@@ -104,15 +104,6 @@ public static partial class TerminalProcessor {
 			Say($"Crack this node security system to get further access.");
 			return;
 		}
-		if (analyzeNode is ScriptedNetworkNode) {
-			ScriptedNetworkNode sNode = analyzeNode as ScriptedNetworkNode;
-			Say("-tl", $@"
-{Util.Format("▶ GC miner detail", StrType.HEADER)}
-{Util.Format("Transfer batch:", StrType.DECOR),padLength}{Util.Format($"{sNode.HackFarm.HackLvl}", StrType.NUMBER)} ({Util.Format($"{sNode.HackFarm.CurHack}", StrType.MONEY)})
-{Util.Format("Transfer speed:", StrType.DECOR),padLength}{Util.Format($"{sNode.HackFarm.TimeLvl}", StrType.NUMBER)} ({Util.Format($"{sNode.HackFarm.CurTime}", StrType.UNIT, "s")})
-{Util.Format("Mining speed:", StrType.DECOR),padLength}{Util.Format($"{sNode.HackFarm.GrowLvl}", StrType.NUMBER)} ({Util.Format(Util.Format($"{sNode.HackFarm.CurGrow}", StrType.MONEY), StrType.UNIT, "/s")})
-");
-		}
 	}
 	static void Sector(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		bool connectedOnly = parsedArgs.ContainsKey("-c") || parsedArgs.ContainsKey("--connected");
@@ -144,14 +135,15 @@ public static partial class TerminalProcessor {
 				int i = 0;
 				int status = NetworkManager.DisconnectFromSector(NetworkManager.GetConnectedSectorNames()[i]);
 				string msg = status switch {
-					0 => $"Disconnected from sector: {Util.Format(NetworkManager.GetConnectedSectorNames()[i], StrType.SECTOR)}",
+					0 => "",
 					1 => $"Failed to disconnect from sector: {Util.Format(NetworkManager.GetConnectedSectorNames()[i], StrType.SECTOR)}. Sector not found.",
 					2 => $"Failed to disconnect from sector: {Util.Format(NetworkManager.GetConnectedSectorNames()[i], StrType.SECTOR)}. Not connected.",
 					_ => $"Unknown error code: {status}. Failed to disconnect from sector: {Util.Format(NetworkManager.GetConnectedSectorNames()[i], StrType.SECTOR)}",
 				};
-                if (status == 0) { Say(msg); } else { Say("-r", msg); }
+                if (status != 0) { Say("-r", msg); }
             }
-			return;
+            Say("Disconnected from all sectors.");
+            return;
 		}
 		for (int i = 0; i < positionalArgs.Length; ++i) {
 			int status = NetworkManager.DisconnectFromSector(positionalArgs[i]);

@@ -4,7 +4,16 @@ using System.Collections.Generic;
 public class DriftSector : Sector {
 	static readonly string[] DRIFT_NODE_NAMES = StringExtensions.Split(FileAccess.Open("res://Utilities/TextFiles/ServerNames/DriftNode.txt", FileAccess.ModeFlags.Read).GetAsText(), "\n", false);
 	static readonly string[] DRIFT_SECTOR_NAMES = StringExtensions.Split(FileAccess.Open("res://Utilities/TextFiles/ServerNames/DriftSector.txt", FileAccess.ModeFlags.Read).GetAsText(), "\n", false);
-	public DriftSector() {
+
+	bool _lockedDown = false;
+    public bool LockedDown { 
+		get => _lockedDown; 
+		set { 
+			if (_lockedDown) return; // Prevents re-locking
+            _lockedDown = value; 
+		} 
+	}
+    public DriftSector() {
 		Name = GenSectorName();
 		int type = GD.RandRange(0, 3);
 		int secLvl = GD.RandRange(1, 10);
@@ -87,10 +96,10 @@ public class DriftSector : Sector {
 		return sb;
 	}
 	static (string, string) GenNodeName() {
-		string baseName = DRIFT_NODE_NAMES[GD.RandRange(0, DRIFT_NODE_NAMES.Length - 1)], suffix = GetSuffix(3);
+		string baseName = DRIFT_NODE_NAMES[GD.RandRange(0, DRIFT_NODE_NAMES.Length - 1)], suffix = GenSuffix(3);
 		return ($"{char.ToUpper(baseName[0])}{baseName[1..]} {suffix.ToUpper()}", $"{baseName}_{suffix}");
 	}
-	static string GetSuffix(int length) {
+	static string GenSuffix(int length) {
 		const string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
 		string sb = "";
 		for (int i = 0; i < length; i++) {

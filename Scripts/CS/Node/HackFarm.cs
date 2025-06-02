@@ -77,7 +77,8 @@ public class HackFarm {
         timeRemains = GD.RandRange(10800.0, 86400) + 3600 * Mathf.Pow(Mathf.E/2, 0.763891 * defLvl) * Mathf.Log(defLvl);
     }
     ~HackFarm() {
-        GD.Print($"HackFarm {HostName} is being destroyed");
+        if (Util.haveFinalWord)
+            GD.Print($"HackFarm {HostName} is being destroyed");
     }
     public void UpgradeHack() {
         HackLVL += 1;

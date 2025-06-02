@@ -23,7 +23,6 @@ public class LockSystem {
 			}
 		}
 		activeLocks = Util.Shuffle<Lock>(activeLocks);
-		for (int i = 0; i < activeLocks.Count; ++i) { activeLocks[i].Intialize(); }
 		lockPool.Clear();
         return 0;
 	}

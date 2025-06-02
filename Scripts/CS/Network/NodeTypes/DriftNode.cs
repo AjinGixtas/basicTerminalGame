@@ -26,7 +26,7 @@ public class DriftNode : NetworkNode {
         }
     }
     ~DriftNode() {
-        GD.Print($"DriftNode {HostName} is being destroyed");
+        if (Util.haveFinalWord) GD.Print($"DriftNode {HostName} is being destroyed");
     }
     public override int AttempCrackNode(Dictionary<string, string> ans, double endEpoch) {
         if (Sector.LockedDown) { 

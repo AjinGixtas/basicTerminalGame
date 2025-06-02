@@ -23,6 +23,7 @@ public static partial class TerminalProcessor {
         Say(
 $@"Botnet: {Util.Format(minerName, StrType.HOSTNAME)}
 {GenerateStringByProportions([.. hackfarm.mineralDistribution.Select(x => x.Item2)], [.. hackfarm.mineralDistribution.Select(x => Util.MINERAL_PROFILES[x.Item1].ColorCode)], 50)}
+{string.Join(" | ", hackfarm.mineralDistribution.Select(x => $"{Util.Format(Util.MINERAL_PROFILES[x.Item1].Name, StrType.MINERAL)}: {Util.Format($"{x.Item2 * 100.0:0.00}", StrType.NUMBER)}%"))}
 ================================================================
 Load capacity  | Lvl.{Util.Format($"{hackfarm.HackLVL}", StrType.NUMBER):3} | {Util.Format($"{hackfarm.HackVal}", StrType.NUMBER):3}
 Mining speed   | Lvl.{Util.Format($"{hackfarm.GrowLVL}", StrType.NUMBER):3} | {Util.Format($"{hackfarm.GrowVal}", StrType.NUMBER):3}

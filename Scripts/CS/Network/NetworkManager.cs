@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public static partial class NetworkManager {
     static PlayerNode _playerNode;
@@ -49,7 +50,8 @@ public static partial class NetworkManager {
         } return null;
     }
     public static void RegenerateDriftSector() {
-        while(connectedSectors.Count > 0) {
+        if (connectedSectors.Count > 1) (connectedSectors[0], connectedSectors[1]) = (connectedSectors[1], connectedSectors[0]); // Swap the first two sectors
+        while (connectedSectors.Count > 0) {
             DisconnectFromSector(connectedSectors[0]);
         }
         while(driftSectors.Count > 0) {
@@ -58,6 +60,9 @@ public static partial class NetworkManager {
         for (int i = 0; i < DRIFT_SECTOR_COUNT; ++i) {
             driftSectors.Add(new DriftSector());
         }
+        GC.Collect();                    // Try to collect unreachable objects
+        GC.WaitForPendingFinalizers();   // Wait for destructors (~finalizers)
+        GC.Collect();                    // Re-collect objects that were just finalized
     }
 
     public static void LoadStaticSector() {
@@ -185,6 +190,7 @@ public static partial class NetworkManager {
 
     readonly static Queue<HackFarm> AddQueue = [];
     public static void QueueAddHackFarm(HackFarm hackFarm) {
+        GD.Print(hackFarm.HostName);
         AddQueue.Enqueue(hackFarm);
     }
     readonly static Queue<HackFarm> RemovalQueue = [];
@@ -208,6 +214,8 @@ public static partial class NetworkManager {
                 PlayerDataManager.DepositMineral(i, minerals[i]);
             }
         }
+        if (PlayerDataManager.MineInv.All(x => x != 0.0))
+        GD.Print(PlayerDataManager.MineInv.Join(", "));
     }
     public static NetworkNode QueryDNS(string IP) {
         DNS.TryGetValue(IP, out var nodeRef);

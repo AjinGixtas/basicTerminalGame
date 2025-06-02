@@ -2,6 +2,7 @@ using Godot;
 using System.Collections.Generic;
 using System.Linq;
 public static partial class Util {
+    public static bool haveFinalWord = true; // Used to prevent final word in the terminal
     public static T[] Shuffle<T>(T[] array) {
         for (int i = 0; i < array.Length; i++) {
             int j = GD.RandRange(0, array.Length - 1); 

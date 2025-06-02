@@ -15,6 +15,9 @@ public static partial class TerminalProcessor {
             NetworkManager.RemoveSector(sector);
         }
         sectorAttacked.Clear();
+        GC.Collect();                    // Try to collect unreachable objects
+        GC.WaitForPendingFinalizers();   // Wait for destructors (~finalizers)
+        GC.Collect();                    // Re-collect objects that were just finalized
     }
     public static void OnCommandFieldTextChanged() {
         int pastCaretPos = terminalCommandField.GetCaretColumn();

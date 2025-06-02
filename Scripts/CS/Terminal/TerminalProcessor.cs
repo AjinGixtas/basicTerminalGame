@@ -57,7 +57,6 @@ Type {Util.Format("home", StrType.CMD_FUL)} to return to your home node.");
 		HandleInput(delta);
 		ShowMoreChars(delta);
 		UpdateProcessingGraphic(delta);
-		NetworkManager.CollectHackFarmMinerals(delta);
 	}
 	public static void HandleInput(double dela) {
 		if (terminalCommandField.HasFocus()) {

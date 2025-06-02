@@ -9,6 +9,24 @@ public class DriftNode : NetworkNode {
         NetworkManager.AssignDNS(this);
         DefLvl = (int)Mathf.Clamp(GD.Randfn(secLvl + .5, Mathf.E), 1, 10);
         SecLvl = (int)Mathf.Clamp(GD.Randfn(DefLvl/2+3.5, .2 * Mathf.E * Mathf.Pi), 1, DefLvl);
+        _hackFarm = new HackFarm(DefLvl, this);
+
+    }
+    HackFarm _hackFarm = null;
+    public HackFarm HackFarm {
+        get {
+            if (!OwnedByPlayer) {
+                GD.PrintErr("HackFarm is only available for player-owned nodes.");
+                return null;
+            }
+            return _hackFarm;
+        }
+        init {
+            _hackFarm = value;
+        }
+    }
+    ~DriftNode() {
+        GD.Print($"DriftNode {HostName} is being destroyed");
     }
     public override int AttempCrackNode(Dictionary<string, string> ans, double endEpoch) {
         if (Sector.LockedDown) { 

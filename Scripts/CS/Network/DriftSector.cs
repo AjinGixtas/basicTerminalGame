@@ -26,6 +26,9 @@ public class DriftSector : Sector {
 		}
 		MarkIntializationCompleted();
 	}
+	~DriftSector() {
+        GD.Print($"DriftSector {Name} is being destroyed");
+    }
 	
 	int AddSurfaceNode(DriftNode node) { if (_isIntialized) return 1; SurfaceNodes.Add(node); return 0; }
 	public int MarkIntializationCompleted() { _isIntialized = true; return 0; }

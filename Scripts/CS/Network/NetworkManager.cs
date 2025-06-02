@@ -1,4 +1,5 @@
 using Godot;
+using System;
 using System.Collections.Generic;
 
 public static partial class NetworkManager {
@@ -7,9 +8,9 @@ public static partial class NetworkManager {
     static List<Sector> connectedSectors;
     static List<DriftSector> driftSectors;
     static List<StaticSector> staticSectors;
-    static Dictionary<string, NetworkNode> DNS;
+    static Dictionary<string, WeakReference<NetworkNode>> DNS;
     static List<HackFarm> BotNet = [];
-    const int DRIFT_SECTOR_COUNT = 128;
+    const int DRIFT_SECTOR_COUNT = 2;
 
     public static void Ready() {
         DNS = []; driftSectors = []; connectedSectors = []; staticSectors = [];
@@ -33,10 +34,27 @@ public static partial class NetworkManager {
             if (sector != null) names.Add(sector.Name);
         return [.. names];
     }
+    public static string[] GetBotnetNames() {
+        List<string> names = [];
+        GD.Print(BotNet.Count);
+        foreach(HackFarm hackFarm in BotNet) {
+            if (hackFarm != null) names.Add(hackFarm.HostName);
+        }
+        return [.. names];
+    }
 
+    public static HackFarm GetHackfarm(string name) {
+        foreach (HackFarm farm in BotNet) {
+            if (farm != null && farm.HostName == name) { return farm; }
+        } return null;
+    }
     public static void RegenerateDriftSector() {
-        connectedSectors.RemoveAll(item => item is DriftSector);
-        driftSectors = [];
+        while(connectedSectors.Count > 0) {
+            DisconnectFromSector(connectedSectors[0]);
+        }
+        while(driftSectors.Count > 0) {
+            RemoveSector(driftSectors[0]);
+        }
         for (int i = 0; i < DRIFT_SECTOR_COUNT; ++i) {
             driftSectors.Add(new DriftSector());
         }
@@ -165,10 +183,25 @@ public static partial class NetworkManager {
         }
     }
 
-    public static void AddHackFarm(HackFarm hackFarm) {
-        BotNet.Add(hackFarm);
+    readonly static Queue<HackFarm> AddQueue = [];
+    public static void QueueAddHackFarm(HackFarm hackFarm) {
+        AddQueue.Enqueue(hackFarm);
+    }
+    readonly static Queue<HackFarm> RemovalQueue = [];
+    public static void QueueRemoveHackFarm(HackFarm hackFarm) {
+        RemovalQueue.Enqueue(hackFarm);
     }
     public static void CollectHackFarmMinerals(double delta) {
+        while (AddQueue.Count > 0) {
+            HackFarm farm = AddQueue.Dequeue();
+            if (farm == null || BotNet.Contains(farm)) continue;
+            BotNet.Add(farm);
+        }
+        while (RemovalQueue.Count > 0) {
+            HackFarm farm = RemovalQueue.Dequeue();
+            if (farm == null || BotNet.Contains(farm)) continue;
+            BotNet.Remove(farm);
+        }
         foreach (HackFarm h in BotNet) {
             double[] minerals = h.ProcessMinerals(delta);
             for (int i = 0; i < minerals.Length; ++i) {
@@ -177,11 +210,15 @@ public static partial class NetworkManager {
         }
     }
     public static NetworkNode QueryDNS(string IP) {
-        return DNS.TryGetValue(IP, out var node) ? node : null;
+        DNS.TryGetValue(IP, out var nodeRef);
+        if (nodeRef != null && nodeRef.TryGetTarget(out NetworkNode node)) {
+            return node;
+        }
+        return null;
     }
     public static int AssignDNS(NetworkNode node) {
         if (string.IsNullOrEmpty(node.IP)) return 1;
-        DNS[node.IP] = node; return 0;
+        DNS[node.IP] = new WeakReference<NetworkNode>(node); return 0;
     }
     public static string GetRandomIP() {
         static string Generate() => $"{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}.{GD.RandRange(0, 255)}";

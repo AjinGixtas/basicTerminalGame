@@ -51,7 +51,7 @@ public static partial class TerminalProcessor {
 			NetworkNode nodeDNS = NetworkManager.QueryDNS(positionalArgs[0]);
 			if (nodeDNS != null) {
 				if (!nodeDNS.OwnedByPlayer) {
-					Say("-r", "Node not owned by you. Cannot connect to it."); return;
+					Say("-r", "Node not owned by you. Cannot connect to it directly."); return;
 				}
 				CurrNode = NetworkManager.QueryDNS(positionalArgs[0]); return;
 			} else { Say("-r", $"IP not found: {Util.Format(positionalArgs[0], StrType.HOSTNAME)}"); return;  }
@@ -149,7 +149,7 @@ public static partial class TerminalProcessor {
 			int status = NetworkManager.DisconnectFromSector(positionalArgs[i]);
 			string msg = status switch {
 				0 => $"Disconnected from sector: {Util.Format(positionalArgs[i], StrType.SECTOR)}",
-				1 => $"Failed to disconnect from sector: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Sector not found.",
+				1 or 3 => $"Failed to disconnect from sector: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Sector not found.",
 				2 => $"Failed to disconnect from sector: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Not connected.",
 				_ => $"Unknown error code: {status}. Failed to disconnect from sector: {Util.Format(positionalArgs[i], StrType.SECTOR)}",
 			};

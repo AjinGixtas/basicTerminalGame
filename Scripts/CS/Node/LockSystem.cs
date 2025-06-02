@@ -11,10 +11,10 @@ public class LockSystem {
 				activeLocks.Add(lockPool[i]);
 				lockPool.RemoveAt(i);
 			}
-            activeLocks = Util.Shuffle<Lock>(activeLocks);
+			activeLocks = Util.Shuffle<Lock>(activeLocks);
         }
     }
-	public int LockIntialization(int secLvl) {
+    public int LockIntialization(int secLvl) {
 		int usedLvl = 0;
 		for (int i = activeLocks.Count; i < lockPool.Count; i++) {
 			if (usedLvl + lockPool[i].Cost <= secLvl && lockPool[i].MinLvl <= secLvl) {
@@ -23,8 +23,9 @@ public class LockSystem {
 			}
 		}
 		activeLocks = Util.Shuffle<Lock>(activeLocks);
+		for (int i = 0; i < activeLocks.Count; ++i) { activeLocks[i].Intialize(); }
 		lockPool.Clear();
-		return 0;
+        return 0;
 	}
 	double endEpoch = -1;
 	// 0 - Success; 1 - Missing flag; 2 - Missing key; 3 - Incorrect key; 4 - Timeout

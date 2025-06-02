@@ -250,7 +250,7 @@ public static partial class Util {
         return art;
     }
     public static string EscapeBBCode(string code) { return code.Replace("[", "[lb]"); }
-    static readonly MineralProfile[] MINERAL_PROFILES =
+    public static readonly MineralProfile[] MINERAL_PROFILES =
     [.. Enumerable.Range(0, 10).Select(i =>
             ResourceLoader.Load<MineralProfile>(
                 $"res://Utilities/Resources/MineralTypes/MineralResources/MineralT{i}.tres"

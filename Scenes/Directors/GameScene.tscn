@@ -10,7 +10,9 @@
 [sub_resource type="Environment" id="Environment_y4jh7"]
 background_mode = 3
 glow_enabled = true
+glow_intensity = 8.0
 glow_hdr_scale = 0.0
+glow_hdr_luminance_cap = 0.05
 
 [node name="RuntimeDirector" type="Control" node_paths=PackedStringArray("terminal", "textEditor", "overlayWindow")]
 layout_mode = 3

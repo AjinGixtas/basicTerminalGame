@@ -1,8 +1,9 @@
 using Godot;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 public static partial class Util {
-    public static bool haveFinalWord = true; // Used to prevent final word in the terminal
+    public const bool HaveFinalWord = false; // Used to prevent final word in the terminal
     public static T[] Shuffle<T>(T[] array) {
         for (int i = 0; i < array.Length; i++) {
             int j = GD.RandRange(0, array.Length - 1); 
@@ -182,26 +183,28 @@ public static partial class Util {
                         return $"[color={Util.CC(Cc.y)}]{input}[/color][color={Util.CC(Cc.y)}]GC[/color]";
                     int index = int.Parse(addons[0]);
                     MineralProfile profile = MINERAL_PROFILES[index];
-                    string[] units    = [ "S",  "Q",  "T",  "B",  "M",  "K"];
-                    double[] divisors = [1e21, 1e15, 1e12,  1e9,  1e6,  1e3];
-                    Cc[] unitColors   = [Cc.R, Cc.Y, Cc.M, Cc.G, Cc.B, Cc.C];
-                    Cc[] mineralColor = [Cc.LG, Cc.C, Cc.bR, Cc.gR, Cc.RGB, Cc.LB, Cc.r, Cc.LC, Cc.M, Cc.Y];
+                    string[] units = ["S", "Q", "T", "B", "M", "K"];
+                    double[] divisors = [1e21, 1e15, 1e12, 1e9, 1e6, 1e3];
+                    Cc[] unitColors = [Cc.R, Cc.Y, Cc.M, Cc.G, Cc.B, Cc.C];
+                    string mineralColor = "";
+                    if (addons.Length == 0) {
+                        mineralColor = Util.CC(profile.ColorCode);
+                    } else { mineralColor = Util.CC(Enum.Parse<Cc>(addons[0])); }
                     for (int i = 0; i < units.Length; i++) {
                         if (value >= divisors[i]) {
                             double unitValue = value / divisors[i];
                             string formatted = unitValue.ToString("0.0");
-                            return $"[color={Util.CC(Cc.rgb)}]{formatted}[/color][color={Util.CC(unitColors[i])}]{units[i]}[/color][color={Util.CC(mineralColor[index])}]{profile.Name}[/color]";
+                            return $"[color={Util.CC(Cc.rgb)}]{formatted}[/color][color={Util.CC(unitColors[i])}]{units[i]}[/color][color={mineralColor}]{profile.Name}[/color]";
                         }
                     }
                     // If less than 1K, just show the number with GC
                     string formattedValue = Mathf.Floor(value).ToString("0.##");
-                    return $"[color={Util.CC(Cc.rgb)}]{formattedValue}[/color][color={Util.CC(mineralColor[index])}]{profile.Name}[/color]";
+                    return $"[color={Util.CC(Cc.rgb)}]{formattedValue}[/color][color={mineralColor}]{profile.Name}[/color]";
                 }
             case StrType.USERNAME:
                 return $"[color={Util.CC(Cc.M)}]{input}[/color]";
             case StrType.WARNING:
-                GD.PrintErr("Not implemented!");
-                return "";
+                return $"[color={Cc.Y}]WARNING: {input}[/color]";
             case StrType.PART_SUCCESS:
                 return $"[color={Util.CC(Cc.C)}]{input}[/color]";
             case StrType.FULL_SUCCESS:

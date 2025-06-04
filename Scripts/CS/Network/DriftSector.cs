@@ -6,14 +6,14 @@ public class DriftSector : Sector {
 	static readonly string[] DRIFT_SECTOR_NAMES = StringExtensions.Split(FileAccess.Open("res://Utilities/TextFiles/ServerNames/DriftSector.txt", FileAccess.ModeFlags.Read).GetAsText(), "\n", false);
 
 	bool _lockedDown = false;
-    public bool LockedDown { 
+	public bool LockedDown { 
 		get => _lockedDown; 
 		set { 
 			if (_lockedDown) return; // Prevents re-locking
-            _lockedDown = value; 
+			_lockedDown = value; 
 		} 
 	}
-    public DriftSector() {
+	public DriftSector() {
 		Name = GenSectorName();
 		int type = GD.RandRange(0, 3);
 		int secLvl = GD.RandRange(1, 10);
@@ -27,9 +27,9 @@ public class DriftSector : Sector {
 		MarkIntializationCompleted();
 	}
 	~DriftSector() {
-        if (Util.haveFinalWord)
-            GD.Print($"DriftSector {Name} is being destroyed");
-    }
+		if (Util.HaveFinalWord)
+			GD.Print($"DriftSector {Name} is being destroyed");
+	}
 	
 	int AddSurfaceNode(DriftNode node) { if (_isIntialized) return 1; SurfaceNodes.Add(node); return 0; }
 	public int MarkIntializationCompleted() { _isIntialized = true; return 0; }

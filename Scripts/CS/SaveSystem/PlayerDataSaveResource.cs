@@ -1,4 +1,5 @@
 using Godot;
+
 public partial class PlayerDataSaveResource : Resource {
     [Export] public string username = "UN1NTIALiZED_USER";
     [Export] public double GC_cur = 0;

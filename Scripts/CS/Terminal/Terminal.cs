@@ -16,7 +16,7 @@ public partial class Terminal : MarginContainer {
 	public override void _Process(double delta) {
 		base._Process(delta);
 		TerminalProcessor.Process(delta);
-		NetworkManager.CollectHackFarmMinerals(delta);
+		NetworkManager.Process(delta);
 	}
 	public void OnCommandFieldTextChanged() { TerminalProcessor.OnCommandFieldTextChanged(); }
 	public void OnCrackDurationTimerTimeout() { TerminalProcessor.OnCrackDurationTimerTimeout(); }

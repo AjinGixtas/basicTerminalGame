@@ -18,12 +18,10 @@ public static partial class TerminalProcessor {
         if (string.IsNullOrEmpty(minerName)) { Say("-r", "No miner name provided."); return; }
         HackFarm hackfarm = NetworkManager.GetHackfarm(minerName);
         if (hackfarm == null) { Say("-r", "No miner with such name."); return; }
-        GD.Print(Util.MINERAL_PROFILES.Length);
-        GD.Print(hackfarm.mineralDistribution.Select(x=>x.Item1));
         Say(
 $@"Botnet: {Util.Format(minerName, StrType.HOSTNAME)}
 {GenerateStringByProportions([.. hackfarm.mineralDistribution.Select(x => x.Item2)], [.. hackfarm.mineralDistribution.Select(x => Util.MINERAL_PROFILES[x.Item1].ColorCode)], 50)}
-{string.Join(" | ", hackfarm.mineralDistribution.Select(x => $"{Util.Format(Util.MINERAL_PROFILES[x.Item1].Name, StrType.MINERAL)}: {Util.Format($"{x.Item2 * 100.0:0.00}", StrType.NUMBER)}%"))}
+{string.Join(" | ", hackfarm.mineralDistribution.Select(x => $"[color={Util.MINERAL_PROFILES[x.Item1].ColorCode}]{Util.MINERAL_PROFILES[x.Item1].Name}[/color]: {Util.Format($"{x.Item2 * 100.0:0.00}", StrType.NUMBER)}%"))}
 ================================================================
 Load capacity  | Lvl.{Util.Format($"{hackfarm.HackLVL}", StrType.NUMBER):3} | {Util.Format($"{hackfarm.HackVal}", StrType.NUMBER):3}
 Mining speed   | Lvl.{Util.Format($"{hackfarm.GrowLVL}", StrType.NUMBER):3} | {Util.Format($"{hackfarm.GrowVal}", StrType.NUMBER):3}
@@ -76,9 +74,10 @@ Aprox lifetime: {TimeDifferenceFriendly(hackfarm.LifeTime)}");
             return sb.ToString();
         }
         static string TimeDifferenceFriendly(double time) {
-            int hours = (int)(time / 3600);
-            if (hours < 1) return $"Less than {Util.Format("1", StrType.UNIT, "hr")}";
-            return $"Aprox.{Util.Format($"{hours}", StrType.UNIT, "hr")} remaining";
+            return $"{time}s";
+            int min = (int)(time / 60);
+            if (min < 1) return $"Less than {Util.Format("1", StrType.UNIT, "min")}";
+            return $"Aprox.{Util.Format($"{min}", StrType.UNIT, "min")} remaining";
         }
     }
     const double FLARE_TIME = 120.0;
@@ -130,5 +129,32 @@ Aprox lifetime: {TimeDifferenceFriendly(hackfarm.LifeTime)}");
             if (targetNode.GetType() == typeof(DriftNode)) NetworkManager.QueueAddHackFarm((targetNode as DriftNode).HackFarm);
         }
         return 0;
+    }
+    static void Analyze(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+        if (positionalArgs.Length == 0) { positionalArgs = [CurrNode.HostName]; }
+        if (CurrNode.ChildNode.FindLast(s => s.HostName == positionalArgs[0]) == null
+            && (CurrNode.ParentNode != null && CurrNode.ParentNode.HostName != positionalArgs[0])
+            && CurrNode.HostName != positionalArgs[0]) {
+            Say("-r", $"Host not found: {positionalArgs[0]}");
+            return;
+        }
+        NetworkNode analyzeNode = null;
+        if (CurrNode.ChildNode.FindLast(s => s.HostName == positionalArgs[0]) != null) analyzeNode = CurrNode.ChildNode.FindLast(s => s.HostName == positionalArgs[0]);
+        else if (CurrNode.ParentNode != null && CurrNode.ParentNode.HostName == positionalArgs[0]) analyzeNode = CurrNode.ParentNode;
+        else if (CurrNode.HostName == positionalArgs[0]) analyzeNode = CurrNode;
+        const int padLength = -40;
+        Say("-tl", $@"
+{Util.Format("▶ Node Info", StrType.HEADER)}
+{Util.Format("Host name:", StrType.DECOR),padLength}{Util.Format(analyzeNode.HostName, StrType.HOSTNAME)}
+{Util.Format("IP address:", StrType.DECOR),padLength}{Util.Format(analyzeNode.IP, StrType.IP)}
+{Util.Format("Display name:", StrType.DECOR),padLength}{Util.Format(analyzeNode.DisplayName, StrType.DISPLAY_NAME)}
+{Util.Format("▶ Classification", StrType.HEADER)}
+{Util.Format("Firewall rating:", StrType.DECOR),padLength}{Util.Format($"{analyzeNode.DefLvl}", StrType.DEF_LVL)}
+{Util.Format("Security level:", StrType.DECOR),padLength}{Util.Format($"{analyzeNode.SecType}", StrType.SEC_TYPE)}
+");
+        if (!analyzeNode.OwnedByPlayer) {
+            Say($"Crack this node security system to get further access.");
+            return;
+        }
     }
 }

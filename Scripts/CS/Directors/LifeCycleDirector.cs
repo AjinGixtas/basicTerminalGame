@@ -49,9 +49,12 @@ public partial class LifeCycleDirector : Node
 		TerminalProcessor.Say($"Quick saving to {newSavePath}");
 		TerminalProcessor.Say(PlayerDataManager.GetSaveStatusMsg(
 			PlayerDataManager.SavePlayerData(StringExtensions.PathJoin(newSavePath, "PlayerData.tres"))));
-		TerminalProcessor.Say(PlayerDataManager.GetSaveStatusMsg(
+		TerminalProcessor.Say(PlayerFileManager.GetSaveStatusMsg(
 			PlayerFileManager.SaveFileSysData(StringExtensions.PathJoin(newSavePath, "FileSys"))));
-		TerminalProcessor.Say($"If there are any error related to save file, feel free to email {Util.Format("ajingixtascontact", StrType.USERNAME)}@{Util.Format("gmail.com", StrType.HOSTNAME)}");
+		TerminalProcessor.Say(NetworkManager.GetSaveStatusMsg(
+            NetworkManager.SaveNetworkData(StringExtensions.PathJoin(newSavePath, "NetworkData"))));
+
+        TerminalProcessor.Say($"If there are any error related to save file, feel free to email {Util.Format("ajingixtascontact", StrType.USERNAME)}@{Util.Format("gmail.com", StrType.HOSTNAME)}");
 	}
 
 	static void QuickLoad(LifeCycleDirector lifeCycleDirector) {
@@ -75,14 +78,16 @@ public partial class LifeCycleDirector : Node
 		int[] statusCodes = [
 			PlayerDataManager.LoadPlayerData(StringExtensions.PathJoin($"{SaveRoot}/{latestFolder}", "PlayerData.tres")),
 			PlayerFileManager.LoadFileSysData(StringExtensions.PathJoin($"{SaveRoot}/{latestFolder}", "FileSys")),
-		];
+            NetworkManager.LoadNetworkData(StringExtensions.PathJoin($"{SaveRoot}/{latestFolder}", "NetworkData"))
+        ];
 		// Wipe the slate clean
 		lifeCycleDirector.RemakeScene();
 
 		TerminalProcessor.Say("Quick loading save...");
 		TerminalProcessor.Say(PlayerDataManager.GetLoadStatusMsg(statusCodes[0]));
 		TerminalProcessor.Say(PlayerFileManager.GetLoadStatusMsg(statusCodes[1]));
-		TerminalProcessor.Say($"If there are any error related to save file, feel free to email {Util.Format("ajingixtascontact", StrType.USERNAME)}@{Util.Format("gmail.com", StrType.HOSTNAME)}");
+        TerminalProcessor.Say(NetworkManager.GetLoadStatusMsg(statusCodes[2]));
+        TerminalProcessor.Say($"If there are any error related to save file, feel free to email {Util.Format("ajingixtascontact", StrType.USERNAME)}@{Util.Format("gmail.com", StrType.HOSTNAME)}");
 	}
 	void RemakeScene() {
 		if (runtimeDirector != null) RemoveChild(runtimeDirector);

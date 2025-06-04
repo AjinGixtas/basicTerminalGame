@@ -50,16 +50,10 @@ public static partial class TerminalProcessor {
 		if (IsIPv4(positionalArgs[0])) { // Check if the input is a valid IPv4 address
 			NetworkNode nodeDNS = NetworkManager.QueryDNS(positionalArgs[0]);
 			if (nodeDNS != null) {
-				if (!nodeDNS.OwnedByPlayer) {
-					Say("-r", "Node not owned by you. Cannot connect to it directly."); return;
-				}
 				CurrNode = NetworkManager.QueryDNS(positionalArgs[0]); return;
 			} else { Say("-r", $"IP not found: {Util.Format(positionalArgs[0], StrType.HOSTNAME)}"); return;  }
 		}
 		
-		if (!CurrNode.OwnedByPlayer) {
-			Say("-r", $"{Util.Format(CurrNode.HostName, StrType.HOSTNAME)} node is not owned by you. Cannot hop beyond it."); return;
-		}
 		NetworkNode parentNode = CurrNode.ParentNode;
 		if (parentNode != null && parentNode.HostName == positionalArgs[0]) {
 
@@ -72,37 +66,6 @@ public static partial class TerminalProcessor {
 		CurrNode = node;
 		static bool IsIPv4(string ip) {
 			return IPAddress.TryParse(ip, out IPAddress address) && address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork;
-		}
-	}
-	static void Analyze(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
-		if (positionalArgs.Length == 0) { positionalArgs = [CurrNode.HostName]; }
-		if (CurrNode.ChildNode.FindLast(s => s.HostName == positionalArgs[0]) == null
-			&& (CurrNode.ParentNode != null && CurrNode.ParentNode.HostName != positionalArgs[0])
-			&& CurrNode.HostName != positionalArgs[0]) {
-			Say("-r", $"Host not found: {positionalArgs[0]}");
-			return;
-		}
-		NetworkNode analyzeNode = null;
-		if (CurrNode.ChildNode.FindLast(s => s.HostName == positionalArgs[0]) != null) analyzeNode = CurrNode.ChildNode.FindLast(s => s.HostName == positionalArgs[0]);
-		else if (CurrNode.ParentNode != null && CurrNode.ParentNode.HostName == positionalArgs[0]) analyzeNode = CurrNode.ParentNode;
-		else if (CurrNode.HostName == positionalArgs[0]) analyzeNode = CurrNode;
-		const int padLength = -40;
-		Say("-tl", $@"
-{Util.Format("▶ Node Info", StrType.HEADER)}
-{Util.Format("Host name:", StrType.DECOR),padLength}{Util.Format(analyzeNode.HostName, StrType.HOSTNAME)}
-{Util.Format("IP address:", StrType.DECOR),padLength}{Util.Format(analyzeNode.IP, StrType.IP)}
-{Util.Format("Display name:", StrType.DECOR),padLength}{Util.Format(analyzeNode.DisplayName, StrType.DISPLAY_NAME)}
-{Util.Format("▶ Classification", StrType.HEADER)}
-{Util.Format("Firewall rating:", StrType.DECOR),padLength}{Util.Format($"{analyzeNode.DefLvl}", StrType.DEF_LVL)}
-{Util.Format("Security level:", StrType.DECOR),padLength}{Util.Format($"{analyzeNode.SecType}", StrType.SEC_TYPE)}
-");
-		if (analyzeNode is DriftNode) {
-			Say("This node is part of a temporal sector. There is nothing useful long term.");
-			return;
-		}
-		if (!analyzeNode.OwnedByPlayer) {
-			Say($"Crack this node security system to get further access.");
-			return;
 		}
 	}
 	static void Sector(Dictionary<string, string> parsedArgs, string[] positionalArgs) {

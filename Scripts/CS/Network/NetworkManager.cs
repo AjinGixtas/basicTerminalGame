@@ -11,14 +11,25 @@ public static partial class NetworkManager {
     static List<StaticSector> staticSectors;
     static Dictionary<string, WeakReference<NetworkNode>> DNS;
     static List<HackFarm> BotNet = [];
-    const int DRIFT_SECTOR_COUNT = 2;
+    const int DRIFT_SECTOR_COUNT = 128;
 
     public static void Ready() {
-        DNS = []; driftSectors = []; connectedSectors = []; staticSectors = [];
+        DNS = []; driftSectors = []; connectedSectors = []; staticSectors = []; BotNet = [];
         PlayerNode = new PlayerNode(GD.Load<NodeData>("res://Utilities/Resources/ScriptedNetworkNodes/PlayerNode.tres"));
 
         AssignDNS(PlayerNode);
         RegenerateDriftSector();
+    }
+    const double CYCLE_TIME = 60*15; // 15min in seconds
+    static double TimeRemains = CYCLE_TIME;
+    public static void Process(double delta) {
+        ManageHackFarm(delta);
+        MineralCollection(delta);
+        TimeRemains -= delta;
+        if (TimeRemains <= 0) {
+            TimeRemains += CYCLE_TIME;
+            RegenerateDriftSector((int)(DRIFT_SECTOR_COUNT * .33));
+        }
     }
 
     public static string[] GetSectorNames() {
@@ -49,17 +60,25 @@ public static partial class NetworkManager {
             if (farm != null && farm.HostName == name) { return farm; }
         } return null;
     }
-    public static void RegenerateDriftSector() {
-        if (connectedSectors.Count > 1) (connectedSectors[0], connectedSectors[1]) = (connectedSectors[1], connectedSectors[0]); // Swap the first two sectors
-        while (connectedSectors.Count > 0) {
+    public static void RegenerateDriftSector(int removalAmount=-1) {
+        if (removalAmount < 0) removalAmount = driftSectors.Count; // Default to all of the current sectors
+        removalAmount = Mathf.Clamp(removalAmount, 0, driftSectors.Count);
+        if (removalAmount == 0) {
+            while (driftSectors.Count < DRIFT_SECTOR_COUNT) { // Fill up to DRIFT_SECTOR_COUNT
+                DriftSector newSector = new DriftSector();
+                if (newSector == null) continue; // Skip if sector creation failed
+                driftSectors.Add(newSector);
+            }
+            return; // Nothing to remove
+        }
+        driftSectors = Util.Shuffle<DriftSector>(driftSectors);
+        int removedAmount = 0;
+        while (removedAmount < removalAmount) {
             DisconnectFromSector(connectedSectors[0]);
-        }
-        while(driftSectors.Count > 0) {
             RemoveSector(driftSectors[0]);
+            removedAmount++;
         }
-        for (int i = 0; i < DRIFT_SECTOR_COUNT; ++i) {
-            driftSectors.Add(new DriftSector());
-        }
+
         GC.Collect();                    // Try to collect unreachable objects
         GC.WaitForPendingFinalizers();   // Wait for destructors (~finalizers)
         GC.Collect();                    // Re-collect objects that were just finalized
@@ -197,7 +216,7 @@ public static partial class NetworkManager {
     public static void QueueRemoveHackFarm(HackFarm hackFarm) {
         RemovalQueue.Enqueue(hackFarm);
     }
-    public static void CollectHackFarmMinerals(double delta) {
+    static void ManageHackFarm(double delta) {
         while (AddQueue.Count > 0) {
             HackFarm farm = AddQueue.Dequeue();
             if (farm == null || BotNet.Contains(farm)) continue;
@@ -205,23 +224,26 @@ public static partial class NetworkManager {
         }
         while (RemovalQueue.Count > 0) {
             HackFarm farm = RemovalQueue.Dequeue();
-            if (farm == null || BotNet.Contains(farm)) continue;
+            if (farm == null || !BotNet.Contains(farm)) continue;
             BotNet.Remove(farm);
         }
+    }
+    static void MineralCollection(double delta) {
         foreach (HackFarm h in BotNet) {
+            if (h.LifeTime <= 0) { QueueRemoveHackFarm(h); continue; }
             double[] minerals = h.ProcessMinerals(delta);
             for (int i = 0; i < minerals.Length; ++i) {
                 PlayerDataManager.DepositMineral(i, minerals[i]);
             }
         }
-        if (PlayerDataManager.MineInv.All(x => x != 0.0))
-        GD.Print(PlayerDataManager.MineInv.Join(", "));
     }
+
     public static NetworkNode QueryDNS(string IP) {
         DNS.TryGetValue(IP, out var nodeRef);
         if (nodeRef != null && nodeRef.TryGetTarget(out NetworkNode node)) {
             return node;
         }
+        DNS.Remove(IP); // Remove stale entry
         return null;
     }
     public static int AssignDNS(NetworkNode node) {
@@ -235,5 +257,54 @@ public static partial class NetworkManager {
         do ip = Generate();
         while (DNS.ContainsKey(ip));
         return ip;
+    }
+    
+    public static string GetSaveStatusMsg(int statusCode) {
+        string[] SAVE_STATUS_MSG = [
+            Util.Format("Saved botnet data successfully", StrType.FULL_SUCCESS),
+            Util.Format("No botnet to save", StrType.WARNING),
+        ];
+        return (statusCode < SAVE_STATUS_MSG.Length) ? SAVE_STATUS_MSG[statusCode]
+            : Util.Format($"{statusCode}", StrType.UNKNOWN_ERROR, "saving player data");
+    }
+    public static int SaveNetworkData(string filePath) {
+        filePath = ProjectSettings.GlobalizePath(filePath);
+        if (!DirAccess.DirExistsAbsolute(filePath)) DirAccess.MakeDirAbsolute(filePath);
+        if (BotNet.Count == 0) return 1; // No bots to serialize
+        HackFarmDataSaveResource[] botData = new HackFarmDataSaveResource[BotNet.Count];
+        for (int i = 0; i < BotNet.Count; ++i) {
+            if (BotNet[i] == null) continue;
+            botData[i] = HackFarm.SerializeBotnet(BotNet[i]); ;
+            Error error = ResourceSaver.Save(botData[i], StringExtensions.PathJoin(filePath, $"{botData[i].HostName}.tres"));
+            if (error != Error.Ok) return (int)error; // Failed to save a botnet data file
+        }
+        return 0; // Successfully saved all botnet data
+    }
+
+    public static string GetLoadStatusMsg(int statusCode) {
+        string[] LOAD_STATUS_MSG = [
+            Util.Format("Loaded botnet data successfully", StrType.FULL_SUCCESS),
+            Util.Format("No botnet data to load", StrType.WARNING),
+            Util.Format("Failed to open directory with botnet data", StrType.ERROR),
+            Util.Format("Failed to load a botnet data file", StrType.ERROR),
+        ];
+        return (statusCode < LOAD_STATUS_MSG.Length) ? LOAD_STATUS_MSG[statusCode]
+            : Util.Format($"{statusCode}", StrType.UNKNOWN_ERROR, "loading player data");
+    }
+    public static int LoadNetworkData(string filePath) {
+        filePath = ProjectSettings.GlobalizePath(filePath);
+        if (!DirAccess.DirExistsAbsolute(filePath)) return 1; // No botnet data to load
+        DirAccess dir = DirAccess.Open(filePath);
+        if (dir == null) return 2; // Failed to open directory
+        string[] files = dir.GetFiles();
+        foreach (string file in files) {
+            if (!file.EndsWith(".tres")) continue; // Only load .tres files
+            GD.Print(StringExtensions.PathJoin(filePath, file));
+            HackFarmDataSaveResource data = GD.Load<HackFarmDataSaveResource>(StringExtensions.PathJoin(filePath, file));
+            if (data == null) continue; // Failed to load data
+            HackFarm farm = new(data);
+            QueueAddHackFarm(farm);
+        }
+        return 0; // Successfully loaded all botnet data
     }
 }

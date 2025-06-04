@@ -13,8 +13,8 @@ public static partial class TerminalProcessor {
             return;
         }
 
-        string minerName = "";
-        parsedArgs.TryGetValue("-h", out minerName); parsedArgs.TryGetValue("--host", out minerName);
+        parsedArgs.TryGetValue("-h", out string minerName);
+        if (string.IsNullOrEmpty(minerName)) parsedArgs.TryGetValue("--host", out minerName);
         if (string.IsNullOrEmpty(minerName)) { Say("-r", "No miner name provided."); return; }
         HackFarm hackfarm = NetworkManager.GetHackfarm(minerName);
         if (hackfarm == null) { Say("-r", "No miner with such name."); return; }
@@ -74,7 +74,6 @@ Aprox lifetime: {TimeDifferenceFriendly(hackfarm.LifeTime)}");
             return sb.ToString();
         }
         static string TimeDifferenceFriendly(double time) {
-            return $"{time}s";
             int min = (int)(time / 60);
             if (min < 1) return $"Less than {Util.Format("1", StrType.UNIT, "min")}";
             return $"Aprox.{Util.Format($"{min}", StrType.UNIT, "min")} remaining";

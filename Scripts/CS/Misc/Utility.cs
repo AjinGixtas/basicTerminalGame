@@ -84,7 +84,7 @@ public static partial class Util {
                     string integerPart = parts[0];
                     string decimalPart = parts[1].PadLeft(2, '0');
                     if (addons.Length > 0 && addons[0][0] != '/') decimalPart = parts[1][..2];
-                    return $"[color={Util.CC(Cc.rgb)}]{integerPart}.{decimalPart}[/color][color={Util.CC(Cc.RGB)}]{addons[0]}[/color]";
+                    return $"{Util.Format($"{integerPart}.{decimalPart}", StrType.NUMBER)}[color={Util.CC(Cc.RGB)}]{addons[0]}[/color]";
                 }
             case StrType.SEC_LVL: {
                     return $"[color={input switch {

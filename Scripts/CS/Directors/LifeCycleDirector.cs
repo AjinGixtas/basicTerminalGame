@@ -27,7 +27,6 @@ public partial class LifeCycleDirector : Node
 	}
 	private const string SaveRoot = "user://Saves";
 	
-	
 	static void QuickSave() {
 		// Ensure the save root directory exists
 		DirAccess.MakeDirAbsolute(ProjectSettings.GlobalizePath(SaveRoot));

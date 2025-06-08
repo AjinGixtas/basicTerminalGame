@@ -85,9 +85,9 @@ public static partial class TerminalProcessor {
     }
     static void SeeColor(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         var colorNames = new (Cc, string)[] {
-        (Cc.___, "Black"),
-        (Cc.rgb, "Dark Gray"),
-        (Cc.RGB, "White"),
+        (Cc._, "Black"),
+        (Cc.w, "Dark Gray"),
+        (Cc.W, "White"),
         (Cc.R, "Bright Red"),
         (Cc.G, "Bright Green"),
         (Cc.B, "Bright Blue"),
@@ -121,5 +121,17 @@ public static partial class TerminalProcessor {
             index++;
         }
         Say(output.TrimEnd('\n'));
+    }
+    static void GenStub(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+        if (positionalArgs.Length == 0) { Say("-r", "No class name provided."); return; }
+        string iFile = positionalArgs[0], oFile = positionalArgs[1];
+        string csCode = FileAccess.Open($"{iFile}", FileAccess.ModeFlags.Read).GetAsText();
+        if (csCode == null) { Say("-r", $"Class {iFile} not found."); return; }
+        var clsData = APIxtractor.ParseClass(csCode);
+        string luaStub = APIxtractor.GenerateLuaStub(clsData);
+        FileAccess f = FileAccess.Open($"{oFile}", FileAccess.ModeFlags.Write);
+        f.StoreString(luaStub);
+        f.Flush();
+        Say($"Generated Lua stub for class {iFile}");
     }
 }

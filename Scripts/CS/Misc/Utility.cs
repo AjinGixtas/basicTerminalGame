@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 public static partial class Util {
     public const bool HaveFinalWord = false; // Used to prevent final word in the terminal
     public static T[] Shuffle<T>(T[] array) {
@@ -22,9 +23,9 @@ public static partial class Util {
     // Cc also stands for Color Code, shortened and have the second 'C' to lowercase for distinguish them apart.
     public static string CC(Cc color) {
         return color switch {
-            Cc.___ => "#000000",   // Black
-            Cc.rgb => "#282828",   // Dark gray
-            Cc.RGB => "#ffffff",   // White
+            Cc._ => "#000000",   // Black
+            Cc.w => "#282828",   // Dark gray
+            Cc.W => "#ffffff",   // White
 
             Cc.R => "#ff0000",     // Bright red
             Cc.G => "#00ff00",     // Bright green
@@ -68,7 +69,7 @@ public static partial class Util {
     public static string Format(string input, StrType type, params string[] addons) {
         switch (type) {
             case StrType.DECOR:
-                return $"[color={Util.CC(Cc.rgb)}]{input}[/color]";
+                return $"[color={Util.CC(Cc.w)}]{input}[/color]";
             case StrType.HOSTNAME:
                 return $"[color={Util.CC(Cc.G)}]{input}[/color]";
             case StrType.DISPLAY_NAME:
@@ -84,7 +85,7 @@ public static partial class Util {
                     string integerPart = parts[0];
                     string decimalPart = parts[1].PadLeft(2, '0');
                     if (addons.Length > 0 && addons[0][0] != '/') decimalPart = parts[1][..2];
-                    return $"{Util.Format($"{integerPart}.{decimalPart}", StrType.NUMBER)}[color={Util.CC(Cc.RGB)}]{addons[0]}[/color]";
+                    return $"{Util.Format($"{integerPart}.{decimalPart}", StrType.NUMBER)}[color={Util.CC(Cc.W)}]{addons[0]}[/color]";
                 }
             case StrType.SEC_LVL: {
                     return $"[color={input switch {
@@ -129,24 +130,23 @@ public static partial class Util {
                     return $"[color={Util.CC(Cc.C)}]{input[..(lastSlash + 1)]}[/color][color={Util.CC(Cc.G)}]{input[(lastSlash + 1)..]}[/color]";
                 }
             case StrType.CMD_FUL: {
-                string output = "";
-                string[] commands = input.Split(';');
-                for (int i = 0; i < commands.Length; i++) {
-                    if (i > 0) { output += ';'; }
-                    if (commands[i].Length == 0) { continue; }
+                    string output = "";
+                    string[] commands = SplitCommands(input);
+                    for (int i = 0; i < commands.Length; ++i) {
+                        string[] tokens = TokenizeCommand(commands[i]);
+                        if (i > 0) output += output += $"[color={Util.CC(Cc.W)}];[/color]";
 
-                    string[] tokens = commands[i].Split(' '); bool firstToken = true;
-                    for (int j = 0; j < tokens.Length; ++j) {
-                        if (j > 0) { output += ' '; }
-                        if (tokens[j].Length == 0) { continue; }
-
-                        if (firstToken) { output += $"{Util.Format(tokens[j], StrType.CMD_CMD)}"; firstToken = false; } 
-                        else if (tokens[j].StartsWith('-')) { output += $"{Util.Format(tokens[j], StrType.CMD_FLAG)}"; } 
-                        else { output += $"{Util.Format(tokens[j], StrType.CMD_ARG)}"; }
+                        output += Util.Format(tokens[0], StrType.CMD_ACT);
+                        if (tokens.Length == 1) continue; // No args, just the command
+                        output += " "; // Add space after command
+                        for (int j = 1; j < tokens.Length; ++j) {
+                            if (tokens[j].StartsWith('-')) output += Util.Format(tokens[j], StrType.CMD_FLAG);
+                            else output += Util.Format(tokens[j], StrType.CMD_ARG);
+                            if (j < tokens.Length - 1) output += " ";
+                        }
                     }
+                    return output;
                 }
-                return output;
-            }
             case StrType.ERROR:
                 return $"[color={Util.CC(Cc.R)}]{input}[/color]";
             case StrType.HEADER:
@@ -162,7 +162,7 @@ public static partial class Util {
                         if (remainder >= divisors[i]) {
                             int unitValue = (int)Mathf.Floor(remainder / divisors[i]);
                             remainder -= unitValue * divisors[i];
-                            sb += $"[color={Util.CC(Cc.rgb)}]{unitValue}[/color][color={Util.CC(colors[i])}]{units[i]}[/color]";
+                            sb += $"[color={Util.CC(Cc.w)}]{unitValue}[/color][color={Util.CC(colors[i])}]{units[i]}[/color]";
                         }
                     }
                     string gcValue;
@@ -175,7 +175,7 @@ public static partial class Util {
                         gcValue = remainder.ToString("N2").Replace(",", "");
                         if (gcValue == "000.00") { gcValue = ""; }
                     }
-                    return sb + $"[color={Util.CC(Cc.rgb)}]{gcValue}[/color][color={Util.CC(Cc.Y)}]GC[/color]";
+                    return sb + $"[color={Util.CC(Cc.w)}]{gcValue}[/color][color={Util.CC(Cc.Y)}]GC[/color]";
                 }
             case StrType.MINERAL: {
                     if (string.IsNullOrWhiteSpace(input)) return "";
@@ -194,17 +194,17 @@ public static partial class Util {
                         if (value >= divisors[i]) {
                             double unitValue = value / divisors[i];
                             string formatted = unitValue.ToString("0.0");
-                            return $"[color={Util.CC(Cc.rgb)}]{formatted}[/color][color={Util.CC(unitColors[i])}]{units[i]}[/color][color={mineralColor}]{profile.Name}[/color]";
+                            return $"[color={Util.CC(Cc.w)}]{formatted}[/color][color={Util.CC(unitColors[i])}]{units[i]}[/color][color={mineralColor}]{profile.Name}[/color]";
                         }
                     }
                     // If less than 1K, just show the number with GC
                     string formattedValue = Mathf.Floor(value).ToString("0.##");
-                    return $"[color={Util.CC(Cc.rgb)}]{formattedValue}[/color][color={mineralColor}]{profile.Name}[/color]";
+                    return $"[color={Util.CC(Cc.w)}]{formattedValue}[/color][color={mineralColor}]{profile.Name}[/color]";
                 }
             case StrType.USERNAME:
                 return $"[color={Util.CC(Cc.M)}]{input}[/color]";
             case StrType.WARNING:
-                return $"[color={Cc.Y}]WARNING: {input}[/color]";
+                return $"[color={Util.CC(Cc.Y)}][WARNING] {input}[/color]";
             case StrType.PART_SUCCESS:
                 return $"[color={Util.CC(Cc.C)}]{input}[/color]";
             case StrType.FULL_SUCCESS:
@@ -212,13 +212,13 @@ public static partial class Util {
             case StrType.CMD_FLAG:
                 return $"[color={Util.CC(Cc.gR)}]{input}[/color]";
             case StrType.CMD_ARG:
-                return $"[color={Util.CC(Cc.rgb)}]{input}[/color]";
-            case StrType.CMD_CMD:
+                return $"[color={Util.CC(Cc.w)}]{input}[/color]";
+            case StrType.CMD_ACT:
                 return $"[color={Util.CC(Cc.C)}]{input}[/color]";
             case StrType.UNKNOWN_ERROR:
                 return Util.Format($"Unknown error encountered{(addons.Length != 0 ? $" with {addons[0]}" : "")}. Error code: {input}", StrType.ERROR);
             case StrType.SECTOR:
-                return $"[color={Util.CC(Cc.RGB)}]{input}[/color]";
+                return $"[color={Util.CC(Cc.W)}]{input}[/color]";
             default:
                 return input;
         }
@@ -261,4 +261,86 @@ public static partial class Util {
                 )
             ).Where(m => m != null)
     ];
+
+    public static string[] SplitCommands(string input) {
+        var commands = new List<string>();
+        var current = new StringBuilder();
+        bool inQuotes = false;
+        char quoteChar = '\0';
+        bool escape = false;
+
+        foreach (char c in input) {
+            if (escape) {
+                current.Append(c);
+                escape = false;
+            } else if (c == '\\') {
+                escape = true;
+            } else if (inQuotes) {
+                if (c == quoteChar) {
+                    inQuotes = false;
+                }
+                current.Append(c);
+            } else {
+                if (c == '"' || c == '\'') {
+                    inQuotes = true;
+                    quoteChar = c;
+                    current.Append(c);
+                } else if (c == ';') {
+                    // semicolon outside quotes means split here
+                    var cmd = current.ToString().Trim();
+                    if (cmd.Length > 0)
+                        commands.Add(cmd);
+                    current.Clear();
+                } else {
+                    current.Append(c);
+                }
+            }
+        }
+
+        var lastCmd = current.ToString().Trim();
+        if (lastCmd.Length > 0)
+            commands.Add(lastCmd);
+
+        return [.. commands];
+    }
+    public static string[] TokenizeCommand(string input) {
+        var args = new List<string>();
+        var current = new StringBuilder();
+        bool inQuotes = false;
+        char quoteChar = '\0';
+        bool escape = false;
+
+        foreach (char c in input) {
+            if (escape) {
+                current.Append(c);
+                escape = false;
+            } else if (c == '\\') {
+                escape = true;
+            } else if (inQuotes) {
+                if (c == quoteChar) {
+                    inQuotes = false;
+                } else {
+                    current.Append(c);
+                }
+            } else {
+                if (char.IsWhiteSpace(c)) {
+                    if (current.Length > 0) {
+                        args.Add(current.ToString());
+                        current.Clear();
+                    }
+                } else if (c == '"' || c == '\'') {
+                    inQuotes = true;
+                    quoteChar = c;
+                } else {
+                    current.Append(c);
+                }
+            }
+        }
+
+        if (current.Length > 0)
+            args.Add(current.ToString());
+
+        return [.. args];
+    }
+
 }

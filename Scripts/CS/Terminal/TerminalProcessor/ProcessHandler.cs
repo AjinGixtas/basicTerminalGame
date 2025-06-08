@@ -1,7 +1,7 @@
 using Godot;
 public static partial class TerminalProcessor {
     static bool _isProcessing = false; static bool IsProcessing { get { return _isProcessing; } set { _isProcessing = value; } }
-    static readonly string[] ProgressChars = [$"[color={Util.CC(Cc.RGB)}]>[/color]", $"[color={Util.CC(Cc.rgb)}]>[/color]"];
+    static readonly string[] ProgressChars = [$"[color={Util.CC(Cc.W)}]>[/color]", $"[color={Util.CC(Cc.w)}]>[/color]"];
     static int tick = 0; static double timeRemain, timeTilNextTick, TimePerTick;
     static string[] queuedCommands = []; static System.Action<string[]> queuedAction = null;
     static void StartProcess(double time) {

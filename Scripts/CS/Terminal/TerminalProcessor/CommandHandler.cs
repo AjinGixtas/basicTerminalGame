@@ -1,7 +1,6 @@
 using Godot;
 using System.Collections.Generic;
 using System.Text;
-using System.Text.RegularExpressions;
 
 public static partial class TerminalProcessor {
     static int SubmitCommand(string newCommand) {
@@ -12,98 +11,18 @@ public static partial class TerminalProcessor {
             while (commandHistory.Count > MAX_HISTORY_CMD_SIZE) { commandHistory.RemoveAt(0); }
             _commandHistoryIndex = commandHistory.Count;
         }
-        string[] commands = SplitCommands(newCommand);
+        string[] commands = Util.SplitCommands(newCommand);
         Say("-n", $"{terminalCommandPrompt.Text.Replace("\r", "").Replace("\n", "")}{Util.Format(Util.EscapeBBCode(newCommand), StrType.CMD_FUL)}");
         queuedAction = ExecuteCommands;
         queuedCommands = commands;
-        StartProcess(Mathf.Clamp(.1 * Mathf.Pow(1.02, newCommand.Length), .1, 1.0));
+        StartProcess(1.5);
         return 0;
         static void ExecuteCommands(string[] commands) {
             for (int i = 0; i < commands.Length; i++) {
-                string[] components = Tokenize(commands[i]);
+                string[] components = Util.TokenizeCommand(commands[i]);
                 if (components.Length == 0) continue;
                 if (!ProcessCommand(components[0], components[1..])) break;
             }
-        }
-        static string[] Tokenize(string input) {
-            var args = new List<string>();
-            var current = new StringBuilder();
-            bool inQuotes = false;
-            char quoteChar = '\0';
-            bool escape = false;
-
-            foreach (char c in input) {
-                if (escape) {
-                    current.Append(c);
-                    escape = false;
-                } else if (c == '\\') {
-                    escape = true;
-                } else if (inQuotes) {
-                    if (c == quoteChar) {
-                        inQuotes = false;
-                    } else {
-                        current.Append(c);
-                    }
-                } else {
-                    if (char.IsWhiteSpace(c)) {
-                        if (current.Length > 0) {
-                            args.Add(current.ToString());
-                            current.Clear();
-                        }
-                    } else if (c == '"' || c == '\'') {
-                        inQuotes = true;
-                        quoteChar = c;
-                    } else {
-                        current.Append(c);
-                    }
-                }
-            }
-
-            if (current.Length > 0)
-                args.Add(current.ToString());
-
-            return [..args];
-        }
-        static string[] SplitCommands(string input) {
-            var commands = new List<string>();
-            var current = new StringBuilder();
-            bool inQuotes = false;
-            char quoteChar = '\0';
-            bool escape = false;
-
-            foreach (char c in input) {
-                if (escape) {
-                    current.Append(c);
-                    escape = false;
-                } else if (c == '\\') {
-                    escape = true;
-                } else if (inQuotes) {
-                    if (c == quoteChar) {
-                        inQuotes = false;
-                    }
-                    current.Append(c);
-                } else {
-                    if (c == '"' || c == '\'') {
-                        inQuotes = true;
-                        quoteChar = c;
-                        current.Append(c);
-                    } else if (c == ';') {
-                        // semicolon outside quotes means split here
-                        var cmd = current.ToString().Trim();
-                        if (cmd.Length > 0)
-                            commands.Add(cmd);
-                        current.Clear();
-                    } else {
-                        current.Append(c);
-                    }
-                }
-            }
-
-            var lastCmd = current.ToString().Trim();
-            if (lastCmd.Length > 0)
-                commands.Add(lastCmd);
-
-            return [..commands];
         }
     }
     static bool ProcessCommand(string command, string[] args) {
@@ -115,6 +34,7 @@ public static partial class TerminalProcessor {
             case "mkf": MkF(parsedArgs, positionalArgs); break; // Make file
             case "rmf": RmF(parsedArgs, positionalArgs); break; // Remove file
             case "pwd": Pwd(parsedArgs, positionalArgs); break; // List current folder path
+            case "run": Run(parsedArgs, positionalArgs); break; // Run a script file
             case "say" or "echo": Say(parsedArgs, positionalArgs); break; // Output to terminal
             case "help": Help(parsedArgs, positionalArgs); break; // List how commands work
             case "home": Home(parsedArgs, positionalArgs); break; // Go to the player's node
@@ -136,6 +56,7 @@ public static partial class TerminalProcessor {
 
             case "regenerate": NetworkManager.RegenerateDriftSector(); break; // Regenerate the drift sector
             case "seecolor": SeeColor(parsedArgs, positionalArgs); break;
+            case "genstub": GenStub(parsedArgs, positionalArgs); break; // Generate a Lua stub for a class
             default: Say("-r", $"{command} is not a valid command."); break;
         }
         return true;

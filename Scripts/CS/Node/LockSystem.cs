@@ -27,8 +27,7 @@ public class LockSystem {
         return 0;
 	}
 	double endEpoch = -1;
-	// 0 - Success; 1 - Missing flag; 2 - Missing key; 3 - Incorrect key; 4 - Timeout
-	public int CrackAttempt(Dictionary<string, string> ans, double endEpoch) {
+	public CError CrackAttempt(Dictionary<string, string> ans, double endEpoch) {
 		if (this.endEpoch != endEpoch) { 
 			this.endEpoch = endEpoch;
 			for (int i = 0; i < activeLocks.Count; ++i) { activeLocks[i].Intialize(); }
@@ -39,20 +38,21 @@ public class LockSystem {
 				if (ans.TryGetValue(flags[j], out string key)) {
 					if (key == "") {
 						TerminalProcessor.Say($"[{Util.Format("N0VALUE", StrType.ERROR)}] {Util.Format("Denied access by", StrType.DECOR)} {Util.Format(activeLocks[i].Name, StrType.CMD_FLAG)}");
-						TerminalProcessor.Say("-r", $"Incorrect key for {Util.Format(flags[j], StrType.CMD_FLAG)}");
-						if (activeLocks[i].Clue.Length > 0) { TerminalProcessor.Say($"[color={Util.CC(Cc.RGB)}]{activeLocks[i].Inp}[/color]"); }
-						return 2;
-					} else if (!activeLocks[i].UnlockAttempt(key, j)) {
+						TerminalProcessor.Say("-r", $"Missing key for {Util.Format(flags[j], StrType.CMD_FLAG)}");
+						if (activeLocks[i].Clue.Length > 0) { TerminalProcessor.Say($"[color={Util.CC(Cc.W)}]{activeLocks[i].Inp}[/color]"); }
+						return CError.MISSING;
+					}
+					if (!activeLocks[i].UnlockAttempt(key, j)) {
 						TerminalProcessor.Say($"[{Util.Format("WRON6KY", StrType.ERROR)}] {Util.Format("Denied access by", StrType.DECOR)} {Util.Format(activeLocks[i].Name, StrType.CMD_FLAG)}");
 						TerminalProcessor.Say("-r", $"Incorrect key for {Util.Format(flags[j], StrType.CMD_FLAG)}");
-						if (activeLocks[i].Clue.Length > 0) { TerminalProcessor.Say($"[color={Util.CC(Cc.RGB)}]{activeLocks[i].Inp}[/color]"); }
-						return 3;
+						if (activeLocks[i].Clue.Length > 0) { TerminalProcessor.Say($"[color={Util.CC(Cc.W)}]{activeLocks[i].Inp}[/color]"); }
+						return CError.INCORRECT;
 					}
 					continue;
 				} else {
 					TerminalProcessor.Say($"[{Util.Format("MI55ING", StrType.ERROR)}] {Util.Format("Denied access by", StrType.DECOR)} {Util.Format(activeLocks[i].Name, StrType.CMD_FLAG)}");
 					TerminalProcessor.Say("-r", $"Missing flag {Util.Format(flags[j], StrType.CMD_FLAG)}");
-					return 1;
+					return CError.MISSING;
 				}
 			}
 			TerminalProcessor.Say($"[{Util.Format("SUCCESS", StrType.PART_SUCCESS)}] {Util.Format("Bypassed", StrType.DECOR)} {Util.Format(activeLocks[i].Name, StrType.CMD_FLAG)}");
@@ -60,6 +60,6 @@ public class LockSystem {
 		lockPool = []; activeLocks = []; // Destroy all security system
 		TerminalProcessor.Say($"{Util.Format("Node defense cracked.", StrType.FULL_SUCCESS)} All security system [color={Util.CC(Cc.gR)}]destroyed[/color].");
 		TerminalProcessor.Say($"Run {Util.Format("analyze", StrType.CMD_FUL)} for all new information.");
-		return 0;
+		return CError.OK;
 	}
 }

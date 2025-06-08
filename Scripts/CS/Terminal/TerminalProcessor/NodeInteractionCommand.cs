@@ -82,53 +82,62 @@ Aprox lifetime: {TimeDifferenceFriendly(hackfarm.LifeTime)}");
     const double FLARE_TIME = 120.0;
     static double startEpoch = 0, endEpoch = 0, remainingTime = 0;
     static List<WeakReference<DriftSector>> sectorAttacked = [];
-    static int Karaxe(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
-        NetworkNode targetNode = CurrNode;
+    static void Karaxe(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         if (parsedArgs.ContainsKey("--axe") && parsedArgs.ContainsKey("--flare")) {
-            Say("-r", "You can not use --axe and --flare at the same time.");
-            return 4;
+            Say("-r", "You can not use --axe and --flare at the same time."); return;
         }
-        
         if (parsedArgs.ContainsKey("--flare")) {
-            if (Time.GetUnixTimeFromSystem() < endEpoch) {
-                Say("Karaxe already in effect.");
-                return 1;
+            int statusCode = BeginFlare();
+            switch (statusCode) {
+                case 0: Say($"{Util.Format("Kraken activated", StrType.FULL_SUCCESS)}. All node [color={Util.CC(Cc.Y)}]lok[/color] system {Util.Format("~=EXP0SED=~", StrType.ERROR)}"); break;
+                case 1: Say("-r", "Karaxe already in effect."); break;
             }
-            startEpoch = Time.GetUnixTimeFromSystem(); remainingTime = FLARE_TIME; endEpoch = startEpoch + remainingTime;
-            crackDurationTimer.Start(FLARE_TIME);
-            Say($"{Util.Format("Kraken activated", StrType.FULL_SUCCESS)}. All node [color={Util.CC(Cc.Y)}]lok[/color] system {Util.Format("~=EXP0SED=~", StrType.ERROR)}");
-            return 2;
+            return;
         }
         if (parsedArgs.ContainsKey("--axe")) {
-            if (Time.GetUnixTimeFromSystem() > endEpoch) {
-                Say("-r", "Karaxe already deactivated.");
-                return 6;
-            }
+            if (Time.GetUnixTimeFromSystem() > endEpoch) { Say("-r", "Karaxe already deactivated."); return; }
             Say($"{Util.Format("Kraken deactivated", StrType.FULL_SUCCESS)}. Flare sequence exited. All [color={Util.CC(Cc.Y)}]lock[/color] closed.");
-            EndFlare();
-            return 5;
+            EndFlare(); return;
         }
         
         if (Time.GetUnixTimeFromSystem() > endEpoch) {
-            Say($"{Util.Format("Kraken inactive", StrType.ERROR)}. Run {Util.Format("karaxe --flare", StrType.CMD_FUL)} to activate.");
-            EndFlare();
-            return 3;
+            Say($"{Util.Format("Kraken inactive", StrType.ERROR)}. Run {Util.Format("karaxe --flare", StrType.CMD_FUL)} to activate."); return;
         }
+        
         if (!parsedArgs.ContainsKey("--attack")) {
-            Say("-r", $"Missing {Util.Format("--attack", StrType.CMD_FLAG)} flag. Use {Util.Format("--attack", StrType.CMD_FLAG)} to attack a node.");
-            return 7;
+            Say("-r", $"Missing {Util.Format("--attack", StrType.CMD_FLAG)} flag. Use {Util.Format("--attack", StrType.CMD_FLAG)} to attack a node."); return;
         }
-        int result = targetNode.AttempCrackNode(parsedArgs, endEpoch);
-        if (targetNode.GetType() == typeof(DriftNode)) {
+        Attack(parsedArgs);
+    }
+    public static void EndFlare() {
+        endEpoch = 0;
+        crackDurationTimer.Stop();
+        foreach (System.WeakReference<DriftSector> sectorRef in sectorAttacked) {
+            if (!sectorRef.TryGetTarget(out DriftSector sector)) continue;
+            NetworkManager.DisconnectFromSector(sector);
+            NetworkManager.RemoveSector(sector);
+        }
+        sectorAttacked.Clear();
+    }
+    public static CError Attack(Dictionary<string, string> flagKeyPairs) {
+        CError result = CurrNode.AttempCrackNode(flagKeyPairs, endEpoch);
+        if (CurrNode.GetType() == typeof(DriftNode)) {
             // No idea why, but hard reference to DriftSector is not working here.
-            sectorAttacked.Add(new WeakReference<DriftSector>((targetNode as DriftNode).Sector));
+            sectorAttacked.Add(new System.WeakReference<DriftSector>((CurrNode as DriftNode).Sector));
         }
-        if (result == 0 && !targetNode.OwnedByPlayer) {
-            targetNode.TransferOwnership();
-            if (targetNode.GetType() == typeof(DriftNode)) NetworkManager.QueueAddHackFarm((targetNode as DriftNode).HackFarm);
+        if (result == CError.OK && !CurrNode.OwnedByPlayer) {
+            CurrNode.TransferOwnership();
+            if (CurrNode.GetType() == typeof(DriftNode)) NetworkManager.QueueAddHackFarm((CurrNode as DriftNode).HackFarm);
         }
+        return result;
+    }
+    public static int BeginFlare() {
+        if (Time.GetUnixTimeFromSystem() < endEpoch) { return 1; }
+        startEpoch = Time.GetUnixTimeFromSystem(); remainingTime = FLARE_TIME; endEpoch = startEpoch + remainingTime;
+        crackDurationTimer.Start(FLARE_TIME);
         return 0;
     }
+    
     static void Analyze(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         if (positionalArgs.Length == 0) { positionalArgs = [CurrNode.HostName]; }
         if (CurrNode.ChildNode.FindLast(s => s.HostName == positionalArgs[0]) == null

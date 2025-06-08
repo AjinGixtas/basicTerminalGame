@@ -28,10 +28,10 @@ public class DriftNode : NetworkNode {
 	~DriftNode() {
 		if (Util.HaveFinalWord) GD.Print($"DriftNode {HostName} is being destroyed");
 	}
-	public override int AttempCrackNode(Dictionary<string, string> ans, double endEpoch) {
+	public override CError AttempCrackNode(Dictionary<string, string> ans, double endEpoch) {
 		if (Sector.LockedDown) { 
 			TerminalProcessor.Say(Util.Format("Sector is locked down, no attack possible.", StrType.ERROR));
-			return 6;
+			return CError.NO_PERMISSION;
 		}
 		return base.AttempCrackNode(ans, endEpoch);
 	}

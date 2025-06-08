@@ -13,8 +13,10 @@ public class DriftSector : Sector {
 			_lockedDown = value; 
 		} 
 	}
+
+	static bool read = false;
 	public DriftSector() {
-		Name = GenSectorName();
+        Name = GenSectorName();
 		int type = GD.RandRange(0, 3);
 		int secLvl = GD.RandRange(1, 10);
 		switch (type) {
@@ -93,7 +95,7 @@ public class DriftSector : Sector {
 	
 	static string GenSectorName() {
 		const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-		string sb = DRIFT_SECTOR_NAMES[GD.RandRange(0, DRIFT_SECTOR_NAMES.Length - 1)] + "_";
+        string sb = DRIFT_SECTOR_NAMES[GD.RandRange(0, DRIFT_SECTOR_NAMES.Length - 1)] + "_";
 		for (int i = 0; i < 4; i++) {
 			sb += chars[GD.RandRange(0, chars.Length - 1)];
 		}

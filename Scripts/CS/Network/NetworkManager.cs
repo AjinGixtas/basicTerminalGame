@@ -61,6 +61,7 @@ public static partial class NetworkManager {
         } return null;
     }
     public static void RegenerateDriftSector(int removalAmount=-1) {
+        driftSectors = driftSectors.Where(s => s != null).ToList(); // Remove null sectors
         if (removalAmount < 0) removalAmount = driftSectors.Count; // Default to all of the current sectors
         removalAmount = Mathf.Clamp(removalAmount, 0, driftSectors.Count);
         if (removalAmount == 0) {
@@ -106,7 +107,7 @@ public static partial class NetworkManager {
         return 0;
     }
 
-    public static int ConnectToSector(string sectorName) {
+    public static CError ConnectToSector(string sectorName) {
         foreach (DriftSector sector in driftSectors) {
             if (sector == null) continue;
             if (sector.Name == sectorName)
@@ -117,9 +118,9 @@ public static partial class NetworkManager {
             if (sector.Name == sectorName)
                 return ConnectToSector(sector);
         }
-        return 3;
+        return CError.NOT_FOUND;
     }
-    public static int DisconnectFromSector(string sectorName) {
+    public static CError DisconnectFromSector(string sectorName) {
         foreach (DriftSector sector in driftSectors) {
             if (sector == null) continue;
             if (sector.Name == sectorName)
@@ -130,19 +131,19 @@ public static partial class NetworkManager {
             if (sector.Name == sectorName)
                 return DisconnectFromSector(sector);
         }
-        return 3;
+        return CError.NOT_FOUND;
     }
 
-    public static int ConnectToSector(Sector sector) {
-        if (sector == null) return 1;
-        if (connectedSectors.Contains(sector)) return 2;
+    public static CError ConnectToSector(Sector sector) {
+        if (sector == null) return CError.INVALID;
+        if (connectedSectors.Contains(sector)) return CError.REDUCDANT;
 
         foreach (NetworkNode node in sector.GetSurfaceNodes()) node.ParentNode = PlayerNode;
-        connectedSectors.Add(sector); return 0;
+        connectedSectors.Add(sector); return CError.OK;
     }
-    public static int DisconnectFromSector(Sector sector) {
-        if (sector == null) return 1;
-        if (!connectedSectors.Contains(sector)) return 2;
+    public static CError DisconnectFromSector(Sector sector) {
+        if (sector == null) return CError.INVALID;
+        if (!connectedSectors.Contains(sector)) return CError.REDUCDANT;
 
         foreach (NetworkNode node in sector.GetSurfaceNodes()) {
             if (IsNodeOrDescendant(TerminalProcessor.CurrNode, node)) {
@@ -153,7 +154,7 @@ public static partial class NetworkManager {
         }
 
         connectedSectors.Remove(sector);
-        return 0;
+        return CError.OK;
     }
 
     static bool IsNodeOrDescendant(NetworkNode target, NetworkNode node) {
@@ -165,7 +166,7 @@ public static partial class NetworkManager {
         return false;
     }
 
-    public static int RemoveSector(string sectorName) {
+    public static CError RemoveSector(string sectorName) {
         foreach (DriftSector sector in driftSectors) {
             if (sector == null) continue;
             if (sector.Name == sectorName)
@@ -176,25 +177,25 @@ public static partial class NetworkManager {
             if (sector.Name == sectorName)
                 return RemoveSector(sector);
         }
-        return 3;
+        return CError.NOT_FOUND;
     }
-    public static int RemoveSector(DriftSector sector) {
-        if (sector == null) return 1;
-        if (!driftSectors.Contains(sector)) return 2;
+    public static CError RemoveSector(DriftSector sector) {
+        if (sector == null) return CError.INVALID;
+        if (!driftSectors.Contains(sector)) return CError.NOT_FOUND;
         foreach (NetworkNode node in sector.GetSurfaceNodes()) {
             RemoveNodeAndChildrenFromDNS(node); node.ParentNode = null;
         }
         driftSectors.Remove(sector);
-        return 0;
+        return CError.OK;
     }
-    public static int RemoveSector(StaticSector sector) {
-        if (sector == null) return 1;
-        if (!staticSectors.Contains(sector)) return 2;
+    public static CError RemoveSector(StaticSector sector) {
+        if (sector == null) return CError.INVALID;
+        if (!staticSectors.Contains(sector)) return CError.NOT_FOUND;
         foreach (NetworkNode node in sector.GetSurfaceNodes()) {
             RemoveNodeAndChildrenFromDNS(node); node.ParentNode = null;
         }
         staticSectors.Remove(sector);
-        return 0;
+        return CError.OK;
     }
 
     static void RemoveNodeAndChildrenFromDNS(NetworkNode node) {

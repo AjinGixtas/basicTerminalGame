@@ -26,33 +26,26 @@ public static partial class TerminalProcessor {
     }
     static void RmF(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         if (positionalArgs.Length == 0) { Say("-r", $"No file name provided."); return; }
-        NodeDirectory parentDirectory;
         for (int i = 0; i < positionalArgs.Length; i++) {
-            string[] components = StringExtensions.Split(positionalArgs[i], "/", false);
-            string fileName = components[^1], parentPath = string.Join('/', components[..^1]);
-            parentDirectory = CurrDir.GetDirectory(parentPath);
-            if (parentDirectory == null) { Say("-r", $"File not found: {parentPath}"); return; }
-            int result = parentDirectory.RemoveFile(positionalArgs[i]);
+            CError result = CurrDir.RemoveFile(positionalArgs[i]);
             switch (result) {
-                case 0: break;
-                case 1: Say($"{positionalArgs[i]} was not found."); break;
+                case CError.OK: break;
+                case CError.NOT_FOUND: Say("-r", $"{Util.Format(positionalArgs[i], StrType.FILE)} was not found."); break;
+                case CError.INVALID: Say("-r", $"Unexpected error when making {Util.Format(positionalArgs[i], StrType.FILE)}. Game bug found and can be reported"); break;
+                case CError.UNKNOWN: Say("-r", $"{Util.Format(positionalArgs[i], StrType.FILE)} can't be removed. Game bug found and can be reported."); break;
                 default: Say("-r", $"{Util.Format(positionalArgs[i], StrType.FILE)} removal failed. Error code: {result}"); break;
             }
         }
     }
     static void MkF(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         if (positionalArgs.Length == 0) { Say("-r", $"No file name provided."); return; }
-        NodeDirectory parentDirectory;
         for (int i = 0; i < positionalArgs.Length; i++) {
-            string[] components = StringExtensions.Split(positionalArgs[i], "/", false);
-            string fileName = components[^1], parentPath = string.Join('/', components[..^1]);
-
-            parentDirectory = CurrDir.GetDirectory(parentPath);
-            if (parentDirectory == null) { Say("-r", $"Directory not found: {Util.Format(parentPath, StrType.DIR)}"); return; }
-            int result = parentDirectory.AddFile(fileName);
+            CError result = CurrDir.AddFile(positionalArgs[i]);
             switch (result) {
-                case 0: break;
-                case 1: Say($"{Util.Format(positionalArgs[i], StrType.FILE)} already exists. Skipped."); break;
+                case CError.OK: break;
+                case CError.NOT_FOUND: Say("-r", $"Parent directory of {Util.Format(positionalArgs[i], StrType.FILE)} was not found."); break;
+                case CError.INVALID: Say("-r", $"Unexpected error when making {Util.Format(positionalArgs[i], StrType.FILE)}. Game bug found and can be reported."); break;
+                case CError.DUPLICATE: Say($"{Util.Format(positionalArgs[i], StrType.FILE)} already exists. Skipped."); break;
                 default: Say("-r", $"{Util.Format(positionalArgs[i], StrType.FILE)} creation failed. Error code: ${result}"); break;
             }
         }
@@ -70,18 +63,14 @@ public static partial class TerminalProcessor {
     }
     static void MkDir(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         if (positionalArgs.Length == 0) { Say("-r", $"No directory name provided."); return; }
-        NodeDirectory parentDirectory;
         for (int i = 0; i < positionalArgs.Length; i++) {
-            string[] components = StringExtensions.Split(positionalArgs[i], "/", false);
-            string dirName = components[^1], parentPath = string.Join('/', components[..^1]);
-
-            parentDirectory = CurrDir.GetDirectory(parentPath);
-            if (parentDirectory == null) { Say("-r", $"Directory not found: {Util.Format(parentPath, StrType.DIR)}"); return; }
-            int result = parentDirectory.AddDir(dirName);
+            CError result = CurrDir.AddDir(positionalArgs[i]);
             switch (result) {
-                case 0: break;
-                case 1: Say($"{Util.Format(parentPath, StrType.DIR)} already exists. Skipped."); break;
-                default: Say("-r", $"{Util.Format(parentPath, StrType.DIR)} creation failed. Error code: ${result}"); break;
+                case CError.OK: break;
+                case CError.NOT_FOUND: Say("-r", $"Parent directory of {Util.Format(positionalArgs[i], StrType.DIR)} was not found."); break;
+                case CError.INVALID: Say("-r", $"Unexpected error when making {Util.Format(positionalArgs[i], StrType.DIR)}. Game bug found and can be reported"); break;
+                case CError.DUPLICATE: Say($"{Util.Format(positionalArgs[i], StrType.DIR)} already exists. Skipped."); break;
+                default: Say("-r", $"{Util.Format(positionalArgs[i], StrType.DIR)} creation failed. Error code: ${result}"); break;
             }
         }
     }
@@ -90,16 +79,13 @@ public static partial class TerminalProcessor {
             Say("-r", "-No directory name provided.");
             return;
         }
-        NodeDirectory parentDirectory;
         for (int i = 0; i < positionalArgs.Length; i++) {
-            parentDirectory = CurrDir.GetDirectory(positionalArgs[i]);
-            if (parentDirectory == null) { Say("-r", $"Directory not found: {Util.Format(positionalArgs[0], StrType.DIR)}"); return; }
-            if (parentDirectory.Parent == null) { Say("-r", $"Can not remove root."); return; }
-            parentDirectory = parentDirectory.Parent;
-            int result = parentDirectory.RemoveDir(positionalArgs[i]);
+            CError result = CurrDir.RemoveDir(positionalArgs[i]);
             switch (result) {
-                case 0: break;
-                case 1: Say("-r", $"{Util.Format(positionalArgs[i], StrType.DIR)} was not found."); break;
+                case CError.OK: break;
+                case CError.NOT_FOUND: Say("-r", $"{Util.Format(positionalArgs[i], StrType.DIR)} was not found."); break;
+                case CError.INVALID: Say("-r", $"{Util.Format(positionalArgs[i], StrType.DIR)} has no parent directory, which is invalid."); break;
+                case CError.UNKNOWN: Say("-r", $"{Util.Format(positionalArgs[i], StrType.DIR)} can't be removed. Game bug found and can be reported."); break;
                 default: Say("-r", $"{Util.Format(positionalArgs[i], StrType.DIR)} removal failed. Error code: {result}"); break;
             }
         }

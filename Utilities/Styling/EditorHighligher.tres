@@ -1,0 +1,10 @@
+[gd_resource type="CodeHighlighter" load_steps=2 format=3 uid="uid://k788co3pmj6y"]
+
+[ext_resource type="Script" uid="uid://cw8s7rb1uppqo" path="res://Utilities/Styling/EditerHighlighterScript.gd" id="1_qrxbb"]
+
+[resource]
+number_color = Color(0.6, 1, 0.8, 1)
+symbol_color = Color(1, 1, 1, 1)
+function_color = Color(1, 0.2, 0.0666667, 1)
+member_variable_color = Color(0, 0.8, 1, 1)
+script = ExtResource("1_qrxbb")

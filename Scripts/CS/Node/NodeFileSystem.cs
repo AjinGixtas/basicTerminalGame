@@ -19,60 +19,52 @@ public class NodeFile : NodeSystemItem {
     }
 }
 public class NodeDirectory : NodeSystemItem {
-    public List<NodeSystemItem> Childrens { get; } = new List<NodeSystemItem>();
+    public List<NodeSystemItem> Childrens { get; } = [];
 
-    public NodeDirectory(string name) : base(name) { }
-    // 0-Success; 1-None found
-    public int RemoveFile(string name) {
-        foreach (NodeSystemItem item in Childrens) {
-            if (item.GetType() == typeof(NodeFile) && item.Name == name) {
-                Childrens.Remove(item);
-                return 0;
-            }
-        }
-        return 1;
+    public NodeDirectory(string name) : base(name) { }  
+    public CError RemoveFile(string pathName) {
+        NodeFile file = GetFile(pathName);
+        if (file == null) return CError.NOT_FOUND;
+        NodeDirectory nodeDirectory = file.Parent;
+        if (nodeDirectory == null) return CError.INVALID; // File has no parent, which is invalid.
+        if (nodeDirectory.Childrens.Remove(file)) return CError.OK;
+        return CError.UNKNOWN;
     }
-    // 0-Success; 1-None found
-    public int RemoveDir(string name) {
-        foreach (NodeSystemItem item in Childrens) {
-            if (item.GetType() == typeof(NodeDirectory) && item.Name == name) {
-                Childrens.Remove(item);
-                return 0;
-            }
-        }
-        return 1;
+    public CError RemoveDir(string pathName) {
+        NodeDirectory dir = GetDirectory(pathName);
+        if (dir == null) return CError.NOT_FOUND;
+        NodeDirectory parentDir = dir.Parent;
+        if (parentDir == null) return CError.INVALID; // Directory has no parent, which is invalid.
+        if (parentDir.Childrens.Remove(dir)) return CError.OK;
+        return CError.UNKNOWN;
     }
-    // 0-Success; 1-Duplicate name found; 2-Attempted to add parent
-    public int Add(NodeSystemItem item) {
-        if (item == Parent) return 2;
+    public CError AddFile(string pathName) {
+        string path = System.IO.Path.GetDirectoryName(pathName), name = System.IO.Path.GetFileName(pathName);
+        NodeDirectory dir = GetDirectory(pathName);
+        if (dir == null) return CError.NOT_FOUND;
+        NodeFile file = new(name) { Parent = dir };
+        return dir.Add(file);
+    }
+    public CError AddDir(string pathName) {
+        string path = System.IO.Path.GetDirectoryName(pathName), name = System.IO.Path.GetFileName(pathName);
+        NodeDirectory dir = GetDirectory(pathName);
+        if (dir == null) return CError.NOT_FOUND;
+        NodeDirectory newDir = new(name) { Parent = dir };
+        return dir.Add(newDir);
+    }
+    public CError Add(NodeSystemItem item) {
+        if (item == Parent) return CError.INVALID;
         foreach (NodeSystemItem children in Childrens) {
-            if (item.Name == children.Name) { return 1; }
+            if (item.Name == children.Name) { return CError.DUPLICATE; }
         }
         item.Parent = this;
         Childrens.Add(item);
-        return 0;
+        return CError.OK;
     }
-    // 0-Success; 1-Duplicate name found
-    public int AddFile(string name) {
-        foreach (NodeSystemItem children in Childrens) {
-            if (children.GetType() == typeof(NodeFile) && name == children.Name) { return 1; }
-        }
-        NodeFile file = new(name) { Parent = this };
-        Childrens.Add(file);
-        return 0;
-    }
-    public int AddDir(string name) {
-        foreach (NodeSystemItem children in Childrens) {
-            if (children.GetType() == typeof(NodeDirectory) && name == children.Name) { return 1; }
-        }
-        NodeDirectory dir = new(name) { Parent = this };
-        Childrens.Add(dir);
-        return 0;
-    }
-    // TerminalDirectory-Directory found; null-Directory not found
-    public NodeDirectory GetDirectory(string name) {
-        string[] components = StringExtensions.Split(name, "/", false);
-        NodeDirectory curDir = name.StartsWith('/') ? GetRoot() : this;
+    
+    public NodeDirectory GetDirectory(string pathName) {
+        string[] components = StringExtensions.Split(pathName, "/", false);
+        NodeDirectory curDir = pathName.StartsWith('/') ? GetRoot() : this;
         foreach (string component in components) {
             if (component == "..") {
                 if (curDir.Parent == null) return null; // Root dir is characterized by a lack of parent.
@@ -85,9 +77,9 @@ public class NodeDirectory : NodeSystemItem {
         }
         return curDir;
     }
-    public NodeFile GetFile(string name) {
-        string[] components = StringExtensions.Split(name, "/", false);
-        NodeDirectory curDir = name.StartsWith('/') ? GetRoot() : this;
+    public NodeFile GetFile(string pathName) {
+        string[] components = StringExtensions.Split(pathName, "/", false);
+        NodeDirectory curDir = pathName.StartsWith('/') ? GetRoot() : this;
         string[] pathComponents = components[..^1]; string fileName = components[^1];
         foreach (string component in pathComponents) {
             if (component == "..") {

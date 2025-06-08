@@ -16,13 +16,13 @@ public static partial class TerminalProcessor {
 		List<NetworkNode> visited = [];
 		string output = "";
 		while (stack.Count > 0) {
-			(NetworkNode node, int depth, bool[] depthMarks) = stack.Pop();
-			if (depth > MAX_DEPTH || visited.Contains(node)) continue;
+			(NetworkNode node, int tdepth, bool[] depthMarks) = stack.Pop();
+			if (tdepth > MAX_DEPTH || visited.Contains(node)) continue;
 			NodeAnalysis analyzeResult = node.Analyze();
 			output += $"{Util.Format(getTreePrefix(depthMarks), StrType.DECOR)}{Util.Format(analyzeResult.IP, StrType.IP), -39}{Util.Format(analyzeResult.HostName, StrType.HOSTNAME)}\n";
 			const int padLength = -40;
 			if (parsedArgs.ContainsKey("-v")) {
-				string descPrefix = getDescPrefix(depthMarks) + ((depth == MAX_DEPTH ? 0 : ((node.ParentNode != null ? 0 : -1) + node.ChildNode.Count)) > 0 ? " │" : "  ");
+				string descPrefix = getDescPrefix(depthMarks) + ((tdepth == MAX_DEPTH ? 0 : ((node.ParentNode != null ? 0 : -1) + node.ChildNode.Count)) > 0 ? " │" : "  ");
 				output += $"{Util.Format(descPrefix, StrType.DECOR)}  {Util.Format("Display name:", StrType.DECOR),padLength}{Util.Format(analyzeResult.DisplayName, StrType.DISPLAY_NAME)}\n";
 				output += $"{Util.Format(descPrefix, StrType.DECOR)}  {Util.Format("Firewall rating:",StrType.DECOR),padLength}{Util.Format($"{analyzeResult.DefLvl}", StrType.DEF_LVL),-2}  {Util.Format("Security:", StrType.DECOR)} {Util.Format($"{analyzeResult.SecType}", StrType.SEC_TYPE)}\n";
 				if (!string.IsNullOrWhiteSpace(descPrefix))
@@ -32,14 +32,14 @@ public static partial class TerminalProcessor {
 
 			// Use k==1 due to FILO algorithm.
 			List<NetworkNode> nextOfQueue = [];
-			if (node.ParentNode != null && !visited.Contains(node.ParentNode) && depth <= MAX_DEPTH) nextOfQueue.Add(node.ParentNode);
+			if (node.ParentNode != null && !visited.Contains(node.ParentNode) && tdepth <= MAX_DEPTH) nextOfQueue.Add(node.ParentNode);
 			foreach (NetworkNode child in node.ChildNode) {
-				if (visited.Contains(child) || depth > MAX_DEPTH) continue;
+				if (visited.Contains(child) || tdepth > MAX_DEPTH) continue;
 				nextOfQueue.Add(child);
 			}
 
 			int k = 0; foreach (NetworkNode child in nextOfQueue) {
-				++k; stack.Push((child, depth + 1, [.. depthMarks, k == 1]));
+				++k; stack.Push((child, tdepth + 1, [.. depthMarks, k == 1]));
 			}
 		}
 		Say("-n", output);
@@ -80,13 +80,13 @@ public static partial class TerminalProcessor {
 	}
 	static void Link(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		for (int i = 0; i < positionalArgs.Length; ++i) { 
-			int status = NetworkManager.ConnectToSector(positionalArgs[i]);
+			CError status = NetworkManager.ConnectToSector(positionalArgs[i]);
 			string msg = status switch {
-				0 => $"Linkto successfully: {Util.Format(positionalArgs[i], StrType.SECTOR)}",
-				1 => $"Linkto failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Sector is null. This behavior is unexpected and should be reported to the developer.",
-				2 => $"Linkto failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Already linked.",
-				3 => $"Linkto failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Sector not found",
-				_ => $"Unknown error code: {status}. Failed to linkto sector: {Util.Format(positionalArgs[i], StrType.SECTOR)}",
+				CError.OK => $"Linkto successfully: {Util.Format(positionalArgs[i], StrType.SECTOR)}",
+				CError.INVALID => $"Linkto failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Sector is null. This behavior is unexpected and should be reported to the developer.",
+				CError.REDUCDANT => $"Linkto failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Already linked.",
+				CError.NOT_FOUND => $"Linkto failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Sector not found",
+				_ => $"Unexpected error: {status}. Please report to the developer. Linkto failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}",
 			};
 			if (status == 0) { Say(msg); } else { Say("-r", msg); }
 		}
@@ -96,30 +96,39 @@ public static partial class TerminalProcessor {
 			// Disconnect from all sectors
 			while (NetworkManager.GetConnectedSectorNames().Length > 0) {
 				int i = 0;
-				int status = NetworkManager.DisconnectFromSector(NetworkManager.GetConnectedSectorNames()[i]);
+				CError status = NetworkManager.DisconnectFromSector(NetworkManager.GetConnectedSectorNames()[i]);
 				string msg = status switch {
-					0 => "",
-					1 => $"Failed to disconnect from sector: {Util.Format(NetworkManager.GetConnectedSectorNames()[i], StrType.SECTOR)}. Sector not found.",
-					2 => $"Failed to disconnect from sector: {Util.Format(NetworkManager.GetConnectedSectorNames()[i], StrType.SECTOR)}. Not connected.",
-					_ => $"Unknown error code: {status}. Failed to disconnect from sector: {Util.Format(NetworkManager.GetConnectedSectorNames()[i], StrType.SECTOR)}",
+					CError.OK => "",
+                    CError.INVALID => $"Unlink failed: {Util.Format(NetworkManager.GetConnectedSectorNames()[i], StrType.SECTOR)}. Sector is null. This behavior is unexpected and should be reported to the developer.",
+                    CError.NOT_FOUND => $"Unlink failed: {Util.Format(NetworkManager.GetConnectedSectorNames()[i], StrType.SECTOR)}. Sector not found.",
+					CError.REDUCDANT => $"Unlink failed: {Util.Format(NetworkManager.GetConnectedSectorNames()[i], StrType.SECTOR)}. Not connected.",
+					_ => $"Unexpected error: {status}. Please report to the developer. Unlink failed: {Util.Format(NetworkManager.GetConnectedSectorNames()[i], StrType.SECTOR)}",
 				};
-                if (status != 0) { Say("-r", msg); }
+				if (status == CError.OK) { Say(msg); } else { Say("-r", msg); }
             }
-            Say("Disconnected from all sectors.");
             return;
 		}
 		for (int i = 0; i < positionalArgs.Length; ++i) {
-			int status = NetworkManager.DisconnectFromSector(positionalArgs[i]);
+			CError status = NetworkManager.DisconnectFromSector(positionalArgs[i]);
 			string msg = status switch {
-				0 => $"Disconnected from sector: {Util.Format(positionalArgs[i], StrType.SECTOR)}",
-				1 or 3 => $"Failed to disconnect from sector: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Sector not found.",
-				2 => $"Failed to disconnect from sector: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Not connected.",
-				_ => $"Unknown error code: {status}. Failed to disconnect from sector: {Util.Format(positionalArgs[i], StrType.SECTOR)}",
+				CError.OK => $"Disconnected from sector: {Util.Format(positionalArgs[i], StrType.SECTOR)}",
+                CError.INVALID => $"Unlink failed: {Util.Format(NetworkManager.GetConnectedSectorNames()[i], StrType.SECTOR)}. Sector is null. This behavior is unexpected and should be reported to the developer.",
+				CError.NOT_FOUND => $"Unlink failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Sector not found.",
+				CError.REDUCDANT => $"Unlink failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Not connected.",
+				_ => $"Unexpected error: {status}. Please report to the developer. Unlink failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}",
 			};
-			if (status == 0) { Say(msg); } else { Say("-r", msg); }
+			if (status == CError.OK) { Say(msg); } else { Say("-r", msg); }
 		}
 	}
 	public static void ToHome() {
 		CurrNode = NetworkManager.PlayerNode;
 	}
+	public static string[] Scan(bool verbose=false, string IP="", int MAX_DEPTH=1) {
+		if (string.IsNullOrEmpty(IP)) IP = NetworkManager.PlayerNode.IP;
+        NetworkNode node = NetworkManager.QueryDNS(IP);
+        return node.ChildNode
+			.Select(a => a.IP)
+			.Concat(node.ParentNode != null ? [node.ParentNode.IP] : [])
+			.ToArray();
+    }
 }

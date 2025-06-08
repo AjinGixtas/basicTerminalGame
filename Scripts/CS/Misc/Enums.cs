@@ -27,15 +27,15 @@ public enum Cc {
     gB = 11, rB = 12, rG = 13,
     bG = 14, bR = 15, gR = 16,
 
-    ___ = 0,
-    rgb = 20,
+    _ = 0,
+    w = 20,
     LB = 21,
     LG = 22,
     LC = 23,
     LR = 24,
     LM = 25,
     LY = 26,
-    RGB = 1,
+    W = 1,
 }
 public enum StrType {
     DECOR = 0,
@@ -62,7 +62,7 @@ public enum StrType {
     UNKNOWN_ERROR = 21,
     SEC_TYPE = 22,
     CMD_ARG = 23,
-    CMD_CMD = 24,
+    CMD_ACT = 24,
     SECTOR = 25,
     MINERAL = 26
 }
@@ -78,4 +78,15 @@ public enum LockType {
     C0  = 1<<7,
     C1  = 1<<8,
     C3  = 1<<9
+}
+public enum CError {
+    OK = 0,
+    NOT_FOUND = 1,
+    DUPLICATE = 2,
+    INVALID = 3,
+    REDUCDANT = 4,
+    UNKNOWN = 5,
+    INCORRECT = 6,
+    MISSING = 7,
+    NO_PERMISSION = 8,
 }

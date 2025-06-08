@@ -53,7 +53,8 @@ public class HackFarm {
 	public string DisplayName { get; init; }
 	public string IP { get; init; }
 	double _lifetime = 0;
-	public double LifeTime {
+	public double MAX_LIFE_TIME { get; init; }
+    public double LifeTime {
 		get => _lifetime;
 		private set {
 			_lifetime = value;
@@ -75,7 +76,7 @@ public class HackFarm {
 		mineralDistribution = [.. cacheResult];
 		mineralDistribution = Util.Shuffle<(int, double)>(mineralDistribution);
 		HostName = driftNode.HostName; DisplayName = driftNode.DisplayName; IP = driftNode.IP;
-		LifeTime = 3600 * Mathf.Pow(Mathf.E / 2.5, -5.57180 * defLvl) * Mathf.Log(defLvl) + 1800 * GD.Randf();
+		MAX_LIFE_TIME = LifeTime = 3600 * Mathf.Pow(Mathf.E / 2.5, -5.57180 * defLvl) * Mathf.Log(defLvl) + 1800 * GD.Randf();
 
 		HackCostCurve = (RandRange(1e-4, 2e-4), RandRange(1e-3, 5e-3), RandRange(3.0, 4.0), RandRange(5.0, 12.0));
 		GrowCostCurve = (RandRange(1e-3, 2.5e-3), RandRange(0.1, 0.2), RandRange(0.0, 1.0), RandRange(3.0, 4.0));
@@ -96,7 +97,7 @@ public class HackFarm {
 		TimeLVL += 1;
 	}
 	double _mineralBacklog, _cycleTimeRemain;
-	public double MineralBacklog { get => _mineralBacklog; }
+	public double MBacklog { get => _mineralBacklog; }
     public double CycleTimeRemain { get => _cycleTimeRemain; }
     public double[] ProcessMinerals(double delta) {
 		double[] output = new double[mineralDistribution.Length];
@@ -128,7 +129,7 @@ public class HackFarm {
             TimeA = obj.TimeCostCurve.Item1, TimeB = obj.TimeCostCurve.Item2, TimeC = obj.TimeCostCurve.Item3, _timeD = obj.TimeCostCurve.Item4,
             HackLvl = obj.HackLVL, GrowLvl = obj.GrowLVL, TimeLvl = obj.TimeLVL,
             HostName = obj.HostName, DisplayName = obj.DisplayName, IP = obj.IP,
-            MineralBacklog = obj.MineralBacklog, CycleTimeRemain = obj.CycleTimeRemain, LifeTime = obj.LifeTime,
+            MineralBacklog = obj.MBacklog, CycleTimeRemain = obj.CycleTimeRemain, LifeTime = obj.LifeTime,
             MineralType = obj.mineralDistribution.Select(x => x.Item1).ToArray(),
             MineralDistribution = obj.mineralDistribution.Select(x => x.Item2).ToArray(),
         };

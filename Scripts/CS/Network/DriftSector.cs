@@ -5,7 +5,10 @@ public class DriftSector : Sector {
 	static readonly string[] DRIFT_NODE_NAMES = StringExtensions.Split(FileAccess.Open("res://Utilities/TextFiles/ServerNames/DriftNode.txt", FileAccess.ModeFlags.Read).GetAsText(), "\n", false);
 	static readonly string[] DRIFT_SECTOR_NAMES = StringExtensions.Split(FileAccess.Open("res://Utilities/TextFiles/ServerNames/DriftSector.txt", FileAccess.ModeFlags.Read).GetAsText(), "\n", false);
 
-	bool _lockedDown = false;
+	int _sectorLevel = 1;
+	public int SectorLevel => _sectorLevel;
+
+    bool _lockedDown = false;
 	public bool LockedDown { 
 		get => _lockedDown; 
 		set { 
@@ -18,12 +21,12 @@ public class DriftSector : Sector {
 	public DriftSector() {
         Name = GenSectorName();
 		int type = GD.RandRange(0, 3);
-		int secLvl = GD.RandRange(1, 10);
+		_sectorLevel = GD.RandRange(1, 10);
 		switch (type) {
-			case 0: GenerateBusNetwork(secLvl); break;
-			case 1: GenerateStarNetwork(secLvl); break;
-			case 2: GenerateVineNetwork(secLvl); break;
-			case 3: GenerateTreeNetwork(secLvl); break;
+			case 0: GenerateBusNetwork(_sectorLevel); break;
+			case 1: GenerateStarNetwork(_sectorLevel); break;
+			case 2: GenerateVineNetwork(_sectorLevel); break;
+			case 3: GenerateTreeNetwork(_sectorLevel); break;
 			default: GD.PrintErr("Invalid network type"); break;
 		}
 		MarkIntializationCompleted();
@@ -77,7 +80,7 @@ public class DriftSector : Sector {
 	void GenerateTreeNetwork(int secLvl) {
 		if (_isIntialized) return;
 		int layer = 3, node = 2;
-		for(int i = 0; i < node; ++i) {
+		for(int i = 0; i < 1; ++i) {
 			(string displayName, string hostName) = GenNodeName();
 			DriftNode surfaceNode = new(hostName, displayName, NetworkManager.GetRandomIP(), null, this, secLvl);
 			GenerateTree(surfaceNode, 1, layer, node);

@@ -64,17 +64,15 @@ public static partial class TerminalProcessor {
 		if (node == null) { Say("-r", $"Host not found: {Util.Format(positionalArgs[0], StrType.HOSTNAME)}"); return; }
 		
 		CurrNode = node;
-		static bool IsIPv4(string ip) {
-			return IPAddress.TryParse(ip, out IPAddress address) && address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork;
-		}
 	}
 	static void Sector(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		bool connectedOnly = parsedArgs.ContainsKey("-c") || parsedArgs.ContainsKey("--connected");
-		string[] sectorNames = connectedOnly ? NetworkManager.GetConnectedSectorNames() : NetworkManager.GetSectorNames();
-		string output = "";
+		int sectorLevel = parsedArgs.ContainsKey("-l") ? int.Parse(parsedArgs["-l"]) : -1;
+        string[] sectorNames = NetworkManager.GetSectorNames(connectedOnly, sectorLevel);
+        string output = "";
 		for (int i = 0; i < sectorNames.Length; ++i) {
 			if (sectorNames[i] == null) { continue; }
-			output += $"{Util.Format(sectorNames[i], StrType.SECTOR), -40}";
+            output += $"{Util.Format(sectorNames[i], StrType.SECTOR), -40}";
 		}
 		Say(output);
 	}
@@ -94,17 +92,17 @@ public static partial class TerminalProcessor {
 	static void Unlink(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		if (positionalArgs[0] == "*") {
 			// Disconnect from all sectors
-			while (NetworkManager.GetConnectedSectorNames().Length > 0) {
-				int i = 0;
-				CError status = NetworkManager.DisconnectFromSector(NetworkManager.GetConnectedSectorNames()[i]);
-				string msg = status switch {
-					CError.OK => "",
-                    CError.INVALID => $"Unlink failed: {Util.Format(NetworkManager.GetConnectedSectorNames()[i], StrType.SECTOR)}. Sector is null. This behavior is unexpected and should be reported to the developer.",
-                    CError.NOT_FOUND => $"Unlink failed: {Util.Format(NetworkManager.GetConnectedSectorNames()[i], StrType.SECTOR)}. Sector not found.",
-					CError.REDUCDANT => $"Unlink failed: {Util.Format(NetworkManager.GetConnectedSectorNames()[i], StrType.SECTOR)}. Not connected.",
-					_ => $"Unexpected error: {status}. Please report to the developer. Unlink failed: {Util.Format(NetworkManager.GetConnectedSectorNames()[i], StrType.SECTOR)}",
-				};
-				if (status == CError.OK) { Say(msg); } else { Say("-r", msg); }
+			string[] secNames = NetworkManager.GetSectorNames(true);
+			for (int i = 0; i < secNames.Length; ++i) {
+				CError err = NetworkManager.DisconnectFromSector(secNames[i]);
+				string msg = err switch {
+                    CError.OK => "",
+                    CError.INVALID => $"Unlink failed: {Util.Format(secNames[i], StrType.SECTOR)}. Sector is null. This behavior is unexpected and should be reported to the developer.",
+                    CError.NOT_FOUND => $"Unlink failed: {Util.Format(secNames[i], StrType.SECTOR)}. Sector not found.",
+                    CError.REDUCDANT => $"Unlink failed: {Util.Format(secNames[i], StrType.SECTOR)}. Not connected.",
+                    _ => $"Unexpected error: {err}. Please report to the developer. Unlink failed: {Util.Format(secNames[i], StrType.SECTOR)}",
+                };
+				if (err == CError.OK) { Say(msg); } else { Say("-r", msg); }
             }
             return;
 		}
@@ -112,7 +110,7 @@ public static partial class TerminalProcessor {
 			CError status = NetworkManager.DisconnectFromSector(positionalArgs[i]);
 			string msg = status switch {
 				CError.OK => $"Disconnected from sector: {Util.Format(positionalArgs[i], StrType.SECTOR)}",
-                CError.INVALID => $"Unlink failed: {Util.Format(NetworkManager.GetConnectedSectorNames()[i], StrType.SECTOR)}. Sector is null. This behavior is unexpected and should be reported to the developer.",
+                CError.INVALID => $"Unlink failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Sector is null. This behavior is unexpected and should be reported to the developer.",
 				CError.NOT_FOUND => $"Unlink failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Sector not found.",
 				CError.REDUCDANT => $"Unlink failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Not connected.",
 				_ => $"Unexpected error: {status}. Please report to the developer. Unlink failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}",
@@ -120,15 +118,27 @@ public static partial class TerminalProcessor {
 			if (status == CError.OK) { Say(msg); } else { Say("-r", msg); }
 		}
 	}
+	
 	public static void ToHome() {
 		CurrNode = NetworkManager.PlayerNode;
 	}
-	public static string[] Scan(bool verbose=false, string IP="", int MAX_DEPTH=1) {
+	public static CError ConnectNode(string IP="") {
+        if (string.IsNullOrEmpty(IP)) return CError.MISSING;
+		if (!IsIPv4(IP)) return CError.INVALID;
+        NetworkNode node = NetworkManager.QueryDNS(IP);
+        if (node == null) { return CError.NOT_FOUND; }
+        CurrNode = node;
+		return CError.OK;
+    }
+	public static string[] Scan(string IP="", int MAX_DEPTH=1) {
 		if (string.IsNullOrEmpty(IP)) IP = NetworkManager.PlayerNode.IP;
         NetworkNode node = NetworkManager.QueryDNS(IP);
         return node.ChildNode
 			.Select(a => a.IP)
 			.Concat(node.ParentNode != null ? [node.ParentNode.IP] : [])
 			.ToArray();
+    }
+    static bool IsIPv4(string ip) {
+        return IPAddress.TryParse(ip, out IPAddress address) && address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork;
     }
 }

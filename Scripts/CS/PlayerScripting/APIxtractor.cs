@@ -8,6 +8,7 @@ using System.Linq;
 using System.Xml.Linq;
 using System;
 using Godot;
+using System.Text.RegularExpressions;
 
 class APIxtractor {
     public record MethodData(string Name, List<(string Type, string Name)> Parameters, string ReturnType, string XmlDoc);
@@ -101,9 +102,7 @@ class APIxtractor {
         GD.Print(text);
         string[] lines = text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
         for (int i = 0; i < lines.Length; i++) {
-            GD.Print("|"+lines[i] + "|");
             lines[i] = lines[i].TrimStart('/', ' ').TrimEnd(' ');
-            GD.Print(">"+lines[i] + "<");
         }
         return string.Join("\n---", lines);
     }
@@ -122,8 +121,8 @@ class APIxtractor {
             // Add type params/return (if no XML doc, fallback to simple mapping)
             if (string.IsNullOrWhiteSpace(m.XmlDoc)) {
                 foreach (var p in m.Parameters)
-                    sb.AppendLine($"---@param {p.Name} {MapCSharpTypeToLua(p.Type)}");
-                sb.AppendLine($"---@return {MapCSharpTypeToLua(m.ReturnType)}");
+                    sb.AppendLine($"---@param {p.Name} {LuaTypeMapper.TranslateCSharpTypeToLua(p.Type)}");
+                sb.AppendLine($"---@return {LuaTypeMapper.TranslateCSharpTypeToLua(m.ReturnType)}");
             }
             sb.AppendLine($"function {cls.Name}.{m.Name}({string.Join(", ", m.Parameters.Select(p => p.Name))}) end");
             sb.AppendLine();
@@ -141,6 +140,7 @@ class APIxtractor {
             "bool" => "boolean",
             "string" => "string",
             "void" => "nil",
+
             _ => "any"
         };
     }
@@ -159,5 +159,75 @@ class APIxtractor {
         sb.AppendLine("    }");
         sb.AppendLine("};");
         return sb.ToString();
+    }
+}
+
+public static class LuaTypeMapper {
+    private static readonly Dictionary<string, string> BaseTypeMap = new() {
+        ["int"] = "number",
+        ["float"] = "number",
+        ["double"] = "number",
+        ["bool"] = "boolean",
+        ["string"] = "string",
+        ["void"] = "nil"
+    };
+
+    public static string TranslateCSharpTypeToLua(string csharpType) {
+        csharpType = csharpType.Trim();
+
+        // Array: e.g., "string[]"
+        if (csharpType.EndsWith("[]")) {
+            var elementType = csharpType[..^2];
+            return $"{TranslateCSharpTypeToLua(elementType)}[]";
+        }
+
+        // Generic types: List<>, Dictionary<>, Tuple<>
+        if (Regex.IsMatch(csharpType, @"^\w+<.*>$")) {
+            var match = Regex.Match(csharpType, @"^(\w+)<(.+)>$");
+            if (!match.Success) return "any";
+
+            var outer = match.Groups[1].Value;
+            var inner = match.Groups[2].Value;
+            var args = SplitGenericArgs(inner);
+
+            switch (outer) {
+                case "List":
+                    return $"{TranslateCSharpTypeToLua(args[0])}[]";
+
+                case "Dictionary":
+                    return $"table<{TranslateCSharpTypeToLua(args[0])}, {TranslateCSharpTypeToLua(args[1])}>";
+
+                case "Tuple":
+                    var translated = args.ConvertAll(TranslateCSharpTypeToLua);
+                    return $"table<{string.Join(", ", translated)}>";
+
+                default:
+                    return "any"; // unknown generic
+            }
+        }
+
+        // Base types
+        if (BaseTypeMap.TryGetValue(csharpType, out var luaType))
+            return luaType;
+
+        return "any"; // fallback
+    }
+
+    private static List<string> SplitGenericArgs(string input) {
+        var args = new List<string>();
+        int depth = 0;
+        int start = 0;
+
+        for (int i = 0; i < input.Length; i++) {
+            if (input[i] == '<') depth++;
+            else if (input[i] == '>') depth--;
+            else if (input[i] == ',' && depth == 0) {
+                args.Add(input.Substring(start, i - start).Trim());
+                start = i + 1;
+            }
+        }
+
+        args.Add(input.Substring(start).Trim());
+        return args;
     }
 }

@@ -1,12 +1,26 @@
+using MoonSharp.Interpreter;
 using System.Collections.Generic;
 
 public class CrackModule {
-    public BeginResult Begin() {
+    public int Begin() {
         int result = TerminalProcessor.BeginFlare();
-        return (BeginResult)result;
+        return result;
     }
-    public void AttackNode(Dictionary<string,string> flagKeyPairs) {
-        TerminalProcessor.Attack(flagKeyPairs);
+
+    public List<object[]> AttackNode(Dictionary<string, string> flagKeyPairs) {
+        var result = TerminalProcessor.Attack(flagKeyPairs);
+        var output = new List<object[]>(result.Length);
+
+        foreach (var (err, s1, s2, s3) in result) {
+            output.Add(new object[]
+            {
+            (int)err,  // or err.ToString()
+            s1,
+            s2,
+            s3
+            });
+        }
+        return output;
     }
     public void End() {
         TerminalProcessor.EndFlare();

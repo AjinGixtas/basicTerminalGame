@@ -7,22 +7,24 @@ public static class ScriptRunner {
 
 	static ScriptRunner() {
 		UserData.RegisterType<TestModule>();
-		UserData.RegisterType<NetworkModule>();
-		UserData.RegisterType<MainModule>();
-		UserData.RegisterType<HackFarmModule>();
+        UserData.RegisterType<NetworkModule>();
+		UserData.RegisterType<CrackModule>();
+        UserData.RegisterType<HackFarmModule>();
         UserData.RegisterType<FileModule>();
 		UserData.RegisterType<CError>();
-	}
+        UserData.RegisterType<MainModule>();
+    }
 
-	public static void RunPlayerScript(string scriptContent) {
+    public static void RunPlayerScript(string scriptContent) {
 
 		var script = new MoonSharp.Interpreter.Script();
-		script.Globals["TestModule"] = new TestModule();
-		script.Globals["NetworkModule"] = new NetworkModule();
-		script.Globals["MainModule"] = new MainModule();
-		script.Globals["MinerModule"] = new HackFarmModule();
-        script.Globals["FileModule"] = new FileModule();
-		script.Globals["CError"] = new CError();
+		script.Globals["tet"] = new TestModule();
+		script.Globals["net"] = new NetworkModule();
+		script.Globals["kar"] = new CrackModule();
+		script.Globals["bot"] = new HackFarmModule();
+        script.Globals["fio"] = new FileModule();
+		script.Globals["cer"] = new CError();
+        script.Globals["ax"] = new MainModule();
 
         script.Globals["print"] = DynValue.NewCallback((context, args) => { 
 			TerminalProcessor.Say(Util.Format("Use ax:Say() instead of print()", StrType.WARNING));

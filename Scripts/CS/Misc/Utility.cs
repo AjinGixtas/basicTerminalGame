@@ -134,7 +134,7 @@ public static partial class Util {
                     string[] commands = SplitCommands(input);
                     for (int i = 0; i < commands.Length; ++i) {
                         string[] tokens = TokenizeCommand(commands[i]);
-                        if (i > 0) output += output += $"[color={Util.CC(Cc.W)}];[/color]";
+                        if (i > 0) output += $"[color={Util.CC(Cc.W)}];[/color]";
 
                         output += Util.Format(tokens[0], StrType.CMD_ACT);
                         if (tokens.Length == 1) continue; // No args, just the command

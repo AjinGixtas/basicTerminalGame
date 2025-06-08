@@ -8,11 +8,11 @@ public class FileModule {
 		if (dir == null) throw new DirectoryNotFoundException($"Directory '{path}' not found.");
 		return dir.Childrens.Where(x => x is NodeFile).Select(x => x.Name).ToArray();
 	}
-	public CError MkF(string path) => TerminalProcessor.CurrDir.AddFile(path);
-	public CError RmF(string path) => TerminalProcessor.CurrDir.RemoveFile(path);
+	public int MkF(string path) => (int)TerminalProcessor.CurrDir.AddFile(path);
+	public int RmF(string path) => (int)TerminalProcessor.CurrDir.RemoveFile(path);
     public bool ExistF(string path) => TerminalProcessor.CurrDir.GetFile(path) != null;
-	public CError MkDir(string path) => TerminalProcessor.CurrDir.AddDir(path);
-	public CError RmDir(string path) => TerminalProcessor.CurrDir.RemoveDir(path);
+	public int MkDir(string path) => (int)TerminalProcessor.CurrDir.AddDir(path);
+	public int RmDir(string path) => (int)TerminalProcessor.CurrDir.RemoveDir(path);
     public bool ExistDir(string path) => TerminalProcessor.CurrDir.GetDirectory(path) != null;
 	
     public CError WriteF(string path, string content, WriteMode mode) {

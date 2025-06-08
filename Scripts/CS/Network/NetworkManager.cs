@@ -11,7 +11,7 @@ public static partial class NetworkManager {
     static List<StaticSector> staticSectors;
     static Dictionary<string, WeakReference<NetworkNode>> DNS;
     static List<HackFarm> BotNet = [];
-    const int DRIFT_SECTOR_COUNT = 128;
+    const int DRIFT_SECTOR_COUNT = 64;
 
     public static void Ready() {
         DNS = []; driftSectors = []; connectedSectors = []; staticSectors = []; BotNet = [];
@@ -32,17 +32,15 @@ public static partial class NetworkManager {
         }
     }
 
-    public static string[] GetSectorNames() {
+    public static string[] GetSectorNames(bool mustConnected=false, int level=-1) {
         List<string> names = [];
-        foreach (var sector in driftSectors)
-            if (sector != null) names.Add(sector.Name);
+        foreach (var sector in driftSectors) {
+            if (sector == null) continue; // Skip null sectors
+            if (level > 0 && sector.SectorLevel != level) continue; // Skip sectors that don't match the level
+            if (mustConnected && !connectedSectors.Contains(sector)) continue; // Skip if mustConnected is true and sector is not connected
+            names.Add(sector.Name);
+        }
         foreach (var sector in staticSectors)
-            if (sector != null) names.Add(sector.Name);
-        return [.. names];
-    }
-    public static string[] GetConnectedSectorNames() {
-        List<string> names = [];
-        foreach (var sector in connectedSectors)
             if (sector != null) names.Add(sector.Name);
         return [.. names];
     }
@@ -75,11 +73,15 @@ public static partial class NetworkManager {
         driftSectors = Util.Shuffle<DriftSector>(driftSectors);
         int removedAmount = 0;
         while (removedAmount < removalAmount) {
-            DisconnectFromSector(connectedSectors[0]);
+            DisconnectFromSector(driftSectors[0]);
             RemoveSector(driftSectors[0]);
             removedAmount++;
         }
-
+        while (driftSectors.Count < DRIFT_SECTOR_COUNT) { // Fill up to DRIFT_SECTOR_COUNT
+            DriftSector newSector = new DriftSector();
+            if (newSector == null) continue; // Skip if sector creation failed
+            driftSectors.Add(newSector);
+        }
         GC.Collect();                    // Try to collect unreachable objects
         GC.WaitForPendingFinalizers();   // Wait for destructors (~finalizers)
         GC.Collect();                    // Re-collect objects that were just finalized
@@ -236,6 +238,24 @@ public static partial class NetworkManager {
             for (int i = 0; i < minerals.Length; ++i) {
                 PlayerDataManager.DepositMineral(i, minerals[i]);
             }
+        }
+    }
+
+    public enum HackFarmSortType {
+        HOSTNAME, // Sort by HostName
+        LIFETIME, // Sort by LifeTime
+        MBACKLOG, // Sort by MineralAmount
+    }
+    static readonly Comparison<HackFarm> HostnameSort = (a, b) => a.HostName.CompareTo(b.HostName);
+    static readonly Comparison<HackFarm> LifetimeSort = (a, b) => a.LifeTime.CompareTo(b.LifeTime);
+    static readonly Comparison<HackFarm> LifePercSort = (a, b) => (a.LifeTime/ a.MAX_LIFE_TIME).CompareTo(b.LifeTime/b.MAX_LIFE_TIME);
+    static readonly Comparison<HackFarm> MBacklogSort = (a, b) => a.MBacklog.CompareTo(b.MBacklog);
+    public static void SortHackFarm(HackFarmSortType sortType=HackFarmSortType.LIFETIME) {
+        BotNet.RemoveAll(x => x == null); // Remove null entries
+        switch (sortType) {
+            case HackFarmSortType.HOSTNAME: BotNet.Sort(HostnameSort); break;
+            case HackFarmSortType.LIFETIME: BotNet.Sort(LifetimeSort); break;
+            case HackFarmSortType.MBACKLOG: BotNet.Sort(MBacklogSort); break;
         }
     }
 

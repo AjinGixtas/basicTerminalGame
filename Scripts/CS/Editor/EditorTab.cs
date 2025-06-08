@@ -8,8 +8,8 @@ public partial class EditorTab : CodeEdit
 		file = nodeFile;
 		Text = file.Content;
 		this.textEditor = textEditor;
-    }
-    public override void _Process(double delta) {
+	}
+	public override void _Process(double delta) {
 		if (HasFocus()) {
 			if (Input.IsActionJustPressed("closeTab")) { textEditor.CloseTab(false); }
 			if (Input.IsActionJustPressed("saveFile")) { textEditor.SaveFile(); }
@@ -22,10 +22,10 @@ public partial class EditorTab : CodeEdit
 		file.Content = Text;
 	}
 	public void OnCodeCompletionRequested() {
-		AddCodeCompletionOption(CodeCompletionKind.Function, "print", "print");
+		AddCodeCompletionOption(CodeCompletionKind.Function, "ax:Say", "ax:Say");
 		UpdateCodeCompletionOptions(false);
-    }
+	}
 	public void OnTextChanged() {
 		RequestCodeCompletion();
-    }
+	}
 }

@@ -99,15 +99,37 @@ Aprox lifetime: {TimeDifferenceFriendly(hackfarm.LifeTime)}");
             Say($"{Util.Format("Kraken deactivated", StrType.FULL_SUCCESS)}. Flare sequence exited. All [color={Util.CC(Cc.Y)}]lock[/color] closed.");
             EndFlare(); return;
         }
-        
+
         if (Time.GetUnixTimeFromSystem() > endEpoch) {
             Say($"{Util.Format("Kraken inactive", StrType.ERROR)}. Run {Util.Format("karaxe --flare", StrType.CMD_FUL)} to activate."); return;
         }
-        
+
         if (!parsedArgs.ContainsKey("--attack")) {
             Say("-r", $"Missing {Util.Format("--attack", StrType.CMD_FLAG)} flag. Use {Util.Format("--attack", StrType.CMD_FLAG)} to attack a node."); return;
         }
-        Attack(parsedArgs);
+        (CError, string, string, string)[] result = Attack(parsedArgs);
+        for (int i = 0; i < result.Length; ++i) {
+            (CError, string, string, string) res = result[i];
+            if (res.Item1 == CError.MISSING) {
+                TerminalProcessor.Say($"[{Util.Format("N0VALUE", StrType.ERROR)}] {Util.Format("Denied access by", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
+                TerminalProcessor.Say("-r", $"Missing key for {Util.Format(res.Item3, StrType.CMD_FLAG)}");
+                TerminalProcessor.Say($"[color={Util.CC(Cc.W)}]{res.Item4}[/color]");
+            } else if (res.Item1 == CError.INCORRECT) {
+                TerminalProcessor.Say($"[{Util.Format("WRON6KY", StrType.ERROR)}] {Util.Format("Denied access by", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
+                TerminalProcessor.Say("-r", $"Incorrect key for {Util.Format(res.Item3, StrType.CMD_FLAG)}");
+                TerminalProcessor.Say($"[color={Util.CC(Cc.W)}]{res.Item4}[/color]");
+            } else if (res.Item1 == CError.MISSING) {
+                TerminalProcessor.Say($"[{Util.Format("MI55ING", StrType.ERROR)}] {Util.Format("Denied access by", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
+                TerminalProcessor.Say("-r", $"Missing flag {Util.Format(res.Item3, StrType.CMD_FLAG)}");
+            } else if (res.Item1 == CError.OK) {
+                if (res.Item2 != "") {
+                    TerminalProcessor.Say($"[{Util.Format("SUCCESS", StrType.PART_SUCCESS)}] {Util.Format("Bypassed", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
+                } else {
+                    TerminalProcessor.Say($"{Util.Format("Node defense cracked.", StrType.FULL_SUCCESS)} All security system [color={Util.CC(Cc.gR)}]destroyed[/color].");
+                    TerminalProcessor.Say($"Run {Util.Format("analyze", StrType.CMD_FUL)} for all new information.");
+                }
+            }
+        }
     }
     public static void EndFlare() {
         endEpoch = 0;
@@ -119,13 +141,13 @@ Aprox lifetime: {TimeDifferenceFriendly(hackfarm.LifeTime)}");
         }
         sectorAttacked.Clear();
     }
-    public static CError Attack(Dictionary<string, string> flagKeyPairs) {
-        CError result = CurrNode.AttempCrackNode(flagKeyPairs, endEpoch);
+    public static (CError, string, string, string)[] Attack(Dictionary<string, string> flagKeyPairs) {
+        (CError, string, string, string)[] result = CurrNode.AttemptCrackNode(flagKeyPairs, endEpoch);
         if (CurrNode.GetType() == typeof(DriftNode)) {
             // No idea why, but hard reference to DriftSector is not working here.
             sectorAttacked.Add(new System.WeakReference<DriftSector>((CurrNode as DriftNode).Sector));
         }
-        if (result == CError.OK && !CurrNode.OwnedByPlayer) {
+        if (result[^1].Item1 == CError.OK && !CurrNode.OwnedByPlayer) {
             CurrNode.TransferOwnership();
             if (CurrNode.GetType() == typeof(DriftNode)) NetworkManager.QueueAddHackFarm((CurrNode as DriftNode).HackFarm);
         }

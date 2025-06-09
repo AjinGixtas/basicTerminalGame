@@ -1,7 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 
-public static partial class TerminalProcessor {
+public static partial class ShellCore {
 	static RuntimeDirector overseer;
 	static RichTextLabel terminalOutputField; static RichTextLabel terminalCommandPrompt; 
 	static TextEdit terminalCommandField; 
@@ -27,27 +27,27 @@ public static partial class TerminalProcessor {
 		Timer crackDurationTimer) {
 
 		// Assign provided parameters to static fields
-		TerminalProcessor.overseer = overseer;
-		TerminalProcessor.terminalOutputField = terminalOutputField;
-		TerminalProcessor.terminalCommandPrompt = terminalCommandPrompt;
-		TerminalProcessor.terminalCommandField = terminalCommandField;
-		TerminalProcessor.crackDurationTimer = crackDurationTimer;
+		ShellCore.overseer = overseer;
+		ShellCore.terminalOutputField = terminalOutputField;
+		ShellCore.terminalCommandPrompt = terminalCommandPrompt;
+		ShellCore.terminalCommandField = terminalCommandField;
+		ShellCore.crackDurationTimer = crackDurationTimer;
 
 		// Set the username and command prompt
-		TerminalProcessor.terminalCommandField.GrabFocus();
+		ShellCore.terminalCommandField.GrabFocus();
 
         // Mark as initialized
-        TerminalProcessor.terminalCommandField.ScrollFitContentHeight = true;
-		TerminalProcessor.terminalCommandField.ScrollFitContentWidth = true;
+        ShellCore.terminalCommandField.ScrollFitContentHeight = true;
+		ShellCore.terminalCommandField.ScrollFitContentWidth = true;
 	}
 	public static void IntializeInternal() {
-		TerminalProcessor._currNode = NetworkManager.PlayerNode;
-		TerminalProcessor._currDir = PlayerFileManager.FileSystem;
-		TerminalProcessor.SetCommandPrompt();
+		ShellCore._currNode = NetworkManager.PlayerNode;
+		ShellCore._currDir = PlayerFileManager.FileSystem;
+		ShellCore.SetCommandPrompt();
 	}
 	public static void Ready() {
         if (!PlayerDataManager.CompletedTutorial) {
-            TerminalProcessor.Say(@$"Welcome to the terminal! Type {Util.Format("help", StrType.CMD_FUL)} to see available commands.
+            ShellCore.Say(@$"Welcome to the terminal! Type {Util.Format("help", StrType.CMD_FUL)} to see available commands.
 You can also type {Util.Format("scan", StrType.CMD_FUL)} to see the network nodes around you.
 Type {Util.Format("connect <hostname>", StrType.CMD_FUL)} to connect to a node.
 Type {Util.Format("home", StrType.CMD_FUL)} to return to your home node.");

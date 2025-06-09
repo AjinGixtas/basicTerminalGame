@@ -64,7 +64,7 @@ public static partial class PlayerDataManager {
 
 		if (_gc_cur <= GC_Max) { needWarn = false; warned = false; } else needWarn = true;
 		if (needWarn && !warned) {
-			TerminalProcessor.Say($"[color={Util.CC(Cc.gR)}]Warning:[/color] GC total is over the limit of {_gc_max}. Remaining GC lost.");
+			ShellCore.Say($"[color={Util.CC(Cc.gR)}]Warning:[/color] GC total is over the limit of {_gc_max}. Remaining GC lost.");
 			warned = true;
 		}
 		return 0;

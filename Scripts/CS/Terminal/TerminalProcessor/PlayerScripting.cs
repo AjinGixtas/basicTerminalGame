@@ -1,6 +1,6 @@
 using Godot;
 using System.Collections.Generic;
-public static partial class TerminalProcessor {
+public static partial class ShellCore {
     static void Run(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         if (positionalArgs.Length == 0) {
             GD.Print("Usage: run <script_file>");

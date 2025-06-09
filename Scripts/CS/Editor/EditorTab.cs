@@ -20,6 +20,7 @@ public partial class EditorTab : CodeEdit
 	}
 	public void Save() {
 		file.Content = Text;
+		LifeCycleDirector.SaveFileSystem();
 	}
 	public void OnCodeCompletionRequested() {
 		AddCodeCompletionOption(CodeCompletionKind.Function, "ax:Say", "ax:Say");
@@ -27,5 +28,6 @@ public partial class EditorTab : CodeEdit
 	}
 	public void OnTextChanged() {
 		RequestCodeCompletion();
+		FoldAllLines();
 	}
 }

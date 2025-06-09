@@ -14,7 +14,7 @@ public partial class LifeCycleDirector : Node
 			PlayerFileManager.Ready();
 			NetworkManager.Ready();
 			QuickLoad(this);
-			TerminalProcessor.Ready();
+			ShellCore.Ready();
 		} else { GD.PrintErr("Game scene not set in LifeCycleDirector."); }
 	}
 	public override void _Process(double delta) {
@@ -26,7 +26,7 @@ public partial class LifeCycleDirector : Node
 		}
 	}
 	private const string SaveRoot = "user://Saves";
-	
+	static string CurrentSavePath = "";
 	static void QuickSave() {
 		// Ensure the save root directory exists
 		DirAccess.MakeDirAbsolute(ProjectSettings.GlobalizePath(SaveRoot));
@@ -45,25 +45,26 @@ public partial class LifeCycleDirector : Node
 		// Create new save directory
 		DirAccess.MakeDirAbsolute(ProjectSettings.GlobalizePath(newSavePath));
 		// Save player data (convert back to user:// path for Godot API)
-		TerminalProcessor.Say($"Quick saving to {newSavePath}");
-		TerminalProcessor.Say(PlayerDataManager.GetSaveStatusMsg(
+		ShellCore.Say($"Quick saving to {newSavePath}");
+		ShellCore.Say(PlayerDataManager.GetSaveStatusMsg(
 			PlayerDataManager.SavePlayerData(StringExtensions.PathJoin(newSavePath, "PlayerData.tres"))));
-		TerminalProcessor.Say(PlayerFileManager.GetSaveStatusMsg(
+		ShellCore.Say(PlayerFileManager.GetSaveStatusMsg(
 			PlayerFileManager.SaveFileSysData(StringExtensions.PathJoin(newSavePath, "FileSys"))));
-		TerminalProcessor.Say(NetworkManager.GetSaveStatusMsg(
+		ShellCore.Say(NetworkManager.GetSaveStatusMsg(
             NetworkManager.SaveNetworkData(StringExtensions.PathJoin(newSavePath, "NetworkData"))));
 
-        TerminalProcessor.Say($"If there are any error related to save file, feel free to email {Util.Format("ajingixtascontact", StrType.USERNAME)}@{Util.Format("gmail.com", StrType.HOSTNAME)}");
-	}
+        ShellCore.Say($"If there are any error related to save file, feel free to email {Util.Format("ajingixtascontact", StrType.USERNAME)}@{Util.Format("gmail.com", StrType.HOSTNAME)}");
+		CurrentSavePath = newSavePath; // Update current save path
+    }
 
 	static void QuickLoad(LifeCycleDirector lifeCycleDirector) {
 		lifeCycleDirector.RemakeScene();
-		if (!DirAccess.DirExistsAbsolute(ProjectSettings.GlobalizePath(SaveRoot))) { TerminalProcessor.Say("-r", "No previous record of user found. Intialize new user."); return; }
+		if (!DirAccess.DirExistsAbsolute(ProjectSettings.GlobalizePath(SaveRoot))) { ShellCore.Say("-r", "No previous record of user found. Intialize new user."); return; }
 
 		// Find all save folders named like "Game_###"
 		var saveFolders = DirAccess.GetDirectoriesAt(SaveRoot).Where(dir => Regex.IsMatch(dir, @"Game_\d{3}$")).ToList();
 
-		if (saveFolders.Count == 0) { TerminalProcessor.Say("-r", "No previous record of user found. Intialize new user."); return; }
+		if (saveFolders.Count == 0) { ShellCore.Say("-r", "No previous record of user found. Intialize new user."); return; }
 
 		// Find the most recently updated one
 		
@@ -72,7 +73,7 @@ public partial class LifeCycleDirector : Node
 			.OrderByDescending(dir => FileAccess.GetModifiedTime(StringExtensions.PathJoin($"{SaveRoot}/{dir}", "PlayerData.tres")))
 			.FirstOrDefault();
 		GD.Print(saveFolders[0]);
-		TerminalProcessor.Say($"Loading save from: {latestFolder}");
+		ShellCore.Say($"Loading save from: {latestFolder}");
 		// Load global data
 		int[] statusCodes = [
 			PlayerDataManager.LoadPlayerData(StringExtensions.PathJoin($"{SaveRoot}/{latestFolder}", "PlayerData.tres")),
@@ -82,16 +83,21 @@ public partial class LifeCycleDirector : Node
 		// Wipe the slate clean
 		lifeCycleDirector.RemakeScene();
 
-		TerminalProcessor.Say("Quick loading save...");
-		TerminalProcessor.Say(PlayerDataManager.GetLoadStatusMsg(statusCodes[0]));
-		TerminalProcessor.Say(PlayerFileManager.GetLoadStatusMsg(statusCodes[1]));
-        TerminalProcessor.Say(NetworkManager.GetLoadStatusMsg(statusCodes[2]));
-        TerminalProcessor.Say($"If there are any error related to save file, feel free to email {Util.Format("ajingixtascontact", StrType.USERNAME)}@{Util.Format("gmail.com", StrType.HOSTNAME)}");
-	}
+		ShellCore.Say("Quick loading save...");
+		ShellCore.Say(PlayerDataManager.GetLoadStatusMsg(statusCodes[0]));
+		ShellCore.Say(PlayerFileManager.GetLoadStatusMsg(statusCodes[1]));
+        ShellCore.Say(NetworkManager.GetLoadStatusMsg(statusCodes[2]));
+        ShellCore.Say($"If there are any error related to save file, feel free to email {Util.Format("ajingixtascontact", StrType.USERNAME)}@{Util.Format("gmail.com", StrType.HOSTNAME)}");
+		CurrentSavePath = StringExtensions.PathJoin(SaveRoot, latestFolder); // Update current save path
+    }
+	public static void SaveFileSystem() {
+        int statusCode = PlayerFileManager.SaveFileSysData(StringExtensions.PathJoin(CurrentSavePath, "FileSys"));
+		if (statusCode != 0) ShellCore.Say(PlayerFileManager.GetSaveStatusMsg(statusCode));
+    }
 	void RemakeScene() {
 		if (runtimeDirector != null) RemoveChild(runtimeDirector);
 		runtimeDirector = gameScene.Instantiate<RuntimeDirector>();
 		AddChild(runtimeDirector);
-		TerminalProcessor.IntializeInternal();
+		ShellCore.IntializeInternal();
 	}
 }

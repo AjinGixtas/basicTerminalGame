@@ -27,20 +27,20 @@ public static class ScriptRunner {
         script.Globals["ax"] = new MainModule();
 
         script.Globals["print"] = DynValue.NewCallback((context, args) => { 
-			TerminalProcessor.Say(Util.Format("Use ax:Say() instead of print()", StrType.WARNING));
+			ShellCore.Say(Util.Format("Use ax:Say() instead of print()", StrType.WARNING));
 			return DynValue.Nil;
 		});
 		try {
 			script.DoString(scriptContent);
 		} catch (ScriptRuntimeException ex) {
-			TerminalProcessor.Say($"Script error: {ex}");
+			ShellCore.Say($"Script error: {ex}");
 		}
 	}
 
 	public static void RunPlayerScriptFromFile(string filePath) {
-		NodeFile file = TerminalProcessor.CurrDir.GetFile(filePath);
+		NodeFile file = ShellCore.CurrDir.GetFile(filePath);
 		if (file == null) {
-			TerminalProcessor.Say("-r", $"Script file not found: {Util.Format(filePath, StrType.FILE)}");
+			ShellCore.Say("-r", $"Script file not found: {Util.Format(filePath, StrType.FILE)}");
 			return;
 		}
         RunPlayerScript(file.Content);

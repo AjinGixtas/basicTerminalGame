@@ -40,14 +40,14 @@ public class NodeDirectory : NodeSystemItem {
     }
     public CError AddFile(string pathName) {
         string path = System.IO.Path.GetDirectoryName(pathName), name = System.IO.Path.GetFileName(pathName);
-        NodeDirectory dir = GetDirectory(pathName);
+        NodeDirectory dir = GetDirectory(path);
         if (dir == null) return CError.NOT_FOUND;
         NodeFile file = new(name) { Parent = dir };
         return dir.Add(file);
     }
     public CError AddDir(string pathName) {
         string path = System.IO.Path.GetDirectoryName(pathName), name = System.IO.Path.GetFileName(pathName);
-        NodeDirectory dir = GetDirectory(pathName);
+        NodeDirectory dir = GetDirectory(path);
         if (dir == null) return CError.NOT_FOUND;
         NodeDirectory newDir = new(name) { Parent = dir };
         return dir.Add(newDir);
@@ -61,11 +61,12 @@ public class NodeDirectory : NodeSystemItem {
         Childrens.Add(item);
         return CError.OK;
     }
-    
     public NodeDirectory GetDirectory(string pathName) {
+        if (string.IsNullOrWhiteSpace(pathName) || pathName == "") return this; // Empty path returns current directory.
         string[] components = StringExtensions.Split(pathName, "/", false);
         NodeDirectory curDir = pathName.StartsWith('/') ? GetRoot() : this;
         foreach (string component in components) {
+            if (component == ".") continue; // Current directory, do nothing.
             if (component == "..") {
                 if (curDir.Parent == null) return null; // Root dir is characterized by a lack of parent.
                 curDir = curDir.Parent;

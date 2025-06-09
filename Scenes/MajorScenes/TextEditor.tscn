@@ -23,9 +23,10 @@ dragging_enabled = false
 dragger_visibility = 2
 
 [node name="TabBar" type="TabBar" parent="VSplitContainer"]
-custom_minimum_size = Vector2(0, 32)
+custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 size_flags_vertical = 0
+theme = ExtResource("3_0ojv2")
 drag_to_rearrange_enabled = true
 
 [node name="TabContainer" type="TabContainer" parent="VSplitContainer"]

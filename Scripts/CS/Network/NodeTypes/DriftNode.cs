@@ -30,7 +30,7 @@ public class DriftNode : NetworkNode {
 	}
 	public override (CError, string, string, string)[] AttemptCrackNode(Dictionary<string, string> ans, double endEpoch) {
 		if (Sector.LockedDown) { 
-			TerminalProcessor.Say(Util.Format("Sector is locked down, no attack possible.", StrType.ERROR));
+			ShellCore.Say(Util.Format("Sector is locked down, no attack possible.", StrType.ERROR));
 			return [(CError.NO_PERMISSION, "", "", "")];
 		}
 		return base.AttemptCrackNode(ans, endEpoch);

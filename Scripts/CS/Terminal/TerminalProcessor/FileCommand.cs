@@ -1,6 +1,6 @@
 using Godot;
 using System.Collections.Generic;
-public static partial class TerminalProcessor {
+public static partial class ShellCore {
     static void LS(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         NodeDirectory targetDir = CurrDir;
         if (positionalArgs.Length != 0) {

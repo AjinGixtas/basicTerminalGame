@@ -1,7 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-public static partial class TerminalProcessor {
+public static partial class ShellCore {
     // It gets 2 since this one is REALLY close to standard, but since it's also called independently a lot, allow for seperate shorthand flag is way better.
     static void Say(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         const int MAX_HISTORY_CHAR_SIZE = 65536, RESET_HISTORY_CHAR_SIZE = 16384;

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-public static partial class TerminalProcessor {
+public static partial class ShellCore {
     static void Farm(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         bool listAll = parsedArgs.ContainsKey("-a") || parsedArgs.ContainsKey("--all");
         string[] botnetNames = NetworkManager.GetBotnetNames();
@@ -111,22 +111,22 @@ Aprox lifetime: {TimeDifferenceFriendly(hackfarm.LifeTime)}");
         for (int i = 0; i < result.Length; ++i) {
             (CError, string, string, string) res = result[i];
             if (res.Item1 == CError.MISSING) {
-                TerminalProcessor.Say($"[{Util.Format("N0VALUE", StrType.ERROR)}] {Util.Format("Denied access by", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
-                TerminalProcessor.Say("-r", $"Missing key for {Util.Format(res.Item3, StrType.CMD_FLAG)}");
-                TerminalProcessor.Say($"[color={Util.CC(Cc.W)}]{res.Item4}[/color]");
+                ShellCore.Say($"[{Util.Format("N0VALUE", StrType.ERROR)}] {Util.Format("Denied access by", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
+                ShellCore.Say("-r", $"Missing key for {Util.Format(res.Item3, StrType.CMD_FLAG)}");
+                ShellCore.Say($"[color={Util.CC(Cc.W)}]{res.Item4}[/color]");
             } else if (res.Item1 == CError.INCORRECT) {
-                TerminalProcessor.Say($"[{Util.Format("WRON6KY", StrType.ERROR)}] {Util.Format("Denied access by", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
-                TerminalProcessor.Say("-r", $"Incorrect key for {Util.Format(res.Item3, StrType.CMD_FLAG)}");
-                TerminalProcessor.Say($"[color={Util.CC(Cc.W)}]{res.Item4}[/color]");
+                ShellCore.Say($"[{Util.Format("WRON6KY", StrType.ERROR)}] {Util.Format("Denied access by", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
+                ShellCore.Say("-r", $"Incorrect key for {Util.Format(res.Item3, StrType.CMD_FLAG)}");
+                ShellCore.Say($"[color={Util.CC(Cc.W)}]{res.Item4}[/color]");
             } else if (res.Item1 == CError.MISSING) {
-                TerminalProcessor.Say($"[{Util.Format("MI55ING", StrType.ERROR)}] {Util.Format("Denied access by", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
-                TerminalProcessor.Say("-r", $"Missing flag {Util.Format(res.Item3, StrType.CMD_FLAG)}");
+                ShellCore.Say($"[{Util.Format("MI55ING", StrType.ERROR)}] {Util.Format("Denied access by", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
+                ShellCore.Say("-r", $"Missing flag {Util.Format(res.Item3, StrType.CMD_FLAG)}");
             } else if (res.Item1 == CError.OK) {
                 if (res.Item2 != "") {
-                    TerminalProcessor.Say($"[{Util.Format("SUCCESS", StrType.PART_SUCCESS)}] {Util.Format("Bypassed", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
+                    ShellCore.Say($"[{Util.Format("SUCCESS", StrType.PART_SUCCESS)}] {Util.Format("Bypassed", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
                 } else {
-                    TerminalProcessor.Say($"{Util.Format("Node defense cracked.", StrType.FULL_SUCCESS)} All security system [color={Util.CC(Cc.gR)}]destroyed[/color].");
-                    TerminalProcessor.Say($"Run {Util.Format("analyze", StrType.CMD_FUL)} for all new information.");
+                    ShellCore.Say($"{Util.Format("Node defense cracked.", StrType.FULL_SUCCESS)} All security system [color={Util.CC(Cc.gR)}]destroyed[/color].");
+                    ShellCore.Say($"Run {Util.Format("analyze", StrType.CMD_FUL)} for all new information.");
                 }
             }
         }

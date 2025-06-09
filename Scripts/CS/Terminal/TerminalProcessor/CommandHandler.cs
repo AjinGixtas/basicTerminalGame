@@ -2,7 +2,7 @@ using Godot;
 using System.Collections.Generic;
 using System.Text;
 
-public static partial class TerminalProcessor {
+public static partial class ShellCore {
     static int SubmitCommand(string newCommand) {
         const int MAX_HISTORY_CMD_SIZE = 64;
         if (IsProcessing) return 1;

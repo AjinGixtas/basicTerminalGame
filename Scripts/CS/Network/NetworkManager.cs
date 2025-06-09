@@ -148,8 +148,8 @@ public static partial class NetworkManager {
         if (!connectedSectors.Contains(sector)) return CError.REDUCDANT;
 
         foreach (NetworkNode node in sector.GetSurfaceNodes()) {
-            if (IsNodeOrDescendant(TerminalProcessor.CurrNode, node)) {
-                TerminalProcessor.ToHome();
+            if (IsNodeOrDescendant(ShellCore.CurrNode, node)) {
+                ShellCore.ToHome();
                 break;
             }
             node.ParentNode = null;

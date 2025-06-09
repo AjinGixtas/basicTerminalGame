@@ -7,6 +7,6 @@ public class MainModule {
     /// </summary>
     /// <param name="content">The string to be said.</param>
     public void Say(string content) {
-		TerminalProcessor.Say(content);
+		ShellCore.Say(content);
 	}
 }

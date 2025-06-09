@@ -2,7 +2,7 @@ using Godot;
 using System.Collections.Generic;
 using System.Linq;
 
-public static partial class TerminalProcessor {
+public static partial class ShellCore {
     static void SetCommandPrompt() {
         terminalCommandPrompt.Text = $"{Util.Format(PlayerDataManager.Username, StrType.USERNAME)}@{Util.Format(CurrNode.HostName, StrType.HOSTNAME)}:{Util.Format(CurrDir.GetPath(), StrType.DIR)}>";
     }

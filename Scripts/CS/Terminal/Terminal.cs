@@ -8,16 +8,16 @@ public partial class Terminal : MarginContainer {
 
 	bool isProcessing = false;
 	public override void _Ready() {
-		TerminalProcessor.IntializeInterface(
+		ShellCore.IntializeInterface(
 			overseer,
 			terminalOutputField, terminalCommandPrompt, terminalCommandField, 
 			crackDurationTimer);
 	}
 	public override void _Process(double delta) {
 		base._Process(delta);
-		TerminalProcessor.Process(delta);
+		ShellCore.Process(delta);
 		NetworkManager.Process(delta);
 	}
-	public void OnCommandFieldTextChanged() { TerminalProcessor.OnCommandFieldTextChanged(); }
-	public void OnCrackDurationTimerTimeout() { TerminalProcessor.OnCrackDurationTimerTimeout(); }
+	public void OnCommandFieldTextChanged() { ShellCore.OnCommandFieldTextChanged(); }
+	public void OnCrackDurationTimerTimeout() { ShellCore.OnCrackDurationTimerTimeout(); }
 }

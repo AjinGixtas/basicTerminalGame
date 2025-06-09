@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-public static partial class TerminalProcessor {
+public static partial class ShellCore {
 	static void Home(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		ToHome();
 	}

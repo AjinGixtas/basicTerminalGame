@@ -1,4 +1,4 @@
-public static partial class TerminalProcessor {
+public static partial class ShellCore {
     public static void OnCrackDurationTimerTimeout() {
         Say($"{Util.Format("Flare sequence timeout", StrType.ERROR)}. All [color={Util.CC(Cc.Y)}]locks[/color] closed.");
         EndFlare();

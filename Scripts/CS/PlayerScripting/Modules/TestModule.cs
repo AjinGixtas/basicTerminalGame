@@ -1,5 +1,5 @@
 public class TestModule {
     public void Say() {
-        TerminalProcessor.Say("Hello from TestModule!");
+        ShellCore.Say("Hello from TestModule!");
     }
 }

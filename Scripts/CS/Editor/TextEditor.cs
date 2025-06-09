@@ -46,4 +46,7 @@ Run {Util.Format("edit FILENAME", StrType.CMD_FUL)} to open that file here.";
 	public void OnTabSelected(int tab) {
 		tabContainer.CurrentTab = Mathf.Clamp(tab+1, 0, tabContainer.GetTabCount()-1);
 	}
+	public void OnFocusEntered() {
+		(tabContainer.GetChild(Mathf.Max(0, tabBar.CurrentTab)) as Control).GrabFocus();
+	}
 }

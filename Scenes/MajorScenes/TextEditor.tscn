@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://dsqh3owg3cspi"]
+[gd_scene load_steps=5 format=3 uid="uid://dsqh3owg3cspi"]
 
 [ext_resource type="Script" uid="uid://mp4u0q4eb6nf" path="res://Scripts/CS/Editor/TextEditor.cs" id="1_nbc5l"]
 [ext_resource type="PackedScene" uid="uid://dcg54ljq6rpbt" path="res://Scenes/InstanceScenes/EditorTab.tscn" id="2_640ve"]
 [ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="3_0ojv2"]
+[ext_resource type="Theme" uid="uid://d4flr0varsg8l" path="res://Utilities/Themes/TextEditor.tres" id="3_30p6h"]
 
 [node name="TextEditor" type="MarginContainer" node_paths=PackedStringArray("tabBar", "tabContainer", "noFileOpenedTab", "saveDialog")]
 anchors_preset = 15
@@ -10,6 +11,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+focus_mode = 2
 script = ExtResource("1_nbc5l")
 tabBar = NodePath("VSplitContainer/TabBar")
 tabContainer = NodePath("VSplitContainer/TabContainer")
@@ -26,7 +28,7 @@ dragger_visibility = 2
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 size_flags_vertical = 0
-theme = ExtResource("3_0ojv2")
+theme = ExtResource("3_30p6h")
 drag_to_rearrange_enabled = true
 
 [node name="TabContainer" type="TabContainer" parent="VSplitContainer"]
@@ -54,6 +56,7 @@ unresizable = true
 always_on_top = true
 dialog_text = "Unsaved change detected. Close anyway?"
 
+[connection signal="focus_entered" from="." to="." method="OnFocusEntered"]
 [connection signal="tab_selected" from="VSplitContainer/TabBar" to="." method="OnTabSelected"]
 [connection signal="canceled" from="ConfirmationDialog" to="." method="ConfirmedCanceled"]
 [connection signal="confirmed" from="ConfirmationDialog" to="." method="ConfirmedClosing"]

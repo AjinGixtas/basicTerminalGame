@@ -9,6 +9,7 @@ public partial class MenuDirector : HBoxContainer {
 			value = Mathf.Clamp(value, 0, menuWindowContainer.GetTabCount()-1);
 			if (menuWindowContainer.CurrentTab == value) return;
 			menuWindowContainer.CurrentTab = value;
+			(menuWindowContainer.GetChild(value) as Control).GrabFocus();
 		}
 	}
 	public override void _Ready() {

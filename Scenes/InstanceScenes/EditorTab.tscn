@@ -14,7 +14,6 @@ grow_vertical = 2
 theme = ExtResource("1_wulu7")
 theme_override_colors/font_color = Color(0.8, 0.941176, 1, 1)
 theme_override_colors/line_number_color = Color(0.6, 1, 0.8, 1)
-emoji_menu_enabled = false
 deselect_on_focus_loss_enabled = false
 wrap_mode = 1
 indent_wrapped_lines = true

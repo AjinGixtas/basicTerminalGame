@@ -22,6 +22,7 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+focus_mode = 2
 theme = ExtResource("2_tjxev")
 script = ExtResource("1_q6j3v")
 terminalOutputField = NodePath("TerminalSplitPart/TerminalZone/OutputArea")
@@ -108,7 +109,8 @@ custom_minimum_size = Vector2(32, 0)
 layout_mode = 2
 theme = ExtResource("2_tjxev")
 wrap_mode = 1
-caret_blink = true
+caret_blink_interval = 0.33
+caret_mid_grapheme = true
 caret_multiple = false
 syntax_highlighter = ExtResource("3_c8ipk")
 indent_use_spaces = true
@@ -159,6 +161,7 @@ one_shot = true
 wait_time = 2.0
 autostart = true
 
+[connection signal="focus_entered" from="." to="." method="OnFocusEntered"]
 [connection signal="text_changed" from="TerminalSplitPart/TerminalZone/CommandLine/CommandField" to="." method="OnCommandFieldTextChanged"]
 [connection signal="timeout" from="TimersContainer/CrackDurationTimer" to="." method="OnCrackDurationTimerTimeout"]
 [connection signal="timeout" from="TimersContainer/StatSwitchTimer" to="TerminalSplitPart/Sidebar" method="OnStatSwitchTimerTimeout"]

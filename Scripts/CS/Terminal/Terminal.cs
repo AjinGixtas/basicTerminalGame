@@ -20,4 +20,8 @@ public partial class Terminal : MarginContainer {
 	}
 	public void OnCommandFieldTextChanged() { ShellCore.OnCommandFieldTextChanged(); }
 	public void OnCrackDurationTimerTimeout() { ShellCore.OnCrackDurationTimerTimeout(); }
+	public void OnFocusEntered() {
+		// When the terminal gains focus, grab focus for the command field
+		terminalCommandField.GrabFocus();
+	}
 }

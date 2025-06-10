@@ -16,7 +16,7 @@ public static partial class ShellCore {
         parsedArgs.TryGetValue("-h", out string minerName);
         if (string.IsNullOrEmpty(minerName)) parsedArgs.TryGetValue("--host", out minerName);
         if (string.IsNullOrEmpty(minerName)) { Say("-r", "No miner name provided."); return; }
-        HackFarm hackfarm = NetworkManager.GetHackfarm(minerName);
+        BotFarm hackfarm = NetworkManager.GetBotFarm(minerName);
         if (hackfarm == null) { Say("-r", "No miner with such name."); return; }
         Say(
 $@"Botnet: {Util.Format(minerName, StrType.HOSTNAME)}

@@ -9,11 +9,11 @@ public class DriftNode : NetworkNode {
 		NetworkManager.AssignDNS(this);
 		DefLvl = (int)Mathf.Clamp(GD.Randfn(secLvl + .5, Mathf.E), 1, 10);
 		SecLvl = (int)Mathf.Clamp(GD.Randfn(DefLvl/2+3.5, .2 * Mathf.E * Mathf.Pi), 1, DefLvl);
-		_hackFarm = new HackFarm(DefLvl, this);
+		_hackFarm = new BotFarm(DefLvl, this);
 
 	}
-	HackFarm _hackFarm = null;
-	public HackFarm HackFarm {
+	BotFarm _hackFarm = null;
+	public BotFarm HackFarm {
 		get {
 			if (!OwnedByPlayer) {
 				GD.PrintErr("HackFarm is only available for player-owned nodes.");

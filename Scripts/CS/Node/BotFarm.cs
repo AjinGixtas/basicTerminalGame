@@ -2,7 +2,7 @@ using Godot;
 using System.Collections.Generic;
 using System.Linq;
 
-public class HackFarm {
+public class BotFarm {
 	const double baseHack = 10.1, baseGrow = .1, baseTime = 60.0;
 	const double MAX_LVL = 64;
 	public (double, double, double, double) HackCostCurve { get; init; }
@@ -60,7 +60,7 @@ public class HackFarm {
 			_lifetime = value;
 		}
 	}
-	public HackFarm(int defLvl, DriftNode driftNode) {
+	public BotFarm(int defLvl, DriftNode driftNode) {
 		List<int> mineralType = []; for (int i = Mathf.Max(defLvl - 2, 1); i <= Mathf.Min(10, defLvl + 1); ++i) { mineralType.Add(i); }
 		mineralType.Remove(defLvl); mineralType = Util.Shuffle<int>(mineralType);
 		List<(int, double)> cacheResult = [];
@@ -76,14 +76,15 @@ public class HackFarm {
 		mineralDistribution = [.. cacheResult];
 		mineralDistribution = Util.Shuffle<(int, double)>(mineralDistribution);
 		HostName = driftNode.HostName; DisplayName = driftNode.DisplayName; IP = driftNode.IP;
-		MAX_LIFE_TIME = LifeTime = 3600 * Mathf.Pow(Mathf.E / 2.5, -5.57180 * defLvl) * Mathf.Log(defLvl) + 1800 * GD.Randf();
+		MAX_LIFE_TIME = 3600 * Mathf.Pow(Mathf.E / 2.5, -5.57180 * defLvl) * Mathf.Log(defLvl) + 1800 * GD.Randf();
+		LifeTime = MAX_LIFE_TIME;
 
 		HackCostCurve = (RandRange(1e-4, 2e-4), RandRange(1e-3, 5e-3), RandRange(3.0, 4.0), RandRange(5.0, 12.0));
 		GrowCostCurve = (RandRange(1e-3, 2.5e-3), RandRange(0.1, 0.2), RandRange(0.0, 1.0), RandRange(3.0, 4.0));
 		TimeCostCurve = (RandRange(1e-5, 1e-4), RandRange(1e-3, 1e-2), RandRange(1e-3, 1e-2), 0.05);
 		double RandRange(double min, double max) => GD.Randf() * (max - min) + min;
 	}
-	~HackFarm() {
+	~BotFarm() {
 		if (Util.HaveFinalWord)
 			GD.Print($"HackFarm {HostName} is being destroyed");
 	}
@@ -113,7 +114,7 @@ public class HackFarm {
 		LifeTime -= delta;
 		return output;
 	}
-	public HackFarm(HackFarmDataSaveResource res) {
+	public BotFarm(HackFarmDataSaveResource res) {
         HackCostCurve = (res.HackA, res.HackB, res.HackC, res.HackD);
         GrowCostCurve = (res.GrowA, res.GrowB, res.GrowC, res.GrowD);
         TimeCostCurve = (res.TimeA, res.TimeB, res.TimeC, res._timeD);
@@ -121,8 +122,9 @@ public class HackFarm {
         HostName = res.HostName; DisplayName = res.DisplayName; IP = res.IP;
         LifeTime = res.LifeTime; _mineralBacklog = res.MineralBacklog; _cycleTimeRemain = res.CycleTimeRemain;
         mineralDistribution = [.. res.MineralType.Zip(res.MineralDistribution, (i, d) => (i, d))];
+		MAX_LIFE_TIME = res.MAX_LIFE_TIME;
     }
-    public static HackFarmDataSaveResource SerializeBotnet(HackFarm obj) {
+    public static HackFarmDataSaveResource SerializeBotnet(BotFarm obj) {
 		return new() {
             HackA = obj.HackCostCurve.Item1, HackB = obj.HackCostCurve.Item2, HackC = obj.HackCostCurve.Item3, HackD = obj.HackCostCurve.Item4,
             GrowA = obj.GrowCostCurve.Item1, GrowB = obj.GrowCostCurve.Item2, GrowC = obj.GrowCostCurve.Item3, GrowD = obj.GrowCostCurve.Item4,
@@ -132,6 +134,7 @@ public class HackFarm {
             MineralBacklog = obj.MBacklog, CycleTimeRemain = obj.CycleTimeRemain, LifeTime = obj.LifeTime,
             MineralType = obj.mineralDistribution.Select(x => x.Item1).ToArray(),
             MineralDistribution = obj.mineralDistribution.Select(x => x.Item2).ToArray(),
+            MAX_LIFE_TIME = obj.MAX_LIFE_TIME
         };
 	}
 }

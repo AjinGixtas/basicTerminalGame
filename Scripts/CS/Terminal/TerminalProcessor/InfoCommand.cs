@@ -69,7 +69,7 @@ public static partial class ShellCore {
         Say($"Username: {Util.Format(PlayerDataManager.Username, StrType.USERNAME)}");
         Say($"Balance:  {Util.Format($"{PlayerDataManager.GC_Cur}", StrType.MONEY)}");
         
-        Say($"Resouces: {Util.Format($"{PlayerDataManager.MineInv[0]}", StrType.MINERAL, "0")}");
+        Say($"Resouces: {Util.Format($"{PlayerDataManager.MineInv[0]}", StrType.T_MINERAL, "0")}");
     }
     static void Clear(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         terminalOutputField.Clear();

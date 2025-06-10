@@ -80,12 +80,7 @@ public static partial class Util {
                 return $"[color={Util.CC(Cc.m)}]{input}[/color]";
             case StrType.UNIT: {
                     if (string.IsNullOrWhiteSpace(input)) return "";
-                    string[] parts = input.Split('.');
-                    if (parts.Length < 2) { parts = [parts[0], "00"]; }
-                    string integerPart = parts[0];
-                    string decimalPart = parts[1].PadLeft(2, '0');
-                    if (addons.Length > 0 && addons[0][0] != '/') decimalPart = parts[1][..2];
-                    return $"{Util.Format($"{integerPart}.{decimalPart}", StrType.NUMBER)}[color={Util.CC(Cc.W)}]{addons[0]}[/color]";
+                    return $"{Util.Format(input, StrType.NUMBER)}[color={Util.CC(Cc.W)}]{addons[0]}[/color]";
                 }
             case StrType.SEC_LVL: {
                     return $"[color={input switch {
@@ -118,7 +113,7 @@ public static partial class Util {
 
                 }}]{input}[/color]";
             case StrType.NUMBER:
-                return $"[color={Util.CC(Cc.c)}]{input}[/color]";
+                return $"[color={Util.CC(Cc.c)}]{double.Parse(input):F2}[/color]";
             case StrType.IP:
                 return $"[color={Util.CC(Cc.C)}]{input}[/color]";
             case StrType.DIR:
@@ -177,7 +172,7 @@ public static partial class Util {
                     }
                     return sb + $"[color={Util.CC(Cc.w)}]{gcValue}[/color][color={Util.CC(Cc.Y)}]GC[/color]";
                 }
-            case StrType.MINERAL: {
+            case StrType.T_MINERAL: {
                     if (string.IsNullOrWhiteSpace(input)) return "";
                     if (!double.TryParse(input, out double value))
                         return $"[color={Util.CC(Cc.y)}]{input}[/color][color={Util.CC(Cc.y)}]GC[/color]";
@@ -342,5 +337,4 @@ public static partial class Util {
 
         return [.. args];
     }
-
 }

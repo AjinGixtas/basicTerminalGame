@@ -10,7 +10,7 @@ public static partial class NetworkManager {
     static List<DriftSector> driftSectors;
     static List<StaticSector> staticSectors;
     static Dictionary<string, WeakReference<NetworkNode>> DNS;
-    static List<HackFarm> BotNet = [];
+    static List<BotFarm> BotNet = [];
     const int DRIFT_SECTOR_COUNT = 64;
 
     public static void Ready() {
@@ -34,30 +34,49 @@ public static partial class NetworkManager {
 
     public static string[] GetSectorNames(bool mustConnected=false, int level=-1) {
         List<string> names = [];
+        List<Sector> nullSector = [];
         foreach (var sector in driftSectors) {
-            if (sector == null) continue; // Skip null sectors
+            if (sector == null) { 
+                nullSector.Add(sector);
+                continue; // Skip null sectors
+            }
             if (level > 0 && sector.SectorLevel != level) continue; // Skip sectors that don't match the level
             if (mustConnected && !connectedSectors.Contains(sector)) continue; // Skip if mustConnected is true and sector is not connected
             names.Add(sector.Name);
         }
-        foreach (var sector in staticSectors)
-            if (sector != null) names.Add(sector.Name);
+        foreach (DriftSector sector in nullSector) driftSectors.Remove(sector);
+        nullSector.Clear();
+        foreach (var sector in staticSectors) {
+            if (sector == null) { nullSector.Add(sector); continue; } 
+            if (mustConnected && !connectedSectors.Contains(sector)) continue; // Skip if mustConnected is true and sector is not connected
+            names.Add(sector.Name);
+        }
+        foreach (StaticSector sector in nullSector) staticSectors.Remove(sector);
+        nullSector.Clear();
         return [.. names];
     }
+    
     public static string[] GetBotnetNames() {
         List<string> names = [];
-        GD.Print(BotNet.Count);
-        foreach(HackFarm hackFarm in BotNet) {
-            if (hackFarm != null) names.Add(hackFarm.HostName);
+        foreach(BotFarm hackFarm in BotNet) {
+            if (hackFarm == null) { QueueRemoveHackFarm(hackFarm); continue; }
+            names.Add(hackFarm.HostName);
         }
         return [.. names];
     }
-
-    public static HackFarm GetHackfarm(string name) {
-        foreach (HackFarm farm in BotNet) {
+    public static int GetBotFarmCount() {
+        return BotNet.Count; // Count non-null bot farms
+    }
+    public static BotFarm GetBotFarm(string name) {
+        foreach (BotFarm farm in BotNet) {
+            if (farm == null) { QueueRemoveHackFarm(farm); continue; } // Remove null farms
             if (farm != null && farm.HostName == name) { return farm; }
         } return null;
     }
+    public static BotFarm[] GetBotFarms() {
+        return [.. BotNet];
+    }
+
     public static void RegenerateDriftSector(int removalAmount=-1) {
         driftSectors = driftSectors.Where(s => s != null).ToList(); // Remove null sectors
         if (removalAmount < 0) removalAmount = driftSectors.Count; // Default to all of the current sectors
@@ -110,29 +129,35 @@ public static partial class NetworkManager {
     }
 
     public static CError ConnectToSector(string sectorName) {
+        List<Sector> nullSector = [];
         foreach (DriftSector sector in driftSectors) {
-            if (sector == null) continue;
-            if (sector.Name == sectorName)
-                return ConnectToSector(sector);
+            if (sector == null) { nullSector.Add(sector); continue; }
+            if (sector.Name == sectorName) return ConnectToSector(sector);
         }
+        foreach(DriftSector sector in nullSector) driftSectors.Remove(sector); 
+        nullSector.Clear();
         foreach (StaticSector sector in staticSectors) {
-            if (sector == null) continue;
-            if (sector.Name == sectorName)
-                return ConnectToSector(sector);
+            if (sector == null) { nullSector.Add(sector); continue; }
+            if (sector.Name == sectorName) return ConnectToSector(sector);
         }
+        foreach (StaticSector sector in nullSector) staticSectors.Remove(sector);
+        nullSector.Clear();
         return CError.NOT_FOUND;
     }
     public static CError DisconnectFromSector(string sectorName) {
+        List<Sector> nullSector = [];
         foreach (DriftSector sector in driftSectors) {
-            if (sector == null) continue;
-            if (sector.Name == sectorName)
-                return DisconnectFromSector(sector);
+            if (sector == null) { nullSector.Add(sector); continue; }
+            if (sector.Name == sectorName) return DisconnectFromSector(sector);
         }
+        foreach(DriftSector sector in nullSector) driftSectors.Remove(sector); 
+        nullSector.Clear();
         foreach (StaticSector sector in staticSectors) {
-            if (sector == null) continue;
-            if (sector.Name == sectorName)
-                return DisconnectFromSector(sector);
+            if (sector == null) { nullSector.Add(sector); continue; }
+            if (sector.Name == sectorName) return DisconnectFromSector(sector);
         }
+        foreach (StaticSector sector in nullSector) staticSectors.Remove(sector);
+        nullSector.Clear();
         return CError.NOT_FOUND;
     }
 
@@ -210,29 +235,29 @@ public static partial class NetworkManager {
         }
     }
 
-    readonly static Queue<HackFarm> AddQueue = [];
-    public static void QueueAddHackFarm(HackFarm hackFarm) {
+    readonly static Queue<BotFarm> AddQueue = [];
+    public static void QueueAddHackFarm(BotFarm hackFarm) {
         GD.Print(hackFarm.HostName);
         AddQueue.Enqueue(hackFarm);
     }
-    readonly static Queue<HackFarm> RemovalQueue = [];
-    public static void QueueRemoveHackFarm(HackFarm hackFarm) {
+    readonly static Queue<BotFarm> RemovalQueue = [];
+    public static void QueueRemoveHackFarm(BotFarm hackFarm) {
         RemovalQueue.Enqueue(hackFarm);
     }
     static void ManageHackFarm(double delta) {
         while (AddQueue.Count > 0) {
-            HackFarm farm = AddQueue.Dequeue();
+            BotFarm farm = AddQueue.Dequeue();
             if (farm == null || BotNet.Contains(farm)) continue;
             BotNet.Add(farm);
         }
         while (RemovalQueue.Count > 0) {
-            HackFarm farm = RemovalQueue.Dequeue();
+            BotFarm farm = RemovalQueue.Dequeue();
             if (farm == null || !BotNet.Contains(farm)) continue;
             BotNet.Remove(farm);
         }
     }
     static void MineralCollection(double delta) {
-        foreach (HackFarm h in BotNet) {
+        foreach (BotFarm h in BotNet) {
             if (h.LifeTime <= 0) { QueueRemoveHackFarm(h); continue; }
             double[] minerals = h.ProcessMinerals(delta);
             for (int i = 0; i < minerals.Length; ++i) {
@@ -241,15 +266,15 @@ public static partial class NetworkManager {
         }
     }
 
+    [Flags]
     public enum HackFarmSortType {
-        HOSTNAME, // Sort by HostName
-        LIFETIME, // Sort by LifeTime
-        MBACKLOG, // Sort by MineralAmount
+        HOSTNAME = 1<<0, // Sort by HostName
+        LIFETIME = 1<<1, // Sort by LifeTime
+        MBACKLOG = 1<<2, // Sort by MineralAmount
     }
-    static readonly Comparison<HackFarm> HostnameSort = (a, b) => a.HostName.CompareTo(b.HostName);
-    static readonly Comparison<HackFarm> LifetimeSort = (a, b) => a.LifeTime.CompareTo(b.LifeTime);
-    static readonly Comparison<HackFarm> LifePercSort = (a, b) => (a.LifeTime/ a.MAX_LIFE_TIME).CompareTo(b.LifeTime/b.MAX_LIFE_TIME);
-    static readonly Comparison<HackFarm> MBacklogSort = (a, b) => a.MBacklog.CompareTo(b.MBacklog);
+    static readonly Comparison<BotFarm> HostnameSort = (a, b) => a.HostName.CompareTo(b.HostName);
+    static readonly Comparison<BotFarm> LifetimeSort = (a, b) => a.LifeTime.CompareTo(b.LifeTime);
+    static readonly Comparison<BotFarm> MBacklogSort = (a, b) => a.MBacklog.CompareTo(b.MBacklog);
     public static void SortHackFarm(HackFarmSortType sortType=HackFarmSortType.LIFETIME) {
         BotNet.RemoveAll(x => x == null); // Remove null entries
         switch (sortType) {
@@ -295,7 +320,7 @@ public static partial class NetworkManager {
         HackFarmDataSaveResource[] botData = new HackFarmDataSaveResource[BotNet.Count];
         for (int i = 0; i < BotNet.Count; ++i) {
             if (BotNet[i] == null) continue;
-            botData[i] = HackFarm.SerializeBotnet(BotNet[i]); ;
+            botData[i] = BotFarm.SerializeBotnet(BotNet[i]); ;
             Error error = ResourceSaver.Save(botData[i], StringExtensions.PathJoin(filePath, $"{botData[i].HostName}.tres"));
             if (error != Error.Ok) return (int)error; // Failed to save a botnet data file
         }
@@ -323,9 +348,17 @@ public static partial class NetworkManager {
             GD.Print(StringExtensions.PathJoin(filePath, file));
             HackFarmDataSaveResource data = GD.Load<HackFarmDataSaveResource>(StringExtensions.PathJoin(filePath, file));
             if (data == null) continue; // Failed to load data
-            HackFarm farm = new(data);
+            BotFarm farm = new(data);
             QueueAddHackFarm(farm);
         }
         return 0; // Successfully loaded all botnet data
+    }
+
+    static void CleanNullValue() {
+        driftSectors = driftSectors.Where(s => s != null).ToList();
+        staticSectors = staticSectors.Where(s => s != null).ToList();
+        connectedSectors = connectedSectors.Where(s => s != null).ToList();
+        BotNet = BotNet.Where(b => b != null).ToList();
+        DNS = DNS.Where(kv => kv.Value.TryGetTarget(out _)).ToDictionary(kv => kv.Key, kv => kv.Value);
     }
 }

@@ -10,4 +10,5 @@ public partial class HackFarmDataSaveResource : Resource {
     [Export] public double MineralBacklog, CycleTimeRemain, LifeTime;
     [Export] public double[] MineralDistribution;
     [Export] public int[] MineralType;
+    [Export] public double MAX_LIFE_TIME;
 }

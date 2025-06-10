@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://ccwqfx7w5pm3k"]
+[gd_scene load_steps=9 format=3 uid="uid://ccwqfx7w5pm3k"]
 
 [ext_resource type="Script" uid="uid://cruda7xtodutw" path="res://Scripts/CS/Directors/RuntimeDirector.cs" id="1_40tl5"]
 [ext_resource type="Script" uid="uid://b2ynbwrig2yqu" path="res://Scripts/CS/Directors/MenuDirector.cs" id="2_rv8lf"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://ywm7rhxebeh4" path="res://Scenes/MajorScenes/Terminal.tscn" id="4_rbu8k"]
 [ext_resource type="PackedScene" uid="uid://dsqh3owg3cspi" path="res://Scenes/MajorScenes/TextEditor.tscn" id="5_vnf3w"]
 [ext_resource type="PackedScene" uid="uid://blkjllh1u7by7" path="res://Scenes/MajorScenes/OverlayWindow.tscn" id="6_1de4d"]
+[ext_resource type="PackedScene" uid="uid://b6bxlse3m58ck" path="res://Scenes/MajorScenes/BotnetStatusBoard.tscn" id="6_sfmy1"]
 
 [sub_resource type="Environment" id="Environment_y4jh7"]
 background_mode = 3
@@ -67,7 +68,13 @@ theme = ExtResource("3_0n3pm")
 text = "Editor"
 alignment = 0
 
-[node name="Other" type="Button" parent="MenuDirector/MenuButtons"]
+[node name="BotnetButton" type="Button" parent="MenuDirector/MenuButtons"]
+layout_mode = 2
+theme = ExtResource("3_0n3pm")
+text = "Botnet"
+alignment = 0
+
+[node name="Other_2" type="Button" parent="MenuDirector/MenuButtons"]
 layout_mode = 2
 theme = ExtResource("3_0n3pm")
 text = "Other
@@ -95,8 +102,15 @@ layout_mode = 2
 overseer = NodePath("../../..")
 metadata/_tab_index = 1
 
+[node name="BotnetStatusBoard" parent="MenuDirector/MenuWindows" node_paths=PackedStringArray("menuDirector") instance=ExtResource("6_sfmy1")]
+visible = false
+layout_mode = 2
+menuDirector = NodePath("../..")
+metadata/_tab_index = 2
+
 [node name="OverlayWindow" parent="." instance=ExtResource("6_1de4d")]
 position = Vector2i(427, 64)
 
 [connection signal="button_down" from="MenuDirector/MenuButtons/TerminalButton" to="MenuDirector" method="TerminalButtonPressed"]
 [connection signal="button_down" from="MenuDirector/MenuButtons/EditorButton" to="MenuDirector" method="EditorButtonPressed"]
+[connection signal="button_down" from="MenuDirector/MenuButtons/BotnetButton" to="MenuDirector" method="BotnetButtonPressed"]

@@ -1,0 +1,79 @@
+[gd_scene load_steps=3 format=3 uid="uid://bdnxo2pmmm0v8"]
+
+[ext_resource type="Theme" uid="uid://b1ho65js5h7y7" path="res://Utilities/Themes/Botnet.tres" id="1_yf65v"]
+[ext_resource type="Script" uid="uid://d1nh2n16rb25u" path="res://Scripts/CS/BotnetDashboard/BotSlide.cs" id="2_fsow6"]
+
+[node name="BotSlide" type="Button" node_paths=PackedStringArray("botName", "lifetimeBar", "mineSpeed")]
+custom_minimum_size = Vector2(512, 32)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource("1_yf65v")
+script = ExtResource("2_fsow6")
+botName = NodePath("Control/BotName")
+lifetimeBar = NodePath("Control/LifetimeBar")
+mineSpeed = NodePath("Control/MiningSpeed")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+theme = ExtResource("1_yf65v")
+
+[node name="BotName" type="RichTextLabel" parent="Control"]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 185.0
+grow_vertical = 2
+theme = ExtResource("1_yf65v")
+bbcode_enabled = true
+text = "CARBONMONOXIDESNIFFER_123456"
+fit_content = true
+autowrap_mode = 0
+vertical_alignment = 1
+
+[node name="LifetimeBar" type="RichTextLabel" parent="Control"]
+layout_mode = 1
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -74.5
+offset_right = 74.5
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+theme = ExtResource("1_yf65v")
+bbcode_enabled = true
+text = "[||||||||||||||||||||]"
+fit_content = true
+autowrap_mode = 0
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MiningSpeed" type="RichTextLabel" parent="Control"]
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -95.0
+grow_horizontal = 0
+grow_vertical = 2
+theme = ExtResource("1_yf65v")
+bbcode_enabled = true
+text = "3.1479 unit/s
+"
+fit_content = true
+autowrap_mode = 0
+horizontal_alignment = 2
+vertical_alignment = 1

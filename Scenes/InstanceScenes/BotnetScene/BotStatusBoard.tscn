@@ -1,4 +1,6 @@
-[gd_scene format=3 uid="uid://yios1pd5iiwu"]
+[gd_scene load_steps=2 format=3 uid="uid://yios1pd5iiwu"]
+
+[ext_resource type="Script" uid="uid://8ln3y0dnckuf" path="res://Scripts/CS/BotnetDashboard/BotStatusBoard.cs" id="1_s0ffo"]
 
 [node name="BotStatusBoard" type="MarginContainer"]
 custom_minimum_size = Vector2(0, 128)
@@ -7,7 +9,32 @@ anchor_right = 1.0
 grow_horizontal = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+script = ExtResource("1_s0ffo")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 2
-color = Color(0, 1, 1, 1)
+color = Color(0, 1, 1, 0.0823529)
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 2
+
+[node name="LeftLabel" type="RichTextLabel" parent="Control"]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 1.0
+grow_vertical = 2
+text = "Host name: pootisattack_ussr
+"
+fit_content = true
+autowrap_mode = 0
+
+[node name="RightLabel" type="RichTextLabel" parent="Control"]
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -1.0
+grow_horizontal = 0
+grow_vertical = 2

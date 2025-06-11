@@ -121,11 +121,13 @@ theme = ExtResource("4_uighi")
 alignment = 1
 last_wrap_alignment = 2
 
+[node name="Control" parent="SplitContainer/Control/ScrollContainer/MarginContainer/HFlowContainer" instance=ExtResource("2_fnrm0")]
+layout_mode = 2
+
 [node name="TimerContainer" type="Node" parent="."]
 
 [node name="RefreshDashboardTimer" type="Timer" parent="TimerContainer"]
-wait_time = 0.2
-autostart = true
+wait_time = 0.1
 
 [connection signal="pressed" from="SplitContainer/Control/MarginContainer/PageControlBar/HFlowContainer/PageSize10" to="." method="SetPageLength" binds= [10]]
 [connection signal="pressed" from="SplitContainer/Control/MarginContainer/PageControlBar/HFlowContainer/PageSize20" to="." method="SetPageLength" binds= [20]]

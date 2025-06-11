@@ -113,7 +113,9 @@ public static partial class Util {
 
                 }}]{input}[/color]";
             case StrType.NUMBER:
-                return $"[color={Util.CC(Cc.c)}]{double.Parse(input):F2}[/color]";
+                string number = addons.Length > 0 ? double.Parse(input).ToString($"F{addons[0]}") :
+                    double.Parse(input).ToString("F2");
+                return $"[color={Util.CC(Cc.C)}]{number}[/color]";
             case StrType.IP:
                 return $"[color={Util.CC(Cc.C)}]{input}[/color]";
             case StrType.DIR:

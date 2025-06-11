@@ -1,9 +1,11 @@
 using Godot;
+using System;
 
 public partial class BotnetDashboard : MarginContainer {
 	[Export] MenuDirector menuDirector;
 	[Export] PackedScene slideScene;
 	[Export] HFlowContainer slideContainer;
+	[Export] BotStatusBoard botStatusBoard;
 	[Export] private NetworkManager.HackFarmSortType sortType = NetworkManager.HackFarmSortType.LIFETIME;
 
 	BotSlide[] BotSlides;
@@ -14,12 +16,9 @@ public partial class BotnetDashboard : MarginContainer {
 		for (int i = 0; i < pageLength[^1]; ++i) {
 			BotSlides[i] = slideScene.Instantiate<BotSlide>();
 			slideContainer.AddChild(BotSlides[i]);
-		}
-		for (int i = 0; i < _pageLength; ++i) {
-			BotSlides[i].Visible = true; // Show new slides
-		}
-		for (int i = _pageLength; i < BotSlides.Length; ++i) {
-			BotSlides[i].Visible = false; // Hide slides that are not needed
+			BotSlides[i].Visible = false;
+			BotSlides[i].Director = this;
+			BotSlides[i].ID = i;
 		}
 		RenderDashboardPage();
 	}
@@ -40,6 +39,7 @@ public partial class BotnetDashboard : MarginContainer {
 	}
 	public override void _Process(double delta) {
 		base._Process(delta);
+		OnRefreshTimerTimeout();
 	}
 	public void OnRefreshTimerTimeout() {
 		if (menuDirector.MenuWindowIndex != MenuDirector.BOTNET_INDEX) return;
@@ -59,8 +59,12 @@ public partial class BotnetDashboard : MarginContainer {
 			BotSlides[index].Visible = true;
 		}
 	}
-
-	public void SetPageLength(int length) {
+	public void OnBotSlidePressed(int index) {
+		int entryIndex = CurPage * PageLength + index;
+		if (entryIndex >= NetworkManager.BotNet.Count) return;
+		botStatusBoard.ChangeFocusedBotFarm(NetworkManager.BotNet[entryIndex]);
+    }
+    public void SetPageLength(int length) {
 		PageLength = length;
 	}
 }

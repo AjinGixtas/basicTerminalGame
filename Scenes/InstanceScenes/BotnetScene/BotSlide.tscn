@@ -3,32 +3,22 @@
 [ext_resource type="Theme" uid="uid://b1ho65js5h7y7" path="res://Utilities/Themes/Botnet.tres" id="1_yf65v"]
 [ext_resource type="Script" uid="uid://d1nh2n16rb25u" path="res://Scripts/CS/BotnetDashboard/BotSlide.cs" id="2_fsow6"]
 
-[node name="BotSlide" type="Button" node_paths=PackedStringArray("botName", "lifetimeBar", "mineSpeed")]
-custom_minimum_size = Vector2(512, 32)
+[node name="BotSlide" type="Control" node_paths=PackedStringArray("botName", "hackTimeBar", "lifeTimeDisplay")]
+custom_minimum_size = Vector2(512, 40)
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
-size_flags_vertical = 3
 theme = ExtResource("1_yf65v")
 script = ExtResource("2_fsow6")
-botName = NodePath("Control/BotName")
-lifetimeBar = NodePath("Control/LifetimeBar")
-mineSpeed = NodePath("Control/MiningSpeed")
+botName = NodePath("BotName")
+hackTimeBar = NodePath("HackTimeBar")
+lifeTimeDisplay = NodePath("LifeTimeDisplay")
 
-[node name="Control" type="Control" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 3
-theme = ExtResource("1_yf65v")
-
-[node name="BotName" type="RichTextLabel" parent="Control"]
+[node name="BotName" type="RichTextLabel" parent="."]
 layout_mode = 1
 anchors_preset = 9
 anchor_bottom = 1.0
@@ -41,7 +31,7 @@ fit_content = true
 autowrap_mode = 0
 vertical_alignment = 1
 
-[node name="LifetimeBar" type="RichTextLabel" parent="Control"]
+[node name="HackTimeBar" type="RichTextLabel" parent="."]
 layout_mode = 1
 anchors_preset = 13
 anchor_left = 0.5
@@ -60,7 +50,7 @@ autowrap_mode = 0
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="MiningSpeed" type="RichTextLabel" parent="Control"]
+[node name="LifeTimeDisplay" type="RichTextLabel" parent="."]
 layout_mode = 1
 anchors_preset = 11
 anchor_left = 1.0
@@ -77,3 +67,19 @@ fit_content = true
 autowrap_mode = 0
 horizontal_alignment = 2
 vertical_alignment = 1
+
+[node name="BotSlide" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource("1_yf65v")
+toggle_mode = true
+text = "
+"
+
+[connection signal="pressed" from="BotSlide" to="." method="OnPressed"]

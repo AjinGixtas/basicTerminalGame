@@ -10,7 +10,7 @@ public static partial class NetworkManager {
     static List<DriftSector> driftSectors;
     static List<StaticSector> staticSectors;
     static Dictionary<string, WeakReference<NetworkNode>> DNS;
-    static List<BotFarm> BotNet = [];
+    public static List<BotFarm> BotNet { get; private set; } = [];
     const int DRIFT_SECTOR_COUNT = 64;
 
     public static void Ready() {

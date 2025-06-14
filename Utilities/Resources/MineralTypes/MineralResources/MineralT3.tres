@@ -5,5 +5,6 @@
 [resource]
 script = ExtResource("1_srw4m")
 Name = "Ferrosync"
+Shorthand = "FS"
 Index = 5
-_colorCode = 10
+_colorCode = 25

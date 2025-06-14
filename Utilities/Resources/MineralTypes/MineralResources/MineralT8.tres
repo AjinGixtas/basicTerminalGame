@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_28k0v")
-Name = "Corruptium"
+Name = "Synthite"
+Shorthand = "SY"
 Index = 8
-_colorCode = 4
+_colorCode = 23

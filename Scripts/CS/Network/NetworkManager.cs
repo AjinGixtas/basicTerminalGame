@@ -56,7 +56,7 @@ public static partial class NetworkManager {
         return [.. names];
     }
     
-    public static string[] GetBotnetNames() {
+    public static string[] GetBotsName() {
         List<string> names = [];
         foreach(BotFarm hackFarm in BotNet) {
             if (hackFarm == null) { QueueRemoveHackFarm(hackFarm); continue; }
@@ -64,14 +64,29 @@ public static partial class NetworkManager {
         }
         return [.. names];
     }
-    public static int GetBotFarmCount() {
+    public static string[] GetBotsIP() {
+        List<string> ips = [];
+        foreach (BotFarm hackFarm in BotNet) {
+            if (hackFarm == null) { QueueRemoveHackFarm(hackFarm); continue; }
+            ips.Add(hackFarm.IP);
+        }
+        return [.. ips];
+    }
+    public static int GetBotCount() {
         return BotNet.Count; // Count non-null bot farms
     }
-    public static BotFarm GetBotFarm(string name) {
+    public static BotFarm GetBotByName(string name) {
         foreach (BotFarm farm in BotNet) {
             if (farm == null) { QueueRemoveHackFarm(farm); continue; } // Remove null farms
-            if (farm != null && farm.HostName == name) { return farm; }
+            if (farm.HostName == name) { return farm; }
         } return null;
+    }
+    public static BotFarm GetBotByIP(string ip) {
+        foreach (BotFarm farm in BotNet) {
+            if (farm == null) { QueueRemoveHackFarm(farm); continue; } // Remove null farms
+            if (farm.IP == ip) { return farm; }
+        }
+        return null;
     }
     public static BotFarm[] GetBotFarms() {
         return [.. BotNet];
@@ -259,9 +274,9 @@ public static partial class NetworkManager {
     static void MineralCollection(double delta) {
         foreach (BotFarm h in BotNet) {
             if (h.LifeTime <= 0) { QueueRemoveHackFarm(h); continue; }
-            double[] minerals = h.ProcessMinerals(delta);
+            (int, double)[] minerals = h.ProcessMinerals(delta);
             for (int i = 0; i < minerals.Length; ++i) {
-                PlayerDataManager.DepositMineral(i, minerals[i]);
+                PlayerDataManager.DepositMineral(minerals[i].Item1, minerals[i].Item2);
             }
         }
     }

@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_32ufw")
-Name = "Carbonmesh"
+Name = "Algorite"
+Shorthand = "AG"
 Index = 6
-_colorCode = 10
+_colorCode = 7

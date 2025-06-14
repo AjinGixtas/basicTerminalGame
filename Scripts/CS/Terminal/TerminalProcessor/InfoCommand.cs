@@ -1,10 +1,11 @@
 using Godot;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using static System.Net.Mime.MediaTypeNames;
 public static partial class ShellCore {
     // It gets 2 since this one is REALLY close to standard, but since it's also called independently a lot, allow for seperate shorthand flag is way better.
+    const int MAX_HISTORY_CHAR_SIZE = 65536, RESET_HISTORY_CHAR_SIZE = 16384;
     static void Say(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
-        const int MAX_HISTORY_CHAR_SIZE = 65536, RESET_HISTORY_CHAR_SIZE = 16384;
         if (positionalArgs.Length == 0) { Say(""); return; }
         string c = terminalOutputField.Text;
         if (c.Length >= MAX_HISTORY_CHAR_SIZE) {
@@ -21,8 +22,17 @@ public static partial class ShellCore {
         if (parsedArgs.ContainsKey("-w")) text = Util.Format(text, StrType.WARNING);
         terminalOutputField.AppendText(text);
     }
+    public static void SayM(string content) {
+        if (terminalOutputField == null) return;
+        string c = terminalOutputField.Text;
+        if (c.Length >= MAX_HISTORY_CHAR_SIZE) {
+            terminalOutputField.Clear();
+            terminalOutputField.AppendText(GetLastLinesUnderLimit(c, RESET_HISTORY_CHAR_SIZE));
+        }
+        terminalOutputField.ScrollToLine(terminalOutputField.GetLineCount() - 1);
+        terminalOutputField.AppendText(content+'\n');
+    }
     public static void Say(params string[] args) {
-        const int MAX_HISTORY_CHAR_SIZE = 65536, RESET_HISTORY_CHAR_SIZE = 16384;
         if (terminalOutputField == null) return;
         if (args.Length == 0) { Say(""); return; }
 
@@ -69,10 +79,21 @@ public static partial class ShellCore {
         Say($"Username: {Util.Format(PlayerDataManager.Username, StrType.USERNAME)}");
         Say($"Balance:  {Util.Format($"{PlayerDataManager.GC_Cur}", StrType.MONEY)}");
         
-        Say($"Resouces: {Util.Format($"{PlayerDataManager.MineInv[0]}", StrType.T_MINERAL, "0")}");
+        Say(
+@$"Resouces: 
+{Util.Format($"{PlayerDataManager.MineInv[0]}", StrType.T_MINERAL, "0")}
+{Util.Format($"{PlayerDataManager.MineInv[1]}", StrType.T_MINERAL, "1")}
+{Util.Format($"{PlayerDataManager.MineInv[2]}", StrType.T_MINERAL, "2")}
+{Util.Format($"{PlayerDataManager.MineInv[3]}", StrType.T_MINERAL, "3")}
+{Util.Format($"{PlayerDataManager.MineInv[4]}", StrType.T_MINERAL, "4")}
+{Util.Format($"{PlayerDataManager.MineInv[5]}", StrType.T_MINERAL, "5")}
+{Util.Format($"{PlayerDataManager.MineInv[6]}", StrType.T_MINERAL, "6")}
+{Util.Format($"{PlayerDataManager.MineInv[7]}", StrType.T_MINERAL, "7")}
+{Util.Format($"{PlayerDataManager.MineInv[8]}", StrType.T_MINERAL, "8")}
+{Util.Format($"{PlayerDataManager.MineInv[9]}", StrType.T_MINERAL, "9")}");
     }
     static void Clear(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
-        terminalOutputField.Clear();
+        Clear();
     }
     static void Inspect(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 
@@ -80,8 +101,7 @@ public static partial class ShellCore {
     static void SetUsername(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         if (positionalArgs.Length == 0) { Say("-r", $"No username provided."); return; }
         if (positionalArgs[0].Length > 20) { Say("-r", $"Username too long. Max length is 20 characters."); return; }
-        PlayerDataManager.Username = positionalArgs[0];
-        SetCommandPrompt();
+        SetUsername(positionalArgs[0]);
     }
     static void SeeColor(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         var colorNames = new (Cc, string)[] {
@@ -117,7 +137,7 @@ public static partial class ShellCore {
         string output = "";
         int index = 0;
         foreach (var (cc, name) in colorNames) {
-            output += $"[color={Util.CC(cc)}]{new string(' ', index * 3)} ███ {name}[/color]\n";
+            output += $"[color={Util.CC(cc)}]{new string(' ', index * 3)} ███ {name} {(int)cc}[/color]\n";
             index++;
         }
         Say(output.TrimEnd('\n'));
@@ -133,5 +153,13 @@ public static partial class ShellCore {
         f.StoreString(luaStub);
         f.Flush();
         Say($"Generated Lua stub for class {iFile}");
+    }
+    
+    public static void Clear() {
+        terminalOutputField.Clear();
+    }
+    public static void SetUsername(string newUsername) {
+        PlayerDataManager.Username = newUsername;
+        SetCommandPrompt();
     }
 }

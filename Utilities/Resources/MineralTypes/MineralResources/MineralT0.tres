@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_ojl2l")
-Name = "Neurogel"
+Name = "Datacite"
+Shorthand = "DC"
 Index = 0
-_colorCode = 20
+_colorCode = 11

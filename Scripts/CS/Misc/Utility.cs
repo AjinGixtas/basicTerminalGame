@@ -24,7 +24,7 @@ public static partial class Util {
     public static string CC(Cc color) {
         return color switch {
             Cc._ => "#000000",   // Black
-            Cc.w => "#282828",   // Dark gray
+            Cc.w => "#666666",   // Dark gray
             Cc.W => "#ffffff",   // White
 
             Cc.R => "#ff0000",     // Bright red
@@ -50,7 +50,7 @@ public static partial class Util {
 
             Cc.LB => "#6666ff",    // Periwinkle
             Cc.LG => "#66ff66",    // Light green
-            Cc.LC => "#66ffff",    // Light cyan
+            Cc.LC => "#adffff",    // Light cyan
             Cc.LR => "#ff6666",    // Light coral
             Cc.LM => "#ff66ff",    // Light magenta
             Cc.LY => "#ffff66",    // Light yellow
@@ -177,16 +177,14 @@ public static partial class Util {
             case StrType.T_MINERAL: {
                     if (string.IsNullOrWhiteSpace(input)) return "";
                     if (!double.TryParse(input, out double value))
-                        return $"[color={Util.CC(Cc.y)}]{input}[/color][color={Util.CC(Cc.y)}]GC[/color]";
+                        return Util.Format("NUMBER_PARSE_FAILED", StrType.ERROR);
                     int index = int.Parse(addons[0]);
                     MineralProfile profile = MINERAL_PROFILES[index];
                     string[] units = ["S", "Q", "T", "B", "M", "K"];
                     double[] divisors = [1e21, 1e15, 1e12, 1e9, 1e6, 1e3];
                     Cc[] unitColors = [Cc.R, Cc.Y, Cc.M, Cc.G, Cc.B, Cc.C];
                     string mineralColor = "";
-                    if (addons.Length == 0) {
-                        mineralColor = Util.CC(profile.ColorCode);
-                    } else { mineralColor = Util.CC(Enum.Parse<Cc>(addons[0])); }
+                    mineralColor = Util.CC(profile.ColorCode);
                     for (int i = 0; i < units.Length; i++) {
                         if (value >= divisors[i]) {
                             double unitValue = value / divisors[i];
@@ -196,8 +194,14 @@ public static partial class Util {
                     }
                     // If less than 1K, just show the number with GC
                     string formattedValue = Mathf.Floor(value).ToString("0.##");
-                    return $"[color={Util.CC(Cc.w)}]{formattedValue}[/color][color={mineralColor}]{profile.Name}[/color]";
+                    return $"[color={Util.CC(Cc.w)}]{formattedValue}[/color][color={mineralColor}]{profile.Shorthand}[/color]";
                 }
+            case StrType.G_MINERAL: { // General mineral formatting
+                    if (!int.TryParse(addons[0], out int index))
+                        return Util.Format("MINERAL_TYPE_INDEX_PARSE_FAILED", StrType.ERROR);
+                    return $"[color={Util.CC(MINERAL_PROFILES[index].ColorCode)}]{input}[/color]";
+                }
+
             case StrType.USERNAME:
                 return $"[color={Util.CC(Cc.M)}]{input}[/color]";
             case StrType.WARNING:
@@ -338,5 +342,54 @@ public static partial class Util {
             args.Add(current.ToString());
 
         return [.. args];
+    }
+    public static string GenerateStringByProportions(double[] proportions, Cc[] colorCode, int length) {
+        if (proportions.Length != colorCode.Length)
+            throw new ArgumentException("Proportions and characters must be of the same length.");
+
+        int[] counts = new int[proportions.Length];
+        int assigned = 0;
+
+        // First pass: calculate initial counts using floor
+        for (int i = 0; i < proportions.Length; i++) {
+            counts[i] = (int)Math.Floor(proportions[i] * length);
+            assigned += counts[i];
+        }
+
+        // Distribute the remainder
+        int remainder = length - assigned;
+
+        // Get decimal parts and their indices
+        double[] decimalParts = new double[proportions.Length];
+        for (int i = 0; i < proportions.Length; i++) {
+            decimalParts[i] = (proportions[i] * length) - counts[i];
+        }
+
+        // Assign remaining characters based on largest decimal parts
+        while (remainder > 0) {
+            int maxIndex = 0;
+            for (int i = 1; i < decimalParts.Length; i++) {
+                if (decimalParts[i] > decimalParts[maxIndex]) {
+                    maxIndex = i;
+                }
+            }
+
+            counts[maxIndex]++;
+            decimalParts[maxIndex] = 0; // Mark as used
+            remainder--;
+        }
+
+        // Build final string
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < counts.Length; i++) {
+            sb.Append($"[color={Util.CC(colorCode[i])}]" + new string('█', counts[i]) + "[/color]");
+        }
+
+        return sb.ToString();
+    }
+    public static string TimeDifferenceFriendly(double time) {
+        int min = (int)(time / 60);
+        if (min < 1) return $"Less than {Util.Format("1", StrType.UNIT, "min")}";
+        return $"Aprox.{Util.Format($"{min}", StrType.UNIT, "min")} remaining";
     }
 }

@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_qb4p4")
-Name = "Bytecore"
+Name = "Cachelium"
+Shorthand = "CH"
 Index = 2
-_colorCode = 7
+_colorCode = 14

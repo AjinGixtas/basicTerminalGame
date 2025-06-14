@@ -11,7 +11,7 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
-[node name="MarginContainer" type="MarginContainer" node_paths=PackedStringArray("slideContainer")]
+[node name="MarginContainer" type="MarginContainer" node_paths=PackedStringArray("slideContainer", "botStatusBoard")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -22,6 +22,7 @@ focus_mode = 2
 script = ExtResource("1_fnrm0")
 slideScene = ExtResource("2_fnrm0")
 slideContainer = NodePath("SplitContainer/Control/ScrollContainer/MarginContainer/HFlowContainer")
+botStatusBoard = NodePath("SplitContainer/BotStatusBoard")
 _pageLength = 20
 
 [node name="SplitContainer" type="VSplitContainer" parent="."]
@@ -31,7 +32,6 @@ dragger_visibility = 2
 
 [node name="BotStatusBoard" parent="SplitContainer" instance=ExtResource("1_6dl4o")]
 layout_mode = 2
-size_flags_vertical = 1
 
 [node name="Control" type="VSplitContainer" parent="SplitContainer"]
 layout_mode = 2
@@ -120,9 +120,6 @@ size_flags_vertical = 3
 theme = ExtResource("4_uighi")
 alignment = 1
 last_wrap_alignment = 2
-
-[node name="Control" parent="SplitContainer/Control/ScrollContainer/MarginContainer/HFlowContainer" instance=ExtResource("2_fnrm0")]
-layout_mode = 2
 
 [node name="TimerContainer" type="Node" parent="."]
 

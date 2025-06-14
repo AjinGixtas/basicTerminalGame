@@ -39,7 +39,7 @@ public class LockSystem {
 			for (int j = 0; j < flags.Length; j++) {
 				if (ans.TryGetValue(flags[j], out string key)) {
 					if (key == "") {
-						errors.Add((CError.MISSING, activeLocks[i].Name, flags[j], activeLocks[i].Inp));
+						errors.Add((CError.INCORRECT, activeLocks[i].Name, flags[j], activeLocks[i].Inp));
 						return [.. errors]; // If any key is empty, return immediately
 					}
 					if (!activeLocks[i].UnlockAttempt(key, j)) {

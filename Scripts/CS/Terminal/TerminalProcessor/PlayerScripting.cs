@@ -1,7 +1,6 @@
 using Godot;
-using System.Collections.Generic;
 public static partial class ShellCore {
-    static void Run(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+    static void Run(System.Collections.Generic.Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         if (positionalArgs.Length == 0) {
             GD.Print("Usage: run <script_file>");
             return;
@@ -14,7 +13,7 @@ public static partial class ShellCore {
         }
         try {
             string scriptContent = file.Content;
-            ScriptRunner.RunPlayerScript(scriptContent);
+            ScriptRunner.RunPlayerScript(scriptContent, parsedArgs, positionalArgs);
         } catch (System.Exception ex) {
             GD.PrintErr($"Error running script '{scriptPath}': {ex.Message}");
         }

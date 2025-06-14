@@ -1,6 +1,9 @@
 using Godot;
 
 public class NetworkModule {
+    public string GetMyIP() {
+        return NetworkManager.PlayerNode.IP;
+    }
     public int LinkSector(string sectorName) {
         return (int)NetworkManager.ConnectToSector(sectorName);
     }

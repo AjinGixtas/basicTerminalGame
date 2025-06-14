@@ -1,40 +1,74 @@
-[gd_scene load_steps=2 format=3 uid="uid://yios1pd5iiwu"]
+[gd_scene load_steps=3 format=3 uid="uid://yios1pd5iiwu"]
 
 [ext_resource type="Script" uid="uid://8ln3y0dnckuf" path="res://Scripts/CS/BotnetDashboard/BotStatusBoard.cs" id="1_s0ffo"]
+[ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="2_7b57d"]
 
-[node name="BotStatusBoard" type="MarginContainer"]
-custom_minimum_size = Vector2(0, 128)
+[node name="BotStatusBoard" type="MarginContainer" node_paths=PackedStringArray("leftLabel", "rightLabel")]
+custom_minimum_size = Vector2(0, 180)
 anchors_preset = 10
 anchor_right = 1.0
+offset_bottom = 10.0
 grow_horizontal = 2
 size_flags_horizontal = 3
-size_flags_vertical = 3
 script = ExtResource("1_s0ffo")
+leftLabel = NodePath("Container/Control/LeftLabel")
+rightLabel = NodePath("Container/Control/RightLabel")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 2
-color = Color(0, 1, 1, 0.0823529)
+color = Color(0, 1, 1, 0.0196078)
 
-[node name="Control" type="Control" parent="."]
+[node name="Container" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 2
+
+[node name="Control" type="Control" parent="Container"]
 layout_mode = 2
 
-[node name="LeftLabel" type="RichTextLabel" parent="Control"]
+[node name="LeftLabel" type="RichTextLabel" parent="Container/Control"]
 layout_mode = 1
-anchors_preset = 9
-anchor_bottom = 1.0
-offset_right = 1.0
-grow_vertical = 2
-text = "Host name: pootisattack_ussr
-"
+offset_right = 1433.0
+offset_bottom = 167.0
+focus_mode = 2
+theme = ExtResource("2_7b57d")
+bbcode_enabled = true
+text = "$@\"[color={Util.CC(Cc.w)}]Botnet:[/color] {Util.Format(minerName, StrType.HOSTNAME)}
+{Util.GenerateStringByProportions([.. hackfarm.mineralDistribution.Select(x => x.Item2)], [.. hackfarm.mineralDistribution.Select(x => Util.MINERAL_PROFILES[x.Item1].ColorCode)], 50)}
+{string.Join(\" | \", hackfarm.mineralDistribution.Select(x => $\"[color={Util.MINERAL_PROFILES[x.Item1].ColorCode}]{Util.MINERAL_PROFILES[x.Item1].Shorthand}[/color]: {Util.Format($\"{x.Item2 * 100.0:0.00}\", StrType.NUMBER)}%\"))}
+================================================================
+[color={Util.CC(Cc.w)}]Batch size[/color]    | Lvl.{Util.Format($\"{hackfarm.HackLVL}\", StrType.NUMBER):3} | {Util.Format($\"{hackfarm.HackVal}\", StrType.NUMBER):3}
+[color={Util.CC(Cc.w)}]Mining speed[/color]  | Lvl.{Util.Format($\"{hackfarm.GrowLVL}\", StrType.NUMBER):3} | {Util.Format($\"{hackfarm.GrowVal}\", StrType.NUMBER):3}
+[color={Util.CC(Cc.w)}]Transfer time[/color] | Lvl.{Util.Format($\"{hackfarm.TimeLVL}\", StrType.NUMBER):3} | {Util.Format($\"{hackfarm.TimeVal}\", StrType.NUMBER):3}
+================================================================
+[color={Util.CC(Cc.w)}]Aprox. Time To Live:[/color] {Util.TimeDifferenceFriendly(hackfarm.LifeTime)}
+
+!NODE UPGRADABLE THROUGH SCRIPTING!\""
 fit_content = true
 autowrap_mode = 0
+vertical_alignment = 1
+selection_enabled = true
+deselect_on_focus_loss_enabled = false
 
-[node name="RightLabel" type="RichTextLabel" parent="Control"]
+[node name="RightLabel" type="RichTextLabel" parent="Container/Control"]
 layout_mode = 1
 anchors_preset = 11
 anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -1.0
+offset_left = -24.0
 grow_horizontal = 0
 grow_vertical = 2
+focus_mode = 2
+theme = ExtResource("2_7b57d")
+bbcode_enabled = true
+text = ",--
+|
+|"
+fit_content = true
+autowrap_mode = 0
+horizontal_alignment = 2
+selection_enabled = true
+deselect_on_focus_loss_enabled = false

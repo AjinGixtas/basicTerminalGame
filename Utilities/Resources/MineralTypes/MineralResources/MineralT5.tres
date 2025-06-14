@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_jsjwa")
-Name = "Plasmic Thread"
+Name = "Fractyl"
+Shorthand = "FY"
 Index = 5
-_colorCode = 9
+_colorCode = 21

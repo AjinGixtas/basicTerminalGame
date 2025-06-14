@@ -66,13 +66,16 @@ public partial class LifeCycleDirector : Node
 
 		if (saveFolders.Count == 0) { ShellCore.Say("-r", "No previous record of user found. Intialize new user."); return; }
 
-		// Find the most recently updated one
-		
-		string latestFolder = saveFolders
+        // Find the most recently updated one
+        for (int i = 0; i < saveFolders.Count; i++) {
+            GD.Print(FileAccess.GetModifiedTime(StringExtensions.PathJoin($"{SaveRoot}/{saveFolders[i]}", "PlayerData.tres")), ' ', saveFolders[i]);
+        }
+        string latestFolder = saveFolders
 			.Where(dir => FileAccess.FileExists(StringExtensions.PathJoin($"{SaveRoot}/{dir}", "PlayerData.tres")))
 			.OrderByDescending(dir => FileAccess.GetModifiedTime(StringExtensions.PathJoin($"{SaveRoot}/{dir}", "PlayerData.tres")))
 			.FirstOrDefault();
-		GD.Print(saveFolders[0]);
+
+		GD.Print(latestFolder);
 		ShellCore.Say($"Loading save from: {latestFolder}");
 		// Load global data
 		int[] statusCodes = [

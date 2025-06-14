@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_fvhmk")
-Name = "Silicrypt"
+Name = "Bitron"
+Shorthand = "BT"
 Index = 1
-_colorCode = 6
+_colorCode = 13

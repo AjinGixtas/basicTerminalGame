@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_gm5uq")
-Name = "Nullite"
+Name = "Nexium"
+Shorthand = "NX"
 Index = 4
-_colorCode = 8
+_colorCode = 5

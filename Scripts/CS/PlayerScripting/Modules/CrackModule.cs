@@ -13,8 +13,7 @@ public class CrackModule {
 
         foreach (var (err, s1, s2, s3) in result) {
             output.Add(new object[]
-            { (int)err,  // or err.ToString()
-            s1, s2, s3 });
+            { err, s1, s2, s3 });
         }
         return output.ToArray();
     }

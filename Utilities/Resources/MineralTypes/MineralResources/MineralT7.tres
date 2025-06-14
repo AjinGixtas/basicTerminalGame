@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_thvdn")
-Name = "Glimmerglass"
+Name = "Quantar"
+Shorthand = "QT"
 Index = 7
 _colorCode = 3

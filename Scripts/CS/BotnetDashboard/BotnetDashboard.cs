@@ -63,8 +63,8 @@ public partial class BotnetDashboard : MarginContainer {
 		int entryIndex = CurPage * PageLength + index;
 		if (entryIndex >= NetworkManager.BotNet.Count) return;
 		botStatusBoard.ChangeFocusedBotFarm(NetworkManager.BotNet[entryIndex]);
-    }
-    public void SetPageLength(int length) {
+	}
+	public void SetPageLength(int length) {
 		PageLength = length;
 	}
 }

@@ -54,9 +54,12 @@ public static partial class ShellCore {
             case "analyze": Analyze(parsedArgs, positionalArgs); break; // Give data about a node
             case "setusername": SetUsername(parsedArgs, positionalArgs); break; // Set the player's username
 
+            case "xyzzy": Say("Nothing happens"); break; // Classic Easter egg command
+
             case "regenerate": NetworkManager.RegenerateDriftSector(); break; // Regenerate the drift sector
             case "seecolor": SeeColor(parsedArgs, positionalArgs); break;
             case "genstub": GenStub(parsedArgs, positionalArgs); break; // Generate a Lua stub for a class
+
             default: Say("-r", $"{command} is not a valid command."); break;
         }
         return true;

@@ -7,7 +7,7 @@ using System.Text;
 public static partial class ShellCore {
     static void Farm(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         bool listAll = parsedArgs.ContainsKey("-a") || parsedArgs.ContainsKey("--all");
-        string[] botnetNames = NetworkManager.GetBotnetNames();
+        string[] botnetNames = NetworkManager.GetBotsName();
         if (listAll) {
             for (int i = 0; i < botnetNames.Length; i++) Say(botnetNames[i]);
             return;
@@ -16,68 +16,23 @@ public static partial class ShellCore {
         parsedArgs.TryGetValue("-h", out string minerName);
         if (string.IsNullOrEmpty(minerName)) parsedArgs.TryGetValue("--host", out minerName);
         if (string.IsNullOrEmpty(minerName)) { Say("-r", "No miner name provided."); return; }
-        BotFarm hackfarm = NetworkManager.GetBotFarm(minerName);
+        BotFarm hackfarm = NetworkManager.GetBotByName(minerName);
         if (hackfarm == null) { Say("-r", "No miner with such name."); return; }
+        for(int i = 0; i < hackfarm.mineralDistribution.Length;++i) {
+            GD.Print(hackfarm.mineralDistribution[i].Item1, ' ', hackfarm.mineralDistribution[i].Item2);
+        }
         Say(
-$@"Botnet: {Util.Format(minerName, StrType.HOSTNAME)}
-{GenerateStringByProportions([.. hackfarm.mineralDistribution.Select(x => x.Item2)], [.. hackfarm.mineralDistribution.Select(x => Util.MINERAL_PROFILES[x.Item1].ColorCode)], 50)}
-{string.Join(" | ", hackfarm.mineralDistribution.Select(x => $"[color={Util.MINERAL_PROFILES[x.Item1].ColorCode}]{Util.MINERAL_PROFILES[x.Item1].Name}[/color]: {Util.Format($"{x.Item2 * 100.0:0.00}", StrType.NUMBER)}%"))}
+$@"[color={Util.CC(Cc.w)}]Botnet:[/color] {Util.Format(minerName, StrType.HOSTNAME)}
+{Util.GenerateStringByProportions([.. hackfarm.mineralDistribution.Select(x => x.Item2)], [.. hackfarm.mineralDistribution.Select(x => Util.MINERAL_PROFILES[x.Item1].ColorCode)], 50)}
+{string.Join(" | ", hackfarm.mineralDistribution.Select(x => $"[color={Util.CC(Util.MINERAL_PROFILES[x.Item1].ColorCode)}]{Util.MINERAL_PROFILES[x.Item1].Shorthand}[/color]: {Util.Format($"{x.Item2 * 100.0:0.00}", StrType.NUMBER)}%"))}
 ================================================================
-Load capacity  | Lvl.{Util.Format($"{hackfarm.HackLVL}", StrType.NUMBER):3} | {Util.Format($"{hackfarm.HackVal}", StrType.NUMBER):3}
-Mining speed   | Lvl.{Util.Format($"{hackfarm.GrowLVL}", StrType.NUMBER):3} | {Util.Format($"{hackfarm.GrowVal}", StrType.NUMBER):3}
-Transfer speed | Lvl.{Util.Format($"{hackfarm.TimeLVL}", StrType.NUMBER):3} | {Util.Format($"{hackfarm.TimeVal}", StrType.NUMBER):3}
+[color={Util.CC(Cc.w)}]Batch size[/color]    | Lvl.{Util.Format($"{hackfarm.BatchSizeLVL}", StrType.NUMBER, "0"), 26} | {Util.Format($"{hackfarm.BatchSize}", StrType.NUMBER):3}
+[color={Util.CC(Cc.w)}]Mining speed[/color]  | Lvl.{Util.Format($"{hackfarm.MineSpeedLVL}", StrType.NUMBER, "0"), 26} | {Util.Format($"{hackfarm.MineSpeed}", StrType.NUMBER):3}
+[color={Util.CC(Cc.w)}]Transfer time[/color] | Lvl.{Util.Format($"{hackfarm.XferDelayLVL}", StrType.NUMBER, "0"), 26} | {Util.Format($"{hackfarm.XferDelay}", StrType.NUMBER):3}
 ================================================================
-Aprox lifetime: {TimeDifferenceFriendly(hackfarm.LifeTime)}");
+[color={Util.CC(Cc.w)}]Aprox. Time To Live:[/color] {Util.TimeDifferenceFriendly(hackfarm.LifeTime)}
 
-        static string GenerateStringByProportions(double[] proportions, Cc[] colorCode, int length) {
-            if (proportions.Length != colorCode.Length)
-                throw new ArgumentException("Proportions and characters must be of the same length.");
-
-            int[] counts = new int[proportions.Length];
-            int assigned = 0;
-
-            // First pass: calculate initial counts using floor
-            for (int i = 0; i < proportions.Length; i++) {
-                counts[i] = (int)Math.Floor(proportions[i] * length);
-                assigned += counts[i];
-            }
-
-            // Distribute the remainder
-            int remainder = length - assigned;
-
-            // Get decimal parts and their indices
-            double[] decimalParts = new double[proportions.Length];
-            for (int i = 0; i < proportions.Length; i++) {
-                decimalParts[i] = (proportions[i] * length) - counts[i];
-            }
-
-            // Assign remaining characters based on largest decimal parts
-            while (remainder > 0) {
-                int maxIndex = 0;
-                for (int i = 1; i < decimalParts.Length; i++) {
-                    if (decimalParts[i] > decimalParts[maxIndex]) {
-                        maxIndex = i;
-                    }
-                }
-
-                counts[maxIndex]++;
-                decimalParts[maxIndex] = 0; // Mark as used
-                remainder--;
-            }
-
-            // Build final string
-            StringBuilder sb = new StringBuilder(length);
-            for (int i = 0; i < counts.Length; i++) {
-                sb.Append($"[color={Util.CC(colorCode[i])}]" + new string('█', counts[i]) + "[/color]");
-            }
-
-            return sb.ToString();
-        }
-        static string TimeDifferenceFriendly(double time) {
-            int min = (int)(time / 60);
-            if (min < 1) return $"Less than {Util.Format("1", StrType.UNIT, "min")}";
-            return $"Aprox.{Util.Format($"{min}", StrType.UNIT, "min")} remaining";
-        }
+!NODE UPGRADABLE THROUGH SCRIPTING!");
     }
     const double FLARE_TIME = 120.0;
     static double startEpoch = 0, endEpoch = 0, remainingTime = 0;

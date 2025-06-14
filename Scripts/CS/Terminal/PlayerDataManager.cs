@@ -82,7 +82,7 @@ public static partial class PlayerDataManager {
 	}
 	public static int DepositMineral(double[] amounts) {
 		if (amounts.Length != _mineInv.Length) return 1; // Invalid amount
-		for (int i = 0; i < amounts.Length; ++i) {
+        for (int i = 0; i < amounts.Length; ++i) {
 			if (amounts[i] < 0) return 2; // Invalid amount
 		}
 		for (int i = 0; i < amounts.Length; ++i) {
@@ -93,7 +93,7 @@ public static partial class PlayerDataManager {
 	public static int DepositMineral(int type, double amount) {
 		if (type < 0 || type >= _mineInv.Length) return 1; // Invalid type
 		if (amount < 0) return 2; // Invalid amount
-		_mineInv[type] += amount;
+        _mineInv[type] += amount;
 		return 0;
 	}
 

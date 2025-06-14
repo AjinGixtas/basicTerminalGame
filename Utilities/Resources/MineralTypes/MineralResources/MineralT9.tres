@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_a6gv3")
-Name = "Echelon Dust"
+Name = "Oblivium"
+Shorthand = "OB"
 Index = 9
-_colorCode = 19
+_colorCode = 16

@@ -28,6 +28,5 @@ public partial class EditorTab : CodeEdit
 	}
 	public void OnTextChanged() {
 		RequestCodeCompletion();
-		FoldAllLines();
 	}
 }

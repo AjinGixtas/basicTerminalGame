@@ -11,7 +11,7 @@ public static partial class ShellCore {
         if (targetDir.Childrens.Count == 0) { Say(""); return; }
         string output = "";
         foreach (NodeSystemItem item in targetDir.Childrens) {
-            output += $"{Util.Format(item.Name, (item is NodeDirectory) ? StrType.DIR : StrType.FILE)} ";
+            output += ($"{Util.Format(((item is NodeDirectory) ? "./" : "") + item.Name, (item is NodeDirectory) ? StrType.DIR : StrType.FILE)}" + new string(' ', 5)).PadRight(16);
         }
         Say(output);
     }

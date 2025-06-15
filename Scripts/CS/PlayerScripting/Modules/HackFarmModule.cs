@@ -3,58 +3,49 @@ public class HackFarmModule {
         return NetworkManager.GetBotsIP();
     }
 
-    public double GetBotXferDelayValue(string botIP) {
-        BotFarm bot = NetworkManager.GetBotByIP(botIP);
-        return bot == null ? -1 : bot.XferDelay;
+    public double? GetBotXferDelayValue(string botIP) {
+        return NetworkManager.GetBotByIP(botIP)?.XferDelay;
     }
-    public double GetBotMineSpeedValue(string botIP) {
-        BotFarm bot = NetworkManager.GetBotByIP(botIP);
-        return bot == null ? -1 : bot.MineSpeed;
+    public double? GetBotMineSpeedValue(string botIP) {
+        return NetworkManager.GetBotByIP(botIP)?.MineSpeed;
     }
-    public double GetBotBatchSizeValue(string botIP) {
-        BotFarm bot = NetworkManager.GetBotByIP(botIP);
-        return bot == null ? -1 : bot.BatchSize;
+    public double? GetBotBatchSizeValue(string botIP) {
+        return NetworkManager.GetBotByIP(botIP)?.BatchSize;
     }
 
-    public double GetBotXferDelayCost(string botIP) {
-        BotFarm bot = NetworkManager.GetBotByIP(botIP);
-        return bot == null ? -1 : bot.GetXferDelayCost();
+    public double? GetBotXferDelayCost(string botIP) {
+        return NetworkManager.GetBotByIP(botIP)?.GetXferDelayCost();
     }
-    public double GetBotMineSpeedCost(string botIP) {
-        BotFarm bot = NetworkManager.GetBotByIP(botIP);
-        return bot == null ? -1 : bot.GetMineSpeedCost();
+    public double? GetBotMineSpeedCost(string botIP) {
+        return NetworkManager.GetBotByIP(botIP)?.GetMineSpeedCost();
     }
-    public double GetBotBatchSizeCost(string botIP) {
-        BotFarm bot = NetworkManager.GetBotByIP(botIP);
-        return bot == null ? -1 : bot.GetBatchSizeCost();
+    public double? GetBotBatchSizeCost(string botIP) {
+        return NetworkManager.GetBotByIP(botIP)?.GetBatchSizeCost();
     }
 
-    public int GetBotXferDelayLevel(string botIP) {
-        BotFarm bot = NetworkManager.GetBotByIP(botIP);
-        return bot == null ? -1 : bot.XferDelayLVL;
+    public int? GetBotXferDelayLevel(string botIP) {
+        return NetworkManager.GetBotByIP(botIP)?.XferDelayLVL;
     }
-    public int GetBotMineSpeedLevel(string botIP) {
-        BotFarm bot = NetworkManager.GetBotByIP(botIP);
-        return bot == null ? -1 : bot.MineSpeedLVL;
+    public int? GetBotMineSpeedLevel(string botIP) {
+        return NetworkManager.GetBotByIP(botIP)?.MineSpeedLVL;
     }
-    public int GetBotBatchSizeLevel(string botIP) {
-        BotFarm bot = NetworkManager.GetBotByIP(botIP);
-        return bot == null ? -1 : bot.BatchSizeLVL;
+    public int? GetBotBatchSizeLevel(string botIP) {
+        return NetworkManager.GetBotByIP(botIP)?.BatchSizeLVL;
     }
 
-    public bool UpgradeBotXferDelay(string botIP) {
+    public CError UpgradeBotXferDelay(string botIP) {
         BotFarm bot = NetworkManager.GetBotByIP(botIP);
-        if (bot == null) return false;
-        return bot.UpgradeTime() == 0;
+        if (bot == null) return CError.NOT_FOUND;
+        return bot.UpgradeTime();
     }
-    public bool UpgradeBotMineSpeed(string botIP) {
+    public CError? UpgradeBotMineSpeed(string botIP) {
         BotFarm bot = NetworkManager.GetBotByIP(botIP);
-        if (bot == null) return false;
-        return bot.UpgradeGrow() == 0;
+        if (bot == null) return CError.NOT_FOUND;
+        return bot.UpgradeGrow();
     }
-    public bool UpgradeBotBatchSize(string botIP) {
+    public CError? UpgradeBotBatchSize(string botIP) {
         BotFarm bot = NetworkManager.GetBotByIP(botIP);
-        if (bot == null) return false;
-        return bot.UpgradeHack() == 0;
+        if (bot == null) return CError.NOT_FOUND;
+        return bot.UpgradeHack();
     }
 }

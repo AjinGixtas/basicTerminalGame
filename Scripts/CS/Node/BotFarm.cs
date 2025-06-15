@@ -1,4 +1,5 @@
 using Godot;
+using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -106,18 +107,21 @@ public class BotFarm {
 		if (Util.HaveFinalWord)
 			GD.Print($"HackFarm {HostName} is being destroyed");
 	}
-	public int UpgradeHack() {
-		if (PlayerDataManager.WithdrawGC(GetBatchSizeCost()) != 0) return 1;
-		BatchSizeLVL += 1; return 0;
+	public CError UpgradeHack() {
+		CError cError = PlayerDataManager.WithdrawGC(GetBatchSizeCost());
+		if (cError != CError.OK) return cError;
+		BatchSizeLVL += 1; return CError.OK;
 	}
-	public int UpgradeGrow() {
-		if (PlayerDataManager.WithdrawGC(GetMineSpeedCost()) != 0) return 1;
-		MineSpeedLVL += 1; return 0;
-	}
-	public int UpgradeTime() {
-		if (PlayerDataManager.WithdrawGC(GetXferDelayCost()) != 0) return 1;
-		XferDelayLVL += 1; return 0;
-	}
+	public CError UpgradeGrow() {
+		CError cError = PlayerDataManager.WithdrawGC(GetMineSpeedCost());
+		if (cError != CError.OK) return cError;
+		MineSpeedLVL += 1; return CError.OK;
+    }
+	public CError UpgradeTime() {
+		CError cError = PlayerDataManager.WithdrawGC(GetXferDelayCost());
+		if (cError != CError.OK) return cError;
+		XferDelayLVL += 1; return CError.OK;
+    }
 
 	public double GetBatchSizeCost() => GetValu(HackCostCurve, BatchSizeLVL);
 	public double GetMineSpeedCost() => GetValu(GrowCostCurve, MineSpeedLVL);

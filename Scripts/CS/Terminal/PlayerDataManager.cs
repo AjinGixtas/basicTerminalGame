@@ -1,4 +1,5 @@
 using Godot;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 public static partial class PlayerDataManager {
 	static PlayerDataSaveResource saveObj;
@@ -51,25 +52,24 @@ public static partial class PlayerDataManager {
 		saveObj = new();
 	}
 
-	public static int WithdrawGC(double amount) { // 0-Successful withdraw; 1-Invalid amount; 2-Not enough money
-		if (amount < 0) { return 1; }
-		if (amount > _gc_max) { return 2; }
+	public static CError WithdrawGC(double amount) {
+		if (amount < 0) return CError.INVALID;
+		if (amount > _gc_max) return CError.INSUFFICIENT;
 		_gc_cur -= amount;
-		return 0;
+		return CError.OK;
 	}
 	static bool needWarn = false, warned = false;
-	public static int DepositGC(double amount) { // 0-Successful deposit; 1-Invalid amount
-		if (amount <= 0) { return 1; }
+	public static CError DepositGC(double amount) {
+		if (amount <= 0) return CError.INVALID;
 		_gc_cur += amount;
 
 		if (_gc_cur <= GC_Max) { needWarn = false; warned = false; } else needWarn = true;
-		if (needWarn && !warned) {
-			ShellCore.Say($"[color={Util.CC(Cc.gR)}]Warning:[/color] GC total is over the limit of {_gc_max}. Remaining GC lost.");
+		if (needWarn) {
+			if (!warned) ShellCore.Say(Util.Format($"GC total is over the limit of {GC_Max}. Remaining GC lost.", StrType.WARNING));
 			warned = true;
-		}
-		return 0;
+		} else ShellCore.Say($"Deposited {Util.Format($"{amount}", StrType.MONEY)}");
+		return CError.OK;
 	}
-
 	public static int WithdrawMineral(double[] amounts) {
 		if (amounts.Length != _mineInv.Length) return 1; // Invalid amount
 		for (int i = 0; i < amounts.Length; ++i) {
@@ -99,7 +99,7 @@ public static partial class PlayerDataManager {
 
 	public static string GetLoadStatusMsg(int statusCode) {
 		string[] LOAD_STATUS_MSG = [
-			Util.Format("Loaded player data successfully", StrType.FULL_SUCCESS),
+			Util.Format("Loaded player data", StrType.FULL_SUCCESS),
 			Util.Format("No player data file found in save. Fall back to new user setting.", StrType.ERROR),
 			Util.Format("Unable to parse player data file. Fall back to new user setting. Check for potentional file malfunction.", StrType.ERROR),
 			Util.Format("File parse successfully yet doesn't get registered. Fall back to new user setting. Check for potentional file malfunction.", StrType.ERROR)
@@ -109,7 +109,7 @@ public static partial class PlayerDataManager {
 	}
 	public static string GetSaveStatusMsg(int statusCode) {
 		string[] SAVE_STATUS_MSG = [
-			Util.Format("Saved player data successfully", StrType.FULL_SUCCESS),
+			Util.Format("Saved player data", StrType.FULL_SUCCESS),
 		];
 		return (statusCode < SAVE_STATUS_MSG.Length) ? SAVE_STATUS_MSG[statusCode]
 	: Util.Format($"{((CError)statusCode)}", StrType.UNKNOWN_ERROR, "saving player data");

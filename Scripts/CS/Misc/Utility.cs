@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 public static partial class Util {
     public const bool HaveFinalWord = false; // Used to prevent final word in the terminal
     public static T[] Shuffle<T>(T[] array) {
@@ -150,8 +151,9 @@ public static partial class Util {
                 return $"[color={Util.CC(Cc.gR)}]{input}[/color]";
             case StrType.MONEY: { // GC is short for Gold Coin. That's all. lol
                     if (string.IsNullOrWhiteSpace(input)) return "";
-                    if (!double.TryParse(input, out double value)) return $"[color={Util.CC(Cc.y)}]{input}[/color][color={Util.CC(Cc.y)}]GC[/color]";
-                    string[] units =    ["S" , "Q" , "T" , "B" , "M" , "K" ];
+                    if (!double.TryParse(input, out double value))
+                        return Util.Format("NUMBER_PARSE_FAILED", StrType.ERROR);
+                    string[] units =    ["S", "Q" , "T" , "B" , "M" , "K" ];
                     double[] divisors = [1e21, 1e15, 1e12, 1e9 , 1e6 , 1e3 ];
                     Cc[] colors =       [Cc.R, Cc.Y, Cc.M, Cc.G, Cc.B, Cc.C];
                     string sb = ""; double remainder = value;
@@ -185,16 +187,18 @@ public static partial class Util {
                     Cc[] unitColors = [Cc.R, Cc.Y, Cc.M, Cc.G, Cc.B, Cc.C];
                     string mineralColor = "";
                     mineralColor = Util.CC(profile.ColorCode);
+                    double remainder = value; string sb = "";
                     for (int i = 0; i < units.Length; i++) {
-                        if (value >= divisors[i]) {
-                            double unitValue = value / divisors[i];
-                            string formatted = unitValue.ToString("0.0");
-                            return $"[color={Util.CC(Cc.w)}]{formatted}[/color][color={Util.CC(unitColors[i])}]{units[i]}[/color][color={mineralColor}]{profile.Name}[/color]";
+                        if (remainder >= divisors[i]) {
+                            int unitValue = (int)Mathf.Floor(remainder / divisors[i]);
+                            remainder -= unitValue * divisors[i];
+                            sb += $"[color={Util.CC(Cc.w)}]{unitValue}[/color][color={Util.CC(unitColors[i])}]{units[i]}[/color]";
                         }
                     }
-                    // If less than 1K, just show the number with GC
-                    string formattedValue = Mathf.Floor(value).ToString("0.##");
-                    return $"[color={Util.CC(Cc.w)}]{formattedValue}[/color][color={mineralColor}]{profile.Shorthand}[/color]";
+                    string gcValue;
+                    gcValue = Mathf.Ceil(remainder).ToString("F0");
+                    if (gcValue == "000") { gcValue = ""; }
+                    return sb + $"[color={Util.CC(Cc.w)}]{gcValue}[/color][color={mineralColor}]{profile.Shorthand}[/color]";
                 }
             case StrType.G_MINERAL: { // General mineral formatting
                     if (!int.TryParse(addons[0], out int index))

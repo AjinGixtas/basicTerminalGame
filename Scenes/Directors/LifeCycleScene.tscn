@@ -6,3 +6,10 @@
 [node name="LifeCycleDirector" type="Node"]
 script = ExtResource("1_r74de")
 gameScene = ExtResource("2_okaxg")
+
+[node name="AutosaveTimer" type="Timer" parent="."]
+wait_time = 600.0
+autostart = true
+ignore_time_scale = true
+
+[connection signal="timeout" from="AutosaveTimer" to="." method="OnAutosaveTimerTimeout"]

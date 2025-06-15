@@ -9,10 +9,15 @@ public partial class EditorTab : CodeEdit
 		Text = file.Content;
 		this.textEditor = textEditor;
 	}
+	public override void _Ready() {
+		AddStringDelimiter("[[", "]]", false);
+		AddStringDelimiter("[=", "=]", false);
+		AddCommentDelimiter("--", "", true);
+		AddCommentDelimiter("--[[", "]]", false);
+	}
 	public override void _Process(double delta) {
 		if (HasFocus()) {
 			if (Input.IsActionJustPressed("closeTab")) { textEditor.CloseTab(false); }
-			if (Input.IsActionJustPressed("saveFile")) { textEditor.SaveFile(); }
 		}
 	}
 	public bool IsDirty() {
@@ -20,7 +25,7 @@ public partial class EditorTab : CodeEdit
 	}
 	public void Save() {
 		file.Content = Text;
-		LifeCycleDirector.SaveFileSystem();
+		LifeCycleDirector.QuickSave(false);
 	}
 	public void OnCodeCompletionRequested() {
 		AddCodeCompletionOption(CodeCompletionKind.Function, "ax:Say", "ax:Say");

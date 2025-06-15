@@ -85,9 +85,10 @@ public enum CError {
     NOT_FOUND = 1,
     DUPLICATE = 2,
     INVALID = 3,
-    REDUCDANT = 4,
+    REDUNDANT = 4,
     UNKNOWN = 5,
     INCORRECT = 6,
     MISSING = 7,
     NO_PERMISSION = 8,
+    INSUFFICIENT = 9
 }

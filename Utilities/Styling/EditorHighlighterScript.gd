@@ -16,6 +16,6 @@ func _init() -> void:
 	#Multi line string
 	add_color_region("[[", "]]", str_kolor, false)
 	add_color_region("[=", "=]", str_kolor, false)
-	# ---
+	#---
 	add_color_region("--", "", comment_kolor, true) #Single line comment
-	add_color_region("--[[", "]]--", comment_kolor, false) #Multi line comment
+	add_color_region("--[[", "]]", comment_kolor, false) #Multi line comment

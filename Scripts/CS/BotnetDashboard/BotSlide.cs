@@ -6,7 +6,7 @@ public partial class BotSlide : Control {
 	public BotnetDashboard Director { get => _director; set => _director ??= value; }
 	public int ID = 0;
 	public void Update(BotFarm farm) {
-		botName.Text = Util.Format(farm.HostName, StrType.HOSTNAME) + $" {Util.Format("|", StrType.DECOR)} " + Util.Format(farm.IP, StrType.IP);
+		botName.Text = Util.Format(farm.IP, StrType.IP).PadLeft(38) + $" {Util.Format("|", StrType.DECOR)} " + Util.Format(farm.HostName, StrType.HOSTNAME);
 		int barAmount = Mathf.CeilToInt(farm.CycleTimeRemain / farm.XferDelay * 50);
 		hackTimeBar.Text = "     [" + new string('|', Mathf.Max(50-barAmount,0)) + new string('-', barAmount) + "]";
 		lifeTimeDisplay.Text = Util.Format($"{farm.LifeTime}", StrType.NUMBER, "3") + "s TTL";

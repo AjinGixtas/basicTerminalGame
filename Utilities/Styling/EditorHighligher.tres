@@ -1,6 +1,6 @@
 [gd_resource type="CodeHighlighter" load_steps=2 format=3 uid="uid://k788co3pmj6y"]
 
-[ext_resource type="Script" uid="uid://cw8s7rb1uppqo" path="res://Utilities/Styling/EditerHighlighterScript.gd" id="1_qrxbb"]
+[ext_resource type="Script" uid="uid://cw8s7rb1uppqo" path="res://Utilities/Styling/EditorHighlighterScript.gd" id="1_qrxbb"]
 
 [resource]
 number_color = Color(0.6, 1, 0.8, 1)

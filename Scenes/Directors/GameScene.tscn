@@ -74,7 +74,14 @@ theme = ExtResource("3_0n3pm")
 text = "Botnet"
 alignment = 0
 
-[node name="Other_2" type="Button" parent="MenuDirector/MenuButtons"]
+[node name="CraftButton" type="Button" parent="MenuDirector/MenuButtons"]
+layout_mode = 2
+theme = ExtResource("3_0n3pm")
+text = "Other
+"
+alignment = 0
+
+[node name="Other_3" type="Button" parent="MenuDirector/MenuButtons"]
 layout_mode = 2
 theme = ExtResource("3_0n3pm")
 text = "Other
@@ -107,6 +114,11 @@ visible = false
 layout_mode = 2
 menuDirector = NodePath("../..")
 metadata/_tab_index = 2
+
+[node name="CraftWindow" type="MarginContainer" parent="MenuDirector/MenuWindows"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 3
 
 [node name="OverlayWindow" parent="." instance=ExtResource("6_1de4d")]
 position = Vector2i(427, 64)

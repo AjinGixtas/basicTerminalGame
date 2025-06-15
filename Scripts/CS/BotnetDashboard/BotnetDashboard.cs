@@ -28,8 +28,9 @@ public partial class BotnetDashboard : MarginContainer {
 		set {
 			value = Mathf.Clamp(value, pageLength[0], pageLength[^1]);
 			if (value == _pageLength) return; // No change
+			for (int i = value; i < _pageLength; ++i) BotSlides[i].Visible = false;
 			_pageLength = value;
-		}
+        }
 	}
 	int _curPage; [Export] int CurPage {
 		get => _curPage;
@@ -66,5 +67,6 @@ public partial class BotnetDashboard : MarginContainer {
 	}
 	public void SetPageLength(int length) {
 		PageLength = length;
+		GD.Print(PageLength);
 	}
 }

@@ -11,13 +11,13 @@ public static partial class NetworkManager {
     static List<StaticSector> staticSectors;
     static Dictionary<string, WeakReference<NetworkNode>> DNS;
     public static List<BotFarm> BotNet { get; private set; } = [];
-    const int DRIFT_SECTOR_COUNT = 64;
+    const int DRIFT_SECTOR_COUNT = 128;
 
     public static void Ready() {
         DNS = []; driftSectors = []; connectedSectors = []; staticSectors = []; BotNet = [];
         PlayerNode = new PlayerNode(GD.Load<NodeData>("res://Utilities/Resources/ScriptedNetworkNodes/PlayerNode.tres"));
 
-        AssignDNS(PlayerNode);
+        AssignNodeToIP(PlayerNode);
         RegenerateDriftSector();
     }
     const double CYCLE_TIME = 60*15; // 15min in seconds
@@ -178,14 +178,14 @@ public static partial class NetworkManager {
 
     public static CError ConnectToSector(Sector sector) {
         if (sector == null) return CError.INVALID;
-        if (connectedSectors.Contains(sector)) return CError.REDUCDANT;
+        if (connectedSectors.Contains(sector)) return CError.REDUNDANT;
 
         foreach (NetworkNode node in sector.GetSurfaceNodes()) node.ParentNode = PlayerNode;
         connectedSectors.Add(sector); return CError.OK;
     }
     public static CError DisconnectFromSector(Sector sector) {
         if (sector == null) return CError.INVALID;
-        if (!connectedSectors.Contains(sector)) return CError.REDUCDANT;
+        if (!connectedSectors.Contains(sector)) return CError.REDUNDANT;
 
         foreach (NetworkNode node in sector.GetSurfaceNodes()) {
             if (IsNodeOrDescendant(ShellCore.CurrNode, node)) {
@@ -299,7 +299,7 @@ public static partial class NetworkManager {
         }
     }
 
-    public static NetworkNode QueryDNS(string IP) {
+    public static NetworkNode GetNodeByIP(string IP) {
         DNS.TryGetValue(IP, out var nodeRef);
         if (nodeRef != null && nodeRef.TryGetTarget(out NetworkNode node)) {
             return node;
@@ -307,7 +307,7 @@ public static partial class NetworkManager {
         DNS.Remove(IP); // Remove stale entry
         return null;
     }
-    public static int AssignDNS(NetworkNode node) {
+    public static int AssignNodeToIP(NetworkNode node) {
         if (string.IsNullOrEmpty(node.IP)) return 1;
         DNS[node.IP] = new WeakReference<NetworkNode>(node); return 0;
     }
@@ -322,7 +322,7 @@ public static partial class NetworkManager {
     
     public static string GetSaveStatusMsg(int statusCode) {
         string[] SAVE_STATUS_MSG = [
-            Util.Format("Saved botnet data successfully", StrType.FULL_SUCCESS),
+            Util.Format("Saved botnet data", StrType.FULL_SUCCESS),
             Util.Format("No botnet to save", StrType.WARNING),
         ];
         return (statusCode < SAVE_STATUS_MSG.Length) ? SAVE_STATUS_MSG[statusCode]
@@ -344,7 +344,7 @@ public static partial class NetworkManager {
 
     public static string GetLoadStatusMsg(int statusCode) {
         string[] LOAD_STATUS_MSG = [
-            Util.Format("Loaded botnet data successfully", StrType.FULL_SUCCESS),
+            Util.Format("Loaded botnet data", StrType.FULL_SUCCESS),
             Util.Format("No botnet data to load", StrType.WARNING),
             Util.Format("Failed to open directory with botnet data", StrType.ERROR),
             Util.Format("Failed to load a botnet data file", StrType.ERROR),

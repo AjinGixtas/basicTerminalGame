@@ -48,9 +48,9 @@ public static partial class ShellCore {
 		if (positionalArgs.Length == 0) { Say("-r", $"No hostname provided."); return; }
 		
 		if (IsIPv4(positionalArgs[0])) { // Check if the input is a valid IPv4 address
-			NetworkNode nodeDNS = NetworkManager.QueryDNS(positionalArgs[0]);
+			NetworkNode nodeDNS = NetworkManager.GetNodeByIP(positionalArgs[0]);
 			if (nodeDNS != null) {
-				CurrNode = NetworkManager.QueryDNS(positionalArgs[0]); return;
+				CurrNode = NetworkManager.GetNodeByIP(positionalArgs[0]); return;
 			} else { Say("-r", $"IP not found: {Util.Format(positionalArgs[0], StrType.HOSTNAME)}"); return;  }
 		}
 		
@@ -82,7 +82,7 @@ public static partial class ShellCore {
 			string msg = status switch {
 				CError.OK => $"Linkto successfully: {Util.Format(positionalArgs[i], StrType.SECTOR)}",
 				CError.INVALID => $"Linkto failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Sector is null. This behavior is unexpected and should be reported to the developer.",
-				CError.REDUCDANT => $"Linkto failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Already linked.",
+				CError.REDUNDANT => $"Linkto failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Already linked.",
 				CError.NOT_FOUND => $"Linkto failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Sector not found",
 				_ => $"Unexpected error: {status}. Please report to the developer. Linkto failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}",
 			};
@@ -99,10 +99,10 @@ public static partial class ShellCore {
                     CError.OK => "",
                     CError.INVALID => $"Unlink failed: {Util.Format(secNames[i], StrType.SECTOR)}. Sector is null. This behavior is unexpected and should be reported to the developer.",
                     CError.NOT_FOUND => $"Unlink failed: {Util.Format(secNames[i], StrType.SECTOR)}. Sector not found.",
-                    CError.REDUCDANT => $"Unlink failed: {Util.Format(secNames[i], StrType.SECTOR)}. Not connected.",
+                    CError.REDUNDANT => $"Unlink failed: {Util.Format(secNames[i], StrType.SECTOR)}. Not connected.",
                     _ => $"Unexpected error: {err}. Please report to the developer. Unlink failed: {Util.Format(secNames[i], StrType.SECTOR)}",
                 };
-				if (err == CError.OK) { Say(msg); } else { Say("-r", msg); }
+				if (err == CError.OK) { } else { Say("-r", msg); }
             }
             return;
 		}
@@ -112,10 +112,10 @@ public static partial class ShellCore {
 				CError.OK => $"Disconnected from sector: {Util.Format(positionalArgs[i], StrType.SECTOR)}",
                 CError.INVALID => $"Unlink failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Sector is null. This behavior is unexpected and should be reported to the developer.",
 				CError.NOT_FOUND => $"Unlink failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Sector not found.",
-				CError.REDUCDANT => $"Unlink failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Not connected.",
+				CError.REDUNDANT => $"Unlink failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Not connected.",
 				_ => $"Unexpected error: {status}. Please report to the developer. Unlink failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}",
 			};
-			if (status == CError.OK) { Say(msg); } else { Say("-r", msg); }
+			if (status == CError.OK && msg != "") { Say(msg); } else { Say("-r", msg); }
 		}
 	}
 	
@@ -125,14 +125,15 @@ public static partial class ShellCore {
 	public static CError ConnectNode(string IP="") {
         if (string.IsNullOrEmpty(IP)) return CError.MISSING;
 		if (!IsIPv4(IP)) return CError.INVALID;
-        NetworkNode node = NetworkManager.QueryDNS(IP);
+        NetworkNode node = NetworkManager.GetNodeByIP(IP);
         if (node == null) { return CError.NOT_FOUND; }
         CurrNode = node;
 		return CError.OK;
     }
 	public static string[] Scan(string IP="", int MAX_DEPTH=1) {
 		if (string.IsNullOrEmpty(IP)) IP = NetworkManager.PlayerNode.IP;
-        NetworkNode node = NetworkManager.QueryDNS(IP);
+        NetworkNode node = NetworkManager.GetNodeByIP(IP);
+		if (node == null) return null;
         return node.ChildNode
 			.Select(a => a.IP)
 			.Concat(node.ParentNode != null ? [node.ParentNode.IP] : [])

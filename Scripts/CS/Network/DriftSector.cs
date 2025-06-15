@@ -99,13 +99,13 @@ public class DriftSector : Sector {
 	static string GenSectorName() {
 		const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         string sb = DRIFT_SECTOR_NAMES[GD.RandRange(0, DRIFT_SECTOR_NAMES.Length - 1)] + "_";
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 6; i++) {
 			sb += chars[GD.RandRange(0, chars.Length - 1)];
 		}
 		return sb;
 	}
 	static (string, string) GenNodeName() {
-		string baseName = DRIFT_NODE_NAMES[GD.RandRange(0, DRIFT_NODE_NAMES.Length - 1)], suffix = GenSuffix(3);
+		string baseName = DRIFT_NODE_NAMES[GD.RandRange(0, DRIFT_NODE_NAMES.Length - 1)], suffix = GenSuffix(6);
 		return ($"{char.ToUpper(baseName[0])}{baseName[1..]} {suffix.ToUpper()}", $"{baseName}_{suffix}");
 	}
 	static string GenSuffix(int length) {

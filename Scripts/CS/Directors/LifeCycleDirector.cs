@@ -18,16 +18,19 @@ public partial class LifeCycleDirector : Node
 		} else { GD.PrintErr("Game scene not set in LifeCycleDirector."); }
 	}
 	public override void _Process(double delta) {
-		if (Input.IsActionJustPressed("quickSaveGame")) { 
-			QuickSave();
+		if (Input.IsActionJustPressed("sequentialSave")) { 
+			QuickSave(true);
 		}
 		if (Input.IsActionJustPressed("quickLoadGame")) { 
 			QuickLoad(this);
 		}
+		if (Input.IsActionJustPressed("overwriteSave")) {
+			QuickSave(false);
+		}
 	}
 	private const string SaveRoot = "user://Saves";
 	static string CurrentSavePath = "";
-	static void QuickSave() {
+	public static void QuickSave(bool newSave) {
 		// Ensure the save root directory exists
 		DirAccess.MakeDirAbsolute(ProjectSettings.GlobalizePath(SaveRoot));
 
@@ -38,24 +41,28 @@ public partial class LifeCycleDirector : Node
 		}).Where(num => num > 0).ToList();
 
 		// Pick next save number
-		int nextSaveNumber = existingSaves.Count == 0 ? 1 : existingSaves.Max() + 1;
-		string newSaveFolderName = $"Game_{nextSaveNumber:D3}";
+		int nextSaveNumber = existingSaves.Count == 0 ? 1 : newSave ? existingSaves.Max() + 1 : existingSaves.Max();
+		string newSaveFolderName = $"Game_{nextSaveNumber:D5}";
 		string newSavePath = StringExtensions.PathJoin(SaveRoot, newSaveFolderName);
 
 		// Create new save directory
 		DirAccess.MakeDirAbsolute(ProjectSettings.GlobalizePath(newSavePath));
 		// Save player data (convert back to user:// path for Godot API)
-		ShellCore.Say($"Quick saving to {newSavePath}");
-		ShellCore.Say(PlayerDataManager.GetSaveStatusMsg(
-			PlayerDataManager.SavePlayerData(StringExtensions.PathJoin(newSavePath, "PlayerData.tres"))));
-		ShellCore.Say(PlayerFileManager.GetSaveStatusMsg(
-			PlayerFileManager.SaveFileSysData(StringExtensions.PathJoin(newSavePath, "FileSys"))));
-		ShellCore.Say(NetworkManager.GetSaveStatusMsg(
-            NetworkManager.SaveNetworkData(StringExtensions.PathJoin(newSavePath, "NetworkData"))));
+		if (newSave) ShellCore.Say($"Saving game to {newSavePath}");
+		else ShellCore.Say($"Overwriting save to {newSavePath}");
+		ShellCore.Say("-n", PlayerDataManager.GetSaveStatusMsg(
+				PlayerDataManager.SavePlayerData(StringExtensions.PathJoin(newSavePath, "PlayerData.tres"))
+			) + "... ");
+		ShellCore.Say("-n", PlayerFileManager.GetSaveStatusMsg(
+				PlayerFileManager.SaveFileSysData(StringExtensions.PathJoin(newSavePath, "FileSys"))
+			) + "... ");
+		ShellCore.Say("-n", NetworkManager.GetSaveStatusMsg(
+				NetworkManager.SaveNetworkData(StringExtensions.PathJoin(newSavePath, "NetworkData"))
+			) + "... ");
 
-        ShellCore.Say($"If there are any error related to save file, feel free to email {Util.Format("ajingixtascontact", StrType.USERNAME)}@{Util.Format("gmail.com", StrType.HOSTNAME)}");
+		ShellCore.Say($"\nIf there are any error related to save file, feel free to email {Util.Format("ajingixtascontact", StrType.USERNAME)}@{Util.Format("gmail.com", StrType.HOSTNAME)}");
 		CurrentSavePath = newSavePath; // Update current save path
-    }
+	}
 
 	static void QuickLoad(LifeCycleDirector lifeCycleDirector) {
 		lifeCycleDirector.RemakeScene();
@@ -66,11 +73,11 @@ public partial class LifeCycleDirector : Node
 
 		if (saveFolders.Count == 0) { ShellCore.Say("-r", "No previous record of user found. Intialize new user."); return; }
 
-        // Find the most recently updated one
-        for (int i = 0; i < saveFolders.Count; i++) {
-            GD.Print(FileAccess.GetModifiedTime(StringExtensions.PathJoin($"{SaveRoot}/{saveFolders[i]}", "PlayerData.tres")), ' ', saveFolders[i]);
-        }
-        string latestFolder = saveFolders
+		// Find the most recently updated one
+		for (int i = 0; i < saveFolders.Count; i++) {
+			GD.Print(FileAccess.GetModifiedTime(StringExtensions.PathJoin($"{SaveRoot}/{saveFolders[i]}", "PlayerData.tres")), ' ', saveFolders[i]);
+		}
+		string latestFolder = saveFolders
 			.Where(dir => FileAccess.FileExists(StringExtensions.PathJoin($"{SaveRoot}/{dir}", "PlayerData.tres")))
 			.OrderByDescending(dir => FileAccess.GetModifiedTime(StringExtensions.PathJoin($"{SaveRoot}/{dir}", "PlayerData.tres")))
 			.FirstOrDefault();
@@ -81,26 +88,25 @@ public partial class LifeCycleDirector : Node
 		int[] statusCodes = [
 			PlayerDataManager.LoadPlayerData(StringExtensions.PathJoin($"{SaveRoot}/{latestFolder}", "PlayerData.tres")),
 			PlayerFileManager.LoadFileSysData(StringExtensions.PathJoin($"{SaveRoot}/{latestFolder}", "FileSys")),
-            NetworkManager.LoadNetworkData(StringExtensions.PathJoin($"{SaveRoot}/{latestFolder}", "NetworkData"))
-        ];
+			NetworkManager.LoadNetworkData(StringExtensions.PathJoin($"{SaveRoot}/{latestFolder}", "NetworkData"))
+		];
 		// Wipe the slate clean
 		lifeCycleDirector.RemakeScene();
 
 		ShellCore.Say("Quick loading save...");
 		ShellCore.Say(PlayerDataManager.GetLoadStatusMsg(statusCodes[0]));
 		ShellCore.Say(PlayerFileManager.GetLoadStatusMsg(statusCodes[1]));
-        ShellCore.Say(NetworkManager.GetLoadStatusMsg(statusCodes[2]));
-        ShellCore.Say($"If there are any error related to save file, feel free to email {Util.Format("ajingixtascontact", StrType.USERNAME)}@{Util.Format("gmail.com", StrType.HOSTNAME)}");
+		ShellCore.Say(NetworkManager.GetLoadStatusMsg(statusCodes[2]));
+		ShellCore.Say($"If there are any error related to save file, feel free to email {Util.Format("ajingixtascontact", StrType.USERNAME)}@{Util.Format("gmail.com", StrType.HOSTNAME)}");
 		CurrentSavePath = StringExtensions.PathJoin(SaveRoot, latestFolder); // Update current save path
-    }
-	public static void SaveFileSystem() {
-        int statusCode = PlayerFileManager.SaveFileSysData(StringExtensions.PathJoin(CurrentSavePath, "FileSys"));
-		if (statusCode != 0) ShellCore.Say(PlayerFileManager.GetSaveStatusMsg(statusCode));
-    }
+	}
 	void RemakeScene() {
 		if (runtimeDirector != null) RemoveChild(runtimeDirector);
 		runtimeDirector = gameScene.Instantiate<RuntimeDirector>();
 		AddChild(runtimeDirector);
 		ShellCore.IntializeInternal();
+	}
+	public void OnAutosaveTimerTimeout() {
+		QuickSave(false);
 	}
 }

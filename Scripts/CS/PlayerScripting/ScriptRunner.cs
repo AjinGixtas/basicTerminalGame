@@ -22,7 +22,8 @@ public static class ScriptRunner {
 		script.Globals["kar"] = new CrackModule();
 		script.Globals["bot"] = new HackFarmModule();
 		script.Globals["fio"] = new FileModule();
-		script.Globals["cer"] = new CError();
+		script.Globals["CError"] = new CError();
+		script.Globals["SecurityType"] = new SecurityType();
 		script.Globals["ax"] = new MainModule();
 
 		Table flagArgsTable = new(script);
@@ -39,13 +40,16 @@ public static class ScriptRunner {
 		});
 		try {
 			script.DoString(scriptContent);
-		} catch (ScriptRuntimeException ex) {
-			ShellCore.Say(ex.DecoratedMessage);
-			GD.Print(ex.DecoratedMessage);
+		} catch (SyntaxErrorException ex) {
+            ShellCore.Say("-r", ex.DecoratedMessage);
+        } catch (ScriptRuntimeException ex) {
+            ShellCore.Say("-r", ex.DecoratedMessage);
+        } catch (InterpreterException ex) {
+            ShellCore.Say("-r", ex.DecoratedMessage);
         } catch (Exception ex) {
-			GD.Print(ex);
+            ShellCore.Say("-r", "Internal error, please report this: " + ex.Message);
         }
-	}
+    }
 
 	public static void RunPlayerScriptFromFile(string filePath) {
 		NodeFile file = ShellCore.CurrDir.GetFile(filePath);

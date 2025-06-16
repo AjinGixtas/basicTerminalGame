@@ -69,16 +69,20 @@ public class BotFarm {
 		}
 	}
 	public BotFarm(int defLvl, DriftNode driftNode) {
-		List<int> mineralType = []; for (int i = Mathf.Max(defLvl - 2, 0); i <= Mathf.Min(9, defLvl + 1); ++i) { mineralType.Add(i); }
+		List<int> mineralType = []; for (int i = Mathf.Max(defLvl - 1, 0); i <= Mathf.Min(9, defLvl + 1); ++i) { mineralType.Add(i); }
 		mineralType.Remove(Mathf.Clamp(defLvl, 0, 9)); mineralType = Util.Shuffle<int>(mineralType);
-		List<(int, double)> cacheResult = [];
-		double weight1 = Mathf.Clamp(.02 * GD.RandRange(20, 60), .4, 1.0);
-		cacheResult.Add((Mathf.Clamp(defLvl, 0, 9), weight1));
+
+		int tick1 = GD.RandRange(100 / (mineralType.Count + 1), 200 / mineralType.Count);
+		int remainT = 100 - tick1;
+        double weight1 = .02 * Mathf.Clamp(tick1, 34, 100);
 		double remainW = 1.0 - weight1;
-		for (int i = 0; i < Mathf.Min(2, mineralType.Count) && 0.0 < remainW; ++i) {
-			double W = Mathf.Clamp(.02 * GD.RandRange(17, 25), Mathf.Min(.2, remainW), remainW);
+
+        List<(int, double)> cacheResult = []; cacheResult.Add((Mathf.Clamp(defLvl, 0, 9), weight1));
+		for (int i = 0; i < mineralType.Count && 0 < remainT && 0.0 < remainW; ++i) {
+			int T = GD.RandRange(remainT / 2, remainT * 2);
+			double W = T * .02;
 			cacheResult.Add((mineralType[i], W));
-			remainW -= W;
+			remainT -= T; remainW -= W;
 		}
 		cacheResult[0] = (cacheResult[0].Item1, cacheResult[0].Item2 + remainW);
 		mineralDistribution = [.. cacheResult];

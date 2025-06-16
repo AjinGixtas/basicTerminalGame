@@ -4,7 +4,7 @@ using Godot;
 public partial class MineralProfile : Resource {
 	[Export] public string Name { get; set; }
 	[Export] public string Shorthand { get; set; }
-	[Export] public int Index { get; set; }
+	[Export] public int ID { get; set; }
 	public Cc ColorCode;
 	[Export] public int _colorCode {
 		get => (int)ColorCode; 
@@ -15,6 +15,6 @@ public partial class MineralProfile : Resource {
 	public MineralProfile() : this(string.Empty, string.Empty, 0, 0) { }
 	public MineralProfile(string name, string shorthand, int index, int _colorCode) {
 		Name = name; Shorthand = shorthand;
-		Index = index; this._colorCode = _colorCode;
+		ID = index; this._colorCode = _colorCode;
 	}
 }

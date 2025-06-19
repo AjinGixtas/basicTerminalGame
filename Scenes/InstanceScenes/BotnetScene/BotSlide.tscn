@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://d1nh2n16rb25u" path="res://Scripts/CS/BotnetDashboard/BotSlide.cs" id="2_fsow6"]
 
 [node name="BotSlide" type="Control" node_paths=PackedStringArray("botName", "hackTimeBar", "lifeTimeDisplay")]
+modulate = Color(1, 1, 1, 0.8)
 custom_minimum_size = Vector2(640, 40)
 layout_mode = 3
 anchors_preset = 15

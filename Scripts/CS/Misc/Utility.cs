@@ -1,5 +1,4 @@
 using Godot;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -159,7 +158,7 @@ public static partial class Util {
                     string sb = ""; double remainder = value;
                     for (int i = 0; i < units.Length; i++) {
                         if (remainder >= divisors[i]) {
-                            int unitValue = (int)Mathf.Floor(remainder / divisors[i]);
+                            int unitValue = (int)System.Math.Floor(remainder / divisors[i]);
                             remainder -= unitValue * divisors[i];
                             sb += $"[color={Util.CC(Cc.w)}]{unitValue}[/color][color={Util.CC(colors[i])}]{units[i]}[/color]";
                         }
@@ -181,7 +180,7 @@ public static partial class Util {
                     if (!double.TryParse(input, out double value))
                         return Util.Format("NUMBER_PARSE_FAILED", StrType.ERROR);
                     int index = int.Parse(addons[0]);
-                    MineralProfile profile = MINERAL_PROFILES[index];
+                    MineralProfile profile = ItemCrafter.MINERALS[index];
                     string[] units = ["S", "Q", "T", "B", "M", "K"];
                     double[] divisors = [1e21, 1e15, 1e12, 1e9, 1e6, 1e3];
                     Cc[] unitColors = [Cc.R, Cc.Y, Cc.M, Cc.G, Cc.B, Cc.C];
@@ -203,7 +202,7 @@ public static partial class Util {
             case StrType.G_MINERAL: { // General mineral formatting
                     if (!int.TryParse(addons[0], out int index))
                         return Util.Format("MINERAL_TYPE_INDEX_PARSE_FAILED", StrType.ERROR);
-                    return $"[color={Util.CC(MINERAL_PROFILES[index].ColorCode)}]{input}[/color]";
+                    return $"[color={Util.CC(ItemCrafter.MINERALS[index].ColorCode)}]{input}[/color]";
                 }
 
             case StrType.USERNAME:
@@ -259,14 +258,6 @@ public static partial class Util {
         return art;
     }
     public static string EscapeBBCode(string code) { return code.Replace("[", "[lb]"); }
-    public static readonly MineralProfile[] MINERAL_PROFILES =
-    [.. Enumerable.Range(0, 10).Select(i =>
-            ResourceLoader.Load<MineralProfile>(
-                $"res://Utilities/Resources/MineralTypes/MineralResources/MineralT{i}.tres"
-                )
-            ).Where(m => m != null)
-    ];
-
     public static string[] SplitCommands(string input) {
         var commands = new List<string>();
         var current = new StringBuilder();
@@ -349,14 +340,14 @@ public static partial class Util {
     }
     public static string GenerateStringByProportions(double[] proportions, Cc[] colorCode, int length) {
         if (proportions.Length != colorCode.Length)
-            throw new ArgumentException("Proportions and characters must be of the same length.");
+            throw new System.ArgumentException("Proportions and characters must be of the same length.");
 
         int[] counts = new int[proportions.Length];
         int assigned = 0;
 
         // First pass: calculate initial counts using floor
         for (int i = 0; i < proportions.Length; i++) {
-            counts[i] = (int)Math.Floor(proportions[i] * length);
+            counts[i] = (int)System.Math.Floor(proportions[i] * length);
             assigned += counts[i];
         }
 
@@ -396,4 +387,22 @@ public static partial class Util {
         if (min < 1) return $"Less than {Util.Format("1", StrType.UNIT, "min")}";
         return $"Aprox.{Util.Format($"{min}", StrType.UNIT, "min")} remaining";
     }
+    public static Lock LockEnumMapper(LockType type) {
+        return type switch {
+            LockType.I4X => new I4X(),
+            LockType.F8X => new F8X(),
+            LockType.I16 => new I16(),
+            LockType.P16X => new P16X(),
+            LockType.P90 => new P90(),
+            LockType.M2 => new M2(),
+            LockType.M3 => new M3(),
+            LockType.C0 => new C0(),
+            LockType.C1 => new C1(),
+            LockType.C3 => new C3(),
+            _ => throw new System.NotImplementedException($"Lock type {type} is not implemented.")
+        };
+    }
+    public static readonly NodeData PLAYER_NODE_DATA_DEFAULT = new([], [], [],
+        [.. System.Enum.GetValues(typeof(LockType)).Cast<int>()], NodeType.PLAYER, "UNINITALIZED_USER",
+            "home", 1, 1, 1, 1);
 }

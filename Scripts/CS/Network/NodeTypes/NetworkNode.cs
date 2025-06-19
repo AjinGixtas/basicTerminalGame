@@ -44,7 +44,7 @@ public abstract class NetworkNode {
 		get => _retLvl;
 	}
 	
-	public NetworkNode(string hostName, string displayName, string IP, NodeType NodeType, NetworkNode parentNode, bool ownedByPlayer, int lockCode = 0) {
+	public NetworkNode(string hostName, string displayName, string IP, NodeType NodeType, NetworkNode parentNode, bool ownedByPlayer, LockType[] lockCode) {
 		HostName = hostName; DisplayName = displayName; this.IP = IP; this.NodeType = NodeType;
 		OwnedByPlayer = ownedByPlayer; ParentNode = parentNode; ChildNode = [];
 		LockSystem = new(lockCode);

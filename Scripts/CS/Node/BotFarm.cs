@@ -1,5 +1,6 @@
 using Godot;
 using Microsoft.CodeAnalysis;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -69,24 +70,8 @@ public class BotFarm {
 		}
 	}
 	public BotFarm(int defLvl, DriftNode driftNode) {
-		List<int> mineralType = []; for (int i = Mathf.Max(defLvl - 1, 0); i <= Mathf.Min(9, defLvl + 1); ++i) { mineralType.Add(i); }
-		mineralType.Remove(Mathf.Clamp(defLvl, 0, 9)); mineralType = Util.Shuffle<int>(mineralType);
-
-		int tick1 = GD.RandRange(100 / (mineralType.Count + 1), 200 / mineralType.Count);
-		int remainT = 100 - tick1;
-        double weight1 = .02 * Mathf.Clamp(tick1, 34, 100);
-		double remainW = 1.0 - weight1;
-
-        List<(int, double)> cacheResult = []; cacheResult.Add((Mathf.Clamp(defLvl, 0, 9), weight1));
-		for (int i = 0; i < mineralType.Count && 0 < remainT && 0.0 < remainW; ++i) {
-			int T = GD.RandRange(remainT / 2, remainT * 2);
-			double W = T * .02;
-			cacheResult.Add((mineralType[i], W));
-			remainT -= T; remainW -= W;
-		}
-		cacheResult[0] = (cacheResult[0].Item1, cacheResult[0].Item2 + remainW);
-		mineralDistribution = [.. cacheResult];
-		mineralDistribution = Util.Shuffle<(int, double)>(mineralDistribution);
+        // defLvl in [1, 10] range, mineralTier in [0, 9] range.
+        mineralDistribution = GenerateMiningWightDistribution(defLvl-1);
 		HostName = driftNode.HostName; DisplayName = driftNode.DisplayName; IP = driftNode.IP;
 		MAX_LIFE_TIME = 3600 * Mathf.Pow(Mathf.E / 2.5, -5.57180 * defLvl) * Mathf.Log(defLvl) + 1800 * GD.Randf();
 		LifeTime = MAX_LIFE_TIME;
@@ -179,4 +164,16 @@ public class BotFarm {
 			MAX_LIFE_TIME = obj.MAX_LIFE_TIME
 		};
 	}
+	static (int, double)[] GenerateMiningWightDistribution(int baseLvl) {
+		double[] initialRand = [GD.Randf(), GD.Randf(), GD.Randf()]; Array.Sort(initialRand);
+		double sum = initialRand.Sum();
+		double[] randDist = sum == 0 ? [1.0/3.0, 1.0/3.0, 1.0/3.0] : initialRand.Select(x => x / sum).ToArray();
+
+		int swap = GD.Randf() < .5 ? 1 : 0;
+        List<(int, double)> result = [(baseLvl-1, randDist[swap]), (baseLvl, randDist[2]), (baseLvl+1, randDist[1-swap])];
+        // If baseLvl is less than 0, we need to add a negative level to the center of the distribution.
+        if (baseLvl < 0) result[1] = (baseLvl, result[1].Item2 + result[0].Item2);
+		if (baseLvl > 9) result[1] = (baseLvl, result[1].Item2 + result[2].Item2);
+        return result.Where(item => item.Item1 >= 0 && item.Item1 <= 9).ToArray();
+    }
 }

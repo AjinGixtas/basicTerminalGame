@@ -34,7 +34,6 @@ public partial class LifeCycleDirector : Node
 		// Ensure the save root directory exists
 		DirAccess.MakeDirAbsolute(ProjectSettings.GlobalizePath(SaveRoot));
 
-		// Find existing save folders named like "Game_###"
 		var existingSaves = DirAccess.GetDirectoriesAt(SaveRoot).Select(dir => {
 			var match = Regex.Match(dir, @"Game_(\d+)$");
 			return match.Success ? int.Parse(match.Groups[1].Value) : 0;
@@ -68,21 +67,16 @@ public partial class LifeCycleDirector : Node
 		lifeCycleDirector.RemakeScene();
 		if (!DirAccess.DirExistsAbsolute(ProjectSettings.GlobalizePath(SaveRoot))) { ShellCore.Say("-r", "No previous record of user found. Intialize new user."); return; }
 
-		// Find all save folders named like "Game_###"
-		var saveFolders = DirAccess.GetDirectoriesAt(SaveRoot).Where(dir => Regex.IsMatch(dir, @"Game_\d{3}$")).ToList();
+		var saveFolders = DirAccess.GetDirectoriesAt(SaveRoot).Where(dir => dir.StartsWith("Game_")).ToList();
 
-		if (saveFolders.Count == 0) { ShellCore.Say("-r", "No previous record of user found. Intialize new user."); return; }
+		if (saveFolders.Count == 0) { ShellCore.Say("-r", "No previous record of user found in system. Intialize new user."); return; }
 
 		// Find the most recently updated one
-		for (int i = 0; i < saveFolders.Count; i++) {
-			GD.Print(FileAccess.GetModifiedTime(StringExtensions.PathJoin($"{SaveRoot}/{saveFolders[i]}", "PlayerData.tres")), ' ', saveFolders[i]);
-		}
 		string latestFolder = saveFolders
 			.Where(dir => FileAccess.FileExists(StringExtensions.PathJoin($"{SaveRoot}/{dir}", "PlayerData.tres")))
 			.OrderByDescending(dir => FileAccess.GetModifiedTime(StringExtensions.PathJoin($"{SaveRoot}/{dir}", "PlayerData.tres")))
 			.FirstOrDefault();
 
-		GD.Print(latestFolder);
 		ShellCore.Say($"Loading save from: {latestFolder}");
 		// Load global data
 		int[] statusCodes = [
@@ -94,10 +88,10 @@ public partial class LifeCycleDirector : Node
 		lifeCycleDirector.RemakeScene();
 
 		ShellCore.Say("Quick loading save...");
-		ShellCore.Say(PlayerDataManager.GetLoadStatusMsg(statusCodes[0]));
-		ShellCore.Say(PlayerFileManager.GetLoadStatusMsg(statusCodes[1]));
-		ShellCore.Say(NetworkManager.GetLoadStatusMsg(statusCodes[2]));
-		ShellCore.Say($"If there are any error related to save file, feel free to email {Util.Format("ajingixtascontact", StrType.USERNAME)}@{Util.Format("gmail.com", StrType.HOSTNAME)}");
+		ShellCore.Say("-n", PlayerDataManager.GetLoadStatusMsg(statusCodes[0]) + "... ");
+		ShellCore.Say("-n", PlayerFileManager.GetLoadStatusMsg(statusCodes[1]) + "... ");
+		ShellCore.Say("-n", NetworkManager.GetLoadStatusMsg(statusCodes[2]) + "... ");
+		ShellCore.Say($"\nIf there are any error related to save file, feel free to email {Util.Format("ajingixtascontact", StrType.USERNAME)}@{Util.Format("gmail.com", StrType.HOSTNAME)}");
 		CurrentSavePath = StringExtensions.PathJoin(SaveRoot, latestFolder); // Update current save path
 	}
 	void RemakeScene() {

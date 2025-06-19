@@ -1,4 +1,5 @@
 using Godot;
+using System.Linq;
 
 public class ScriptedNetworkNode : NetworkNode {
     public NodeData NodeData { get; }
@@ -8,7 +9,7 @@ public class ScriptedNetworkNode : NetworkNode {
             nodeData != null ? nodeData.DisplayName : "Unknown",
             NetworkManager.GetRandomIP(),
             nodeData != null ? nodeData.NodeType : NodeType.VM,
-            parent, nodeData.OwnedByPlayer, (int)nodeData.Locks) {
+            parent, nodeData.OwnedByPlayer, [.. nodeData.Locks.Cast<LockType>()]) {
         
         NodeData = nodeData;
         if (NodeData != null) {

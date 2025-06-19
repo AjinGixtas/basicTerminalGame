@@ -1,11 +1,14 @@
 using Godot;
 using Godot.Collections;
+using System;
+using System.Linq;
+// Despite the general-feel of this file, it is only used for Player's NodeData (as of now).
 [GlobalClass]
 public partial class NodeData : Resource
 {
 	private MiningWeight[] _miningWeights;
 	private NodeData[] _childNodes;
-	private LockType _locks;
+	private LockType[] _locks;
 	private int _defLvl, _secLvl, _retLvl;
 	private double _gcDeposit;
 	[ExportGroup("Node Info")]
@@ -40,18 +43,22 @@ public partial class NodeData : Resource
         }
     }
 	[ExportGroup("Node security sys")]
-	[Export] public double GcDeposit {
+    // GC reward for breaking the node
+    [Export] public double GcDeposit {
         get => _gcDeposit;
         set {
             _gcDeposit = value;
         }
     }
-	[Export] public double[] MineralsDeposit;    
-	[Export] public LockType Locks {
-		get => _locks;
+	[Export] public double[] MineralsDeposit;
+    // Used for security systems against breaking the node
+    [Export] public int[] Locks {
+		get => _locks.Select(e => (int)e).ToArray();
 		set {
-			_locks = value;
-			NotifyPropertyListChanged();
+			_locks = new LockType[value.Length];
+            for (int i = 0; i < value.Length; i++) {
+                _locks[i] = (LockType)value[i];
+            }
 		}
     }
 	[ExportGroup("Mining stats")]
@@ -122,13 +129,13 @@ public partial class NodeData : Resource
 		}
 		return false;
 	}
-	public NodeData() : this([], [], new double[10]) { }
-    public NodeData(NodeData[] childNodes, MiningWeight[] miningWeights, double[] mineralDeposit, 
-		LockType locks = 0, NodeType type = NodeType.VM, 
-		string hostName = "HOST_NOT_FOUND", string displayName = "HOST_NOT_FOUND", 
-		double gcDeposit = 0, int hacklvl = 1, int growlvl = 1, int timelvl = 1) {
+	public NodeData() : this([], [], new double[10], []) { }
+    public NodeData(NodeData[] childNodes, MiningWeight[] miningWeights, double[] mineralDeposit,
+    int[] locks, NodeType type = NodeType.VM,
+    string hostName = "HOST_NOT_FOUND", string displayName = "HOST_NOT_FOUND",
+    double gcDeposit = 0, int hacklvl = 1, int growlvl = 1, int timelvl = 1) {
 
-		ChildNodes = childNodes; MiningWeights = miningWeights; MineralsDeposit = mineralDeposit;
+        ChildNodes = childNodes; MiningWeights = miningWeights; MineralsDeposit = mineralDeposit;
         Locks = locks; NodeType = type;
         HostName = hostName; DisplayName = displayName;
         GcDeposit = gcDeposit; hackLvl = hacklvl; timeLvl = timelvl; growLvl = growlvl;

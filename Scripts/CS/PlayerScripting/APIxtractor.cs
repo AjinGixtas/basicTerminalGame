@@ -99,7 +99,6 @@ class APIxtractor {
 
     // Helper to clean up XML text content (trim, remove extra spaces/newlines)
     private static string CleanXmlText(string text) {
-        GD.Print(text);
         string[] lines = text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
         for (int i = 0; i < lines.Length; i++) {
             lines[i] = lines[i].TrimStart('/', ' ').TrimEnd(' ');

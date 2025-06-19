@@ -15,7 +15,7 @@ public static partial class NetworkManager {
 
     public static void Ready() {
         DNS = []; driftSectors = []; connectedSectors = []; staticSectors = []; BotNet = [];
-        PlayerNode = new PlayerNode(GD.Load<NodeData>("res://Utilities/Resources/ScriptedNetworkNodes/PlayerNode.tres"));
+        PlayerNode = new PlayerNode(Util.PLAYER_NODE_DATA_DEFAULT);
 
         AssignNodeToIP(PlayerNode);
         RegenerateDriftSector();
@@ -24,6 +24,7 @@ public static partial class NetworkManager {
     static double TimeRemains = CYCLE_TIME;
     public static void Process(double delta) {
         ManageHackFarm(delta);
+        ManageDriftSector(delta);
         MineralCollection(delta);
         TimeRemains -= delta;
         if (TimeRemains <= 0) {
@@ -34,25 +35,17 @@ public static partial class NetworkManager {
 
     public static string[] GetSectorNames(bool mustConnected=false, int level=-1) {
         List<string> names = [];
-        List<Sector> nullSector = [];
-        foreach (var sector in driftSectors) {
-            if (sector == null) { 
-                nullSector.Add(sector);
-                continue; // Skip null sectors
-            }
+        int i = -1; foreach (var sector in driftSectors) {
+            ++i; if (sector == null) { QueueRemoveDriftSector(i); continue; }
             if (level > 0 && sector.SectorLevel != level) continue; // Skip sectors that don't match the level
             if (mustConnected && !connectedSectors.Contains(sector)) continue; // Skip if mustConnected is true and sector is not connected
             names.Add(sector.Name);
         }
-        foreach (DriftSector sector in nullSector) driftSectors.Remove(sector);
-        nullSector.Clear();
-        foreach (var sector in staticSectors) {
-            if (sector == null) { nullSector.Add(sector); continue; } 
+        i = -1; foreach (var sector in staticSectors) {
+            ++i; if (sector == null) { QueueRemoveDriftSector(i); continue; } 
             if (mustConnected && !connectedSectors.Contains(sector)) continue; // Skip if mustConnected is true and sector is not connected
             names.Add(sector.Name);
         }
-        foreach (StaticSector sector in nullSector) staticSectors.Remove(sector);
-        nullSector.Clear();
         return [.. names];
     }
     
@@ -144,35 +137,25 @@ public static partial class NetworkManager {
     }
 
     public static CError ConnectToSector(string sectorName) {
-        List<Sector> nullSector = [];
-        foreach (DriftSector sector in driftSectors) {
-            if (sector == null) { nullSector.Add(sector); continue; }
+        int i = -1; foreach (DriftSector sector in driftSectors) {
+            ++i; if (sector == null) { QueueRemoveDriftSector(i); continue; } // Remove null sectors
             if (sector.Name == sectorName) return ConnectToSector(sector);
         }
-        foreach(DriftSector sector in nullSector) driftSectors.Remove(sector); 
-        nullSector.Clear();
-        foreach (StaticSector sector in staticSectors) {
-            if (sector == null) { nullSector.Add(sector); continue; }
+        i = -1;  foreach (StaticSector sector in staticSectors) {
+            ++i; if (sector == null) { QueueRemoveDriftSector(i); continue; } // Remove null sectors
             if (sector.Name == sectorName) return ConnectToSector(sector);
         }
-        foreach (StaticSector sector in nullSector) staticSectors.Remove(sector);
-        nullSector.Clear();
         return CError.NOT_FOUND;
     }
     public static CError DisconnectFromSector(string sectorName) {
-        List<Sector> nullSector = [];
-        foreach (DriftSector sector in driftSectors) {
-            if (sector == null) { nullSector.Add(sector); continue; }
+        int i = -1; foreach (DriftSector sector in driftSectors) {
+            ++i; if (sector == null) { QueueRemoveDriftSector(i); continue; } // Remove null sectors
             if (sector.Name == sectorName) return DisconnectFromSector(sector);
         }
-        foreach(DriftSector sector in nullSector) driftSectors.Remove(sector); 
-        nullSector.Clear();
-        foreach (StaticSector sector in staticSectors) {
-            if (sector == null) { nullSector.Add(sector); continue; }
+        i = -1; foreach (StaticSector sector in staticSectors) {
+            ++i; if (sector == null) { QueueRemoveDriftSector(i); continue; } // Remove null sectors
             if (sector.Name == sectorName) return DisconnectFromSector(sector);
         }
-        foreach (StaticSector sector in nullSector) staticSectors.Remove(sector);
-        nullSector.Clear();
         return CError.NOT_FOUND;
     }
 
@@ -208,6 +191,12 @@ public static partial class NetworkManager {
         return false;
     }
 
+    public static CError RemoveSector(int index) {
+        if (index < 0 || index >= driftSectors.Count) return CError.INVALID;
+        DriftSector sector = driftSectors[index];
+        driftSectors.RemoveAt(index);
+        return CError.OK;
+    }
     public static CError RemoveSector(string sectorName) {
         foreach (DriftSector sector in driftSectors) {
             if (sector == null) continue;
@@ -222,7 +211,7 @@ public static partial class NetworkManager {
         return CError.NOT_FOUND;
     }
     public static CError RemoveSector(DriftSector sector) {
-        if (sector == null) return CError.INVALID;
+        if (sector == null) return CError.INVALID; // Use index overload instead for null sectors
         if (!driftSectors.Contains(sector)) return CError.NOT_FOUND;
         foreach (NetworkNode node in sector.GetSurfaceNodes()) {
             RemoveNodeAndChildrenFromDNS(node); node.ParentNode = null;
@@ -231,7 +220,7 @@ public static partial class NetworkManager {
         return CError.OK;
     }
     public static CError RemoveSector(StaticSector sector) {
-        if (sector == null) return CError.INVALID;
+        if (sector == null) return CError.INVALID; // Use index overload instead for null sectors
         if (!staticSectors.Contains(sector)) return CError.NOT_FOUND;
         foreach (NetworkNode node in sector.GetSurfaceNodes()) {
             RemoveNodeAndChildrenFromDNS(node); node.ParentNode = null;
@@ -250,25 +239,55 @@ public static partial class NetworkManager {
         }
     }
 
-    readonly static Queue<BotFarm> AddQueue = [];
+    readonly static Queue<BotFarm> AddBotFarmQueue = [];
     public static void QueueAddHackFarm(BotFarm hackFarm) {
-        GD.Print(hackFarm.HostName);
-        AddQueue.Enqueue(hackFarm);
+        AddBotFarmQueue.Enqueue(hackFarm);
     }
-    readonly static Queue<BotFarm> RemovalQueue = [];
+    readonly static Queue<BotFarm> RemoveBotFarmQueue = [];
+    readonly static Queue<int> RemoveBotFarmIndexQ = new Queue<int>();
     public static void QueueRemoveHackFarm(BotFarm hackFarm) {
-        RemovalQueue.Enqueue(hackFarm);
+        RemoveBotFarmQueue.Enqueue(hackFarm);
     }
+    public static void QueueRemoveHackFarm(int index) {
+        RemoveBotFarmIndexQ.Enqueue(index);
+    }
+
+    readonly static Queue<DriftSector> RemoveDriftSectorQueue = [];
+    readonly static Queue<int> RemoveDriftSectorIndexQ = new Queue<int>();
+    public static void QueueRemoveDriftSector(DriftSector sector) {
+        RemoveDriftSectorQueue.Enqueue(sector);
+    }
+    public static void QueueRemoveDriftSector(int index) {
+        RemoveDriftSectorIndexQ.Enqueue(index); // We can check valid index later
+    }
+
     static void ManageHackFarm(double delta) {
-        while (AddQueue.Count > 0) {
-            BotFarm farm = AddQueue.Dequeue();
+        while (AddBotFarmQueue.Count > 0) {
+            BotFarm farm = AddBotFarmQueue.Dequeue();
             if (farm == null || BotNet.Contains(farm)) continue;
             BotNet.Add(farm);
         }
-        while (RemovalQueue.Count > 0) {
-            BotFarm farm = RemovalQueue.Dequeue();
+        while (RemoveBotFarmQueue.Count > 0) {
+            BotFarm farm = RemoveBotFarmQueue.Dequeue();
             if (farm == null || !BotNet.Contains(farm)) continue;
             BotNet.Remove(farm);
+        }
+        while (RemoveBotFarmIndexQ.Count > 0) {
+            int index = RemoveBotFarmIndexQ.Dequeue();
+            if (index < 0 || index >= BotNet.Count) continue; // Invalid index
+            BotFarm farm = BotNet[index];
+            BotNet.RemoveAt(index);
+        }
+    }
+    static void ManageDriftSector(double delta) {
+        while (RemoveDriftSectorQueue.Count > 0) {
+            DriftSector sector = RemoveDriftSectorQueue.Dequeue();
+            if (sector == null || !driftSectors.Contains(sector)) continue;
+            RemoveSector(sector);
+        }
+        while (RemoveDriftSectorIndexQ.Count > 0) {
+            int index = RemoveDriftSectorIndexQ.Dequeue();
+            RemoveSector(index); // This checks for valid index already
         }
     }
     static void MineralCollection(double delta) {

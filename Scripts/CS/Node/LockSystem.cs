@@ -3,27 +3,22 @@ using System.Collections.Generic;
 
 public class LockSystem {
 	List<Lock> activeLocks = [];
-	List<Lock> lockPool = [new I4X(), new F8X(), new I16(), new P16X(), new P90(), new M2(), new M3(), new C0(), new C1(), new C3()];
-	public LockSystem(int lockCode=0) {
-		if (lockCode != 0) {
-			for (int i = lockPool.Count - 1; i >= 0; --i) {
-				if (((1 << i) & lockCode) == 0) continue;
-				activeLocks.Add(lockPool[i]);
-				lockPool.RemoveAt(i);
-			}
-			activeLocks = Util.Shuffle<Lock>(activeLocks);
+	public LockSystem(LockType[] lockCode) {
+		for(int i = 0; i < lockCode.Length; i++) {
+            Lock lockObj = Util.LockEnumMapper(lockCode[i]);
+			activeLocks.Add(lockObj);
+            activeLocks = Util.Shuffle<Lock>(activeLocks);
         }
     }
     public int LockIntialization(int secLvl) {
 		int usedLvl = 0;
-		for (int i = activeLocks.Count; i < lockPool.Count; i++) {
-			if (usedLvl + lockPool[i].Cost <= secLvl && lockPool[i].MinLvl <= secLvl) {
-				activeLocks.Add(lockPool[i]);
-				usedLvl += lockPool[i].Cost;
+		for (int i = activeLocks.Count; i < activeLocks.Count; i++) {
+			if (usedLvl + activeLocks[i].Cost <= secLvl && activeLocks[i].MinLvl <= secLvl) {
+				usedLvl += activeLocks[i].Cost; continue;
 			}
-		}
+			activeLocks.RemoveAt(i);
+        }
 		activeLocks = Util.Shuffle<Lock>(activeLocks);
-		lockPool.Clear();
         return 0;
 	}
 	double endEpoch = -1;
@@ -53,8 +48,9 @@ public class LockSystem {
 			}
 			errors.Add((CError.OK, activeLocks[i].Name, "", ""));
 		}
-		lockPool = []; activeLocks = []; // Destroy all security system
-		errors.Add((CError.OK, "", "", ""));
+        // Won't be used in the current implementation, but can be used to reset the system
+        // lockPool = []; activeLocks = []; // Destroy all security system
+        errors.Add((CError.OK, "", "", ""));
         return [.. errors];
     }
 }

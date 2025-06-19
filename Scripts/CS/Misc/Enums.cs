@@ -67,18 +67,17 @@ public enum StrType {
     T_MINERAL = 26,
     G_MINERAL = 27,
 }
-[Flags]
 public enum LockType {
-    I4X = 1<<0,
-    F8X = 1<<1,
-    I16 = 1<<2,
-    P16X= 1<<3,
-    P90 = 1<<4,
-    M2  = 1<<5,
-    M3  = 1<<6,
-    C0  = 1<<7,
-    C1  = 1<<8,
-    C3  = 1<<9
+    I4X = 0,
+    F8X = 1,
+    I16 = 2,
+    P16X= 3,
+    P90 = 4,
+    M2  = 5,
+    M3  = 6,
+    C0  = 7,
+    C1  = 8,
+    C3  = 9
 }
 public enum CError {
     OK = 0,

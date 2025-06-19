@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public class DriftNode : NetworkNode {
 	public DriftSector Sector { get; init; }
 	public DriftNode(string hostName, string displayName, string IP, NetworkNode parentNode, DriftSector sector, int secLvl) : 
-		base(hostName, displayName, IP, NodeType.DRIFT, parentNode, false, 0){
+		base(hostName, displayName, IP, NodeType.DRIFT, parentNode, false, []){
 		Sector = sector;
 		NetworkManager.AssignNodeToIP(this);
 		DefLvl = (int)Mathf.Clamp(GD.Randfn(secLvl + .5, Mathf.E/2), 1, 10);

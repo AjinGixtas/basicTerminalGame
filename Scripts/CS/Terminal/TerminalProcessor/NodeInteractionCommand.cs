@@ -18,13 +18,10 @@ public static partial class ShellCore {
         if (string.IsNullOrEmpty(minerName)) { Say("-r", "No miner name provided."); return; }
         BotFarm hackfarm = NetworkManager.GetBotByName(minerName);
         if (hackfarm == null) { Say("-r", "No miner with such name."); return; }
-        for(int i = 0; i < hackfarm.mineralDistribution.Length;++i) {
-            GD.Print(hackfarm.mineralDistribution[i].Item1, ' ', hackfarm.mineralDistribution[i].Item2);
-        }
         Say(
 $@"[color={Util.CC(Cc.w)}]Botnet:[/color] {Util.Format(minerName, StrType.HOSTNAME)}
-{Util.GenerateStringByProportions([.. hackfarm.mineralDistribution.Select(x => x.Item2)], [.. hackfarm.mineralDistribution.Select(x => Util.MINERAL_PROFILES[x.Item1].ColorCode)], 50)}
-{string.Join(" | ", hackfarm.mineralDistribution.Select(x => $"[color={Util.CC(Util.MINERAL_PROFILES[x.Item1].ColorCode)}]{Util.MINERAL_PROFILES[x.Item1].Shorthand}[/color]: {Util.Format($"{x.Item2 * 100.0:0.00}", StrType.NUMBER)}%"))}
+{Util.GenerateStringByProportions([.. hackfarm.mineralDistribution.Select(x => x.Item2)], [.. hackfarm.mineralDistribution.Select(x => ItemCrafter.MINERALS[x.Item1].ColorCode)], 50)}
+{string.Join(" | ", hackfarm.mineralDistribution.Select(x => $"[color={Util.CC(ItemCrafter.MINERALS[x.Item1].ColorCode)}]{ItemCrafter.MINERALS[x.Item1].Shorthand}[/color]: {Util.Format($"{x.Item2 * 100.0:0.00}", StrType.NUMBER)}%"))}
 ================================================================
 [color={Util.CC(Cc.w)}]Batch size[/color]    | Lvl.{Util.Format($"{hackfarm.BatchSizeLVL}", StrType.NUMBER, "0"), 26} | {Util.Format($"{hackfarm.BatchSize}", StrType.NUMBER):3}
 [color={Util.CC(Cc.w)}]Mining speed[/color]  | Lvl.{Util.Format($"{hackfarm.MineSpeedLVL}", StrType.NUMBER, "0"), 26} | {Util.Format($"{hackfarm.MineSpeed}", StrType.NUMBER):3}

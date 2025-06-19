@@ -6,7 +6,7 @@ public partial class BotnetDashboard : MarginContainer {
 	[Export] PackedScene slideScene;
 	[Export] HFlowContainer slideContainer;
 	[Export] BotStatusBoard botStatusBoard;
-	[Export] private NetworkManager.HackFarmSortType sortType = NetworkManager.HackFarmSortType.LIFETIME;
+	[Export] NetworkManager.HackFarmSortType sortType = NetworkManager.HackFarmSortType.LIFETIME;
 
 	BotSlide[] BotSlides;
 	int[] pageLength;
@@ -45,11 +45,12 @@ public partial class BotnetDashboard : MarginContainer {
 	public void OnRefreshTimerTimeout() {
 		if (menuDirector.MenuWindowIndex != MenuDirector.BOTNET_INDEX) return;
 		RenderDashboardPage();
-	}
+	}	
 	public void RenderDashboardPage() {
 		NetworkManager.SortHackFarm(sortType);
 		BotFarm[] botnet = NetworkManager.GetBotFarms();
 		int startingIndex = CurPage * PageLength;
+		if (botStatusBoard.isRefNull() && NetworkManager.BotNet.Count > 0) botStatusBoard.ChangeFocusedBotFarm(NetworkManager.BotNet[0]);
 		for (int index = 0; index < PageLength; ++index) {
 			int i = startingIndex + index;
 			if (i >= botnet.Length) {
@@ -67,6 +68,5 @@ public partial class BotnetDashboard : MarginContainer {
 	}
 	public void SetPageLength(int length) {
 		PageLength = length;
-		GD.Print(PageLength);
 	}
 }

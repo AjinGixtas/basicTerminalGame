@@ -1,11 +1,10 @@
 using Godot;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 public static partial class PlayerDataManager {
 	static PlayerDataSaveResource saveObj;
-	public static double[] MineInv => _mineInv;
-	public static double GC_Cur => _gc_cur;
-	public static double GC_Max => _gc_max;
+	public static long[] MineInv => _mineInv;
+	public static long GC_Cur => _gc_cur;
+	public static long GC_Max => _gc_max;
 	public static bool CompletedTutorial {
 		get => saveObj.CompletedTutorial;
 		set => saveObj.CompletedTutorial = value;
@@ -15,23 +14,23 @@ public static partial class PlayerDataManager {
 		get => _username;
 		set => _username = value;
 	}
-	static double _gc_cur {
+	static long _gc_cur {
 		get => saveObj.GC_cur;
 		set {
-			saveObj.GC_cur = Mathf.Clamp(value, 0, GC_Max);
+			saveObj.GC_cur = System.Math.Clamp(value, 0, GC_Max);
 		}
 	}
-	static double _gc_max {
+	static long _gc_max {
 		get => saveObj.GC_max;
 		set {
-			saveObj.GC_max = Mathf.Max(value, 0);
+			saveObj.GC_max = System.Math.Max(value, 0);
 		}
 	}
 	static string _username {
 		get => saveObj.username;
 		set { saveObj.username = value; }
 	}
-	static double[] _mineInv {
+	static long[] _mineInv {
 		get => saveObj.MineralInventory;
 		set {
 			if (value.Length != saveObj.MineralInventory.Length) {
@@ -52,14 +51,14 @@ public static partial class PlayerDataManager {
 		saveObj = new();
 	}
 
-	public static CError WithdrawGC(double amount) {
+	public static CError WithdrawGC(long amount) {
 		if (amount < 0) return CError.INVALID;
 		if (amount > _gc_max) return CError.INSUFFICIENT;
 		_gc_cur -= amount;
 		return CError.OK;
 	}
 	static bool needWarn = false, warned = false;
-	public static CError DepositGC(double amount) {
+	public static CError DepositGC(long amount) {
 		if (amount <= 0) return CError.INVALID;
 		_gc_cur += amount;
 
@@ -70,7 +69,7 @@ public static partial class PlayerDataManager {
 		} else ShellCore.Say($"Deposited {Util.Format($"{amount}", StrType.MONEY)}");
 		return CError.OK;
 	}
-	public static int WithdrawMineral(double[] amounts) {
+	public static long WithdrawMineral(long[] amounts) {
 		if (amounts.Length != _mineInv.Length) return 1; // Invalid amount
 		for (int i = 0; i < amounts.Length; ++i) {
 			if (amounts[i] < 0 || amounts[i] > _mineInv[i]) return 2; // Invalid amount
@@ -80,7 +79,7 @@ public static partial class PlayerDataManager {
 		}   
 		return 0;
 	}
-	public static int DepositMineral(double[] amounts) {
+	public static long DepositMineral(long[] amounts) {
 		if (amounts.Length != _mineInv.Length) return 1; // Invalid amount
         for (int i = 0; i < amounts.Length; ++i) {
 			if (amounts[i] < 0) return 2; // Invalid amount
@@ -90,12 +89,14 @@ public static partial class PlayerDataManager {
 		}
 		return 0;
 	}
-	public static int DepositMineral(int type, double amount) {
+	public static long DepositMineral(int type, long amount) {
 		if (type < 0 || type >= _mineInv.Length) return 1; // Invalid type
 		if (amount < 0) return 2; // Invalid amount
         _mineInv[type] += amount;
 		return 0;
 	}
+
+
 
 	public static string GetLoadStatusMsg(int statusCode) {
 		string[] LOAD_STATUS_MSG = [

@@ -57,7 +57,7 @@ public partial class LifeCycleDirector : Node
 			) + "... ");
 		ShellCore.Say("-n", NetworkManager.GetSaveStatusMsg(
 				NetworkManager.SaveNetworkData(StringExtensions.PathJoin(newSavePath, "NetworkData"))
-			) + "... ");
+			));
 
 		ShellCore.Say($"\nIf there are any error related to save file, feel free to email {Util.Format("ajingixtascontact", StrType.USERNAME)}@{Util.Format("gmail.com", StrType.HOSTNAME)}");
 		CurrentSavePath = newSavePath; // Update current save path
@@ -79,18 +79,20 @@ public partial class LifeCycleDirector : Node
 
 		ShellCore.Say($"Loading save from: {latestFolder}");
 		// Load global data
-		int[] statusCodes = [
-			PlayerDataManager.LoadPlayerData(StringExtensions.PathJoin($"{SaveRoot}/{latestFolder}", "PlayerData.tres")),
-			PlayerFileManager.LoadFileSysData(StringExtensions.PathJoin($"{SaveRoot}/{latestFolder}", "FileSys")),
+		int[][] statusCodes = [
+			// Wrap singletons in arrays to match the expected type
+			[PlayerDataManager.LoadPlayerData(StringExtensions.PathJoin($"{SaveRoot}/{latestFolder}", "PlayerData.tres"))],
+			[PlayerFileManager.LoadFileSysData(StringExtensions.PathJoin($"{SaveRoot}/{latestFolder}", "FileSys"))],
 			NetworkManager.LoadNetworkData(StringExtensions.PathJoin($"{SaveRoot}/{latestFolder}", "NetworkData"))
 		];
 		// Wipe the slate clean
 		lifeCycleDirector.RemakeScene();
 
 		ShellCore.Say("Quick loading save...");
-		ShellCore.Say("-n", PlayerDataManager.GetLoadStatusMsg(statusCodes[0]) + "... ");
-		ShellCore.Say("-n", PlayerFileManager.GetLoadStatusMsg(statusCodes[1]) + "... ");
-		ShellCore.Say("-n", NetworkManager.GetLoadStatusMsg(statusCodes[2]) + "... ");
+		ShellCore.Say("-n", PlayerDataManager.GetLoadStatusMsg(statusCodes[0][0]) + "... ");
+		ShellCore.Say("-n", PlayerFileManager.GetLoadStatusMsg(statusCodes[1][0]) + "... ");
+        // The two above use int[][] to match the expected type, but this one is a single int
+        ShellCore.Say("-n", NetworkManager.GetLoadStatusMsg(statusCodes[2]) + "... ");
 		ShellCore.Say($"\nIf there are any error related to save file, feel free to email {Util.Format("ajingixtascontact", StrType.USERNAME)}@{Util.Format("gmail.com", StrType.HOSTNAME)}");
 		CurrentSavePath = StringExtensions.PathJoin(SaveRoot, latestFolder); // Update current save path
 	}

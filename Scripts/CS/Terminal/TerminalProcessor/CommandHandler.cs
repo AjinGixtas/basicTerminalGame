@@ -52,7 +52,7 @@ public static partial class ShellCore {
             case "inspect": Inspect(parsedArgs, positionalArgs); break; // Doesn't do anything yet
             case "connect": Connect(parsedArgs, positionalArgs); break; // Connect to node
             case "analyze": Analyze(parsedArgs, positionalArgs); break; // Give data about a node
-            case "setusername": SetUsername(parsedArgs, positionalArgs); break; // Set the player's username
+            case "setname": SetName(parsedArgs, positionalArgs); break; // Set name of user and node
 
             case "xyzzy": Say("Nothing happens"); break; // Classic Easter egg command
 

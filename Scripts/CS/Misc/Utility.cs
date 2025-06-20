@@ -403,6 +403,8 @@ public static partial class Util {
         };
     }
     public static readonly NodeData PLAYER_NODE_DATA_DEFAULT = new([], [], [],
-        [.. System.Enum.GetValues(typeof(LockType)).Cast<int>()], NodeType.PLAYER, "UNINITALIZED_USER",
-            "home", 1, 1, 1, 1);
+        [.. System.Enum.GetValues(typeof(LockType)).Cast<int>()], NodeType.PLAYER, "home",
+            "Home", 1, 1, 1, 1);
+    public static string GetArg(Dictionary<string, string> dict, params string[] aliases) 
+        => aliases.FirstOrDefault(flag => dict.ContainsKey(flag)) is string found ? dict[found] : null;
 }

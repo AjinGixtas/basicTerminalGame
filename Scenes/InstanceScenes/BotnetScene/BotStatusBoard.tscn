@@ -16,7 +16,7 @@ rightLabel = NodePath("Container/Control/RightLabel")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 2
-color = Color(0, 1, 1, 0.0196078)
+color = Color(0.218303, 0.217186, 1, 0.0431373)
 
 [node name="Container" type="MarginContainer" parent="."]
 layout_mode = 2

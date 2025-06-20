@@ -11,8 +11,8 @@ public class DriftNode : NetworkNode {
 		SecLvl = (int)Mathf.Clamp(GD.Randfn(DefLvl/2+3.5, .2 * Mathf.E * Mathf.Pi), 1, DefLvl);
 		_hackFarm = new BotFarm(DefLvl, this);
 		GCdeposit = GD.RandRange(
-			Mathf.Pow(2, DefLvl) * Mathf.Pow(10, DefLvl/2.0),
-			Mathf.Pow(2, DefLvl + 1) * Mathf.Pow(10, DefLvl/2.0+1)
+			Mathf.CeilToInt(Mathf.Pow(2, DefLvl) * Mathf.Pow(10, DefLvl/2.0)),
+            Mathf.CeilToInt(Mathf.Pow(2, DefLvl + 1) * Mathf.Pow(10, DefLvl/2.0+1))
 		);
     }
 	BotFarm _hackFarm = null;

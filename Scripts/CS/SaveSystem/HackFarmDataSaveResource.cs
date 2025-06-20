@@ -1,5 +1,4 @@
 using Godot;
-using System.Linq;
 
 public partial class HackFarmDataSaveResource : Resource {
     [Export] public double cHackA, cHackB, cHackC, cHackD;

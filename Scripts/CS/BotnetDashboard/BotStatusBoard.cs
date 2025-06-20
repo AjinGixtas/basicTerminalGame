@@ -17,8 +17,7 @@ public partial class BotStatusBoard : Control {
 
 ================================
 [color={Util.CC(Cc.w)}]Time to live:[/color] {Util.Format($"{hackfarm.LifeTime}", StrType.NUMBER)}s
-
-!NODE UPGRADABLE THROUGH SCRIPTING!";
+";
 
 
 		rightLabel.Text = 

@@ -2,8 +2,8 @@ using Godot;
 using System.Collections.Generic;
 
 public abstract class NetworkNode {
-	public string HostName { get; protected set; }
-	public string DisplayName { get; protected set; }
+	public string HostName { get; set; }
+	public string DisplayName { get; set; }
 	public string IP { get; protected set; }
 	// ^ cosmetic info
 	int _secLvl, _defLvl, _retLvl; // Defense = Sec+Ret
@@ -80,13 +80,13 @@ public abstract class NetworkNode {
 		get => _ownedByPlayer;
 		protected set => _ownedByPlayer = value;
 	}
-	double _gcDeposit = 0; public double GCdeposit { get => _gcDeposit;
+    long _gcDeposit = 0; public long GCdeposit { get => _gcDeposit;
 		set {
 			if (_gcDeposit != 0) return;
 			_gcDeposit = value;
 		}
 	}
-	double[] _mineralDeposit = new double[10]; public double[] MineralDeposit {
+    long[] _mineralDeposit = new long[10]; public long[] MineralDeposit {
 		get => _mineralDeposit;
 		set {
 			if (value.Length != MineralDeposit.Length) { GD.PrintErr("Different length was submitted"); return; }

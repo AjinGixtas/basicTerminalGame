@@ -1,6 +1,4 @@
 using Godot;
-using Microsoft.CodeAnalysis;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -71,24 +69,19 @@ public class BotFarm {
 	}
 	public BotFarm(int defLvl, DriftNode driftNode) {
         // defLvl in [1, 10] range, mineralTier in [0, 9] range.
-        mineralDistribution = GenerateMiningWightDistribution(defLvl-1);
+        mineralDistribution = GenerateMiningWeightDistribution(defLvl-1);
 		HostName = driftNode.HostName; DisplayName = driftNode.DisplayName; IP = driftNode.IP;
 		MAX_LIFE_TIME = 3600 * Mathf.Pow(Mathf.E / 2.5, -5.57180 * defLvl) * Mathf.Log(defLvl) + 1800 * GD.Randf();
 		LifeTime = MAX_LIFE_TIME;
-		HackCostCurve = (GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0),
-						 GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0));
-		GrowCostCurve = (GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0),
-						 GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0));
-		TimeCostCurve = (GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0),
-						 GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0));
-		HackValuCurve = (GD.RandRange(1e-5, 1e-4), GD.RandRange(1e-4, 1e-3),
-						 GD.RandRange(4.0, 5.0), GD.RandRange(5, 10));
+		HackCostCurve = (GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0), GD.RandRange(10.0, 25.0));
+		GrowCostCurve = (GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0), GD.RandRange(10.0, 25.0));
+		TimeCostCurve = (GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0), GD.RandRange(10.0, 25.0));
+		HackValuCurve = (GD.RandRange(1e-5, 1e-4), GD.RandRange(1e-4, 1e-3), GD.RandRange(4.0, 5.0), GD.RandRange(5, 10));
 		// This is essentially stores the offset of hackValu curve level and timeValu curve level to calc its own value, thus, it will relies on the other 2 curve being accurate.
 		GrowValuCurve = (0, 0, GD.RandRange(.8, 1.2), GD.RandRange(.8, 1.2));
 		// This one essentially a speed increase algorithm, with v = d*(b^level)+c*level
 		// a being the distance
-		TimeValuCurve = (GD.RandRange(10.0, 60.0), 1.0 + GD.RandRange(.01, .02),
-						 GD.RandRange(.5, 1.0), 1.0);
+		TimeValuCurve = (GD.RandRange(10.0, 60.0), 1.0 + GD.RandRange(.01, .02), GD.RandRange(.5, 1.0), 1.0);
 		BatchSizeLVL = MineSpeedLVL = XferDelayLVL = 1;
 
     }
@@ -112,21 +105,21 @@ public class BotFarm {
 		XferDelayLVL += 1; return CError.OK;
     }
 
-	public double GetBatchSizeCost() => GetValu(HackCostCurve, BatchSizeLVL);
-	public double GetMineSpeedCost() => GetValu(GrowCostCurve, MineSpeedLVL);
-	public double GetXferDelayCost() => GetValu(TimeCostCurve, XferDelayLVL);
+	public long GetBatchSizeCost() => (long)Mathf.Ceil(GetValu(HackCostCurve, BatchSizeLVL)/10.0);
+	public long GetMineSpeedCost() => (long)Mathf.Ceil(GetValu(GrowCostCurve, MineSpeedLVL)/10.0);
+	public long GetXferDelayCost() => (long)Mathf.Ceil(GetValu(TimeCostCurve, XferDelayLVL)/10.0);
 	double _mineralBacklog, _cycleTimeRemain;
 	public double MBacklog { get => _mineralBacklog; private set => _mineralBacklog = value; }
 	public double CycleTimeRemain { get => _cycleTimeRemain; private set => _cycleTimeRemain = value; }
-	public (int, double)[] ProcessMinerals(double delta) {
-		(int, double)[] output = new (int, double)[mineralDistribution.Length];
+	public (int, long)[] ProcessMinerals(double delta) {
+		(int, long)[] output = new (int, long)[mineralDistribution.Length];
 		CycleTimeRemain -= delta; LifeTime -= delta;
 		MBacklog += MineSpeed * delta;
 		if (CycleTimeRemain > 0) { return output; }
 
 		double batch = Mathf.Min(MBacklog, BatchSize);
 		for (int i = 0; i < mineralDistribution.Length; ++i) {
-			output[i] = (mineralDistribution[i].Item1, mineralDistribution[i].Item2 * batch);
+			output[i] = (mineralDistribution[i].Item1, (long)Mathf.Ceil(mineralDistribution[i].Item2 * batch));
 		}
 		MBacklog -= batch;
 		CycleTimeRemain += XferDelay;
@@ -164,8 +157,8 @@ public class BotFarm {
 			MAX_LIFE_TIME = obj.MAX_LIFE_TIME
 		};
 	}
-	static (int, double)[] GenerateMiningWightDistribution(int baseLvl) {
-		double[] initialRand = [GD.Randf(), GD.Randf(), GD.Randf()]; Array.Sort(initialRand);
+	static (int, double)[] GenerateMiningWeightDistribution(int baseLvl) {
+		double[] initialRand = [GD.Randf(), GD.Randf(), GD.Randf()]; System.Array.Sort(initialRand);
 		double sum = initialRand.Sum();
 		double[] randDist = sum == 0 ? [1.0/3.0, 1.0/3.0, 1.0/3.0] : initialRand.Select(x => x / sum).ToArray();
 

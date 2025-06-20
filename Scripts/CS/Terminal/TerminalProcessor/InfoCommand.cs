@@ -30,7 +30,7 @@ public static partial class ShellCore {
             terminalOutputField.AppendText(GetLastLinesUnderLimit(c, RESET_HISTORY_CHAR_SIZE));
         }
         terminalOutputField.ScrollToLine(terminalOutputField.GetLineCount() - 1);
-        terminalOutputField.AppendText(content+'\n');
+        terminalOutputField.AppendText(content);
     }
     public static void Say(params string[] args) {
         if (terminalOutputField == null) return;
@@ -98,10 +98,23 @@ public static partial class ShellCore {
     static void Inspect(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 
     }
-    static void SetUsername(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
-        if (positionalArgs.Length == 0) { Say("-r", $"No username provided."); return; }
-        if (positionalArgs[0].Length > 20) { Say("-r", $"Username too long. Max length is 20 characters."); return; }
-        SetUsername(positionalArgs[0]);
+    static void SetName(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+        string username = Util.GetArg(parsedArgs, "-u", "--username");
+        string hostname = Util.GetArg(parsedArgs, "-h", "--hostname");
+        string displayName = Util.GetArg(parsedArgs, "-d", "--displayname");
+        if (username != null) { 
+            if (Regex.IsMatch(username, @"^[a-z_][a-z0-9_-]{0,31}$")) SetUsername(username);
+            else Say("-r", "Invalid username. Must start with a letter or underscore, followed by letters, numbers, underscores, or hyphens, and be 1-32 characters long.");
+        }
+        if (hostname != null) {
+            if (Regex.IsMatch(hostname, @"^(?!-)[a-zA-Z0-9-]{1,63}(?<!-)$")) NetworkManager.PlayerNode.HostName = hostname;
+            else Say("-r", "Invalid hostname. Must be 1-63 characters long, start and end with a letter or number, and contain only letters, numbers, and hyphens.");
+        }
+        if (displayName != null) {
+            if (Regex.IsMatch(displayName, @"^[^\x00-\x1F\x7F]{1,100}$")) NetworkManager.PlayerNode.DisplayName = displayName;
+            else Say("-r", "Invalid display name. Must be 1-100 characters long and not contain control characters.");
+        }
+        SetCommandPrompt();
     }
     static void SeeColor(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         var colorNames = new (Cc, string)[] {

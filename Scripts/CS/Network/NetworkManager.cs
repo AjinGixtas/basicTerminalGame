@@ -293,7 +293,7 @@ public static partial class NetworkManager {
     static void MineralCollection(double delta) {
         foreach (BotFarm h in BotNet) {
             if (h.LifeTime <= 0) { QueueRemoveHackFarm(h); continue; }
-            (int, double)[] minerals = h.ProcessMinerals(delta);
+            (int, long)[] minerals = h.ProcessMinerals(delta);
             for (int i = 0; i < minerals.Length; ++i) {
                 PlayerDataManager.DepositMineral(minerals[i].Item1, minerals[i].Item2);
             }
@@ -339,53 +339,107 @@ public static partial class NetworkManager {
         return ip;
     }
     
-    public static string GetSaveStatusMsg(int statusCode) {
-        string[] SAVE_STATUS_MSG = [
+    const string BotnetFileName = "Botnet.tres", PlayerNodeFileName = "PlayerNode.tres";
+    public static string GetSaveStatusMsg(int[] statusCodes) {
+        string[] botnetMsgs = {
             Util.Format("Saved botnet data", StrType.FULL_SUCCESS),
             Util.Format("No botnet to save", StrType.WARNING),
-        ];
-        return (statusCode < SAVE_STATUS_MSG.Length) ? SAVE_STATUS_MSG[statusCode]
-            : Util.Format($"{statusCode}", StrType.UNKNOWN_ERROR, "saving player data");
-    }
-    public static int SaveNetworkData(string filePath) {
-        filePath = ProjectSettings.GlobalizePath(filePath);
-        if (!DirAccess.DirExistsAbsolute(filePath)) DirAccess.MakeDirAbsolute(filePath);
-        if (BotNet.Count == 0) return 1; // No bots to serialize
-        HackFarmDataSaveResource[] botData = new HackFarmDataSaveResource[BotNet.Count];
-        for (int i = 0; i < BotNet.Count; ++i) {
-            if (BotNet[i] == null) continue;
-            botData[i] = BotFarm.SerializeBotnet(BotNet[i]); ;
-            Error error = ResourceSaver.Save(botData[i], StringExtensions.PathJoin(filePath, $"{botData[i].HostName}.tres"));
-            if (error != Error.Ok) return (int)error; // Failed to save a botnet data file
-        }
-        return 0; // Successfully saved all botnet data
+        };
+        string[] nodeMsgs = {
+            Util.Format("Saved player node data", StrType.FULL_SUCCESS),
+            Util.Format("No player node to save, this behavior should never happen and should be reported.", StrType.ERROR),
+        };
+
+        string botnetMsg = statusCodes[0] < botnetMsgs.Length
+            ? botnetMsgs[statusCodes[0]]
+            : Util.Format($"{statusCodes[0]}", StrType.UNKNOWN_ERROR, "saving botnet data");
+
+        string nodeMsg = statusCodes[1] < nodeMsgs.Length
+            ? nodeMsgs[statusCodes[1]]
+            : Util.Format($"{statusCodes[1]}", StrType.UNKNOWN_ERROR, "saving player node data");
+
+        return $"{botnetMsg}...{nodeMsg}...";
     }
 
-    public static string GetLoadStatusMsg(int statusCode) {
-        string[] LOAD_STATUS_MSG = [
+    public static int[] SaveNetworkData(string filePath) {
+        filePath = ProjectSettings.GlobalizePath(filePath);
+        if (!DirAccess.DirExistsAbsolute(filePath)) DirAccess.MakeDirAbsolute(filePath);
+        return [
+            SaveBotNet(filePath), // Save botnet data first
+            SavePlayerNode(filePath), // Save player node data
+        ];
+    }
+    static int SavePlayerNode(string filePath) {
+        if (PlayerNode == null) return 1; // No player node to serialize
+        NodeData playerNodeData = PlayerNode.SerializeNodeData();
+        Error error = ResourceSaver.Save(playerNodeData, StringExtensions.PathJoin(filePath, PlayerNodeFileName));
+        return (int)error; // Return error code
+    }
+    static int SaveBotNet(string filePath) {
+        if (BotNet.Count == 0) return 1; // No bots to serialize
+        HackFarmsDataSaveResource botnetData = new();
+        botnetData.BotNet = new HackFarmDataSaveResource[BotNet.Count];
+        for (int i = 0; i < BotNet.Count; ++i) {
+            if (BotNet[i] == null) continue;
+            botnetData.BotNet[i] = BotFarm.SerializeBotnet(BotNet[i]); ;
+        }
+        Error error = ResourceSaver.Save(botnetData, StringExtensions.PathJoin(filePath, BotnetFileName));
+        return (int)error; // Return error code
+    }
+
+    public static string GetLoadStatusMsg(int[] statusCode) {
+        string[] LOAD_BOTNET_STATUS_MSG = [
             Util.Format("Loaded botnet data", StrType.FULL_SUCCESS),
             Util.Format("No botnet data to load", StrType.WARNING),
-            Util.Format("Failed to open directory with botnet data", StrType.ERROR),
-            Util.Format("Failed to load a botnet data file", StrType.ERROR),
+            Util.Format("Failed to load botnet data file", StrType.ERROR),
+            Util.Format("Failed to load all botnet data", StrType.ERROR),
+            Util.Format("Null botnet data found", StrType.ERROR), // This should never happen, but just in case
         ];
-        return (statusCode < LOAD_STATUS_MSG.Length) ? LOAD_STATUS_MSG[statusCode]
-            : Util.Format($"{statusCode}", StrType.UNKNOWN_ERROR, "loading player data");
+        string[] LOAD_PLAYER_NODE_STATUS_MSG = [
+            Util.Format("Loaded player node data", StrType.FULL_SUCCESS),
+            Util.Format("No player node data to load", StrType.WARNING),
+            Util.Format("Failed to load player node data file", StrType.ERROR),
+            Util.Format("Null player node data file found", StrType.ERROR),
+            Util.Format("Failed to load player node data. This should never happen and should be reported.", StrType.ERROR), // This should never happen, but just in case
+        ];
+        string botnetMsg = statusCode[0] < LOAD_BOTNET_STATUS_MSG.Length
+            ? LOAD_BOTNET_STATUS_MSG[statusCode[0]]
+            : Util.Format($"{statusCode[0]}", StrType.UNKNOWN_ERROR, "loading botnet data");
+        string playerNodeMsg = statusCode[1] < LOAD_PLAYER_NODE_STATUS_MSG.Length
+            ? LOAD_PLAYER_NODE_STATUS_MSG[statusCode[1]]
+            : Util.Format($"{statusCode[1]}", StrType.UNKNOWN_ERROR, "loading player node data");
+        return $"{botnetMsg}...{playerNodeMsg}... ";
     }
-    public static int LoadNetworkData(string filePath) {
+    public static int[] LoadNetworkData(string filePath) {
         filePath = ProjectSettings.GlobalizePath(filePath);
-        if (!DirAccess.DirExistsAbsolute(filePath)) return 1; // No botnet data to load
+        if (!DirAccess.DirExistsAbsolute(filePath)) return [1, 0, 0]; // No botnet data to load
         DirAccess dir = DirAccess.Open(filePath);
-        if (dir == null) return 2; // Failed to open directory
-        string[] files = dir.GetFiles();
-        foreach (string file in files) {
-            if (!file.EndsWith(".tres")) continue; // Only load .tres files
-            GD.Print(StringExtensions.PathJoin(filePath, file));
-            HackFarmDataSaveResource data = GD.Load<HackFarmDataSaveResource>(StringExtensions.PathJoin(filePath, file));
-            if (data == null) continue; // Failed to load data
-            BotFarm farm = new(data);
+        if (dir == null) return [2,0,0]; // Failed to open directory
+        return [0, LoadBotNet(dir, filePath), LoadPlayerNode(dir, filePath)];
+    }
+    static int LoadBotNet(DirAccess dir, string filePath) {
+        if (!dir.FileExists(StringExtensions.PathJoin(filePath, BotnetFileName))) { return 1; }
+        HackFarmsDataSaveResource botnetData;
+        try { botnetData = GD.Load<HackFarmsDataSaveResource>(StringExtensions.PathJoin(filePath, BotnetFileName)); } 
+        catch { return 2; } // Failed to load botnet data
+        int errCode = 0;
+        for (int i = 0; i < botnetData.BotNet.Length; ++i) {
+            if (botnetData.BotNet[i] == null) continue; // Skip null entries
+            BotFarm farm;
+            try { farm = new(botnetData.BotNet[i]); } catch { errCode = 3; continue; } // Failed to deserialize
+            if (farm == null) { errCode = 4; continue; }
             QueueAddHackFarm(farm);
         }
-        return 0; // Successfully loaded all botnet data
+        return errCode;
+    }
+    static int LoadPlayerNode(DirAccess dir, string filePath) {
+        if (!dir.FileExists(StringExtensions.PathJoin(filePath, PlayerNodeFileName))) { return 1; }
+        NodeData playerNodeData;
+        try { playerNodeData = GD.Load<NodeData>(StringExtensions.PathJoin(filePath, PlayerNodeFileName)); } catch { return 2; } // Failed to load player node data
+        if (playerNodeData == null) return 3; // Null player node data
+        try { PlayerNode = new PlayerNode(playerNodeData); } catch { return 4; } // Failed to deserialize player node
+        AssignNodeToIP(PlayerNode);
+        return 0; // Success
     }
 
     static void CleanNullValue() {

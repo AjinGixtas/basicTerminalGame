@@ -27,9 +27,7 @@ $@"[color={Util.CC(Cc.w)}]Botnet:[/color] {Util.Format(minerName, StrType.HOSTNA
 [color={Util.CC(Cc.w)}]Mining speed[/color]  | Lvl.{Util.Format($"{hackfarm.MineSpeedLVL}", StrType.NUMBER, "0"), 26} | {Util.Format($"{hackfarm.MineSpeed}", StrType.NUMBER):3}
 [color={Util.CC(Cc.w)}]Transfer time[/color] | Lvl.{Util.Format($"{hackfarm.XferDelayLVL}", StrType.NUMBER, "0"), 26} | {Util.Format($"{hackfarm.XferDelay}", StrType.NUMBER):3}
 ================================================================
-[color={Util.CC(Cc.w)}]Aprox. Time To Live:[/color] {Util.TimeDifferenceFriendly(hackfarm.LifeTime)}
-
-!NODE UPGRADABLE THROUGH SCRIPTING!");
+[color={Util.CC(Cc.w)}]Aprox. Time To Live:[/color] {Util.TimeDifferenceFriendly(hackfarm.LifeTime)}");
     }
     const double FLARE_TIME = 120.0;
     static double startEpoch = 0, endEpoch = 0, remainingTime = 0;

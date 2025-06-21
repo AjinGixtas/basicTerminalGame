@@ -31,7 +31,7 @@ public class NodeDirectory : NodeSystemItem {
         return CError.UNKNOWN;
     }
     public CError RemoveDir(string pathName) {
-        NodeDirectory dir = GetDirectory(pathName);
+        NodeDirectory dir = GetDir(pathName);
         if (dir == null) return CError.NOT_FOUND;
         NodeDirectory parentDir = dir.Parent;
         if (parentDir == null) return CError.INVALID; // Directory has no parent, which is invalid.
@@ -40,14 +40,14 @@ public class NodeDirectory : NodeSystemItem {
     }
     public CError AddFile(string pathName) {
         string path = System.IO.Path.GetDirectoryName(pathName), name = System.IO.Path.GetFileName(pathName);
-        NodeDirectory dir = GetDirectory(path);
+        NodeDirectory dir = GetDir(path);
         if (dir == null) return CError.NOT_FOUND;
         NodeFile file = new(name) { Parent = dir };
         return dir.Add(file);
     }
     public CError AddDir(string pathName) {
         string path = System.IO.Path.GetDirectoryName(pathName), name = System.IO.Path.GetFileName(pathName);
-        NodeDirectory dir = GetDirectory(path);
+        NodeDirectory dir = GetDir(path);
         if (dir == null) return CError.NOT_FOUND;
         NodeDirectory newDir = new(name) { Parent = dir };
         return dir.Add(newDir);
@@ -61,10 +61,10 @@ public class NodeDirectory : NodeSystemItem {
         Childrens.Add(item);
         return CError.OK;
     }
-    public NodeDirectory GetDirectory(string pathName) {
+    public NodeDirectory GetDir(string pathName) {
         if (string.IsNullOrWhiteSpace(pathName) || pathName == "") return this; // Empty path returns current directory.
-        string[] components = StringExtensions.Split(pathName, "/", false);
-        NodeDirectory curDir = pathName.StartsWith('/') ? GetRoot() : this;
+        string[] components = StringExtensions.Split(pathName, "\\", false);
+        NodeDirectory curDir = pathName.StartsWith('\\') ? GetRoot() : this;
         foreach (string component in components) {
             if (component == ".") continue; // Current directory, do nothing.
             if (component == "..") {

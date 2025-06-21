@@ -1,70 +1,70 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 public static partial class ShellCore {
-    static int SubmitCommand(string newCommand) {
+    static int SubmitCommand(string newCMD) {
         const int MAX_HISTORY_CMD_SIZE = 64;
-        if (IsProcessing) return 1;
-        if (commandHistory.Count == 0 || (commandHistory.Count > 0 && commandHistory[^1] != newCommand)) {
-            commandHistory.Add(newCommand);
-            while (commandHistory.Count > MAX_HISTORY_CMD_SIZE) { commandHistory.RemoveAt(0); }
-            _commandHistoryIndex = commandHistory.Count;
+        if (IsShellBusy) return 1;
+        if (cmdHistory.Count == 0 || (cmdHistory.Count > 0 && cmdHistory[^1] != newCMD)) {
+            cmdHistory.Add(newCMD);
+            while (cmdHistory.Count > MAX_HISTORY_CMD_SIZE) { cmdHistory.RemoveAt(0); }
+            _commandHistoryIndex = cmdHistory.Count;
         }
-        string[] commands = Util.SplitCommands(newCommand);
-        Say("-n", $"{terminalCommandPrompt.Text.Replace("\r", "").Replace("\n", "")}{Util.Format(Util.EscapeBBCode(newCommand), StrType.CMD_FUL)}");
+        string[] commands = Util.SplitCommands(newCMD);
+        Say("-n", $"{terminalCommandPrompt.Text.Replace("\r", "").Replace("\n", "")}{Util.Format(Util.EscapeBBCode(newCMD), StrType.CMD_FUL)}");
         queuedAction = ExecuteCommands;
         queuedCommands = commands;
-        StartProcess(GD.Randf()*.8+.2);
+        StartProcess(GD.Randf()*1.0+.5);
         return 0;
-        static void ExecuteCommands(string[] commands) {
-            for (int i = 0; i < commands.Length; i++) {
-                string[] components = Util.TokenizeCommand(commands[i]);
+        static void ExecuteCommands(string[] cmd) {
+            for (int i = 0; i < cmd.Length; i++) {
+                string[] components = Util.TokenizeCommand(cmd[i]);
                 if (components.Length == 0) continue;
                 if (!ProcessCommand(components[0], components[1..])) break;
             }
         }
     }
     public static event Action<string, Dictionary<string, string>, string[]> OnCommandProcessed; // Event to notify when a command is processed
-    static bool ProcessCommand(string command, string[] args) {
-        command = command.ToLower();
-        (Dictionary<string, string> parsedArgs, string[] positionalArgs) = ParseArgs(args);
-        OnCommandProcessed?.Invoke(command, parsedArgs, positionalArgs); // Notify subscribers about the command being processed
-        switch (command) {
-            case "ls": LS(parsedArgs, positionalArgs); break; // Content of folder
-            case "cd": CD(parsedArgs, positionalArgs); break; // Navigate folder
-            case "mkf": MkF(parsedArgs, positionalArgs); break; // Make file
-            case "rmf": RmF(parsedArgs, positionalArgs); break; // Remove file
-            case "pwd": Pwd(parsedArgs, positionalArgs); break; // List current folder path
-            case "run": Run(parsedArgs, positionalArgs); break; // Run a script file
-            case "say" or "echo": Say(parsedArgs, positionalArgs); break; // Output to terminal
-            case "help": Help(parsedArgs, positionalArgs); break; // List how commands work
-            case "home": Home(parsedArgs, positionalArgs); break; // Go to the player's node
-            case "edit" or "nano" or "vim": Edit(parsedArgs, positionalArgs); break; // Open a file for edit
-            case "scan" or "nmap": Scan(parsedArgs, positionalArgs); break; // Scan neighbouring node
-            case "farm": Farm(parsedArgs, positionalArgs); break; // Interact with a node's HackFarm (GCminer)
-            case "link": Link(parsedArgs, positionalArgs); break; // Connect to sector(s)
-            case "stats": Stats(parsedArgs, positionalArgs); break;
-            case "clear": Clear(parsedArgs, positionalArgs); break; // Clear all text on the terminal
-            case "mkdir": MkDir(parsedArgs, positionalArgs); break; // Make folder
-            case "rmdir": RmDir(parsedArgs, positionalArgs); break; // Remove folder
-            case "sector": Sector(parsedArgs, positionalArgs); break; // List out sectors
-            case "karaxe": Karaxe(parsedArgs, positionalArgs); break; // Interact with the rush hacking system
-            case "unlink": Unlink(parsedArgs, positionalArgs); break; // Disconnect from sector(s)
-            case "inspect": Inspect(parsedArgs, positionalArgs); break; // Doesn't do anything yet
-            case "connect": Connect(parsedArgs, positionalArgs); break; // Connect to node
-            case "analyze": Analyze(parsedArgs, positionalArgs); break; // Give data about a node
-            case "setname": SetName(parsedArgs, positionalArgs); break; // Set name of user and node
+    static bool ProcessCommand(string cmd, string[] args) {
+        cmd = cmd.ToLower();
+        (Dictionary<string, string> farg, string[] parg) = ParseArgs(args);
+        switch (cmd) {
+            case "ls": LS(farg, parg); break; // Content of folder
+            case "cd": CD(farg, parg); break; // Navigate folder
+            case "mkf": MkF(farg, parg); break; // Make file
+            case "rmf": RmF(farg, parg); break; // Remove file
+            case "pwd": Pwd(farg, parg); break; // List current folder path
+            case "run": Run(farg, parg); break; // Run a script file
+            case "cat": Cat(farg, parg); break; // Output file content to terminal
+            case "say" or "echo": Say(farg, parg); break; // Output to terminal
+            case "help": Help(farg, parg); break; // List how commands work
+            case "home": Home(farg, parg); break; // Go to the player's node
+            case "edit" or "nano" or "vim": Edit(farg, parg); break; // Open a file for edit
+            case "scan" or "nmap": Scan(farg, parg); break; // Scan neighbouring node
+            case "farm": Farm(farg, parg); break; // Interact with a node's HackFarm (GCminer)
+            case "link": Link(farg, parg); break; // Connect to sector(s)
+            case "stats": Stats(farg, parg); break;
+            case "clear": Clear(farg, parg); break; // Clear all text on the terminal
+            case "mkdir": MkDir(farg, parg); break; // Make folder
+            case "rmdir": RmDir(farg, parg); break; // Remove folder
+            case "sector": Sector(farg, parg); break; // List out sectors
+            case "karaxe": Karaxe(farg, parg); break; // Interact with the rush hacking system
+            case "unlink": Unlink(farg, parg); break; // Disconnect from sector(s)
+            case "inspect": Inspect(farg, parg); break; // Doesn't do anything yet
+            case "connect": Connect(farg, parg); break; // Connect to node
+            case "analyze": Analyze(farg, parg); break; // Give data about a node
+            case "setname": SetName(farg, parg); break; // Set name of user and node
 
             case "xyzzy": Say("Nothing happens"); break; // Classic Easter egg command
 
             case "regenerate": NetworkManager.RegenerateDriftSector(); break; // Regenerate the drift sector
-            case "seecolor": SeeColor(parsedArgs, positionalArgs); break;
-            case "genstub": GenStub(parsedArgs, positionalArgs); break; // Generate a Lua stub for a class
+            case "seecolor": SeeColor(farg, parg); break;
+            case "genstub": GenStub(farg, parg); break; // Generate a Lua stub for a class
 
-            default: Say("-r", $"{command} is not a valid command."); break;
+            default: Say("-r", $"{cmd} is not a valid command."); break;
         }
+        OnCommandProcessed?.Invoke(cmd, farg, parg); // Notify subscribers about the command being processed
         return true;
     }
     static (Dictionary<string, string>, string[]) ParseArgs(string[] args) {

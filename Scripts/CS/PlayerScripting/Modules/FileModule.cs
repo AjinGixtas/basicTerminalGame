@@ -4,7 +4,7 @@ using System.Linq;
 
 public class FileModule {
 	public string[] ListFiles(string path = "") {
-		NodeDirectory dir = ShellCore.CurrDir.GetDirectory(path);
+		NodeDirectory dir = ShellCore.CurrDir.GetDir(path);
 		if (dir == null) throw new DirectoryNotFoundException($"Directory '{path}' not found.");
 		return dir.Childrens.Where(x => x is NodeFile).Select(x => x.Name).ToArray();
 	}
@@ -13,7 +13,7 @@ public class FileModule {
     public bool ExistF(string path) => ShellCore.CurrDir.GetFile(path) != null;
 	public int MkDir(string path) => (int)ShellCore.CurrDir.AddDir(path);
 	public int RmDir(string path) => (int)ShellCore.CurrDir.RemoveDir(path);
-    public bool ExistDir(string path) => ShellCore.CurrDir.GetDirectory(path) != null;
+    public bool ExistDir(string path) => ShellCore.CurrDir.GetDir(path) != null;
 	
     public CError WriteF(string path, string content, WriteMode mode) {
         NodeFile file = ShellCore.CurrDir.GetFile(path);

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -5,7 +6,8 @@ public static partial class ShellCore {
 	static void Home(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		ToHome();
 	}
-	static void Scan(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+	public static event Action<string[]> OnScanCompleted;
+    static void Scan(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		string L = " └─── ", M = " ├─── ", T = "      ", E = " │    ";
 		System.Func<bool[], string> getTreePrefix = arr => string.Concat(arr.Select((b, i) => (i == arr.Length - 1 ? (b ? L : M) : (b ? T : E))));
 		System.Func<bool[], string> getDescPrefix = arr => string.Concat(arr.Select((b, i) => (b ? T : E)));
@@ -42,6 +44,7 @@ public static partial class ShellCore {
 				++k; stack.Push((child, tdepth + 1, [.. depthMarks, k == 1]));
 			}
 		}
+		OnScanCompleted?.Invoke(visited.Select(x => x.HostName).ToArray());
 		Say("-n", output);
 	}
     static void Connect(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
@@ -72,49 +75,51 @@ public static partial class ShellCore {
 		}
 		Say(output);
 	}
-	static void Link(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
-		for (int i = 0; i < positionalArgs.Length; ++i) { 
-			CError status = NetworkManager.ConnectToSector(positionalArgs[i]);
-			string msg = status switch {
-				CError.OK => $"Linkto successfully: {Util.Format(positionalArgs[i], StrType.SECTOR)}",
-				CError.INVALID => $"Linkto failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Sector is null. This behavior is unexpected and should be reported to the developer.",
-				CError.REDUNDANT => $"Linkto failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Already linked.",
-				CError.NOT_FOUND => $"Linkto failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Sector not found",
-				_ => $"Unexpected error: {status}. Please report to the developer. Linkto failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}",
-			};
-			if (status == 0) { Say(msg); } else { Say("-r", msg); }
-		}
+	public static event Action<string, CError> LinkedToSector;
+    static void Link(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+        if (positionalArgs.Length == 0) { Say("-r", "No sector name provided."); return; }
+        CError status = NetworkManager.ConnectToSector(positionalArgs[0]);
+		string msg = status switch {
+			CError.OK => $"Linkto successfully: {Util.Format(positionalArgs[0], StrType.SECTOR)}",
+			CError.INVALID => $"Linkto failed: {Util.Format(positionalArgs[0], StrType.SECTOR)}. Sector is null. This behavior is unexpected and should be reported to the developer.",
+			CError.REDUNDANT => $"Linkto failed: {Util.Format(positionalArgs[0], StrType.SECTOR)}. Already linked.",
+			CError.NOT_FOUND => $"Linkto failed: {Util.Format(positionalArgs[0], StrType.SECTOR)}. Sector not found",
+			_ => $"Unexpected error: {status}. Please report to the developer. Linkto failed: {Util.Format(positionalArgs[0], StrType.SECTOR)}",
+		};
+		if (status == 0) { Say(msg); LinkedToSector?.Invoke(positionalArgs[0], status); } else { Say("-r", msg); }
 	}
-	static void Unlink(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+	public static event Action<string, CError> UnlinkedToSector;
+    static void Unlink(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+		string msg; CError err = CError.OK;
 		if (positionalArgs[0] == "*") {
 			// Disconnect from all sectors
 			string[] secNames = NetworkManager.GetSectorNames(true);
 			for (int i = 0; i < secNames.Length; ++i) {
-				CError err = NetworkManager.DisconnectFromSector(secNames[i]);
-				string msg = err switch {
+				err = NetworkManager.DisconnectFromSector(secNames[i]);
+				msg = err switch {
                     CError.OK => "",
                     CError.INVALID => $"Unlink failed: {Util.Format(secNames[i], StrType.SECTOR)}. Sector is null. This behavior is unexpected and should be reported to the developer.",
                     CError.NOT_FOUND => $"Unlink failed: {Util.Format(secNames[i], StrType.SECTOR)}. Sector not found.",
                     CError.REDUNDANT => $"Unlink failed: {Util.Format(secNames[i], StrType.SECTOR)}. Not connected.",
                     _ => $"Unexpected error: {err}. Please report to the developer. Unlink failed: {Util.Format(secNames[i], StrType.SECTOR)}",
                 };
-				if (err == CError.OK) { } else { Say("-r", msg); }
+				if (err == CError.OK && msg != "") { Say(msg); } else { Say("-r", msg); }
             }
+			UnlinkedToSector?.Invoke("*", CError.OK);
             return;
 		}
-		for (int i = 0; i < positionalArgs.Length; ++i) {
-			CError status = NetworkManager.DisconnectFromSector(positionalArgs[i]);
-			string msg = status switch {
-				CError.OK => $"Disconnected from sector: {Util.Format(positionalArgs[i], StrType.SECTOR)}",
-                CError.INVALID => $"Unlink failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Sector is null. This behavior is unexpected and should be reported to the developer.",
-				CError.NOT_FOUND => $"Unlink failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Sector not found.",
-				CError.REDUNDANT => $"Unlink failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}. Not connected.",
-				_ => $"Unexpected error: {status}. Please report to the developer. Unlink failed: {Util.Format(positionalArgs[i], StrType.SECTOR)}",
-			};
-			if (status == CError.OK && msg != "") { Say(msg); } else { Say("-r", msg); }
-		}
-	}
-	
+		err = NetworkManager.DisconnectFromSector(positionalArgs[0]);
+		msg = err switch {
+			CError.OK => $"Disconnected from sector: {Util.Format(positionalArgs[0], StrType.SECTOR)}",
+            CError.INVALID => $"Unlink failed: {Util.Format(positionalArgs[0], StrType.SECTOR)}. Sector is null. This behavior is unexpected and should be reported to the developer.",
+			CError.NOT_FOUND => $"Unlink failed: {Util.Format(positionalArgs[0], StrType.SECTOR)}. Sector not found.",
+			CError.REDUNDANT => $"Unlink failed: {Util.Format(positionalArgs[0], StrType.SECTOR)}. Not connected.",
+			_ => $"Unexpected error: {err}. Please report to the developer. Unlink failed: {Util.Format(positionalArgs[0], StrType.SECTOR)}",
+		};
+		if (err == CError.OK && msg != "") { Say(msg); } else { Say("-r", msg); }
+		UnlinkedToSector?.Invoke(positionalArgs[0], err);
+    }
+
 	public static void ToHome() {
 		CurrNode = NetworkManager.PlayerNode;
 	}

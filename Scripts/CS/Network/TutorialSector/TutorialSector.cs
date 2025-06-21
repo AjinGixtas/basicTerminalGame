@@ -1,21 +1,19 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 public class TutorialSector : StaticSector {
     public TutorialSector() {
-        this.SurfaceNodes.Add(new KaraxeTutorialNode(null));
+        SurfaceNodes.Add(new KaraxeTutorialNode(null));
         Name = "SCALE_HOUSE_MetroClean_847137_nw";
     }
 }
 public class KaraxeTutorialNode : NetworkNode {
     public KaraxeTutorialNode(NetworkNode parentNode)
         : base(
-            "cl3ver-b0y_" + Util.GenerateRandomString(6),
+            "cl3ver-b0y_fnZ3yX",
             "Zugzwang Washing Machine I748927423478278429374272357T14_06_2003",
             NetworkManager.GetRandomIP(),
             NodeType.VM,
@@ -34,48 +32,36 @@ public class KaraxeTutorialNode : NetworkNode {
     }
 
     public override void NotifyConnected() {
-        _ = InitialWelcomeAsync();
+        InitialWelcomeAsync();
     }
-
-    async Task InitialWelcomeAsync() {
-        (double, string)[] intro = [
-            (2 , "Hello! I'm Cl3ver B0y, one of your many guides on how to play this game."),
-            (2 , "I will help you learn how to use the terminal and crack nodes."),
-            (2 , "Let's start with a simple task: type 'help' to see what commands are available."),
-            (2 , "Or you can read the documentation. It's at the bottom of the menu bar."),
-            (30 , "..."), // Secret dialouge 1
-            (15, $"Tbh, I'm not a very good teacher, so if you don't like me, just type {Util.Format($"unlink SCALE_HOUSE_MetroClean_847137_nw", StrType.CMD_FUL)} and be on your way."),
-            (2, $"If you miss me (you probably won't), do a visit here every once in a while with {Util.Format("link SCALE_HOUSE_MetroClean_847137_nw", StrType.CMD_FUL)}."),
-            (2, "It's neither lonely or boring in here (I'm connected to the internet lol) but if you come here, I will say hi to you :)"),
-            (30 , "..."), // Secret dialouge 2
-            (2 , "It's reverse psychology, you see? If I be straight forward in how to leave, you'll want to stay."),
-        ];
-
-        await DialogueManager.SaySequenceAsync(intro, "cl3ver-b0y_");
-        (double, string)[] commentary = [
-            (3, "That was horrifically bad attempt at self-deprecating humor and smart-ass writing..."),
-            (1, "Anyway, tutorial's over, have fun.")
-        ];
-        await DialogueManager.SaySequenceAsync(commentary, "???");
+    ChatManager cm = new("cl3ver-b0y");
+    void InitialWelcomeAsync() {
+        cm.Enqueue("Hello! I'm Cl3ver B0y, one of your many guides on how to play this game.");
+        cm.Enqueue("I will help you learn the basic commands.");
+        cm.Enqueue("Let's start with a simple task: type 'help' to see what commands are available.");
+        cm.Enqueue(15, "Or you can read the documentation. It's at the bottom of the menu bar.");
+        cm.Enqueue(30, "..."); // Secret dialouge 1
+        cm.Enqueue(15, $"Tbh, I'm not a very good teacher, so if you don't like me, just type {Util.Format($"unlink SCALE_HOUSE_MetroClean_847137_nw", StrType.CMD_FUL)} and be on your way.");
+        cm.Enqueue($"If you miss me (you probably won't), do a visit here every once in a while with {Util.Format("link SCALE_HOUSE_MetroClean_847137_nw", StrType.CMD_FUL)}.");
+        cm.Enqueue("It's neither lonely or boring in here (I'm connected to the internet lol) but if you come here, I will say hi to you :)");
+        _ = cm.RunDialogueAsync();
     }
 
     async Task SpeakHelpAsync() {
-        (double, string)[] helpLines = [
-            (1, "Oh..."),
-            (2, "So there's *quite* a lot of stuff here..."),
-            (2, "Well, let's start with the basics."),
-            (2, $"`{Util.Format("sector", StrType.CMD_FUL)}` lists out sectors you can `{Util.Format("link <sector_name>", StrType.CMD_FUL)}` to."),
-            (2, $"`{Util.Format("scan", StrType.CMD_FUL)}` lists out neighbouring node."),
-            (2, $"`{Util.Format("home", StrType.CMD_FUL)}` returns you to your node. Use it when you get lost."),
-            (2, $"`{Util.Format("connect <ip_or_hostname>", StrType.CMD_FUL)}` connects you to other node (you just did it 2 minutes ago, but jk, jic)"),
-            (2, $"`{Util.Format("ls", StrType.CMD_FUL)}` lists out files and directories."),
-            (2, $"`{Util.Format("mkf <filename>", StrType.CMD_FUL)}` makes a new file and `{Util.Format("edit <filename>", StrType.CMD_FUL)}` edits it."),
-            (2, $"`{Util.Format("run <filename>", StrType.CMD_FUL)}` will run any file you provide (if possible)."),
-            (2, $"`{Util.Format("say <message>", StrType.CMD_FUL)}` outputs a message to terminal."),
-            (2, $"`{Util.Format("help", StrType.CMD_FUL)}` shows you the command documentation again."),
-            (2, $"`{Util.Format("stats", StrType.CMD_FUL)}` shows you your current stats.")
-        ];
-        await DialogueManager.SaySequenceAsync(helpLines, "cl3ver-b0y_");
+        cm.Enqueue("Oh...");
+        cm.Enqueue("So there's *quite* a lot of stuff here...");
+        cm.Enqueue("Well, let's start with the basics.");
+        cm.Enqueue($"`{Util.Format("sector", StrType.CMD_FUL)}` lists out sectors you can `{Util.Format("link <sector_name>", StrType.CMD_FUL)}` to.");
+        cm.Enqueue($"`{Util.Format("scan", StrType.CMD_FUL)}` lists out neighbouring node.");
+        cm.Enqueue($"`{Util.Format("home", StrType.CMD_FUL)}` returns you to your node. Use it when you get lost.");
+        cm.Enqueue($"`{Util.Format("connect <ip_or_hostname>", StrType.CMD_FUL)}` connects you to other node (you just did it 2 minutes ago, but jk, jic)");
+        cm.Enqueue($"`{Util.Format("ls", StrType.CMD_FUL)}` lists out files and directories.");
+        cm.Enqueue($"`{Util.Format("mkf <filename>", StrType.CMD_FUL)}` makes a new file and `{Util.Format("edit <filename>", StrType.CMD_FUL)}` edits it.");
+        cm.Enqueue($"`{Util.Format("run <filename>", StrType.CMD_FUL)}` will run any file you provide (if possible).");
+        cm.Enqueue($"`{Util.Format("say <message>", StrType.CMD_FUL)}` outputs a message to terminal.");
+        cm.Enqueue($"`{Util.Format("help", StrType.CMD_FUL)}` shows you the command documentation again.");
+        cm.Enqueue($"`{Util.Format("stats", StrType.CMD_FUL)}` shows you your current stats.");
+        _ = cm.RunDialogueAsync();
     }
     public override (CError, string, string, string)[] AttemptCrackNode(Dictionary<string, string> ans, double endEpoch) {
         (CError, string, string, string)[] result = base.AttemptCrackNode(ans, endEpoch);
@@ -113,8 +99,8 @@ public class ChatManager {
     public bool IsPaused => !_pauseEvent.IsSet;
     public ChatManager(string characterName) { CharacterName = characterName; }
 
-    public void Enqueue(string content, double delay) => _dialogueQueue.Enqueue((content, delay));
-    public void Enqueue(string content) => Enqueue(content, EstimateReadingTime(content));
+    public void Enqueue(double delay, string content) => _dialogueQueue.Enqueue((content, delay));
+    public void Enqueue(string content) => Enqueue(EstimateReadingTime(content), content);
     public void Pause() => _pauseEvent.Reset();
     public void Resume() => _pauseEvent.Set();
     public void Cancel() => _cts.Cancel();
@@ -127,10 +113,20 @@ public class ChatManager {
             token.ThrowIfCancellationRequested();
             _pauseEvent.Wait(); // Wait here if paused
             (string content, double delay) = _dialogueQueue.Dequeue();
-            await Task.Delay(Mathf.CeilToInt(delay * 1000), token);
+            await Task.Delay(Util.SkipDialogues ? 50 : (Mathf.CeilToInt(delay * 1000)), token);
             _pauseEvent.Wait(); // Check again before printing
-            ShellCore.Say($"[{Util.Format(GetFnv1aTimeHash(), StrType.DECOR)}] <{CharacterName}> {content}");
+            string timeHash = GetFnv1aTimeHash();
+            ShellCore.Say($"[{Util.Format(timeHash, StrType.DECOR)}] <{Util.Format(CharacterName, StrType.USERNAME)}> {content}");
+            LogToFileSys(CharacterName, $"[{timeHash}] <{CharacterName}> {Util.RemoveBBCode(content)}\n");
         }
+    }
+    static void LogToFileSys(string user, string msg) {
+        string folder = "/irc-log", file = StringExtensions.PathJoin(folder, $"{user}.txt");
+        if (PlayerFileManager.FileSystem.GetDir(folder) == null)
+            PlayerFileManager.FileSystem.AddDir(folder);
+        if (PlayerFileManager.FileSystem.GetFile(file) == null)
+            PlayerFileManager.FileSystem.AddFile(file);
+        PlayerFileManager.FileSystem.GetFile(file).Content += msg;
     }
     public static string GetFnv1aTimeHash() {
         uint hash = Util.GetFn1vHash(BitConverter.GetBytes(Time.GetUnixTimeFromSystem()));
@@ -138,7 +134,7 @@ public class ChatManager {
     }
     static double EstimateReadingTime(string message) {
         const double baseTime = 1.0;          // seconds, for prompt comprehension
-        const double charsPerSecond = 20.0;   // customizable pace
+        const double charsPerSecond = 25.0;   // customizable pace
 
         string clean = Util.RemoveBBCode(message);
         return baseTime + (clean.Length / charsPerSecond);

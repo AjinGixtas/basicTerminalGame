@@ -1,8 +1,14 @@
 using Godot;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using static System.Net.Mime.MediaTypeNames;
 public static partial class ShellCore {
+    public static void Cat(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+        if (positionalArgs.Length == 0) { Say("-r", "No file specified."); return; }
+        string fileName = positionalArgs[0];
+        NodeFile file = CurrDir.GetFile(fileName);
+        if (file == null) { Say("-r", $"File `{fileName}` not found."); return; }
+        Say(file.Content);
+    }
     // It gets 2 since this one is REALLY close to standard, but since it's also called independently a lot, allow for seperate shorthand flag is way better.
     const int MAX_HISTORY_CHAR_SIZE = 65536, RESET_HISTORY_CHAR_SIZE = 16384;
     static void Say(Dictionary<string, string> parsedArgs, string[] positionalArgs) {

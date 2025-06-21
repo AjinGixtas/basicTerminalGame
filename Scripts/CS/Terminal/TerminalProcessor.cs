@@ -9,15 +9,15 @@ public static partial class ShellCore {
 	static NetworkNode _currNode = null; static NodeDirectory _currDir = null;
 	public static NodeDirectory CurrDir { get { return _currDir; } private set { _currDir = value; SetCommandPrompt(); } }
 	public static NetworkNode CurrNode { get { return _currNode; } private set { if (_currNode != value) value.NotifyConnected();  _currNode = value; SetCommandPrompt(); } }
-	static readonly List<string> commandHistory = []; static int _commandHistoryIndex = 0;
+	static readonly List<string> cmdHistory = []; static int _commandHistoryIndex = 0;
 	static int CommandHistoryIndex {
 		get => _commandHistoryIndex;
 		set {
-			value = Mathf.Clamp(value, 0, Mathf.Max(0, commandHistory.Count - 1));
+			value = Mathf.Clamp(value, 0, Mathf.Max(0, cmdHistory.Count - 1));
 			_commandHistoryIndex = value;
-			if (_commandHistoryIndex < commandHistory.Count) {
-				terminalCommandField.Text = commandHistory[_commandHistoryIndex];
-				terminalCommandField.SetCaretColumn(commandHistory[_commandHistoryIndex].Length);
+			if (_commandHistoryIndex < cmdHistory.Count) {
+				terminalCommandField.Text = cmdHistory[_commandHistoryIndex];
+				terminalCommandField.SetCaretColumn(cmdHistory[_commandHistoryIndex].Length);
 			}
 		}
 	}

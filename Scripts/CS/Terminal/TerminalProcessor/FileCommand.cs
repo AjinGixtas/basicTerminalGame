@@ -4,7 +4,7 @@ public static partial class ShellCore {
     static void LS(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         NodeDirectory targetDir = CurrDir;
         if (positionalArgs.Length != 0) {
-            targetDir = CurrDir.GetDirectory(positionalArgs[0]);
+            targetDir = CurrDir.GetDir(positionalArgs[0]);
             if (targetDir == null) { Say("-r", $"Directory not found: {Util.Format(positionalArgs[0], StrType.DIR)}"); return; }
         }
 
@@ -17,7 +17,7 @@ public static partial class ShellCore {
     }
     static void CD(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         if (positionalArgs.Length == 0) { Say("-r", "No directory provided."); return; }
-        NodeDirectory targetDir = CurrDir.GetDirectory(positionalArgs[0]);
+        NodeDirectory targetDir = CurrDir.GetDir(positionalArgs[0]);
         if (targetDir == null) { Say("-r", $"Directory not found: {Util.Format(positionalArgs[0], StrType.DIR)}"); return; }
         CurrDir = targetDir;
     }

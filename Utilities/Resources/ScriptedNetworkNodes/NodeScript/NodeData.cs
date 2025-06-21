@@ -10,7 +10,7 @@ public partial class NodeData : Resource
 	private NodeData[] _childNodes;
 	private LockType[] _locks;
 	private int _defLvl, _secLvl, _retLvl;
-	private double _gcDeposit;
+	private long _gcDeposit;
 	[ExportGroup("Node Info")]
     [Export] public NodeType NodeType;
 	[Export] public string HostName;
@@ -44,13 +44,13 @@ public partial class NodeData : Resource
     }
 	[ExportGroup("Node security sys")]
     // GC reward for breaking the node
-    [Export] public double GcDeposit {
+    [Export] public long GcDeposit {
         get => _gcDeposit;
         set {
             _gcDeposit = value;
         }
     }
-	[Export] public double[] MineralsDeposit;
+	[Export] public long[] MineralsDeposit;
     // Used for security systems against breaking the node
     [Export] public int[] Locks {
 		get => _locks.Select(e => (int)e).ToArray();
@@ -129,11 +129,11 @@ public partial class NodeData : Resource
 		}
 		return false;
 	}
-	public NodeData() : this([], [], new double[10], []) { }
-    public NodeData(NodeData[] childNodes, MiningWeight[] miningWeights, double[] mineralDeposit,
+	public NodeData() : this([], [], new long[10], []) { }
+    public NodeData(NodeData[] childNodes, MiningWeight[] miningWeights, long[] mineralDeposit,
     int[] locks, NodeType type = NodeType.VM,
     string hostName = "HOST_NOT_FOUND", string displayName = "HOST_NOT_FOUND",
-    double gcDeposit = 0, int hacklvl = 1, int growlvl = 1, int timelvl = 1) {
+    long gcDeposit = 0, int hacklvl = 1, int growlvl = 1, int timelvl = 1) {
 
         ChildNodes = childNodes; MiningWeights = miningWeights; MineralsDeposit = mineralDeposit;
         Locks = locks; NodeType = type;

@@ -1,9 +1,10 @@
-using Godot;
-using System.Collections.Generic;
-
 public class StaticSector : Sector {
     private SectorData _sectorData;
 
+    public StaticSector() {
+        _sectorData = null;
+        Name = "Default Sector";
+    }
     public StaticSector(SectorData sectorData) {
         _sectorData = sectorData;
         Name = sectorData.SectorName;
@@ -16,7 +17,6 @@ public class StaticSector : Sector {
         }
         MarkIntializationCompleted();
     }
-
     private ScriptedNetworkNode CreateNodeRecursive(NodeData nodeData, NetworkNode parent) {
         ScriptedNetworkNode node = new ScriptedNetworkNode(nodeData, parent);
         if (nodeData.ChildNodes != null) {
@@ -27,7 +27,6 @@ public class StaticSector : Sector {
         }
         return node;
     }
-
     public int MarkIntializationCompleted() {
         _isIntialized = true;
         return 0;

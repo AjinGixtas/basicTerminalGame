@@ -15,10 +15,9 @@ public static partial class NetworkManager {
 
     public static void Ready() {
         DNS = []; driftSectors = []; connectedSectors = []; staticSectors = []; BotNet = [];
-        PlayerNode = new PlayerNode(Util.PLAYER_NODE_DATA_DEFAULT);
 
-        AssignNodeToIP(PlayerNode);
         RegenerateDriftSector();
+        LoadStaticSector();
     }
     const double CYCLE_TIME = 60*15; // 15min in seconds
     static double TimeRemains = CYCLE_TIME;
@@ -37,11 +36,12 @@ public static partial class NetworkManager {
         List<string> names = [];
         int i = -1; foreach (var sector in driftSectors) {
             ++i; if (sector == null) { QueueRemoveDriftSector(i); continue; }
-            if (level > 0 && sector.SectorLevel != level) continue; // Skip sectors that don't match the level
+            if (level > -1 && sector.SectorLevel != level) continue; // Skip sectors that don't match the level
             if (mustConnected && !connectedSectors.Contains(sector)) continue; // Skip if mustConnected is true and sector is not connected
             names.Add(sector.Name);
         }
         i = -1; foreach (var sector in staticSectors) {
+            if (level > -1) continue; // Static sectors don't have levels, so skip all static sectors if level is specified
             ++i; if (sector == null) { QueueRemoveDriftSector(i); continue; } 
             if (mustConnected && !connectedSectors.Contains(sector)) continue; // Skip if mustConnected is true and sector is not connected
             names.Add(sector.Name);
@@ -84,6 +84,13 @@ public static partial class NetworkManager {
     public static BotFarm[] GetBotFarms() {
         return [.. BotNet];
     }
+    public static DriftSector GetDriftSectorByName(string name) {
+        foreach (DriftSector sector in driftSectors) {
+            if (sector == null) { QueueRemoveDriftSector(sector); continue; } // Remove null sectors
+            if (sector.Name == name) return sector;
+        }
+        return null;
+    }
 
     public static void RegenerateDriftSector(int removalAmount=-1) {
         driftSectors = driftSectors.Where(s => s != null).ToList(); // Remove null sectors
@@ -115,7 +122,7 @@ public static partial class NetworkManager {
     }
 
     public static void LoadStaticSector() {
-        GD.Print("No static sector"); return;
+        staticSectors = [new TutorialSector()]; return;
         staticSectors = [];
         string[] sectorPaths = DirAccess.GetFilesAt("res://Utilities/Resources/ScriptedNetworkNodes/Sectors/");
         foreach (string path in sectorPaths) {
@@ -399,7 +406,7 @@ public static partial class NetworkManager {
             Util.Format("Loaded player node data", StrType.FULL_SUCCESS),
             Util.Format("No player node data to load", StrType.WARNING),
             Util.Format("Failed to load player node data file", StrType.ERROR),
-            Util.Format("Null player node data file found", StrType.ERROR),
+            Util.Format("Null player node data file found. Fall back to default player node state", StrType.ERROR),
             Util.Format("Failed to load player node data. This should never happen and should be reported.", StrType.ERROR), // This should never happen, but just in case
         ];
         string botnetMsg = statusCode[0] < LOAD_BOTNET_STATUS_MSG.Length
@@ -436,7 +443,7 @@ public static partial class NetworkManager {
         if (!dir.FileExists(StringExtensions.PathJoin(filePath, PlayerNodeFileName))) { return 1; }
         NodeData playerNodeData;
         try { playerNodeData = GD.Load<NodeData>(StringExtensions.PathJoin(filePath, PlayerNodeFileName)); } catch { return 2; } // Failed to load player node data
-        if (playerNodeData == null) return 3; // Null player node data
+        if (playerNodeData == null) { PlayerNode = new(Util.PLAYER_NODE_DATA_DEFAULT); return 3; }// Null player node data
         try { PlayerNode = new PlayerNode(playerNodeData); } catch { return 4; } // Failed to deserialize player node
         AssignNodeToIP(PlayerNode);
         return 0; // Success

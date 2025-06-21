@@ -71,14 +71,13 @@ alignment = 0
 [node name="BotnetButton" type="Button" parent="MenuDirector/MenuButtons"]
 layout_mode = 2
 theme = ExtResource("3_0n3pm")
-text = "Botnet"
+text = "BitMiner"
 alignment = 0
 
 [node name="CraftButton" type="Button" parent="MenuDirector/MenuButtons"]
 layout_mode = 2
 theme = ExtResource("3_0n3pm")
-text = "Other
-"
+text = "Crafting"
 alignment = 0
 
 [node name="Other_3" type="Button" parent="MenuDirector/MenuButtons"]

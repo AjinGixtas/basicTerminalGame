@@ -1,10 +1,13 @@
 using Godot;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Text.RegularExpressions;
 public static partial class Util {
     public const bool HaveFinalWord = false; // Used to prevent final word in the terminal
+    public const bool SkipDialogues = true; // Used to skip dialogues in the game
     public static T[] Shuffle<T>(T[] array) {
         for (int i = 0; i < array.Length; i++) {
             int j = GD.RandRange(0, array.Length - 1); 
@@ -19,8 +22,7 @@ public static partial class Util {
         }
         return array;
     }
-    // CC stands for Color Code, shortened for cleaner string format.
-    // Cc also stands for Color Code, shortened and have the second 'C' to lowercase for distinguish them apart.
+    // CC and Cc are both used for color codes, but Cc is an enum and CC is a method to get the color code string.
     public static string CC(Cc color) {
         return color switch {
             Cc._ => "#000000",   // Black
@@ -70,54 +72,34 @@ public static partial class Util {
         switch (type) {
             case StrType.DECOR:
                 return $"[color={Util.CC(Cc.w)}]{input}[/color]";
+            case StrType.IP:
+                return $"[color={Util.CC(Cc.C)}]{input}[/color]";
             case StrType.HOSTNAME:
-                return $"[color={Util.CC(Cc.G)}]{input}[/color]";
+                return $"[color={Util.CC(Cc.gR)}]{input}[/color]";
             case StrType.DISPLAY_NAME:
-                return $"[color={Util.CC(Cc.y)}]{input}[/color]";
-            case StrType.DESC:
-                return $"[color={Util.CC(Cc.g)}]{input}[/color]";
-            case StrType.SYMBOL:
-                return $"[color={Util.CC(Cc.m)}]{input}[/color]";
+                return $"[color={Util.CC(Cc.G)}]{input}[/color]";
+            case StrType.SECTOR:
+                return $"[color={ColorMapperSecLvl(input, NetworkManager.GetDriftSectorByName(input)?.SectorLevel ?? 0)}]{input}[/color]";
             case StrType.UNIT: {
                     if (string.IsNullOrWhiteSpace(input)) return "";
                     return $"{Util.Format(input, StrType.NUMBER)}[color={Util.CC(Cc.W)}]{addons[0]}[/color]";
                 }
-            case StrType.SEC_LVL: {
-                    return $"[color={input switch {
-                        "0" => Util.CC(Cc.C),
-                        "1" or "2" or "3" => Util.CC(Cc.B),
-                        "4" or "5" or "6" => Util.CC(Cc.Y),
-                        "7" or "8" or "9" => Util.CC(Cc.R),
-                        "10" => Util.CC(Cc.M),
-                        _ => Util.CC(Cc.M)
-                    }}]{input}[/color]";
-                }
-            case StrType.SEC_TYPE: {
-                    return $"[color={input switch {
-                        "NOSEC" => Util.CC(Cc.C),
-                        "LOSEC" => Util.CC(Cc.B),
-                        "MISEC" => Util.CC(Cc.Y),
-                        "HISEC" => Util.CC(Cc.R),
-                        "MASEC" => Util.CC(Cc.M),
-                        _ => Util.CC(Cc.M)
-                    }}]{input}[/color]";
-                }
+            case StrType.SEC_LVL:
+                    return $"[color={ColorMapperSecLvl(input, input)}]{input}[/color]";
+            case StrType.SEC_TYPE:
+                return $"[color={ColorMapperSecLvl(input, input)}]{input}[/color]";
             case StrType.DEF_LVL:
-                return $"[color={input switch {
-                    "0" => Util.CC(Cc.C),
-                    "1" or "2" or "3" => Util.CC(Cc.B),
-                    "4" or "5" or "6" => Util.CC(Cc.Y),
-                    "7" or "8" or "9" => Util.CC(Cc.R),
-                    "10" => Util.CC(Cc.M),
-                    _ => Util.CC(Cc.M)
-
-                }}]{input}[/color]";
+                return $"[color={ColorMapperSecLvl(input, input)}]{input}[/color]";
+            case StrType.USERNAME:
+                return $"[color={Util.CC(Cc.M)}]{input}[/color]";
+            case StrType.DESC:
+                return $"[color={Util.CC(Cc.g)}]{input}[/color]";
+            case StrType.SYMBOL:
+                return $"[color={Util.CC(Cc.m)}]{input}[/color]";
             case StrType.NUMBER:
                 string number = addons.Length > 0 ? double.Parse(input).ToString($"F{addons[0]}") :
                     double.Parse(input).ToString("F2");
                 return $"[color={Util.CC(Cc.C)}]{number}[/color]";
-            case StrType.IP:
-                return $"[color={Util.CC(Cc.C)}]{input}[/color]";
             case StrType.DIR:
                 return $"[color={Util.CC(Cc.C)}]{input}[/color]";
             case StrType.FILE: {
@@ -144,17 +126,23 @@ public static partial class Util {
                     }
                     return output;
                 }
+            case StrType.CMD_FLAG:
+                return $"[color={Util.CC(Cc.gR)}]{input}[/color]";
+            case StrType.CMD_ARG:
+                return $"[color={Util.CC(Cc.LR)}]{input}[/color]";
+            case StrType.CMD_ACT:
+                return $"[color={Util.CC(Cc.gB)}]{input}[/color]";
             case StrType.ERROR:
                 return $"[color={Util.CC(Cc.R)}]{input}[/color]";
             case StrType.HEADER:
                 return $"[color={Util.CC(Cc.gR)}]{input}[/color]";
             case StrType.MONEY: { // GC is short for Gold Coin. That's all. lol
                     if (string.IsNullOrWhiteSpace(input)) return "";
-                    if (!double.TryParse(input, out double value))
+                    if (!long.TryParse(input, out long value))
                         return Util.Format("NUMBER_PARSE_FAILED", StrType.ERROR);
-                    string[] units =    ["S", "Q" , "T" , "B" , "M" , "K" ];
-                    double[] divisors = [1e21, 1e15, 1e12, 1e9 , 1e6 , 1e3 ];
-                    Cc[] colors =       [Cc.R, Cc.Y, Cc.M, Cc.G, Cc.B, Cc.C];
+                    string[] units = ["S", "Q", "T", "B", "M", "K"];
+                    double[] divisors = [1e21, 1e15, 1e12, 1e9, 1e6, 1e3];
+                    Cc[] colors = [Cc.R, Cc.Y, Cc.M, Cc.G, Cc.B, Cc.C];
                     string sb = ""; double remainder = value;
                     for (int i = 0; i < units.Length; i++) {
                         if (remainder >= divisors[i]) {
@@ -164,15 +152,8 @@ public static partial class Util {
                         }
                     }
                     string gcValue;
-                    if (value > 10_000) {
-                        // Round up to the next integer if value is big
-                        gcValue = Mathf.Ceil(remainder).ToString("F0");
-                        if (gcValue == "000") { gcValue = ""; }
-                    } else {
-                        // Keep two decimals for small values
-                        gcValue = remainder.ToString("N2").Replace(",", "");
-                        if (gcValue == "000.00") { gcValue = ""; }
-                    }
+                    gcValue = Mathf.Ceil(remainder).ToString("F0");
+                    if (gcValue == "000") { gcValue = ""; }
                     return sb + $"[color={Util.CC(Cc.w)}]{gcValue}[/color][color={Util.CC(Cc.Y)}]GC[/color]";
                 }
             case StrType.T_MINERAL: {
@@ -200,31 +181,30 @@ public static partial class Util {
                     return sb + $"[color={Util.CC(Cc.w)}]{gcValue}[/color][color={mineralColor}]{profile.Shorthand}[/color]";
                 }
             case StrType.G_MINERAL: { // General mineral formatting
-                    if (!int.TryParse(addons[0], out int index))
+                    if (!long.TryParse(addons[0], out long index))
                         return Util.Format("MINERAL_TYPE_INDEX_PARSE_FAILED", StrType.ERROR);
                     return $"[color={Util.CC(ItemCrafter.MINERALS[index].ColorCode)}]{input}[/color]";
                 }
-
-            case StrType.USERNAME:
-                return $"[color={Util.CC(Cc.M)}]{input}[/color]";
             case StrType.WARNING:
                 return $"[color={Util.CC(Cc.Y)}][WARNING] {input}[/color]";
             case StrType.PART_SUCCESS:
                 return $"[color={Util.CC(Cc.C)}]{input}[/color]";
             case StrType.FULL_SUCCESS:
                 return $"[color={Util.CC(Cc.G)}]{input}[/color]";
-            case StrType.CMD_FLAG:
-                return $"[color={Util.CC(Cc.gR)}]{input}[/color]";
-            case StrType.CMD_ARG:
-                return $"[color={Util.CC(Cc.w)}]{input}[/color]";
-            case StrType.CMD_ACT:
-                return $"[color={Util.CC(Cc.C)}]{input}[/color]";
             case StrType.UNKNOWN_ERROR:
                 return Util.Format($"Unknown error encountered{(addons.Length != 0 ? $" with {addons[0]}" : "")}. Error code: {input}", StrType.ERROR);
-            case StrType.SECTOR:
-                return $"[color={Util.CC(Cc.W)}]{input}[/color]";
             default:
                 return input;
+        }
+        string ColorMapperSecLvl(string input, object lvl) {
+            return $"{lvl switch {
+                "NOSEC" or 0 or "0" => Util.CC(Cc.G),
+                "LOSEC" or 1 or 2 or 3 or "1" or "2" or "3" => Util.CC(Cc.LB),
+                "MISEC" or 4 or 5 or 6 or "4" or "5" or "6" => Util.CC(Cc.y),
+                "HISEC" or 7 or 8 or 9 or "7" or "8" or "9" => Util.CC(Cc.r),
+                "MASEC" or "10" => Util.CC(Cc.m),
+                _ => Util.CC(Cc.m)
+            }}";
         }
     }
     public static TEnum MapEnum<TEnum>(int value) where TEnum : System.Enum {
@@ -257,7 +237,9 @@ public static partial class Util {
         }
         return art;
     }
-    public static string EscapeBBCode(string code) { return code.Replace("[", "[lb]"); }
+    public static string EscapeBBCode(string input) { return input.Replace("[", "[lb]"); }
+    private static readonly Regex bbcodeRegex = SelectBBCode();
+    public static string RemoveBBCode(string input) { return bbcodeRegex.Replace(input, ""); }
     public static string[] SplitCommands(string input) {
         var commands = new List<string>();
         var current = new StringBuilder();
@@ -407,4 +389,21 @@ public static partial class Util {
             "Home", 1, 1, 1, 1);
     public static string GetArg(Dictionary<string, string> dict, params string[] aliases) 
         => aliases.FirstOrDefault(flag => dict.ContainsKey(flag)) is string found ? dict[found] : null;
+    public static string GenerateRandomString(int length, string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789") {
+        StringBuilder result = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            result.Append(chars[GD.RandRange(0, chars.Length - 1)]);
+        }
+        return result.ToString();
+    }
+    public static uint GetFn1vHash(byte[] input) {
+        const uint FNV_prime = 0x01000193;
+        uint hash = 0x811C9DC5;
+        foreach (byte b in input)
+            hash = (hash ^ b) * FNV_prime;
+        return hash;
+    }
+
+    [GeneratedRegex(@"\[(\/?)(b|i|u|color|size|url|img|quote|code|spoiler|lb|rb|br)[^\]]*\]", RegexOptions.IgnoreCase, "en-150")]
+    private static partial Regex SelectBBCode();
 }

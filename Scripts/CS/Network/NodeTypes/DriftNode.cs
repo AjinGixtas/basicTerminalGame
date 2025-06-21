@@ -6,13 +6,12 @@ public class DriftNode : NetworkNode {
 	public DriftNode(string hostName, string displayName, string IP, NetworkNode parentNode, DriftSector sector, int secLvl) : 
 		base(hostName, displayName, IP, NodeType.DRIFT, parentNode, false, []){
 		Sector = sector;
-		NetworkManager.AssignNodeToIP(this);
-		DefLvl = (int)Mathf.Clamp(GD.Randfn(secLvl + .5, Mathf.E/2), 1, 10);
-		SecLvl = (int)Mathf.Clamp(GD.Randfn(DefLvl/2+3.5, .2 * Mathf.E * Mathf.Pi), 1, DefLvl);
+		DefLvl = (int)Mathf.Clamp(GD.Randfn(secLvl + .5, Mathf.E/2), 0, 10);
+		SecLvl = (int)Mathf.Clamp(GD.Randfn(DefLvl/2+3.5, .2 * Mathf.E * Mathf.Pi), Mathf.Min(1,DefLvl), DefLvl);
 		_hackFarm = new BotFarm(DefLvl, this);
 		GCdeposit = GD.RandRange(
-			Mathf.CeilToInt(Mathf.Pow(2, DefLvl) * Mathf.Pow(10, DefLvl/2.0)),
-            Mathf.CeilToInt(Mathf.Pow(2, DefLvl + 1) * Mathf.Pow(10, DefLvl/2.0+1))
+			Mathf.CeilToInt(Mathf.Pow(2, DefLvl) * Mathf.Pow(10, (DefLvl-3.0)/4.0)),
+            Mathf.CeilToInt(Mathf.Pow(2, DefLvl) * Mathf.Pow(10, (DefLvl+3.0)/4.0))
 		);
     }
 	BotFarm _hackFarm = null;

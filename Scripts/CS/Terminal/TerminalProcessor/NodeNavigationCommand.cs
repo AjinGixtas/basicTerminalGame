@@ -44,28 +44,24 @@ public static partial class ShellCore {
 		}
 		Say("-n", output);
 	}
-	static void Connect(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
-		if (positionalArgs.Length == 0) { Say("-r", $"No hostname provided."); return; }
-		
-		if (IsIPv4(positionalArgs[0])) { // Check if the input is a valid IPv4 address
-			NetworkNode nodeDNS = NetworkManager.GetNodeByIP(positionalArgs[0]);
-			if (nodeDNS != null) {
-				CurrNode = NetworkManager.GetNodeByIP(positionalArgs[0]); return;
-			} else { Say("-r", $"IP not found: {Util.Format(positionalArgs[0], StrType.HOSTNAME)}"); return;  }
-		}
-		
-		NetworkNode parentNode = CurrNode.ParentNode;
-		if (parentNode != null && parentNode.HostName == positionalArgs[0]) {
+    static void Connect(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+        if (positionalArgs.Length == 0) { Say("-r", "No hostname provided."); return; }
+		string target = positionalArgs[0]; NetworkNode node = null;
+        
+		if (IsIPv4(target)) {
+            node = NetworkManager.GetNodeByIP(target);
+            if (node == null) { Say("-r", $"IP not found: {Util.Format(target, StrType.HOSTNAME)}"); return; }
+        } else if (CurrNode.ParentNode != null && CurrNode.ParentNode.HostName == target) {
+            node = CurrNode.ParentNode;
+        } else {
+            node = CurrNode.ChildNode.FindLast(n => n.HostName == target);
+            if (node == null) { Say("-r", $"Host not found: {Util.Format(target, StrType.HOSTNAME)}"); return; }
+        }
 
-			CurrNode = parentNode; return; 
-		}
-
-		NetworkNode node = CurrNode.ChildNode.FindLast(s => s.HostName == positionalArgs[0]);
-		if (node == null) { Say("-r", $"Host not found: {Util.Format(positionalArgs[0], StrType.HOSTNAME)}"); return; }
-		
-		CurrNode = node;
-	}
-	static void Sector(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+        if (!node.RequestConnectPermission()) { Say("-r", "Connection denied by the corresponding node."); return; }
+        CurrNode = node;
+    }
+    static void Sector(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		bool connectedOnly = parsedArgs.ContainsKey("-c") || parsedArgs.ContainsKey("--connected");
 		int sectorLevel = parsedArgs.ContainsKey("-l") ? int.Parse(parsedArgs["-l"]) : -1;
         string[] sectorNames = NetworkManager.GetSectorNames(connectedOnly, sectorLevel);
@@ -126,7 +122,8 @@ public static partial class ShellCore {
         if (string.IsNullOrEmpty(IP)) return CError.MISSING;
 		if (!IsIPv4(IP)) return CError.INVALID;
         NetworkNode node = NetworkManager.GetNodeByIP(IP);
-        if (node == null) { return CError.NOT_FOUND; }
+        if (node == null) return CError.NOT_FOUND;
+		if (!node.RequestConnectPermission()) return CError.NO_PERMISSION;
         CurrNode = node;
 		return CError.OK;
     }

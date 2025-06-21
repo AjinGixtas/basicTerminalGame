@@ -21,7 +21,7 @@ public class DriftSector : Sector {
 	public DriftSector() {
         Name = GenSectorName();
 		int type = GD.RandRange(0, 3);
-		_sectorLevel = GD.RandRange(1, 10);
+		_sectorLevel = GD.RandRange(0, 10);
 		switch (type) {
 			case 0: GenerateBusNetwork(_sectorLevel); break;
 			case 1: GenerateStarNetwork(_sectorLevel); break;
@@ -105,14 +105,7 @@ public class DriftSector : Sector {
 		return sb;
 	}
 	static (string, string) GenNodeName() {
-		string baseName = DRIFT_NODE_NAMES[GD.RandRange(0, DRIFT_NODE_NAMES.Length - 1)], suffix = GenSuffix(6);
+		string baseName = DRIFT_NODE_NAMES[GD.RandRange(0, DRIFT_NODE_NAMES.Length - 1)], suffix = Util.GenerateRandomString(6);
 		return ($"{char.ToUpper(baseName[0])}{baseName[1..]} {suffix.ToUpper()}", $"{baseName}_{suffix}");
-	}
-	static string GenSuffix(int length) {
-		const string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-		string sb = "";
-		for (int i = 0; i < length; i++) {
-			sb += chars[GD.RandRange(0, chars.Length - 1)];
-		} return sb;
 	}
 }

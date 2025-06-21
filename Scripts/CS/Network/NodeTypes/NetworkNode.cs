@@ -48,9 +48,10 @@ public abstract class NetworkNode {
 		HostName = hostName; DisplayName = displayName; this.IP = IP; this.NodeType = NodeType;
 		OwnedByPlayer = ownedByPlayer; ParentNode = parentNode; ChildNode = [];
 		LockSystem = new(lockCode);
-	}
-	
-	public virtual void Init(int DefLvl, int SecLvl) {
+		NetworkManager.AssignNodeToIP(this);
+    }
+
+    public virtual void Init(int DefLvl, int SecLvl) {
 		this.DefLvl = DefLvl; this.SecLvl = SecLvl;
 	}
 	
@@ -115,4 +116,9 @@ public abstract class NetworkNode {
 		if (IsSecure) return 1; // Node secured, transfer impossible
 		OwnedByPlayer = true; return 0; // Transfer successful
 	}
+    // Default connection method, can be overridden by derived classes, like tutorial nodes acting as NPC talking to the player.
+    public virtual bool RequestConnectPermission () {
+		return true;
+	}
+	public virtual void NotifyConnected() { } // Called when a player connects to this node, can be overridden for custom behavior.
 }

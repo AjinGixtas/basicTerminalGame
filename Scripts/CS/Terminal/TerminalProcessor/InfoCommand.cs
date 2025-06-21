@@ -167,7 +167,7 @@ public static partial class ShellCore {
         f.Flush();
         Say($"Generated Lua stub for class {iFile}");
     }
-    
+
     public static void Clear() {
         terminalOutputField.Clear();
     }

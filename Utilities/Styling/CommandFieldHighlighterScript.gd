@@ -1,8 +1,8 @@
 extends CodeHighlighter
 
-const CMD_COLOR : Color = Color("#00ffff")
+const CMD_COLOR : Color = Color("#00aaff")
 const FLAG_COLOR : Color = Color("#ffaa00")
-const ARG_COLOR : Color = Color("#282828")
+const ARG_COLOR : Color = Color("#ff6666")
 const SEMICOLON_COLOR : Color = Color("#ffffff")
 func _get_line_syntax_highlighting(line: int) -> Dictionary:
 	var input_str : String = get_text_edit().get_line(line)

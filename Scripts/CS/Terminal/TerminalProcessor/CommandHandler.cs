@@ -1,4 +1,5 @@
 using Godot;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -25,9 +26,11 @@ public static partial class ShellCore {
             }
         }
     }
+    public static event Action<string, Dictionary<string, string>, string[]> OnCommandProcessed; // Event to notify when a command is processed
     static bool ProcessCommand(string command, string[] args) {
         command = command.ToLower();
         (Dictionary<string, string> parsedArgs, string[] positionalArgs) = ParseArgs(args);
+        OnCommandProcessed?.Invoke(command, parsedArgs, positionalArgs); // Notify subscribers about the command being processed
         switch (command) {
             case "ls": LS(parsedArgs, positionalArgs); break; // Content of folder
             case "cd": CD(parsedArgs, positionalArgs); break; // Navigate folder

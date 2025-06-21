@@ -1,4 +1,5 @@
 using Godot;
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -6,6 +7,7 @@ public partial class LifeCycleDirector : Node
 {
 	[Export] PackedScene gameScene;
 	RuntimeDirector runtimeDirector;
+	public static event Action FinishScene;
 	public override void _Ready() {
 		// Load the game scene
 		if (gameScene != null) {
@@ -64,7 +66,6 @@ public partial class LifeCycleDirector : Node
 	}
 
 	static void QuickLoad(LifeCycleDirector lifeCycleDirector) {
-		lifeCycleDirector.RemakeScene();
 		if (!DirAccess.DirExistsAbsolute(ProjectSettings.GlobalizePath(SaveRoot))) { ShellCore.Say("-r", "No previous record of user found. Intialize new user."); return; }
 
 		var saveFolders = DirAccess.GetDirectoriesAt(SaveRoot).Where(dir => dir.StartsWith("Game_")).ToList();
@@ -95,7 +96,9 @@ public partial class LifeCycleDirector : Node
         ShellCore.Say("-n", NetworkManager.GetLoadStatusMsg(statusCodes[2]) + "... ");
 		ShellCore.Say($"\nIf there are any error related to save file, feel free to email {Util.Format("ajingixtascontact", StrType.USERNAME)}@{Util.Format("gmail.com", StrType.HOSTNAME)}");
 		CurrentSavePath = StringExtensions.PathJoin(SaveRoot, latestFolder); // Update current save path
-	}
+		FinishScene.Invoke();
+		foreach (Delegate d in FinishScene.GetInvocationList()) FinishScene -= (Action)d; // Clear the event to prevent multiple invocations
+    }
 	void RemakeScene() {
 		if (runtimeDirector != null) RemoveChild(runtimeDirector);
 		runtimeDirector = gameScene.Instantiate<RuntimeDirector>();

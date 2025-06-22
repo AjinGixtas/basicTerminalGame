@@ -1,14 +1,8 @@
 using Godot;
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 public static partial class ShellCore {
-    public static void Cat(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
-        if (positionalArgs.Length == 0) { Say("-r", "No file specified."); return; }
-        string fileName = positionalArgs[0];
-        NodeFile file = CurrDir.GetFile(fileName);
-        if (file == null) { Say("-r", $"File `{fileName}` not found."); return; }
-        Say(file.Content);
-    }
     // It gets 2 since this one is REALLY close to standard, but since it's also called independently a lot, allow for seperate shorthand flag is way better.
     const int MAX_HISTORY_CHAR_SIZE = 65536, RESET_HISTORY_CHAR_SIZE = 16384;
     static void Say(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
@@ -76,10 +70,12 @@ public static partial class ShellCore {
         terminalOutputField.ScrollToLine(terminalOutputField.GetLineCount() - 1);
         terminalOutputField.AppendText(text);
     }
+    public static event Action OnHelpCMDrun;
     static void Help(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         string fileName = parsedArgs.ContainsKey("-v") ? "helpVerbose.txt" : "helpShort.txt";
         FileAccess fileAccess = FileAccess.Open($"res://Utilities/TextFiles/CommandOutput/{fileName}", FileAccess.ModeFlags.Read);
         Say(fileAccess.GetAsText());
+        OnHelpCMDrun?.Invoke();
     }
     static void Stats(Dictionary<string, string> parsedArgs, string[] postionalArgs) {
         Say($"Username: {Util.Format(PlayerDataManager.Username, StrType.USERNAME)}");
@@ -115,6 +111,12 @@ public static partial class ShellCore {
         if (hostname != null) {
             if (Regex.IsMatch(hostname, @"^(?!-)[a-zA-Z0-9-]{1,63}(?<!-)$")) NetworkManager.PlayerNode.HostName = hostname;
             else Say("-r", "Invalid hostname. Must be 1-63 characters long, start and end with a letter or number, and contain only letters, numbers, and hyphens.");
+            if (hostname == "cl3ver-b0y_fnZ3yX") {
+                NetworkManager.PlayerNode.cm.Enqueue("Clever, and. Yes, that would bug the game tutorial.");
+                NetworkManager.PlayerNode.cm.Enqueue("But it uses an illegal hostname, so you can't change it to that.");
+                NetworkManager.PlayerNode.cm.Enqueue("Unless...? o_O");
+                _ = NetworkManager.PlayerNode.cm.RunDialogueAsync();
+            }
         }
         if (displayName != null) {
             if (Regex.IsMatch(displayName, @"^[^\x00-\x1F\x7F]{1,100}$")) NetworkManager.PlayerNode.DisplayName = displayName;

@@ -1,13 +1,18 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 public static partial class Util {
-    public const bool HaveFinalWord = false; // Used to prevent final word in the terminal
-    public const bool SkipDialogues = true; // Used to skip dialogues in the game
+    /// <summary>
+    /// Use to prevent final word of objects before getting freed.
+    /// </summary>
+    public const bool HaveFinalWord = false;
+    /// <summary>
+    /// Skip dialogues in the game, used for testing purposes.
+    /// </summary>
+    public const bool SkipDialogues = true;
     public static T[] Shuffle<T>(T[] array) {
         for (int i = 0; i < array.Length; i++) {
             int j = GD.RandRange(0, array.Length - 1); 
@@ -22,8 +27,25 @@ public static partial class Util {
         }
         return array;
     }
-    // CC and Cc are both used for color codes, but Cc is an enum and CC is a method to get the color code string.
+    /// <summary>
+    /// Converts a Cc enum value to a color code string.
+    /// </summary>
+    /// <param name="color"></param>
+    /// <returns>
+    /// <br/><c>Cc._</c>: Black, <c>Cc.w</c>: Dark gray, <c>Cc.W</c>: White
+    /// <br/><c>Cc.r</c>: Deep red, <c>Cc.R</c>: Bright red, <c>Cc.LR</c>: Light red (coral)
+    /// <br/><c>Cc.g</c>: Deep green, <c>Cc.G</c>: Bright green, <c>Cc.LG</c>: Light green
+    /// <br/><c>Cc.b</c>: Deep blue, <c>Cc.B</c>: Bright blue, <c>Cc.LB</c>: Light blue (periwinkle)
+    /// <br/><c>Cc.c</c>: Dark cyan (teal), <c>Cc.C</c>: Bright cyan, <c>Cc.LC</c>: Light cyan
+    /// <br/><c>Cc.m</c>: Deep magenta, <c>Cc.M</c>: Bright magenta, <c>Cc.LM</c>: Light magenta
+    /// <br/><c>Cc.y</c>: Dark yellow (olive), <c>Cc.Y</c>: Bright yellow, <c>Cc.LY</c>: Light yellow
+    /// <br/><br/>Mixed/blended colors:
+    /// <br/><c>Cc.bR</c>: Hot pink, <c>Cc.gR</c>: Amber (orange-yellow), <c>Cc.gB</c>: Ocean blue
+    /// <br/><c>Cc.rB</c>: Violet, <c>Cc.rG</c>: Lime green, <c>Cc.bG</c>: Mint green
+    /// <br/><br/>Defaults to <c>Cc.W</c> in all other cases.
+    /// </returns>
     public static string CC(Cc color) {
+        // CC and Cc are both used for color codes, but Cc is an enum and CC is a method to get the color code string.
         return color switch {
             Cc._ => "#000000",   // Black
             Cc.w => "#666666",   // Dark gray
@@ -43,17 +65,17 @@ public static partial class Util {
             Cc.m => "#cc00cc",     // Deep magenta
             Cc.y => "#cccc00",     // Olive yellow
 
+            Cc.bR => "#ff00aa",    // Hot pink
+            Cc.gR => "#ffaa00",    // Amber
             Cc.gB => "#00aaff",    // Aqua blue
             Cc.rB => "#aa00ff",    // Violet
             Cc.rG => "#aaff00",    // Lime green
             Cc.bG => "#00ffaa",    // Mint green
-            Cc.bR => "#ff00aa",    // Hot pink
-            Cc.gR => "#ffaa00",    // Amber
 
-            Cc.LB => "#6666ff",    // Periwinkle
-            Cc.LG => "#66ff66",    // Light green
-            Cc.LC => "#adffff",    // Light cyan
             Cc.LR => "#ff6666",    // Light coral
+            Cc.LG => "#66ff66",    // Light green
+            Cc.LB => "#6666ff",    // Periwinkle
+            Cc.LC => "#adffff",    // Light cyan
             Cc.LM => "#ff66ff",    // Light magenta
             Cc.LY => "#ffff66",    // Light yellow
 
@@ -68,6 +90,57 @@ public static partial class Util {
         }
         return new string(chars);
     }
+    /// <summary>
+    /// Formats the given <paramref name="input"/> string with color tags based on the specified <paramref name="type"/>.
+    /// </summary>
+    /// <param name="input">The text to wrap in color tags.</param>
+    /// <param name="type">One of the <see cref="StrType"/> values indicating how to colorize <paramref name="input"/>.</param>
+    /// <param name="addons">
+    /// Optional parameters for certain types:
+    /// <list type="bullet">
+    ///   <item><description><see cref="StrType.UNIT"/>: addons[0] is the unit suffix (e.g. “MB”).</description></item>
+    ///   <item><description><see cref="StrType.NUMBER"/>: addons[0] is the number of decimal places.</description></item>
+    ///   <item><description><see cref="StrType.T_MINERAL"/>: addons[0] is the mineral index.</description></item>
+    ///   <item><description><see cref="StrType.G_MINERAL"/>: addons[0] is the mineral index for lookup.</description></item>
+    ///   <item><description><see cref="StrType.UNKNOWN_ERROR"/>: addons[0] is optional extra context.</description></item>
+    /// </list>
+    /// </param>
+    /// <returns>
+    /// A string wrapped in color tags:
+    /// <list type="bullet">
+    ///   <item><description><c>StrType.DECOR</c>: [color=<c>Cc.w</c>]</description></item>
+    ///   <item><description><c>StrType.IP</c>:    [color=<c>Cc.C</c>]</description></item>
+    ///   <item><description><c>StrType.HOSTNAME</c>: [color=<c>Cc.gR</c>]</description></item>
+    ///   <item><description><c>StrType.DISPLAY_NAME</c>: [color=<c>Cc.G</c>]</description></item>
+    ///   <item><description><c>StrType.SECTOR</c>: uses <c>ColorMapperSecLvl</c> to pick a <c>Cc</c> based on sector level.</description></item>
+    ///   <item><description><c>StrType.UNIT</c>: formats input as a number then appends [color=<c>Cc.W</c>]addons[0]</description></item>
+    ///   <item><description><c>StrType.SEC_LVL</c>, <c>StrType.SEC_TYPE</c>, <c>StrType.DEF_LVL</c>: all use <c>ColorMapperSecLvl</c> with input as both value and level.</description></item>
+    ///   <item><description><c>StrType.USERNAME</c>: [color=<c>Cc.M</c>]</description></item>
+    ///   <item><description><c>StrType.DESC</c>:     [color=<c>Cc.g</c>]</description></item>
+    ///   <item><description><c>StrType.SYMBOL</c>:   [color=<c>Cc.m</c>]</description></item>
+    ///   <item><description><c>StrType.NUMBER</c>: wraps a parsed and formatted numeric value in [color=<c>Cc.C</c>]</description></item>
+    ///   <item><description><c>StrType.DIR</c>:       [color=<c>Cc.C</c>]</description></item>
+    ///   <item><description><c>StrType.FILE</c>: splits path into directory ([color=<c>Cc.C</c>]) + name ([color=<c>Cc.G</c>])</description></item>
+    ///   <item><description><c>StrType.CMD_FUL</c>: full command string, with<br/>
+    ///     - name formatted via <c>StrType.CMD_ACT</c>,<br/>
+    ///     - flags via <c>StrType.CMD_FLAG</c>,<br/>
+    ///     - args via <c>StrType.CMD_ARG</c>,<br/>
+    ///     and semicolon separators in [color=<c>Cc.W</c>]</description></item>
+    ///   <item><description><c>StrType.CMD_FLAG</c>: [color=<c>Cc.gR</c>]</description></item>
+    ///   <item><description><c>StrType.CMD_ARG</c>:  [color=<c>Cc.LR</c>]</description></item>
+    ///   <item><description><c>StrType.CMD_ACT</c>:  [color=<c>Cc.gB</c>]</description></item>
+    ///   <item><description><c>StrType.ERROR</c>:    [color=<c>Cc.R</c>]</description></item>
+    ///   <item><description><c>StrType.HEADER</c>:   [color=<c>Cc.gR</c>]</description></item>
+    ///   <item><description><c>StrType.MONEY</c>: formats large integer into units [<c>Cc.w</c>]&lt;value&gt; + [<c>Cc.*</c>]&lt;unit&gt; + “GC” in [<c>Cc.Y</c>]</description></item>
+    ///   <item><description><c>StrType.T_MINERAL</c>: splits large value into mineral units with [<c>Cc.w</c>] value + [<c>Cc.*</c>] unit + profile shorthand color</description></item>
+    ///   <item><description><c>StrType.G_MINERAL</c>: [color=<c>Cc.ItemCrafter.MINERALS[index].ColorCode</c>]</description></item>
+    ///   <item><description><c>StrType.WARNING</c>: [color=<c>Cc.Y</c>] prefix “[WARNING] ”</description></item>
+    ///   <item><description><c>StrType.PART_SUCCESS</c>: [color=<c>Cc.C</c>]</description></item>
+    ///   <item><description><c>StrType.FULL_SUCCESS</c>: [color=<c>Cc.G</c>]</description></item>
+    ///   <item><description><c>StrType.UNKNOWN_ERROR</c>: calls <see cref="Format(string, StrType)"/> recursively with error text in [color=<c>Cc.R</c>]</description></item>
+    ///   <item><description>default: returns <paramref name="input"/> unchanged.</description></item>
+    /// </list>
+    /// </returns>
     public static string Format(string input, StrType type, params string[] addons) {
         switch (type) {
             case StrType.DECOR:

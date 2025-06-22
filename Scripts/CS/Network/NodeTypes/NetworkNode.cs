@@ -1,4 +1,5 @@
 using Godot;
+using System;
 using System.Collections.Generic;
 
 public abstract class NetworkNode {
@@ -51,11 +52,20 @@ public abstract class NetworkNode {
 		NetworkManager.AssignNodeToIP(this);
     }
 
+    /// <summary>
+    /// Set the initial security and defense levels of this node.
+    /// </summary>
+    /// <param name="DefLvl">The "Firewall rating" of a node.</param>
+    /// <param name="SecLvl">Obfuscate from player with SecLvl, always smaller or equal to DefLvl</param>
     public virtual void Init(int DefLvl, int SecLvl) {
 		this.DefLvl = DefLvl; this.SecLvl = SecLvl;
 	}
-	
-	public int GetDepth() {
+
+    /// <summary>
+    /// Get the depth of this node in the network tree. Cause infinite loop for non-true tree structures.
+    /// </summary>
+    /// <returns></returns>
+    public int GetDepth() {
 		int output = 0;
 		NetworkNode curNode = this;
 		while (curNode.ParentNode != null) {
@@ -103,7 +113,13 @@ public abstract class NetworkNode {
             _isSecure = value;
 		}
 	}
-	public virtual (CError, string, string, string)[] AttemptCrackNode(Dictionary<string, string> ans, double endEpoch) {
+    /// <summary>
+    /// Attempt to crack the node with the provided answers.
+    /// </summary>
+    /// <param name="ans">Example: { "--longFlag1": "value1", "--longFlag2": "value2", "--longFlag3": "value3" }</param>
+    /// <param name="endEpoch">Time when cracking ends. Use to determine whether the node need to refresh locks answer.</param>
+    /// <returns></returns>
+    public virtual (CError, string, string, string)[] AttemptCrackNode(Dictionary<string, string> ans, double endEpoch) {
 		if (LockSystem == null) { return [(CError.REDUNDANT, "", "", "")]; } // No lock system, cannot crack
 		(CError, string, string, string)[] result = LockSystem.CrackAttempt(ans, endEpoch);
 		if (result[^1].Item1 == CError.OK) {
@@ -112,13 +128,24 @@ public abstract class NetworkNode {
 		}
 		return result;
 	}
-	public virtual int TransferOwnership() {
+    /// <summary>
+    /// Transfer ownership of this node to the player.
+    /// </summary>
+    /// <returns></returns>
+    public virtual int TransferOwnership() {
 		if (IsSecure) return 1; // Node secured, transfer impossible
 		OwnedByPlayer = true; return 0; // Transfer successful
 	}
-    // Default connection method, can be overridden by derived classes, like tutorial nodes acting as NPC talking to the player.
+    /// <summary>
+    /// Use to see if the player can connect to this node.
+    /// </summary>
+    /// <returns></returns>
     public virtual bool RequestConnectPermission () {
 		return true;
 	}
-	public virtual void NotifyConnected() { } // Called when a player connects to this node, can be overridden for custom behavior.
+	public event Action NodeConnected;
+    /// <summary>
+    /// Called when a player connects to this node.
+    /// </summary>
+    public virtual void NotifyConnected() { NodeConnected?.Invoke(); }
 }

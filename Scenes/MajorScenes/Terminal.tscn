@@ -103,7 +103,8 @@ autowrap_mode = 0
 selection_enabled = true
 
 [node name="CommandField" type="CodeEdit" parent="TerminalSplitPart/TerminalZone/CommandLine"]
-self_modulate = Color(12, 12, 12, 0.125)
+modulate = Color(10, 10, 10, 0.124)
+self_modulate = Color(9, 9, 9, 0.125)
 clip_contents = false
 custom_minimum_size = Vector2(32, 0)
 layout_mode = 2

@@ -19,7 +19,7 @@ public class PlayerFileManager {
 	public static NodeDirectory FileSystem { get => fileSystem; }
 	
 	public static void Ready() {
-		fileSystem = new("~");
+		fileSystem = new("");
 	}
 	
 	public static int SaveFileSysData(string basePath) {
@@ -29,7 +29,7 @@ public class PlayerFileManager {
 		return 0;
 	}
 	public static int LoadFileSysData(string basePath) {
-		NodeDirectory root = new("~");
+		NodeDirectory root = new("");
         if (!DirAccess.DirExistsAbsolute(basePath)) { return 1; }
 		ReadDirectoryRecursive(root, basePath);
 		fileSystem = root; return 0;

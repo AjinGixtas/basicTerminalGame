@@ -8,7 +8,7 @@ public static partial class ShellCore {
 	static Timer crackDurationTimer;
 	static NetworkNode _currNode = null; static NodeDirectory _currDir = null;
 	public static NodeDirectory CurrDir { get { return _currDir; } private set { _currDir = value; SetCommandPrompt(); } }
-	public static NetworkNode CurrNode { get { return _currNode; } private set { if (_currNode != value) value.NotifyConnected();  _currNode = value; SetCommandPrompt(); } }
+	public static NetworkNode CurrNode { get { return _currNode; } private set { if (_currNode != value && value != null) { value.NotifyConnected(); } _currNode = value; SetCommandPrompt(); } }
 	static readonly List<string> cmdHistory = []; static int _commandHistoryIndex = 0;
 	static int CommandHistoryIndex {
 		get => _commandHistoryIndex;

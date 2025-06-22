@@ -1,5 +1,4 @@
 using Godot;
-using System.Collections.Generic;
 
 public class DriftSector : Sector {
 	static readonly string[] DRIFT_NODE_NAMES = StringExtensions.Split(FileAccess.Open("res://Utilities/TextFiles/ServerNames/DriftNode.txt", FileAccess.ModeFlags.Read).GetAsText(), "\n", false);

@@ -13,7 +13,7 @@ public static class ScriptRunner {
 		UserData.RegisterType<MainModule>();
 	}
 
-	public static void RunPlayerScript(string scriptContent, System.Collections.Generic.Dictionary<string, string> flagArgs, string[] posArgs) {
+	public static void RunPlayerScript(string scriptContent, System.Collections.Generic.Dictionary<string, string> farg, string[] parg) {
 
 		var script = new MoonSharp.Interpreter.Script();
 		script.Globals["tet"] = new TestModule();
@@ -26,9 +26,9 @@ public static class ScriptRunner {
 		script.Globals["ax"] = new MainModule();
 
 		Table flagArgsTable = new(script);
-		foreach (var kvp in flagArgs) flagArgsTable[kvp.Key] = string.IsNullOrEmpty(kvp.Value) ? true : DynValue.NewString(kvp.Value);
+		foreach (var kvp in farg) flagArgsTable[kvp.Key] = string.IsNullOrEmpty(kvp.Value) ? true : DynValue.NewString(kvp.Value);
 		Table posArgsTable = new(script);
-		for (int i = 0; i < posArgs.Length; i++) posArgsTable[i] = DynValue.NewString(posArgs[i]);
+		for (int i = 0; i < parg.Length; i++) posArgsTable[i] = DynValue.NewString(parg[i]);
 
 		script.Globals["arf"] = flagArgsTable;
         script.Globals["arp"] = posArgsTable;

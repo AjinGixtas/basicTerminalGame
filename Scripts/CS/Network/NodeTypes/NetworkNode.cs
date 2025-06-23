@@ -148,4 +148,11 @@ public abstract class NetworkNode {
     /// Called when a player connects to this node.
     /// </summary>
     public virtual void NotifyConnected() { NodeConnected?.Invoke(); }
+	public event Action NodeDisconnected;
+    /// <summary>
+    /// Called when a player disconnects from this node.
+    /// </summary>
+    public virtual void NotifyDisconnected() {
+		NodeDisconnected?.Invoke();	
+    }
 }

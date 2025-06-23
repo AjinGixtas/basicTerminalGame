@@ -37,7 +37,14 @@ public class TutorialNode : NetworkNode {
     /// <param name="delay"></param>
     protected void EnqueueTutorialDialouge(string message, double delay = -1) {
         if (PlayerDataManager.CompletedTutorial) return; // Don't enqueue if tutorial is already completed
+        if (delay > 0) { cm.Enqueue(delay, message); return; }
         cm.Enqueue(message);
+    }
+    protected void EnqueueTutorialDialouge(string message, ChatManager _cm, double delay = -1) {
+        if (PlayerDataManager.CompletedTutorial) return; // Don't enqueue if tutorial is already completed
+        _cm ??= cm;
+        if (delay > 0) { _cm.Enqueue(delay, message); return; }
+        _cm.Enqueue(message);
     }
 }
 public class FileSysTutorialNode : TutorialNode {
@@ -53,9 +60,10 @@ public class FileSysTutorialNode : TutorialNode {
         ) {
         Init(10, 10);
         cm = new("cl3ver-b0y");
-        NodeConnected += OnNodeConnected;
+        NodeConnected += TutorialNodeActivate;
     }
-    public void OnNodeConnected() {
+    public void TutorialNodeActivate() {
+        NodeConnected -= TutorialNodeActivate;
         if (PlayerDataManager.CompletedTutorial) return; // Don't start tutorial if already completed
         TutorialSpeak0();
     }
@@ -115,9 +123,7 @@ public class FileSysTutorialNode : TutorialNode {
         _ = cm.RunDialogueAsync();
     }
     public override (CError, string, string, string)[] AttemptCrackNode(Dictionary<string, string> ans, double endEpoch) {
-        return [(CError.NO_PERMISSION, "9001", "--power", "I am far beyond your comprehension...")];
-        (CError, string, string, string)[] result = base.AttemptCrackNode(ans, endEpoch);
-        return result;
+        return [(CError.NO_PERMISSION, "NOPE", "--nein", "10")];
     }
     public override bool RequestConnectPermission() {
         return base.RequestConnectPermission();
@@ -127,7 +133,7 @@ public class ScriptTutorialNode : TutorialNode {
     public ScriptTutorialNode(NetworkNode parentNode)
         : base(
             "cthuwu",
-            "ChizuNoWa_Motorcycle_ID32758234792832_EXP2974-03-28",
+            "Chīzuhoīru_Vehicle&Transportation_ID32758234792832_EXP2974-03-28",
             NetworkManager.GetRandomIP(),
             NodeType.VM,
             parentNode,
@@ -136,9 +142,10 @@ public class ScriptTutorialNode : TutorialNode {
         ) {
         cm = new ("cthuwu");
         Init(10, 10);
-        NodeConnected += OnNodeConnected;
+        NodeConnected += TutorialNodeActivate;
     }
-    public void OnNodeConnected() {
+    public void TutorialNodeActivate() {
+        NodeConnected -= TutorialNodeActivate;
         if (PlayerDataManager.CompletedTutorial) return; // Don't start tutorial if already completed
         TutorialSpeak0();
     }
@@ -177,16 +184,153 @@ public class ScriptTutorialNode : TutorialNode {
         EnqueueTutorialDialouge("Great! Now you know how to edit scripts.");
         EnqueueTutorialDialouge($"You can also create new scripts with `{Util.Format("mkf <file_name>", StrType.CMD_FUL)}`");
         EnqueueTutorialDialouge($"And remove them with `{Util.Format("rmf <file_name>", StrType.CMD_FUL)}`");
-        EnqueueTutorialDialouge($"Scripting is quite complicated. Open the [color={Util.CC(Cc.gR)}]Documentaion[/color] whenever you need to. Treat it like a dictionary.");
-        EnqueueTutorialDialouge("Here's a little gift. Bye bye now ( ´ ▽ `)ﾉシ");
+        EnqueueTutorialDialouge($"Scripting is quite complicated. So the [color={Util.CC(Cc.gR)}]Documentaion[/color] will be very helpful.");
+        EnqueueTutorialDialouge("Here's a little gift.");
+        NodeFile fileGift = new("Attack.lua",
+@"-- You will see the use for them soon :)
+local xtractors = {""fl1p"",""2bin"",""der3f"",""bl4nk""}
+local colors = {""red"",""cyan"",""green"",""yellow"",""blue"",""magenta"",""white"",""black""}
+-- Shortened name of the modules for convenience.
+local mai, net, fio, bot, kar = MainModule, NetworkModule, FileModule, BotNetModule, KaraxeModule");
+        PlayerFileManager.FileSystem.AddDir("Download"); PlayerFileManager.FileSystem.GetDir("Download").Add(fileGift);
+        ShellCore.Say($"{Util.Format("Attack.lua", StrType.FILE)} {Util.Format("has been added to your file system", StrType.DECOR)}");
+        EnqueueTutorialDialouge("Bye bye now ( ´ ▽ `)ﾉシ");
         FinishedTutorial = true;
         _ = cm.RunDialogueAsync();
+    }
+    public override (CError, string, string, string)[] AttemptCrackNode(Dictionary<string, string> ans, double endEpoch) {
+        return [(CError.NO_PERMISSION, "?v=kXpmmJBaqIk", "--bggrrfff", "EGGGGGG!!!!!")];
     }
     public override bool RequestConnectPermission() {
         if ((ParentNode as TutorialNode).FinishedTutorial) return base.RequestConnectPermission();
         return false;
     }
 }
+public class KaraxeTutorialNode : TutorialNode {
+    public KaraxeTutorialNode(NetworkNode parentNode)
+        : base(
+            "robo-cl4m",
+            "TinyThingyInAnOldPhone_HaraldGormssonInternational_ID184858A00FD7971F810848266EBCECEE5E8B69972C5FFAED622F5EE078671AED_EXP####-##-##",
+            NetworkManager.GetRandomIP(),
+            NodeType.VM,
+            parentNode,
+            false,
+            [LockType.I4X]
+        ) {
+        cm = new("Karaxe");
+        Init(10, 10);
+        NodeConnected += TutorialNodeActivate;
+    }
+    public void TutorialNodeActivate() {
+        NodeConnected -= TutorialNodeActivate;
+        if (PlayerDataManager.CompletedTutorial) return; // Don't start tutorial if already completed
+        TutorialSpeak0();
+    }
+    void TutorialSpeak0() {
+        EnqueueTutorialDialouge("I'm gonna teach you \"hacking\" in this game.");
+        EnqueueTutorialDialouge("You're not allowed to hack us though. Go to the next node and I will teach ya.");
+        _ = cm.RunDialogueAsync();
+        ShellCore.CONNECTrunCMD += TutorialSpeak1;
+    }
+    bool tutorialSpeak1Block0 = false, tutorialSpeak1Block1 = false;
+    void TutorialSpeak1(CError cer, string target) {
+        if (ShellCore.CurrNode == this) { return; }
+        if (ShellCore.CurrNode != ChildNode[0]) { 
+            if (ShellCore.CurrNode.HostName == "cthuwu") {
+                if (tutorialSpeak1Block0) tutorialSpeak1Block0 = true;
+                EnqueueTutorialDialouge("Don't be a smartass, you know what I meant by the \"next node\".");
+                EnqueueTutorialDialouge("Keep pestering the guy. It will never works.");
+                return;
+            }
+            if (tutorialSpeak1Block1) return; tutorialSpeak1Block1 = true;
+            EnqueueTutorialDialouge("You're going to the wrong node.");
+            EnqueueTutorialDialouge("I own the node next to me, but not whatever you're trying to break in right now");
+            _ = cm.RunDialogueAsync();
+            return;
+        }
+        ShellCore.ANALYZErunCMD -= TutorialSpeak1;
+        EnqueueTutorialDialouge($"Alright cool, now run `{Util.Format("analyze", StrType.CMD_FUL)}`");
+        _ = cm.RunDialogueAsync();
+        ShellCore.ANALYZErunCMD += TutorialSpeak2;
+    }
+    int tutorialSpeak2_IncorrectAnalyzeHost = 0;
+    void TutorialSpeak2(CError cer, string target) {
+        if (ShellCore.CurrNode == this) {
+            EnqueueTutorialDialouge("...", 3);
+            EnqueueTutorialDialouge("uh huh.", 2);
+            EnqueueTutorialDialouge("Pretty interesting yeah?");
+            _ = cm.RunDialogueAsync();
+            return;
+        }
+        if (ShellCore.CurrNode != ChildNode[0]) {
+            tutorialSpeak2_IncorrectAnalyzeHost++;
+            if (tutorialSpeak2_IncorrectAnalyzeHost < 2)
+                EnqueueTutorialDialouge($"You know you are on the correct node from earlier. Do it again and run `{Util.Format("analyze", StrType.CMD_FUL)}`");
+            else { 
+                EnqueueTutorialDialouge($"Did you forget? The host target is {Util.Format($"{ChildNode[0].HostName}", StrType.HOSTNAME)}"); 
+                EnqueueTutorialDialouge("I put a lot of effort into it y'know?");
+            }
+            _ = cm.RunDialogueAsync();
+            return;
+        }
+        ShellCore.ANALYZErunCMD -= TutorialSpeak2;
+        EnqueueTutorialDialouge("Cool. There's a number and a fancy word there.");
+        EnqueueTutorialDialouge($"Go to the [color={Util.CC(Cc.gR)}]Documentation[/color] for explanation alright?");
+        EnqueueTutorialDialouge("The important thing now is the `Firewall rating` and `Security Level`");
+        EnqueueTutorialDialouge("`Security Level` is the approximated amount of locks you have to bypass to break a node.");
+        EnqueueTutorialDialouge("`Firewall rating` is the the amount of locks + traps a node security system might have.");
+        EnqueueTutorialDialouge("Until you are prepared, a good rule of thumb is to avoid node with Security Level and Firewall rating having different color");
+        EnqueueTutorialDialouge($"For now, let's try to break it, run `{Util.Format("karaxe --flare", StrType.CMD_FUL)}` to begin.");
+        _ = cm.RunDialogueAsync();
+        if (ShellCore.RemainingTime > 10) _ = RushTutorialSpeak3();
+        else ShellCore.KaraxeBegin += TutorialSpeak3;
+    }
+    async Task RushTutorialSpeak3() {
+        await Task.Delay(5000);
+        EnqueueTutorialDialouge("WAIT WHAT?");
+        EnqueueTutorialDialouge("YOU STARTED IT?");
+        EnqueueTutorialDialouge("Uh, so here's how this works...");
+        _ = cm.RunDialogueAsync();
+        TutorialSpeak3();
+    }
+    void TutorialSpeak3() {
+        ShellCore.KaraxeBegin -= TutorialSpeak3;
+        EnqueueTutorialDialouge("Alright, so we are VERY tight on time here.");
+        EnqueueTutorialDialouge("You have 120 seconds to break nodes until it is over.");
+        EnqueueTutorialDialouge("Normally the sector will ban you after this period is over, but this is exempt for training purpose");
+        EnqueueTutorialDialouge($"You can use {Util.Format("arrows key", StrType.HEADER)} to cycle between old command.");
+        EnqueueTutorialDialouge($"Or copy them from the terminal to save time typing.");
+        EnqueueTutorialDialouge($"Now run this `{Util.Format("karaxe --attack", StrType.CMD_FUL)}`. Just do it.");
+        _ = cm.RunDialogueAsync();
+        ShellCore.KaraxeAttack += TutorialSpeak4_Attack;
+    }
+    void TutorialSpeak4_Attack((CError, string, string, string)[] result) {
+        (CError cer, string target, string flag, string message) = result[^1];
+        if (cer == CError.OK) {
+            EnqueueTutorialDialouge("YES! YOU DID IT!");
+            EnqueueTutorialDialouge("Good job buddy B)");
+            ChatManager dev = new("(\\_AJIN_/)");
+            EnqueueTutorialDialouge("Now get out there and enjoy the game.", dev);
+            EnqueueTutorialDialouge("Hacked node will give you materials over time, and it does some stuff, erghh etc...", dev);
+            EnqueueTutorialDialouge("Look, it's a lot. Read the doc, ja? -_-", dev);
+            EnqueueTutorialDialouge("That's all now. If you have any problem, email me ^^", dev);
+            EnqueueTutorialDialouge("Bye bye ( ´ ▽ `)ﾉシ");
+            _ = cm.RunDialogueAsync();
+        }
+    }
+    public override (CError, string, string, string)[] AttemptCrackNode(Dictionary<string, string> ans, double endEpoch) {
+        EnqueueTutorialDialouge("Oh, you tried to hack me?");
+        EnqueueTutorialDialouge("Whatever, I am hardcoded to not be hackable.");
+        EnqueueTutorialDialouge("Now go to the next node.");
+        _ = cm.RunDialogueAsync();
+        return [(CError.NO_PERMISSION, "9001", "--power", "I am far beyond your comprehension...")];
+    }
+    public override bool RequestConnectPermission() {
+        if ((ParentNode as TutorialNode).FinishedTutorial) return base.RequestConnectPermission();
+        return false;
+    }
+}
+
 
 public class ChatManager {
     public string CharacterName { get; set; }

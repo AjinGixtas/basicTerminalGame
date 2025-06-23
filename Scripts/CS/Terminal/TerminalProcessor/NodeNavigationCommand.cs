@@ -6,7 +6,7 @@ public static partial class ShellCore {
 	static void Home(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		ToHome();
 	}
-	public static event Action<string[]> OnScanCompleted;
+	public static event Action<string[]> SCANrunCMD;
     static void Scan(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		string L = " └─── ", M = " ├─── ", T = "      ", E = " │    ";
 		System.Func<bool[], string> getTreePrefix = arr => string.Concat(arr.Select((b, i) => (i == arr.Length - 1 ? (b ? L : M) : (b ? T : E))));
@@ -44,25 +44,32 @@ public static partial class ShellCore {
 				++k; stack.Push((child, tdepth + 1, [.. depthMarks, k == 1]));
 			}
 		}
-		OnScanCompleted?.Invoke(visited.Select(x => x.HostName).ToArray());
+		SCANrunCMD?.Invoke(visited.Select(x => x.HostName).ToArray());
 		Say("-n", output);
 	}
+	public static event Action<CError, string> CONNECTrunCMD;
+    /// <summary>
+    /// Connect to a node by its hostname or IP address.
+    /// </summary>
+    /// <param name="parsedArgs">Parsed arguments from the command line.</param>
+    /// <param name="positionalArgs">Positional arguments, where the first argument is the target node.</param>
     static void Connect(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         if (positionalArgs.Length == 0) { Say("-r", "No hostname provided."); return; }
 		string target = positionalArgs[0]; NetworkNode node = null;
         
 		if (IsIPv4(target)) {
             node = NetworkManager.GetNodeByIP(target);
-            if (node == null) { Say("-r", $"IP not found: {Util.Format(target, StrType.HOSTNAME)}"); return; }
+            if (node == null) { Say("-r", $"IP not found: {Util.Format(target, StrType.HOSTNAME)}"); CONNECTrunCMD?.Invoke(CError.NOT_FOUND, target); return; }
         } else if (CurrNode.ParentNode != null && CurrNode.ParentNode.HostName == target) {
             node = CurrNode.ParentNode;
         } else {
             node = CurrNode.ChildNode.FindLast(n => n.HostName == target);
-            if (node == null) { Say("-r", $"Host not found: {Util.Format(target, StrType.HOSTNAME)}"); return; }
+            if (node == null) { Say("-r", $"Host not found: {Util.Format(target, StrType.HOSTNAME)}"); CONNECTrunCMD?.Invoke(CError.NOT_FOUND, target); return; }
         }
 
-        if (!node.RequestConnectPermission()) { Say("-r", "Connection denied by the corresponding node."); return; }
+        if (!node.RequestConnectPermission()) { Say("-r", "Connection denied by the corresponding node."); CONNECTrunCMD?.Invoke(CError.NO_PERMISSION, target); return; }
         CurrNode = node;
+        CONNECTrunCMD?.Invoke(CError.OK, target);
     }
     static void Sector(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		bool connectedOnly = parsedArgs.ContainsKey("-c") || parsedArgs.ContainsKey("--connected");

@@ -31,7 +31,7 @@ public static partial class ShellCore {
         if (parg.Length == 0) { Say("-r", "No file specified."); CATrunCMD?.Invoke("", "", CError.MISSING); return; }
         string fileName = parg[0];
         NodeFile file = CurrDir.GetFile(fileName);
-        if (file == null) { Say("-r", $"File `{fileName}` not found."); CATrunCMD?.Invoke(fileName, file.GetPath(), CError.NOT_FOUND); return; }
+        if (file == null) { Say("-r", $"File `{fileName}` not found."); CATrunCMD?.Invoke(fileName, "", CError.NOT_FOUND); return; }
         Say(file.Content);
         CATrunCMD?.Invoke(fileName, file.GetPath(), CError.OK);
     }

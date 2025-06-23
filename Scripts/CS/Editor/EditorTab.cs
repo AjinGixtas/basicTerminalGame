@@ -18,7 +18,8 @@ public partial class EditorTab : CodeEdit
 	public override void _Process(double delta) {
 		if (HasFocus()) {
 			if (Input.IsActionJustPressed("closeTab")) { textEditor.CloseTab(false); }
-		}
+			if (Input.IsActionJustPressed("saveFile")) { Save(); }
+        }
 	}
 	public bool IsDirty() {
 		return Text != file.Content;

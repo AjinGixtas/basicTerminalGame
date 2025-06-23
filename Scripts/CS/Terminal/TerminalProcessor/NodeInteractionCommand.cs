@@ -30,98 +30,153 @@ $@"[color={Util.CC(Cc.w)}]Botnet:[/color] {Util.Format(minerName, StrType.HOSTNA
 	}
 	const double FLARE_TIME = 120.0;
 	static double startEpoch = 0, endEpoch = 0, remainingTime = 0;
-	static List<WeakReference<DriftSector>> sectorAttacked = [];
+	public static double StartEpoch { get => startEpoch; private set => startEpoch = value; }
+    public static double EndEpoch { get => endEpoch; private set => endEpoch = value; }
+    public static double RemainingTime { get => remainingTime; private set => remainingTime = value; }
+    /// <summary>
+    /// Weak reference sectors that have been attacked during the Karaxe flare.
+    /// All sectors will be disconnected and removed when Karaxe is deactivated.
+	/// </summary>
+    static List<WeakReference<DriftSector>> sectorAttacked = [];
+    /// <summary>
+    /// Event that is invoked when the karaxe command is run from the UI.
+	/// <code>result[i] = (CrackStatus, LockName, LockFlag, LockInput)</code>
+	/// For non-attack commands, the first item in the tuple will be <see cref="CError.UNKNOWN"/>.
+	/// and the other items will be empty strings. With <c>LockInput</c> being the command details.
+    /// </summary>
+    public static event Action<(CError, string, string, string)[]> KARrunCMD;
 	static void Karaxe(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		if (parsedArgs.ContainsKey("--axe") && parsedArgs.ContainsKey("--flare")) {
-			Say("-r", "You can not use --axe and --flare at the same time."); return;
+			Say("-r", "You can not use --axe and --flare at the same time.");
+			KARrunCMD?.Invoke([(CError.UNKNOWN, "", "", "--flare and --axe incompatible")]);
+			return;
 		}
-		if (parsedArgs.ContainsKey("--flare")) {
+        if (parsedArgs.ContainsKey("--flare")) {
 			int statusCode = BeginFlare();
 			switch (statusCode) {
-				case 0: Say($"{Util.Format("Kraken activated", StrType.FULL_SUCCESS)}. All node [color={Util.CC(Cc.Y)}]lok[/color] system {Util.Format("~=EXP0SED=~", StrType.ERROR)}"); break;
-				case 1: Say("-r", "Karaxe already in effect."); break;
-			}
+				case 0: {
+						Say($"{Util.Format("Kraken activated", StrType.FULL_SUCCESS)}. All node [color={Util.CC(Cc.Y)}]lock[/color] system {Util.Format("~=EXP0SED=~", StrType.ERROR)}");
+						KARrunCMD?.Invoke([(CError.UNKNOWN, "", "", "Flare start")]);
+						break;
+					}
+				case 1: {
+						Say("-r", "Karaxe already in effect."); 
+						KARrunCMD?.Invoke([(CError.UNKNOWN, "", "", "Flare start|FAILED")]);
+						break;
+                    }
+            }
 			return;
 		}
 		if (parsedArgs.ContainsKey("--axe")) {
-			if (Time.GetUnixTimeFromSystem() > endEpoch) { Say("-r", "Karaxe already deactivated."); return; }
+			if (Time.GetUnixTimeFromSystem() > endEpoch) { 
+				Say("-r", "Karaxe already deactivated."); 
+				KARrunCMD?.Invoke([(CError.UNKNOWN, "", "", "Flare stop|FAILED")]);
+                return;
+			}
 			Say($"{Util.Format("Kraken deactivated", StrType.FULL_SUCCESS)}. Flare sequence exited. All [color={Util.CC(Cc.Y)}]lock[/color] closed.");
-			EndFlare(); return;
+            KARrunCMD?.Invoke([(CError.UNKNOWN, "", "", "Flare stop")]);
+            EndFlare(); return;
 		}
 
 		if (Time.GetUnixTimeFromSystem() > endEpoch) {
-			Say($"{Util.Format("Kraken inactive", StrType.ERROR)}. Run {Util.Format("karaxe --flare", StrType.CMD_FUL)} to activate."); return;
+			Say($"{Util.Format("Kraken inactive", StrType.ERROR)}. Run {Util.Format("karaxe --flare", StrType.CMD_FUL)} to activate.");
+            KARrunCMD?.Invoke([(CError.UNKNOWN, "", "", "Flare inactive")]);
+            return;
 		}
 
 		if (!parsedArgs.ContainsKey("--attack")) {
-			Say("-r", $"Missing {Util.Format("--attack", StrType.CMD_FLAG)} flag. Use {Util.Format("--attack", StrType.CMD_FLAG)} to attack a node."); return;
+			Say("-r", $"Missing {Util.Format("--attack", StrType.CMD_FLAG)} flag. Use {Util.Format("--attack", StrType.CMD_FLAG)} to attack a node.");
+            KARrunCMD?.Invoke([(CError.UNKNOWN, "", "", "Missing --attack")]);
+            return;
 		}
 		(CError, string, string, string)[] result = Attack(parsedArgs);
+		KARrunCMD?.Invoke(result);
 		for (int i = 0; i < result.Length; ++i) {
 			(CError, string, string, string) res = result[i];
-			if (res.Item1 == CError.MISSING) {
+            if (res.Item1 == CError.OK) {
+                if (i != result.Length - 1) {
+                    ShellCore.Say($"[{Util.Format("SUCCESS", StrType.PART_SUCCESS)}] {Util.Format("Bypassed", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
+                    continue;
+                }
+                ShellCore.Say($"{Util.Format("Node defense cracked.", StrType.FULL_SUCCESS)} All security system [color={Util.CC(Cc.gR)}]destroyed[/color].");
+                ShellCore.Say($"Run {Util.Format("analyze", StrType.CMD_FUL)} for all new information.");
+                continue;
+            }
+            if (res.Item1 == CError.MISSING) {
 				ShellCore.Say($"[{Util.Format("N0VALUE", StrType.ERROR)}] {Util.Format("Denied access by", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
 				ShellCore.Say("-r", $"Missing key for {Util.Format(res.Item3, StrType.CMD_FLAG)}");
 				ShellCore.Say($"[color={Util.CC(Cc.W)}]{res.Item4}[/color]");
-			} else if (res.Item1 == CError.INCORRECT) {
+				continue;
+			} 
+			if (res.Item1 == CError.INCORRECT) {
 				ShellCore.Say($"[{Util.Format("WRON6KY", StrType.ERROR)}] {Util.Format("Denied access by", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
 				ShellCore.Say("-r", $"Incorrect key for {Util.Format(res.Item3, StrType.CMD_FLAG)}");
 				ShellCore.Say($"[color={Util.CC(Cc.W)}]{res.Item4}[/color]");
-			} else if (res.Item1 == CError.MISSING) {
+				continue;
+			} 
+			if (res.Item1 == CError.MISSING) {
 				ShellCore.Say($"[{Util.Format("MI55ING", StrType.ERROR)}] {Util.Format("Denied access by", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
 				ShellCore.Say("-r", $"Missing flag {Util.Format(res.Item3, StrType.CMD_FLAG)}");
-			} else if (res.Item1 == CError.OK) {
-				if (res.Item2 != "") {
-					ShellCore.Say($"[{Util.Format("SUCCESS", StrType.PART_SUCCESS)}] {Util.Format("Bypassed", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
-				} else {
-					ShellCore.Say($"{Util.Format("Node defense cracked.", StrType.FULL_SUCCESS)} All security system [color={Util.CC(Cc.gR)}]destroyed[/color].");
-					ShellCore.Say($"Run {Util.Format("analyze", StrType.CMD_FUL)} for all new information.");
-				}
-			} else if (res.Item1 == CError.NO_PERMISSION) {
+				continue;
+			} 
+			if (res.Item1 == CError.NO_PERMISSION) {
 				ShellCore.Say($"[{Util.Format("N0P3RMS", StrType.ERROR)}] {Util.Format("Denied access by", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
 				ShellCore.Say("-r", $"You do not have permission to use {Util.Format(res.Item3, StrType.CMD_FLAG)}");
-			} else {
-				ShellCore.Say($"[{Util.Format("UNKNOWN", StrType.ERROR)}] {Util.Format("Denied access by", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
-				ShellCore.Say("-r", $"Unknown error for {Util.Format(res.Item3, StrType.CMD_FLAG)}");
+				continue;
 			}
+			ShellCore.Say($"[{Util.Format("UNK??WN", StrType.ERROR)}] {Util.Format("Denied access by", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
+			ShellCore.Say("-r", $"Unknown error for {Util.Format(res.Item3, StrType.CMD_FLAG)}");
 		}
 	}
-	public static void EndFlare() {
+	public static event Action KaraxeEnd;
+    public static void EndFlare() {
 		endEpoch = 0;
 		crackDurationTimer.Stop();
-		foreach (System.WeakReference<DriftSector> sectorRef in sectorAttacked) {
+		foreach (WeakReference<DriftSector> sectorRef in sectorAttacked) {
 			if (!sectorRef.TryGetTarget(out DriftSector sector)) continue;
 			NetworkManager.DisconnectFromSector(sector);
 			NetworkManager.RemoveSector(sector);
 		}
 		sectorAttacked.Clear();
-	}
-	public static (CError, string, string, string)[] Attack(Dictionary<string, string> flagKeyPairs) {
+		KaraxeEnd?.Invoke();
+    }
+	public static event Action<(CError, string, string, string)[]> KaraxeAttack;
+    /// <summary>
+    /// Attempt to crack the node with the provided answers.
+    /// </summary>
+    /// <param name="flagKeyPairs"></param>
+    /// <returns><code>result[i] = (CrackStatus, LockName, LockFlag, LockInput)</code></returns>
+    public static (CError, string, string, string)[] Attack(Dictionary<string, string> flagKeyPairs) {
 		(CError, string, string, string)[] result = CurrNode.AttemptCrackNode(flagKeyPairs, endEpoch);
 		if (CurrNode.GetType() == typeof(DriftNode)) {
 			// No idea why, but hard reference to DriftSector is not working here.
-			sectorAttacked.Add(new System.WeakReference<DriftSector>((CurrNode as DriftNode).Sector));
+			sectorAttacked.Add(new WeakReference<DriftSector>((CurrNode as DriftNode).Sector));
 		}
 		if (result[^1].Item1 == CError.OK && !CurrNode.OwnedByPlayer) {
 			CurrNode.TransferOwnership();
 			if (CurrNode.GetType() == typeof(DriftNode)) NetworkManager.QueueAddHackFarm((CurrNode as DriftNode).HackFarm);
 		}
-		return result;
+        KaraxeAttack?.Invoke(result);
+        return result;
 	}
-	public static int BeginFlare() {
+	public static event Action KaraxeBegin;
+    public static int BeginFlare() {
 		if (Time.GetUnixTimeFromSystem() < endEpoch) { return 1; }
 		startEpoch = Time.GetUnixTimeFromSystem(); remainingTime = FLARE_TIME; endEpoch = startEpoch + remainingTime;
 		crackDurationTimer.Start(FLARE_TIME);
+		KaraxeBegin?.Invoke();
 		return 0;
 	}
 	
-	static void Analyze(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
+	public static event Action<CError, string> ANALYZErunCMD;
+    static void Analyze(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		if (positionalArgs.Length == 0) { positionalArgs = [CurrNode.HostName]; }
 		if (CurrNode.ChildNode.FindLast(s => s.HostName == positionalArgs[0]) == null
 			&& (CurrNode.ParentNode != null && CurrNode.ParentNode.HostName != positionalArgs[0])
 			&& CurrNode.HostName != positionalArgs[0]) {
-			Say("-r", $"Host not found: {positionalArgs[0]}");
-			return;
+            Say("-r", $"Host not found: {positionalArgs[0]}");
+            ANALYZErunCMD?.Invoke(CError.NOT_FOUND, positionalArgs[0]);
+            return;
 		}
 		NetworkNode analyzeNode = null;
 		if (CurrNode.ChildNode.FindLast(s => s.HostName == positionalArgs[0]) != null) analyzeNode = CurrNode.ChildNode.FindLast(s => s.HostName == positionalArgs[0]);
@@ -135,11 +190,8 @@ $@"[color={Util.CC(Cc.w)}]Botnet:[/color] {Util.Format(minerName, StrType.HOSTNA
 {Util.Format("Display name:", StrType.DECOR),padLength}{Util.Format(analyzeNode.DisplayName, StrType.DISPLAY_NAME)}
 {Util.Format("▶ Classification", StrType.HEADER)}
 {Util.Format("Firewall rating:", StrType.DECOR),padLength}{Util.Format($"{analyzeNode.DefLvl}", StrType.DEF_LVL)}
-{Util.Format("Security level:", StrType.DECOR),padLength}{Util.Format($"{analyzeNode.SecType}", StrType.SEC_TYPE)}
+{Util.Format("Security Level:", StrType.DECOR),padLength}{Util.Format($"{analyzeNode.SecType}", StrType.SEC_TYPE)}
 ");
-		if (!analyzeNode.OwnedByPlayer) {
-			Say($"Crack this node security system to get further access.");
-			return;
-		}
+		ANALYZErunCMD?.Invoke(CError.OK, positionalArgs[0]);
 	}
 }

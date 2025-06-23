@@ -16,14 +16,14 @@ public static class ScriptRunner {
 	public static void RunPlayerScript(string scriptContent, System.Collections.Generic.Dictionary<string, string> farg, string[] parg) {
 
 		var script = new MoonSharp.Interpreter.Script();
-		script.Globals["tet"] = new TestModule();
-		script.Globals["net"] = new NetworkModule();
-		script.Globals["kar"] = new CrackModule();
-		script.Globals["bot"] = new HackFarmModule();
-		script.Globals["fio"] = new FileModule();
+		// script.Globals["tet"] = new TestModule();
+		script.Globals["NetworkModule"] = new NetworkModule();
+		script.Globals["KaraxeModule"] = new CrackModule();
+		script.Globals["BotNetModule"] = new HackFarmModule();
+		script.Globals["FileModule"] = new FileModule();
 		script.Globals["CError"] = new CError();
 		script.Globals["SecurityType"] = new SecurityType();
-		script.Globals["ax"] = new MainModule();
+		script.Globals["MainModule"] = new MainModule();
 
 		Table flagArgsTable = new(script);
 		foreach (var kvp in farg) flagArgsTable[kvp.Key] = string.IsNullOrEmpty(kvp.Value) ? true : DynValue.NewString(kvp.Value);

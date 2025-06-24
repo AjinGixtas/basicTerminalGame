@@ -12,7 +12,7 @@ public static partial class Util {
     /// <summary>
     /// Skip dialogues in the game, used for testing purposes.
     /// </summary>
-    public const bool SkipDialogues = false;
+    public const bool SkipDialogues = true;
     public static T[] Shuffle<T>(T[] array) {
         for (int i = 0; i < array.Length; i++) {
             int j = GD.RandRange(0, array.Length - 1); 

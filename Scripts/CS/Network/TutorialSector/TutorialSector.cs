@@ -65,7 +65,7 @@ public class FileSysTutorialNode : TutorialNode {
         TutorialSpeak0();
     }
     async void TutorialSpeak0() {
-        await Task.Delay(20_000);
+        await Task.Delay(10_000);
         EnqueueTutorialDialouge("Hello! I'm one of your many guides on how to play this game.");
         EnqueueTutorialDialouge("I will help you learn the basic commands.");
         EnqueueTutorialDialouge($"Let's start with a simple task: type `{Util.Format("help", StrSty.CMD_FUL)}` to see what commands are available.");
@@ -153,7 +153,7 @@ public class ScriptTutorialNode : TutorialNode {
         TutorialSpeak0();
     }
     async void TutorialSpeak0() {
-        NodeFile fileSuprise = new("EVIL_VIRUS.lua", @$"MainModule:Say(""Hi:)"")");
+        NodeFile fileSuprise = new("FunniFile.lua", @$"MainModule:Say(""Hi:)"")");
         EnqueueTutorialDialouge("Hey! Catch this >:)", 0);
         await cm.RunDialogueAsync();
         PlayerFileManager.FileSystem.AddDir("Download"); PlayerFileManager.FileSystem.GetDir("Download").Add(fileSuprise);
@@ -165,7 +165,6 @@ public class ScriptTutorialNode : TutorialNode {
         ShellCore.RUNrunCMD += TutorialSpeak1;
     }
     async void TutorialSpeak1(string actedPath, string finalPath, CError cer) {
-        ShellCore.RUNrunCMD -= TutorialSpeak1;
         if (cer != CError.OK) {
             await Task.Delay(500);
             EnqueueTutorialDialouge("Hmm... something went wrong.");
@@ -173,6 +172,7 @@ public class ScriptTutorialNode : TutorialNode {
             _ = cm.RunDialogueAsync();
             return;
         }
+        ShellCore.RUNrunCMD -= TutorialSpeak1;
         await Task.Delay(1000);
         EnqueueTutorialDialouge("Good job! You just ran your first script!");
         EnqueueTutorialDialouge("Now you know how to run scripts.");
@@ -185,7 +185,7 @@ public class ScriptTutorialNode : TutorialNode {
         if (cer != CError.OK) {
             await Task.Delay(500);
             EnqueueTutorialDialouge("Hmm... something went wrong.");
-            EnqueueTutorialDialouge($"Try running `{Util.Format("edit /Download/EVIL_VIRUS.lua", StrSty.CMD_FUL)}` to see the script you just ran.");
+            EnqueueTutorialDialouge($"Try running `{Util.Format("edit /Download/FunniFile.lua", StrSty.CMD_FUL)}` to see the script you just ran.");
             _ = cm.RunDialogueAsync();
             return;
         }
@@ -255,6 +255,7 @@ public class KaraxeTutorialNode : TutorialNode {
                 await Task.Delay(333);
                 EnqueueTutorialDialouge("Don't be a smartass, you know what I meant by the \"next node\".");
                 EnqueueTutorialDialouge("Keep pestering the guy. It will never works.");
+                _ = cm.RunDialogueAsync();
                 return;
             }
             if (tutorialSpeak1Block1) return; tutorialSpeak1Block1 = true;
@@ -264,7 +265,7 @@ public class KaraxeTutorialNode : TutorialNode {
             _ = cm.RunDialogueAsync();
             return;
         }
-        ShellCore.ANALYZErunCMD -= TutorialSpeak1;
+        ShellCore.CONNECTrunCMD -= TutorialSpeak1;
         await Task.Delay(1_000);
         EnqueueTutorialDialouge($"Alright cool, now run `{Util.Format("analyze", StrSty.CMD_FUL)}`");
         _ = cm.RunDialogueAsync();
@@ -323,12 +324,21 @@ public class KaraxeTutorialNode : TutorialNode {
         EnqueueTutorialDialouge($"Now run this `{Util.Format("karaxe --attack", StrSty.CMD_FUL)}`. Just do it.");
         _ = cm.RunDialogueAsync();
         ShellCore.KaraxeAttack += TutorialSpeak4_Attack;
+        ShellCore.KaraxeEnd += TutorialSpeak4_End;
+    }
+    void TutorialSpeak4_End() {
+        EnqueueTutorialDialouge("...", 2);
+        EnqueueTutorialDialouge("You failed.");
+        EnqueueTutorialDialouge("We go again.");
+        EnqueueTutorialDialouge($"Run `{Util.Format("karaxe --flare", StrSty.CMD_FUL)}`");
+        _ = cm.RunDialogueAsync();
     }
     async void TutorialSpeak4_Attack((CError, string, string, string)[] result) {
-        await Task.Delay(3000);
+        await Task.Delay(1000);
         (CError cer, string locN, string locF, string msg) = result[^1];
         if (cer == CError.OK) {
             ShellCore.KaraxeAttack -= TutorialSpeak4_Attack;
+            ShellCore.KaraxeEnd -= TutorialSpeak4_End;
             EnqueueTutorialDialouge("YES! YOU DID IT!!!!!");
             EnqueueTutorialDialouge("Good job buddy B)");
             EnqueueTutorialDialouge("Now get out there and enjoy the game.");
@@ -345,11 +355,12 @@ public class KaraxeTutorialNode : TutorialNode {
             return;
         }
         if (cer == CError.INCORRECT) {
-            if (locN == "I4X")
+            if (locN == "I4X"){
                 if (locF == "--i4") EnqueueTutorialDialouge("The answer is one of the first 4 positive natural number. Try each one.");
-                else if (locF == "--2xtractor") EnqueueTutorialDialouge($"The answer is one of the 4 phrase `{Util.Format("fl1p", StrSty.CMD_ARG)}`, `{Util.Format("2bin", StrSty.CMD_ARG)}`, `{Util.Format("der3f", StrSty.CMD_ARG)}`, `{Util.Format("bl4nk", StrSty.CMD_ARG)}`. Try each one.");
-            else if (locN == "C0")
+                else if (locF == "--2xtract") EnqueueTutorialDialouge($"The answer is one of the 4 phrase `{Util.Format("fl1p", StrSty.CMD_ARG)}`, `{Util.Format("2bin", StrSty.CMD_ARG)}`, `{Util.Format("der3f", StrSty.CMD_ARG)}`, `{Util.Format("bl4nk", StrSty.CMD_ARG)}`. Try each one.");
+            } else if (locN == "C0"){
                 if (locF == "--c0") EnqueueTutorialDialouge("The answer is the color name opposite to the one you see in the terminal.");
+            }
             _ = cm.RunDialogueAsync();
             return;
         }
@@ -419,7 +430,7 @@ public class ChatManager {
             await Task.Delay(Util.SkipDialogues ? 0 : delay >= 0 ? Mathf.CeilToInt(delay * 1000) : Mathf.CeilToInt(EstimateReadingTime(content) * 1000), token);
             cache += $"[{timeHash}] <{CharacterName}> {Util.RemoveBBCode(content)}\n";
         }
-        await Task.Delay(GD.RandRange(1000, 3000));
+        await Task.Delay(100);
         LogToFileSys(CharacterName, cache);
     }
     /// <summary>

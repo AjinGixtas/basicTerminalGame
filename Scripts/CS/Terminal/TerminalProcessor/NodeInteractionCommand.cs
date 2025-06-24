@@ -28,7 +28,7 @@ $@"[color={Util.CC(Cc.w)}]Botnet:[/color] {Util.Format(minerName, StrSty.HOSTNAM
 ================================================================
 [color={Util.CC(Cc.w)}]Aprox. Time To Live:[/color] {Util.TimeDifferenceFriendly(hackfarm.LifeTime)}");
 	}
-	const double FLARE_TIME = 120.0;
+	const double FLARE_TIME = 20.0;
 	static double startEpoch = 0, endEpoch = 0, remainingTime = 0;
 	public static double StartEpoch { get => startEpoch; private set => startEpoch = value; }
     public static double EndEpoch { get => endEpoch; private set => endEpoch = value; }

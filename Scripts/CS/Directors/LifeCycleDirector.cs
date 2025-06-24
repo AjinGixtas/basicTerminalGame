@@ -66,9 +66,9 @@ public partial class LifeCycleDirector : Node
 			ShellCore.Say("-n", PlayerDataManager.GetSaveStatusMsg(saveStatus[0][0]) + "... ");
 			ShellCore.Say("-n", PlayerFileManager.GetSaveStatusMsg(saveStatus[1][0]) + "... ");
 			ShellCore.Say("-n", NetworkManager.GetSaveStatusMsg(saveStatus[2]));
-		}
-		ShellCore.Say($"\nIf there are any error related to save file, feel free to email {Util.Format("ajingixtascontact", StrSty.USERNAME)}@{Util.Format("gmail.com", StrSty.HOSTNAME)}");
-		CurrentSavePath = newSavePath; // Update current save path
+			ShellCore.Say($"\nIf error are unexpected. Email {Util.Format("ajingixtascontact", StrSty.USERNAME)}@{Util.Format("gmail.com", StrSty.HOSTNAME)}");
+        }
+        CurrentSavePath = newSavePath; // Update current save path
 	}
 
 	static void QuickLoad(LifeCycleDirector lifeCycleDirector) {

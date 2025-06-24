@@ -13,11 +13,13 @@ public static partial class NetworkManager {
     public static List<BotFarm> BotNet { get; private set; } = [];
     const int DRIFT_SECTOR_COUNT = 128;
 
-    public static void Ready() {
+    public static void Setup() {
         DNS = []; driftSectors = []; connectedSectors = []; staticSectors = []; BotNet = [];
-
         RegenerateDriftSector();
         LoadStaticSector();
+    }
+    public static void Ready() {
+        _playerNode ??= new PlayerNode(Util.PLAYER_NODE_DATA_DEFAULT);
     }
     const double CYCLE_TIME = 60*15; // 15min in seconds
     static double TimeRemains = CYCLE_TIME;
@@ -122,7 +124,8 @@ public static partial class NetworkManager {
     }
 
     public static void LoadStaticSector() {
-        staticSectors = [new TutorialSector()]; return;
+        staticSectors = [new TutorialSector()];
+        return;
         staticSectors = [];
         string[] sectorPaths = DirAccess.GetFilesAt("res://Utilities/Resources/ScriptedNetworkNodes/Sectors/");
         foreach (string path in sectorPaths) {
@@ -349,23 +352,23 @@ public static partial class NetworkManager {
     const string BotnetFileName = "Botnet.tres", PlayerNodeFileName = "PlayerNode.tres";
     public static string GetSaveStatusMsg(int[] statusCodes) {
         string[] botnetMsgs = {
-            Util.Format("Saved botnet data", StrType.FULL_SUCCESS),
-            Util.Format("No botnet to save", StrType.WARNING),
+            Util.Format("Saved botnet data", StrSty.FULL_SUCCESS),
+            Util.Format("No botnet to save", StrSty.WARNING),
         };
         string[] nodeMsgs = {
-            Util.Format("Saved player node data", StrType.FULL_SUCCESS),
-            Util.Format("No player node to save, this behavior should never happen and should be reported.", StrType.ERROR),
+            Util.Format("Saved player node data", StrSty.FULL_SUCCESS),
+            Util.Format("No player node to save, this behavior should never happen and should be reported.", StrSty.ERROR),
         };
 
         string botnetMsg = statusCodes[0] < botnetMsgs.Length
             ? botnetMsgs[statusCodes[0]]
-            : Util.Format($"{statusCodes[0]}", StrType.UNKNOWN_ERROR, "saving botnet data");
+            : Util.Format($"{statusCodes[0]}", StrSty.UNKNOWN_ERROR, "saving botnet data");
 
         string nodeMsg = statusCodes[1] < nodeMsgs.Length
             ? nodeMsgs[statusCodes[1]]
-            : Util.Format($"{statusCodes[1]}", StrType.UNKNOWN_ERROR, "saving player node data");
+            : Util.Format($"{statusCodes[1]}", StrSty.UNKNOWN_ERROR, "saving player node data");
 
-        return $"{botnetMsg}...{nodeMsg}...";
+        return $"{botnetMsg}... {nodeMsg}... ";
     }
 
     public static int[] SaveNetworkData(string filePath) {
@@ -396,25 +399,25 @@ public static partial class NetworkManager {
 
     public static string GetLoadStatusMsg(int[] statusCode) {
         string[] LOAD_BOTNET_STATUS_MSG = [
-            Util.Format("Loaded botnet data", StrType.FULL_SUCCESS),
-            Util.Format("No botnet data to load", StrType.WARNING),
-            Util.Format("Failed to load botnet data file", StrType.ERROR),
-            Util.Format("Failed to load all botnet data", StrType.ERROR),
-            Util.Format("Null botnet data found", StrType.ERROR), // This should never happen, but just in case
+            Util.Format("Loaded botnet data", StrSty.FULL_SUCCESS),
+            Util.Format("No botnet data to load", StrSty.WARNING),
+            Util.Format("Failed to load botnet data file", StrSty.ERROR),
+            Util.Format("Failed to load all botnet data", StrSty.ERROR),
+            Util.Format("Null botnet data found", StrSty.ERROR), // This should never happen, but just in case
         ];
         string[] LOAD_PLAYER_NODE_STATUS_MSG = [
-            Util.Format("Loaded player node data", StrType.FULL_SUCCESS),
-            Util.Format("No player node data to load", StrType.WARNING),
-            Util.Format("Failed to load player node data file", StrType.ERROR),
-            Util.Format("Null player node data file found. Fall back to default player node state", StrType.ERROR),
-            Util.Format("Failed to load player node data. This should never happen and should be reported.", StrType.ERROR), // This should never happen, but just in case
+            Util.Format("Loaded player node data", StrSty.FULL_SUCCESS),
+            Util.Format("No player node data to load", StrSty.WARNING),
+            Util.Format("Failed to load player node data file", StrSty.ERROR),
+            Util.Format("Null player node data file found. Fall back to default player node state", StrSty.ERROR),
+            Util.Format("Failed to load player node data. This should never happen and should be reported.", StrSty.ERROR), // This should never happen, but just in case
         ];
         string botnetMsg = statusCode[0] < LOAD_BOTNET_STATUS_MSG.Length
             ? LOAD_BOTNET_STATUS_MSG[statusCode[0]]
-            : Util.Format($"{statusCode[0]}", StrType.UNKNOWN_ERROR, "loading botnet data");
+            : Util.Format($"{statusCode[0]}", StrSty.UNKNOWN_ERROR, "loading botnet data");
         string playerNodeMsg = statusCode[1] < LOAD_PLAYER_NODE_STATUS_MSG.Length
             ? LOAD_PLAYER_NODE_STATUS_MSG[statusCode[1]]
-            : Util.Format($"{statusCode[1]}", StrType.UNKNOWN_ERROR, "loading player node data");
+            : Util.Format($"{statusCode[1]}", StrSty.UNKNOWN_ERROR, "loading player node data");
         return $"{botnetMsg}...{playerNodeMsg}... ";
     }
     public static int[] LoadNetworkData(string filePath) {

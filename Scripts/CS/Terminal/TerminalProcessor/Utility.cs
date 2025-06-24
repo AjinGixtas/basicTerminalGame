@@ -4,7 +4,8 @@ using System.Linq;
 
 public static partial class ShellCore {
     static void SetCommandPrompt() {
-        terminalCommandPrompt.Text = $"{Util.Format(PlayerDataManager.Username, StrType.USERNAME)}@{Util.Format(CurrNode.HostName, StrType.HOSTNAME)}:{Util.Format(CurrDir.GetPath(), StrType.DIR)}>";
+        if (terminalCommandPrompt == null || CurrNode == null || CurrDir == null) return;
+        terminalCommandPrompt.Text = $"{Util.Format(PlayerDataManager.Username, StrSty.USERNAME)}@{Util.Format(CurrNode.HostName, StrSty.HOSTNAME)}:{Util.Format(CurrDir.GetPath(), StrSty.DIR)}>";
     }
     const double TIME_TIL_NEXT_LINE = .1; 
     static double timeLeft = TIME_TIL_NEXT_LINE;

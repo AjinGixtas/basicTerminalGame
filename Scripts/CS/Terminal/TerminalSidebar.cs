@@ -28,7 +28,7 @@ public partial class TerminalSidebar : MarginContainer {
 	string GetBisonStatFormat() {
 		return 
 $@"
-Total money: {Util.Format($"{PlayerDataManager.GC_Cur}", StrType.MONEY)} 
+Total money: {Util.Format($"{PlayerDataManager.GC_Cur}", StrSty.MONEY)} 
 ";
 	}
 	string GetRavenStatFormat() {

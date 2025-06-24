@@ -104,7 +104,7 @@ public enum Cc {
     /// <summary>Light yellow: <c>#ffff66</c></summary>
     LY = 26
 }
-public enum StrType {
+public enum StrSty {
     DECOR = 0,
     HOSTNAME = 1,
     DISPLAY_NAME = 2,

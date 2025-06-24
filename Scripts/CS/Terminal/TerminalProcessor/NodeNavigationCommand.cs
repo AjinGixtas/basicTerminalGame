@@ -12,7 +12,7 @@ public static partial class ShellCore {
 		System.Func<bool[], string> getTreePrefix = arr => string.Concat(arr.Select((b, i) => (i == arr.Length - 1 ? (b ? L : M) : (b ? T : E))));
 		System.Func<bool[], string> getDescPrefix = arr => string.Concat(arr.Select((b, i) => (b ? T : E)));
 		if (!parsedArgs.TryGetValue("-d", out string value)) { value = "1"; parsedArgs["-d"] = value; }
-		if (!int.TryParse(value, out int MAX_DEPTH)) { Say("-r", $"Invalid depth: {Util.Format(value, StrType.NUMBER)}"); return; }
+		if (!int.TryParse(value, out int MAX_DEPTH)) { Say("-r", $"Invalid depth: {Util.Format(value, StrSty.NUMBER)}"); return; }
 
 		Stack<(NetworkNode, int, bool[])> stack = new([(_currNode, 0, [])]);
 		List<NetworkNode> visited = [];
@@ -21,14 +21,14 @@ public static partial class ShellCore {
 			(NetworkNode node, int tdepth, bool[] depthMarks) = stack.Pop();
 			if (tdepth > MAX_DEPTH || visited.Contains(node)) continue;
 			NodeAnalysis analyzeResult = node.Analyze();
-			output += $"{Util.Format(getTreePrefix(depthMarks), StrType.DECOR)}{Util.Format(analyzeResult.IP, StrType.IP), -39}{Util.Format(analyzeResult.HostName, StrType.HOSTNAME)}\n";
+			output += $"{Util.Format(getTreePrefix(depthMarks), StrSty.DECOR)}{Util.Format(analyzeResult.IP, StrSty.IP), -39}{Util.Format(analyzeResult.HostName, StrSty.HOSTNAME)}\n";
 			const int padLength = -40;
 			if (parsedArgs.ContainsKey("-v")) {
 				string descPrefix = getDescPrefix(depthMarks) + ((tdepth == MAX_DEPTH ? 0 : ((node.ParentNode != null ? 0 : -1) + node.ChildNode.Count)) > 0 ? " │" : "  ");
-				output += $"{Util.Format(descPrefix, StrType.DECOR)}  {Util.Format("Display name:", StrType.DECOR),padLength}{Util.Format(analyzeResult.DisplayName, StrType.DISPLAY_NAME)}\n";
-				output += $"{Util.Format(descPrefix, StrType.DECOR)}  {Util.Format("Firewall rating:",StrType.DECOR),padLength}{Util.Format($"{analyzeResult.DefLvl}", StrType.DEF_LVL),-2}  {Util.Format("Security:", StrType.DECOR)} {Util.Format($"{analyzeResult.SecType}", StrType.SEC_TYPE)}\n";
+				output += $"{Util.Format(descPrefix, StrSty.DECOR)}  {Util.Format("Display name:", StrSty.DECOR),padLength}{Util.Format(analyzeResult.DisplayName, StrSty.DISPLAY_NAME)}\n";
+				output += $"{Util.Format(descPrefix, StrSty.DECOR)}  {Util.Format("Firewall rating:",StrSty.DECOR),padLength}{Util.Format($"{analyzeResult.DefLvl}", StrSty.DEF_LVL),-2}  {Util.Format("Security:", StrSty.DECOR)} {Util.Format($"{analyzeResult.SecType}", StrSty.SEC_TYPE)}\n";
 				if (!string.IsNullOrWhiteSpace(descPrefix))
-					output += $"{Util.Format(descPrefix, StrType.DECOR)}\n";
+					output += $"{Util.Format(descPrefix, StrSty.DECOR)}\n";
 			}
 			visited.Add(node);
 
@@ -59,12 +59,12 @@ public static partial class ShellCore {
         
 		if (IsIPv4(target)) {
             node = NetworkManager.GetNodeByIP(target);
-            if (node == null) { Say("-r", $"IP not found: {Util.Format(target, StrType.HOSTNAME)}"); CONNECTrunCMD?.Invoke(CError.NOT_FOUND, target); return; }
+            if (node == null) { Say("-r", $"IP not found: {Util.Format(target, StrSty.HOSTNAME)}"); CONNECTrunCMD?.Invoke(CError.NOT_FOUND, target); return; }
         } else if (CurrNode.ParentNode != null && CurrNode.ParentNode.HostName == target) {
             node = CurrNode.ParentNode;
         } else {
             node = CurrNode.ChildNode.FindLast(n => n.HostName == target);
-            if (node == null) { Say("-r", $"Host not found: {Util.Format(target, StrType.HOSTNAME)}"); CONNECTrunCMD?.Invoke(CError.NOT_FOUND, target); return; }
+            if (node == null) { Say("-r", $"Host not found: {Util.Format(target, StrSty.HOSTNAME)}"); CONNECTrunCMD?.Invoke(CError.NOT_FOUND, target); return; }
         }
 
         if (!node.RequestConnectPermission()) { Say("-r", "Connection denied by the corresponding node."); CONNECTrunCMD?.Invoke(CError.NO_PERMISSION, target); return; }
@@ -78,7 +78,7 @@ public static partial class ShellCore {
         string output = "";
 		for (int i = 0; i < sectorNames.Length; ++i) {
 			if (sectorNames[i] == null) { continue; }
-            output += $"{Util.Format(sectorNames[i], StrType.SECTOR), -40}";
+            output += $"{Util.Format(sectorNames[i], StrSty.SECTOR), -40}";
 		}
 		Say(output);
 	}
@@ -87,11 +87,11 @@ public static partial class ShellCore {
         if (positionalArgs.Length == 0) { Say("-r", "No sector name provided."); return; }
         CError status = NetworkManager.ConnectToSector(positionalArgs[0]);
 		string msg = status switch {
-			CError.OK => $"Linkto successfully: {Util.Format(positionalArgs[0], StrType.SECTOR)}",
-			CError.INVALID => $"Linkto failed: {Util.Format(positionalArgs[0], StrType.SECTOR)}. Sector is null. This behavior is unexpected and should be reported to the developer.",
-			CError.REDUNDANT => $"Linkto failed: {Util.Format(positionalArgs[0], StrType.SECTOR)}. Already linked.",
-			CError.NOT_FOUND => $"Linkto failed: {Util.Format(positionalArgs[0], StrType.SECTOR)}. Sector not found",
-			_ => $"Unexpected error: {status}. Please report to the developer. Linkto failed: {Util.Format(positionalArgs[0], StrType.SECTOR)}",
+			CError.OK => $"Linkto successfully: {Util.Format(positionalArgs[0], StrSty.SECTOR)}",
+			CError.INVALID => $"Linkto failed: {Util.Format(positionalArgs[0], StrSty.SECTOR)}. Sector is null. This behavior is unexpected and should be reported to the developer.",
+			CError.REDUNDANT => $"Linkto failed: {Util.Format(positionalArgs[0], StrSty.SECTOR)}. Already linked.",
+			CError.NOT_FOUND => $"Linkto failed: {Util.Format(positionalArgs[0], StrSty.SECTOR)}. Sector not found",
+			_ => $"Unexpected error: {status}. Please report to the developer. Linkto failed: {Util.Format(positionalArgs[0], StrSty.SECTOR)}",
 		};
 		if (status == 0) { Say(msg); LinkedToSector?.Invoke(positionalArgs[0], status); } else { Say("-r", msg); }
 	}
@@ -105,10 +105,10 @@ public static partial class ShellCore {
 				err = NetworkManager.DisconnectFromSector(secNames[i]);
 				msg = err switch {
                     CError.OK => "",
-                    CError.INVALID => $"Unlink failed: {Util.Format(secNames[i], StrType.SECTOR)}. Sector is null. This behavior is unexpected and should be reported to the developer.",
-                    CError.NOT_FOUND => $"Unlink failed: {Util.Format(secNames[i], StrType.SECTOR)}. Sector not found.",
-                    CError.REDUNDANT => $"Unlink failed: {Util.Format(secNames[i], StrType.SECTOR)}. Not connected.",
-                    _ => $"Unexpected error: {err}. Please report to the developer. Unlink failed: {Util.Format(secNames[i], StrType.SECTOR)}",
+                    CError.INVALID => $"Unlink failed: {Util.Format(secNames[i], StrSty.SECTOR)}. Sector is null. This behavior is unexpected and should be reported to the developer.",
+                    CError.NOT_FOUND => $"Unlink failed: {Util.Format(secNames[i], StrSty.SECTOR)}. Sector not found.",
+                    CError.REDUNDANT => $"Unlink failed: {Util.Format(secNames[i], StrSty.SECTOR)}. Not connected.",
+                    _ => $"Unexpected error: {err}. Please report to the developer. Unlink failed: {Util.Format(secNames[i], StrSty.SECTOR)}",
                 };
 				if (err == CError.OK && msg != "") { Say(msg); } else { Say("-r", msg); }
             }
@@ -117,11 +117,11 @@ public static partial class ShellCore {
 		}
 		err = NetworkManager.DisconnectFromSector(positionalArgs[0]);
 		msg = err switch {
-			CError.OK => $"Disconnected from sector: {Util.Format(positionalArgs[0], StrType.SECTOR)}",
-            CError.INVALID => $"Unlink failed: {Util.Format(positionalArgs[0], StrType.SECTOR)}. Sector is null. This behavior is unexpected and should be reported to the developer.",
-			CError.NOT_FOUND => $"Unlink failed: {Util.Format(positionalArgs[0], StrType.SECTOR)}. Sector not found.",
-			CError.REDUNDANT => $"Unlink failed: {Util.Format(positionalArgs[0], StrType.SECTOR)}. Not connected.",
-			_ => $"Unexpected error: {err}. Please report to the developer. Unlink failed: {Util.Format(positionalArgs[0], StrType.SECTOR)}",
+			CError.OK => $"Disconnected from sector: {Util.Format(positionalArgs[0], StrSty.SECTOR)}",
+            CError.INVALID => $"Unlink failed: {Util.Format(positionalArgs[0], StrSty.SECTOR)}. Sector is null. This behavior is unexpected and should be reported to the developer.",
+			CError.NOT_FOUND => $"Unlink failed: {Util.Format(positionalArgs[0], StrSty.SECTOR)}. Sector not found.",
+			CError.REDUNDANT => $"Unlink failed: {Util.Format(positionalArgs[0], StrSty.SECTOR)}. Not connected.",
+			_ => $"Unexpected error: {err}. Please report to the developer. Unlink failed: {Util.Format(positionalArgs[0], StrSty.SECTOR)}",
 		};
 		if (err == CError.OK && msg != "") { Say(msg); } else { Say("-r", msg); }
 		UnlinkedToSector?.Invoke(positionalArgs[0], err);

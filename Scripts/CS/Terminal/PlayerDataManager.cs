@@ -47,7 +47,7 @@ public static partial class PlayerDataManager {
 		}
 	}
 
-	public static void Ready() {
+	public static void Setup() {
 		saveObj = new();
 	}
 
@@ -64,9 +64,9 @@ public static partial class PlayerDataManager {
 
 		if (_gc_cur <= GC_Max) { needWarn = false; warned = false; } else needWarn = true;
 		if (needWarn) {
-			if (!warned) ShellCore.Say(Util.Format($"GC total is over the limit of {GC_Max}. Remaining GC lost.", StrType.WARNING));
+			if (!warned) ShellCore.Say(Util.Format($"GC total is over the limit of {GC_Max}. Remaining GC lost.", StrSty.WARNING));
 			warned = true;
-		} else ShellCore.Say($"Deposited {Util.Format($"{amount}", StrType.MONEY)}");
+		} else ShellCore.Say($"Deposited {Util.Format($"{amount}", StrSty.MONEY)}");
 		return CError.OK;
 	}
 	public static long WithdrawMineral(long[] amounts) {
@@ -100,20 +100,20 @@ public static partial class PlayerDataManager {
 
 	public static string GetLoadStatusMsg(int statusCode) {
 		string[] LOAD_STATUS_MSG = [
-			Util.Format("Loaded player data", StrType.FULL_SUCCESS),
-			Util.Format("No player data file found in save. Fall back to new user setting.", StrType.ERROR),
-			Util.Format("Unable to parse player data file. Fall back to new user setting. Check for potentional file malfunction.", StrType.ERROR),
-			Util.Format("File parse successfully yet doesn't get registered. Fall back to new user setting. Check for potentional file malfunction.", StrType.ERROR)
+			Util.Format("Loaded player data", StrSty.FULL_SUCCESS),
+			Util.Format("No player data file found in save. Fall back to new user setting.", StrSty.ERROR),
+			Util.Format("Unable to parse player data file. Fall back to new user setting. Check for potentional file malfunction.", StrSty.ERROR),
+			Util.Format("File parse successfully yet doesn't get registered. Fall back to new user setting. Check for potentional file malfunction.", StrSty.ERROR)
 		];
 		return (statusCode < LOAD_STATUS_MSG.Length) ? LOAD_STATUS_MSG[statusCode]
-			: Util.Format($"{statusCode}", StrType.UNKNOWN_ERROR, "loading player data");
+			: Util.Format($"{statusCode}", StrSty.UNKNOWN_ERROR, "loading player data");
 	}
 	public static string GetSaveStatusMsg(int statusCode) {
 		string[] SAVE_STATUS_MSG = [
-			Util.Format("Saved player data", StrType.FULL_SUCCESS),
+			Util.Format("Saved player data", StrSty.FULL_SUCCESS),
 		];
 		return (statusCode < SAVE_STATUS_MSG.Length) ? SAVE_STATUS_MSG[statusCode]
-	: Util.Format($"{((CError)statusCode)}", StrType.UNKNOWN_ERROR, "saving player data");
+	: Util.Format($"{((CError)statusCode)}", StrSty.UNKNOWN_ERROR, "saving player data");
 	}
 	
 	public static int LoadPlayerData(string filePath) {

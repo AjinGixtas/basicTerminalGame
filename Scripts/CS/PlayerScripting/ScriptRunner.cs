@@ -34,7 +34,7 @@ public static class ScriptRunner {
         script.Globals["arp"] = posArgsTable;
 
         script.Globals["print"] = DynValue.NewCallback((context, args) => {
-			ShellCore.Say(Util.Format("Use ax:Say() instead of print()", StrType.WARNING));
+			ShellCore.Say(Util.Format("Use ax:Say() instead of print()", StrSty.WARNING));
 			return DynValue.Nil;
 		});
 		try {
@@ -53,7 +53,7 @@ public static class ScriptRunner {
 	public static void RunPlayerScriptFromFile(string filePath) {
 		NodeFile file = ShellCore.CurrDir.GetFile(filePath);
 		if (file == null) {
-			ShellCore.Say("-r", $"Script file not found: {Util.Format(filePath, StrType.FILE)}");
+			ShellCore.Say("-r", $"Script file not found: {Util.Format(filePath, StrSty.FILE)}");
 			return;
 		}
 		RunPlayerScript(file.Content, [], []);

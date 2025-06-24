@@ -12,7 +12,7 @@ public static partial class ShellCore {
             _commandHistoryIndex = cmdHistory.Count;
         }
         string[] commands = Util.SplitCommands(newCMD);
-        Say("-n", $"{terminalCommandPrompt.Text.Replace("\r", "").Replace("\n", "")}{Util.Format(Util.EscapeBBCode(newCMD), StrType.CMD_FUL)}");
+        Say("-n", $"{terminalCommandPrompt.Text.Replace("\r", "").Replace("\n", "")}{Util.Format(Util.EscapeBBCode(newCMD), StrSty.CMD_FUL)}");
         queuedAction = ExecuteCommands;
         queuedCommands = commands;
         StartProcess(GD.Randf()*1.0+.5);

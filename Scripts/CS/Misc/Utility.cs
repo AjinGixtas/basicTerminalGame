@@ -12,7 +12,7 @@ public static partial class Util {
     /// <summary>
     /// Skip dialogues in the game, used for testing purposes.
     /// </summary>
-    public const bool SkipDialogues = true;
+    public const bool SkipDialogues = false;
     public static T[] Shuffle<T>(T[] array) {
         for (int i = 0; i < array.Length; i++) {
             int j = GD.RandRange(0, array.Length - 1); 
@@ -94,15 +94,15 @@ public static partial class Util {
     /// Formats the given <paramref name="input"/> string with color tags based on the specified <paramref name="type"/>.
     /// </summary>
     /// <param name="input">The text to wrap in color tags.</param>
-    /// <param name="type">One of the <see cref="StrType"/> values indicating how to colorize <paramref name="input"/>.</param>
+    /// <param name="type">One of the <see cref="StrSty"/> values indicating how to colorize <paramref name="input"/>.</param>
     /// <param name="addons">
     /// Optional parameters for certain types:
     /// <list type="bullet">
-    ///   <item><description><see cref="StrType.UNIT"/>: addons[0] is the unit suffix (e.g. “MB”).</description></item>
-    ///   <item><description><see cref="StrType.NUMBER"/>: addons[0] is the number of decimal places.</description></item>
-    ///   <item><description><see cref="StrType.T_MINERAL"/>: addons[0] is the mineral index.</description></item>
-    ///   <item><description><see cref="StrType.G_MINERAL"/>: addons[0] is the mineral index for lookup.</description></item>
-    ///   <item><description><see cref="StrType.UNKNOWN_ERROR"/>: addons[0] is optional extra context.</description></item>
+    ///   <item><description><see cref="StrSty.UNIT"/>: addons[0] is the unit suffix (e.g. “MB”).</description></item>
+    ///   <item><description><see cref="StrSty.NUMBER"/>: addons[0] is the number of decimal places.</description></item>
+    ///   <item><description><see cref="StrSty.T_MINERAL"/>: addons[0] is the mineral index.</description></item>
+    ///   <item><description><see cref="StrSty.G_MINERAL"/>: addons[0] is the mineral index for lookup.</description></item>
+    ///   <item><description><see cref="StrSty.UNKNOWN_ERROR"/>: addons[0] is optional extra context.</description></item>
     /// </list>
     /// </param>
     /// <returns>
@@ -137,82 +137,82 @@ public static partial class Util {
     ///   <item><description><c>StrType.WARNING</c>: [color=<c>Cc.Y</c>] prefix “[WARNING] ”</description></item>
     ///   <item><description><c>StrType.PART_SUCCESS</c>: [color=<c>Cc.C</c>]</description></item>
     ///   <item><description><c>StrType.FULL_SUCCESS</c>: [color=<c>Cc.G</c>]</description></item>
-    ///   <item><description><c>StrType.UNKNOWN_ERROR</c>: calls <see cref="Format(string, StrType)"/> recursively with error text in [color=<c>Cc.R</c>]</description></item>
+    ///   <item><description><c>StrType.UNKNOWN_ERROR</c>: calls <see cref="Format(string, StrSty)"/> recursively with error text in [color=<c>Cc.R</c>]</description></item>
     ///   <item><description>default: returns <paramref name="input"/> unchanged.</description></item>
     /// </list>
     /// </returns>
-    public static string Format(string input, StrType type, params string[] addons) {
+    public static string Format(string input, StrSty type, params string[] addons) {
         switch (type) {
-            case StrType.DECOR:
+            case StrSty.DECOR:
                 return $"[color={Util.CC(Cc.w)}]{input}[/color]";
-            case StrType.IP:
+            case StrSty.IP:
                 return $"[color={Util.CC(Cc.C)}]{input}[/color]";
-            case StrType.HOSTNAME:
+            case StrSty.HOSTNAME:
                 return $"[color={Util.CC(Cc.gR)}]{input}[/color]";
-            case StrType.DISPLAY_NAME:
+            case StrSty.DISPLAY_NAME:
                 return $"[color={Util.CC(Cc.G)}]{input}[/color]";
-            case StrType.SECTOR:
+            case StrSty.SECTOR:
                 return $"[color={ColorMapperSecLvl(input, NetworkManager.GetDriftSectorByName(input)?.SectorLevel ?? 0)}]{input}[/color]";
-            case StrType.UNIT: {
+            case StrSty.UNIT: {
                     if (string.IsNullOrWhiteSpace(input)) return "";
-                    return $"{Util.Format(input, StrType.NUMBER)}[color={Util.CC(Cc.W)}]{addons[0]}[/color]";
+                    return $"{Util.Format(input, StrSty.NUMBER)}[color={Util.CC(Cc.W)}]{addons[0]}[/color]";
                 }
-            case StrType.SEC_LVL:
+            case StrSty.SEC_LVL:
                     return $"[color={ColorMapperSecLvl(input, input)}]{input}[/color]";
-            case StrType.SEC_TYPE:
+            case StrSty.SEC_TYPE:
                 return $"[color={ColorMapperSecLvl(input, input)}]{input}[/color]";
-            case StrType.DEF_LVL:
+            case StrSty.DEF_LVL:
                 return $"[color={ColorMapperSecLvl(input, input)}]{input}[/color]";
-            case StrType.USERNAME:
+            case StrSty.USERNAME:
                 return $"[color={Util.CC(Cc.M)}]{input}[/color]";
-            case StrType.DESC:
+            case StrSty.DESC:
                 return $"[color={Util.CC(Cc.g)}]{input}[/color]";
-            case StrType.SYMBOL:
+            case StrSty.SYMBOL:
                 return $"[color={Util.CC(Cc.m)}]{input}[/color]";
-            case StrType.NUMBER:
+            case StrSty.NUMBER:
                 string number = addons.Length > 0 ? double.Parse(input).ToString($"F{addons[0]}") :
                     double.Parse(input).ToString("F2");
                 return $"[color={Util.CC(Cc.C)}]{number}[/color]";
-            case StrType.DIR:
+            case StrSty.DIR:
                 return $"[color={Util.CC(Cc.C)}]{input}[/color]";
-            case StrType.FILE: {
+            case StrSty.FILE: {
                     int lastSlash = input.LastIndexOf('/');
                     if (lastSlash == -1 || lastSlash == input.Length - 1)
                         return $"[color={Util.CC(Cc.G)}]{input}[/color]"; // fallback if no slash or only slash
                     return $"[color={Util.CC(Cc.C)}]{input[..(lastSlash + 1)]}[/color][color={Util.CC(Cc.G)}]{input[(lastSlash + 1)..]}[/color]";
                 }
-            case StrType.CMD_FUL: {
+            case StrSty.CMD_FUL: {
                     string output = "";
                     string[] commands = SplitCommands(input);
                     for (int i = 0; i < commands.Length; ++i) {
                         string[] tokens = TokenizeCommand(commands[i]);
                         if (i > 0) output += $"[color={Util.CC(Cc.W)}];[/color]";
 
-                        output += Util.Format(tokens[0], StrType.CMD_ACT);
+                        output += Util.Format(tokens[0], StrSty.CMD_ACT);
                         if (tokens.Length == 1) continue; // No args, just the command
                         output += " "; // Add space after command
                         for (int j = 1; j < tokens.Length; ++j) {
-                            if (tokens[j].StartsWith('-')) output += Util.Format(tokens[j], StrType.CMD_FLAG);
-                            else output += Util.Format(tokens[j], StrType.CMD_ARG);
+                            if (tokens[j].StartsWith('-')) output += Util.Format(tokens[j], StrSty.CMD_FLAG);
+                            else output += Util.Format(tokens[j], StrSty.CMD_ARG);
                             if (j < tokens.Length - 1) output += " ";
                         }
                     }
                     return output;
                 }
-            case StrType.CMD_FLAG:
+            case StrSty.CMD_FLAG:
                 return $"[color={Util.CC(Cc.gR)}]{input}[/color]";
-            case StrType.CMD_ARG:
+            case StrSty.CMD_ARG:
                 return $"[color={Util.CC(Cc.LR)}]{input}[/color]";
-            case StrType.CMD_ACT:
+            case StrSty.CMD_ACT:
                 return $"[color={Util.CC(Cc.gB)}]{input}[/color]";
-            case StrType.ERROR:
+            case StrSty.ERROR:
                 return $"[color={Util.CC(Cc.R)}]{input}[/color]";
-            case StrType.HEADER:
+            case StrSty.HEADER:
                 return $"[color={Util.CC(Cc.gR)}]{input}[/color]";
-            case StrType.MONEY: { // GC is short for Gold Coin. That's all. lol
+            case StrSty.MONEY: { // GC is short for Gold Coin. That's all. lol
                     if (string.IsNullOrWhiteSpace(input)) return "";
                     if (!long.TryParse(input, out long value))
-                        return Util.Format("NUMBER_PARSE_FAILED", StrType.ERROR);
+                        return Util.Format("NUMBER_PARSE_FAILED", StrSty.ERROR);
                     string[] units = ["S", "Q", "T", "B", "M", "K"];
                     double[] divisors = [1e21, 1e15, 1e12, 1e9, 1e6, 1e3];
                     Cc[] colors = [Cc.R, Cc.Y, Cc.M, Cc.G, Cc.B, Cc.C];
@@ -229,10 +229,10 @@ public static partial class Util {
                     if (gcValue == "000") { gcValue = ""; }
                     return sb + $"[color={Util.CC(Cc.w)}]{gcValue}[/color][color={Util.CC(Cc.Y)}]GC[/color]";
                 }
-            case StrType.T_MINERAL: {
+            case StrSty.T_MINERAL: {
                     if (string.IsNullOrWhiteSpace(input)) return "";
                     if (!double.TryParse(input, out double value))
-                        return Util.Format("NUMBER_PARSE_FAILED", StrType.ERROR);
+                        return Util.Format("NUMBER_PARSE_FAILED", StrSty.ERROR);
                     int index = int.Parse(addons[0]);
                     MineralProfile profile = ItemCrafter.MINERALS[index];
                     string[] units = ["S", "Q", "T", "B", "M", "K"];
@@ -253,19 +253,19 @@ public static partial class Util {
                     if (gcValue == "000") { gcValue = ""; }
                     return sb + $"[color={Util.CC(Cc.w)}]{gcValue}[/color][color={mineralColor}]{profile.Shorthand}[/color]";
                 }
-            case StrType.G_MINERAL: { // General mineral formatting
+            case StrSty.G_MINERAL: { // General mineral formatting
                     if (!long.TryParse(addons[0], out long index))
-                        return Util.Format("MINERAL_TYPE_INDEX_PARSE_FAILED", StrType.ERROR);
+                        return Util.Format("MINERAL_TYPE_INDEX_PARSE_FAILED", StrSty.ERROR);
                     return $"[color={Util.CC(ItemCrafter.MINERALS[index].ColorCode)}]{input}[/color]";
                 }
-            case StrType.WARNING:
+            case StrSty.WARNING:
                 return $"[color={Util.CC(Cc.Y)}][WARNING] {input}[/color]";
-            case StrType.PART_SUCCESS:
+            case StrSty.PART_SUCCESS:
                 return $"[color={Util.CC(Cc.C)}]{input}[/color]";
-            case StrType.FULL_SUCCESS:
+            case StrSty.FULL_SUCCESS:
                 return $"[color={Util.CC(Cc.G)}]{input}[/color]";
-            case StrType.UNKNOWN_ERROR:
-                return Util.Format($"Unknown error encountered{(addons.Length != 0 ? $" with {addons[0]}" : "")}. Error code: {input}", StrType.ERROR);
+            case StrSty.UNKNOWN_ERROR:
+                return Util.Format($"Unknown error encountered{(addons.Length != 0 ? $" with {addons[0]}" : "")}. Error code: {input}", StrSty.ERROR);
             default:
                 return input;
         }
@@ -439,8 +439,8 @@ public static partial class Util {
     }
     public static string TimeDifferenceFriendly(double time) {
         int min = (int)(time / 60);
-        if (min < 1) return $"Less than {Util.Format("1", StrType.UNIT, "min")}";
-        return $"Aprox.{Util.Format($"{min}", StrType.UNIT, "min")} remaining";
+        if (min < 1) return $"Less than {Util.Format("1", StrSty.UNIT, "min")}";
+        return $"Aprox.{Util.Format($"{min}", StrSty.UNIT, "min")} remaining";
     }
     public static Lock LockEnumMapper(LockType type) {
         return type switch {

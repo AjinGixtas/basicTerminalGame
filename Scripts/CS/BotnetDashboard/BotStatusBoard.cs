@@ -8,22 +8,22 @@ public partial class BotStatusBoard : Control {
 		botFarmRef.TryGetTarget(out BotFarm hackfarm);
 		if (hackfarm == null) return;
 		leftLabel.Text =
-@$"[color={Util.CC(Cc.w)}]Botnet:[/color] {Util.Format(hackfarm.HostName, StrType.HOSTNAME)}
+@$"[color={Util.CC(Cc.w)}]Botnet:[/color] {Util.Format(hackfarm.HostName, StrSty.HOSTNAME)}
 ================================
 
-[color={Util.CC(Cc.w)}]Batch size[/color]    | Lvl.{Util.Format($"{hackfarm.BatchSizeLVL}", StrType.NUMBER, "0"),-26} | {Util.Format($"{hackfarm.BatchSize}", StrType.NUMBER):3}unit
-[color={Util.CC(Cc.w)}]Mining speed[/color]  | Lvl.{Util.Format($"{hackfarm.MineSpeedLVL}", StrType.NUMBER, "0"),-26} | {Util.Format($"{hackfarm.MineSpeed}", StrType.NUMBER):3}u/s
-[color={Util.CC(Cc.w)}]Transfer time[/color] | Lvl.{Util.Format($"{hackfarm.XferDelayLVL}", StrType.NUMBER, "0"),-26} | {Util.Format($"{hackfarm.XferDelay}", StrType.NUMBER):3}second
+[color={Util.CC(Cc.w)}]Batch size[/color]    | Lvl.{Util.Format($"{hackfarm.BatchSizeLVL}", StrSty.NUMBER, "0"),-26} | {Util.Format($"{hackfarm.BatchSize}", StrSty.NUMBER):3}unit
+[color={Util.CC(Cc.w)}]Mining speed[/color]  | Lvl.{Util.Format($"{hackfarm.MineSpeedLVL}", StrSty.NUMBER, "0"),-26} | {Util.Format($"{hackfarm.MineSpeed}", StrSty.NUMBER):3}u/s
+[color={Util.CC(Cc.w)}]Transfer time[/color] | Lvl.{Util.Format($"{hackfarm.XferDelayLVL}", StrSty.NUMBER, "0"),-26} | {Util.Format($"{hackfarm.XferDelay}", StrSty.NUMBER):3}second
 
 ================================
-[color={Util.CC(Cc.w)}]Time to live:[/color] {Util.Format($"{hackfarm.LifeTime}", StrType.NUMBER)}s
+[color={Util.CC(Cc.w)}]Time to live:[/color] {Util.Format($"{hackfarm.LifeTime}", StrSty.NUMBER)}s
 ";
 
 
 		rightLabel.Text = 
 @$"MINERAL BACKLOG
 {CombineBox(hackfarm)}
-Next batch in: {Util.Format($"{hackfarm.CycleTimeRemain}", StrType.NUMBER, "2"), 6} 
+Next batch in: {Util.Format($"{hackfarm.CycleTimeRemain}", StrSty.NUMBER, "2"), 6} 
 {GenerateHackTimeBar(hackfarm)}
 [color={Util.CC(Cc.w)}]Batch distribution:[/color] ({GenerateBatchDistVisual(hackfarm)} )";
 		if (hackfarm.LifeTime <= 0) botFarmRef.SetTarget(null);
@@ -47,18 +47,18 @@ Next batch in: {Util.Format($"{hackfarm.CycleTimeRemain}", StrType.NUMBER, "2"),
 		string[] box = new string[5];
 		string I = $"[color={Util.CC(Cc.w)}]|[/color]";
 		box[0] = $"[color={Util.CC(Cc.w)}]------------+[/color]";
-		box[1] = $"     {Util.Format($"{ItemCrafter.MINERALS[hackfarm.mineralDistribution[index].Item1].Shorthand}", StrType.G_MINERAL, $"{hackfarm.mineralDistribution[index].Item1}")}     {I}";
+		box[1] = $"     {Util.Format($"{ItemCrafter.MINERALS[hackfarm.mineralDistribution[index].Item1].Shorthand}", StrSty.G_MINERAL, $"{hackfarm.mineralDistribution[index].Item1}")}     {I}";
 		string content = (hackfarm.MBacklog * hackfarm.mineralDistribution[index].Item2).ToString("F2");
 		int padLeft = (10 - content.Length) / 2; int padRight = 10 - content.Length - padLeft;
-		box[2] = $" {new string(' ', padRight)}{Util.Format(content, StrType.NUMBER)}{new string(' ', padLeft)} {I}";
-		box[3] = $" {Util.Format($"{hackfarm.MineSpeed * hackfarm.mineralDistribution[index].Item2}", StrType.NUMBER)+ "u/s", 33} {I}";
+		box[2] = $" {new string(' ', padRight)}{Util.Format(content, StrSty.NUMBER)}{new string(' ', padLeft)} {I}";
+		box[3] = $" {Util.Format($"{hackfarm.MineSpeed * hackfarm.mineralDistribution[index].Item2}", StrSty.NUMBER)+ "u/s", 33} {I}";
 		box[4] = $"[color={Util.CC(Cc.w)}]------------+[/color]";
 		return box;
 	}
 	string GenerateBatchDistVisual(BotFarm hackfarm) {
 		string result = "";
 		for (int i = 0; i < hackfarm.mineralDistribution.Length; ++i) {
-			result += $" +{Util.Format($"{hackfarm.mineralDistribution[i].Item2 * hackfarm.BatchSize}", StrType.NUMBER, "1")}[color={Util.CC(Cc.w)}]u[/color]{Util.Format($"{ItemCrafter.MINERALS[hackfarm.mineralDistribution[i].Item1].Shorthand}", StrType.G_MINERAL, $"{hackfarm.mineralDistribution[i].Item1}")}";
+			result += $" +{Util.Format($"{hackfarm.mineralDistribution[i].Item2 * hackfarm.BatchSize}", StrSty.NUMBER, "1")}[color={Util.CC(Cc.w)}]u[/color]{Util.Format($"{ItemCrafter.MINERALS[hackfarm.mineralDistribution[i].Item1].Shorthand}", StrSty.G_MINERAL, $"{hackfarm.mineralDistribution[i].Item1}")}";
 		}
 		return result;
 	}

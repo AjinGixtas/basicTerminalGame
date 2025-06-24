@@ -3,22 +3,22 @@ using Godot;
 public class PlayerFileManager {
 	public static string GetLoadStatusMsg(int statusCode) {
 		string[] LOAD_STATUS_MSG = [
-			Util.Format("Loaded virtual file system", StrType.FULL_SUCCESS),
-			Util.Format("No virtual file system found in save. Fall back to empty virtual disk", StrType.ERROR)
+			Util.Format("Loaded virtual file system", StrSty.FULL_SUCCESS),
+			Util.Format("No virtual file system found in save. Fall back to empty virtual disk", StrSty.ERROR)
 		];
 		return (statusCode < LOAD_STATUS_MSG.Length) ? LOAD_STATUS_MSG[statusCode]
-			: Util.Format($"{statusCode}", StrType.UNKNOWN_ERROR, "loading virtual file system");
+			: Util.Format($"{statusCode}", StrSty.UNKNOWN_ERROR, "loading virtual file system");
 	}
 	public static string GetSaveStatusMsg(int statusCode) {
 		string[] SAVE_STATUS_MSG = [
-			Util.Format("Saved virtual file system", StrType.FULL_SUCCESS)
+			Util.Format("Saved virtual file system", StrSty.FULL_SUCCESS)
 		];
 		return (statusCode < SAVE_STATUS_MSG.Length) ? SAVE_STATUS_MSG[statusCode] : 
-			Util.Format($"{statusCode}", StrType.UNKNOWN_ERROR, "saving virtual file system"); }
+			Util.Format($"{statusCode}", StrSty.UNKNOWN_ERROR, "saving virtual file system"); }
 	static NodeDirectory fileSystem;
 	public static NodeDirectory FileSystem { get => fileSystem; }
 	
-	public static void Ready() {
+	public static void Setup() {
 		fileSystem = new("");
 	}
 	

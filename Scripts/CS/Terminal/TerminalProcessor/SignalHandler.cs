@@ -1,6 +1,6 @@
 public static partial class ShellCore {
     public static void OnCrackDurationTimerTimeout() {
-        Say($"{Util.Format("Flare sequence timeout", StrType.ERROR)}. All [color={Util.CC(Cc.Y)}]locks[/color] closed.");
+        Say($"{Util.Format("Flare sequence timeout", StrSty.ERROR)}. All [color={Util.CC(Cc.Y)}]locks[/color] closed.");
         EndFlare();
     }
 

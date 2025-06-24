@@ -12,14 +12,18 @@ public partial class LifeCycleDirector : Node
 		// Load the game scene
 		if (gameScene != null) {
 			// Intialize default state
-			PlayerDataManager.Ready();
-			PlayerFileManager.Ready();
-			NetworkManager.Ready();
-			QuickLoad(this);
-			ShellCore.Ready();
+			PlayerDataManager.Setup();
+            PlayerFileManager.Setup();
+            NetworkManager.Setup();
+            QuickLoad(this);
+            ShellCore.Ready();
+            NetworkManager.Ready();
+            RemakeScene();
+            FinishScene?.Invoke();
+			foreach (Delegate d in FinishScene.GetInvocationList()) FinishScene -= (Action)d; // Clear the event to prevent multiple invocations
 		} else { GD.PrintErr("Game scene not set in LifeCycleDirector."); }
-	}
-	public override void _Process(double delta) {
+    }
+    public override void _Process(double delta) {
 		if (Input.IsActionJustPressed("sequentialSave")) { 
 			QuickSave(true);
 		}
@@ -42,26 +46,28 @@ public partial class LifeCycleDirector : Node
 		}).Where(num => num > 0).ToList();
 
 		// Pick next save number
-		int nextSaveNumber = existingSaves.Count == 0 ? 1 : newSave ? existingSaves.Max() + 1 : existingSaves.Max();
-		string newSaveFolderName = $"Game_{nextSaveNumber:D5}";
+		int nextSaveNumber = existingSaves.Count == 0 ? 1 : existingSaves.Max() + 1;
+		string newSaveFolderName = newSave ? $"Game_{nextSaveNumber:D5}" : CurrentSavePath;
 		string newSavePath = StringExtensions.PathJoin(SaveRoot, newSaveFolderName);
 
 		// Create new save directory
 		DirAccess.MakeDirAbsolute(ProjectSettings.GlobalizePath(newSavePath));
+        
 		// Save player data (convert back to user:// path for Godot API)
-		if (newSave) ShellCore.Say($"Saving game to {newSavePath}");
-		else ShellCore.Say($"Overwriting save to {newSavePath}");
-		ShellCore.Say("-n", PlayerDataManager.GetSaveStatusMsg(
-				PlayerDataManager.SavePlayerData(StringExtensions.PathJoin(newSavePath, "PlayerData.tres"))
-			) + "... ");
-		ShellCore.Say("-n", PlayerFileManager.GetSaveStatusMsg(
-				PlayerFileManager.SaveFileSysData(StringExtensions.PathJoin(newSavePath, "FileSys"))
-			) + "... ");
-		ShellCore.Say("-n", NetworkManager.GetSaveStatusMsg(
-				NetworkManager.SaveNetworkData(StringExtensions.PathJoin(newSavePath, "NetworkData"))
-			));
-
-		ShellCore.Say($"\nIf there are any error related to save file, feel free to email {Util.Format("ajingixtascontact", StrType.USERNAME)}@{Util.Format("gmail.com", StrType.HOSTNAME)}");
+        int[][] saveStatus = [
+            [PlayerDataManager.SavePlayerData(StringExtensions.PathJoin(newSavePath, "PlayerData.tres"))],
+            [PlayerFileManager.SaveFileSysData(StringExtensions.PathJoin(newSavePath, "FileSys"))],
+            NetworkManager.SaveNetworkData(StringExtensions.PathJoin(newSavePath, "NetworkData"))
+        ];
+		if (saveStatus.All(row => row.All(cell => cell == 0))) {
+            if (newSave) ShellCore.Say($"Saved game to {newSavePath}");
+            else ShellCore.Say($"Overwrote save to {newSavePath}");
+        } else {
+			ShellCore.Say("-n", PlayerDataManager.GetSaveStatusMsg(saveStatus[0][0]) + "... ");
+			ShellCore.Say("-n", PlayerFileManager.GetSaveStatusMsg(saveStatus[1][0]) + "... ");
+			ShellCore.Say("-n", NetworkManager.GetSaveStatusMsg(saveStatus[2]));
+		}
+		ShellCore.Say($"\nIf there are any error related to save file, feel free to email {Util.Format("ajingixtascontact", StrSty.USERNAME)}@{Util.Format("gmail.com", StrSty.HOSTNAME)}");
 		CurrentSavePath = newSavePath; // Update current save path
 	}
 
@@ -86,18 +92,15 @@ public partial class LifeCycleDirector : Node
 			[PlayerFileManager.LoadFileSysData(StringExtensions.PathJoin($"{SaveRoot}/{latestFolder}", "FileSys"))],
 			NetworkManager.LoadNetworkData(StringExtensions.PathJoin($"{SaveRoot}/{latestFolder}", "NetworkData"))
 		];
-		// Wipe the slate clean
-		lifeCycleDirector.RemakeScene();
 
 		ShellCore.Say("Quick loading save...");
 		ShellCore.Say("-n", PlayerDataManager.GetLoadStatusMsg(statusCodes[0][0]) + "... ");
 		ShellCore.Say("-n", PlayerFileManager.GetLoadStatusMsg(statusCodes[1][0]) + "... ");
         // The two above use int[][] to match the expected type, but this one is a single int
         ShellCore.Say("-n", NetworkManager.GetLoadStatusMsg(statusCodes[2]) + "... ");
-		ShellCore.Say($"\nIf there are any error related to save file, feel free to email {Util.Format("ajingixtascontact", StrType.USERNAME)}@{Util.Format("gmail.com", StrType.HOSTNAME)}");
+		ShellCore.Say($"\nIf there are any error related to save file, feel free to email {Util.Format("ajingixtascontact", StrSty.USERNAME)}@{Util.Format("gmail.com", StrSty.HOSTNAME)}");
+
 		CurrentSavePath = StringExtensions.PathJoin(SaveRoot, latestFolder); // Update current save path
-		FinishScene?.Invoke();
-		foreach (Delegate d in FinishScene.GetInvocationList()) FinishScene -= (Action)d; // Clear the event to prevent multiple invocations
     }
 	void RemakeScene() {
 		if (runtimeDirector != null) RemoveChild(runtimeDirector);

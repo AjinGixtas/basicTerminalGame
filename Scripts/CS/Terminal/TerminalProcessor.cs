@@ -55,12 +55,6 @@ public static partial class ShellCore {
 		ShellCore.SetCommandPrompt();
 	}
 	public static void Ready() {
-        if (!PlayerDataManager.CompletedTutorial) {
-            ShellCore.Say(@$"Welcome to the terminal! Type {Util.Format("help", StrType.CMD_FUL)} to see available commands.
-You can also type {Util.Format("scan", StrType.CMD_FUL)} to see the network nodes around you.
-Type {Util.Format("connect <hostname>", StrType.CMD_FUL)} to connect to a node.
-Type {Util.Format("home", StrType.CMD_FUL)} to return to your home node.");
-        }
     }
 	public static void Process(double delta) {
 		HandleInput(delta);

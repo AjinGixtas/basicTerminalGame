@@ -76,7 +76,7 @@ public class NodeDirectory : NodeSystemItem {
     /// <c>CError.INVALID</c>: Invalid operation, e.g. trying to add a file to itself.
     /// </returns>
     public CError AddFile(string pathName) {
-        string path = System.IO.Path.GetDirectoryName(pathName), name = System.IO.Path.GetFileName(pathName);
+        string path = System.IO.Path.GetDirectoryName(pathName).Replace('\\', '/'), name = System.IO.Path.GetFileName(pathName).Replace('\\', '/');
         NodeDirectory dir = GetDir(path);
         if (dir == null) return CError.NOT_FOUND;
         NodeFile file = new(name) { Parent = dir };
@@ -93,7 +93,7 @@ public class NodeDirectory : NodeSystemItem {
     /// <c>CError.INVALID</c>: Invalid operation, e.g. trying to add a file to itself.
     /// </returns>
     public CError AddDir(string pathName) {
-        string path = System.IO.Path.GetDirectoryName(pathName), name = System.IO.Path.GetFileName(pathName);
+        string path = System.IO.Path.GetDirectoryName(pathName).Replace('\\', '/'), name = System.IO.Path.GetFileName(pathName).Replace('\\', '/');
         NodeDirectory dir = GetDir(path);
         if (dir == null) return CError.NOT_FOUND;
         NodeDirectory newDir = new(name) { Parent = dir };

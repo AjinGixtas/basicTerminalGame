@@ -18,13 +18,13 @@ public static partial class ShellCore {
 		BotFarm hackfarm = NetworkManager.GetBotByName(minerName);
 		if (hackfarm == null) { Say("-r", "No miner with such name."); return; }
 		Say(
-$@"[color={Util.CC(Cc.w)}]Botnet:[/color] {Util.Format(minerName, StrType.HOSTNAME)}
+$@"[color={Util.CC(Cc.w)}]Botnet:[/color] {Util.Format(minerName, StrSty.HOSTNAME)}
 {Util.GenerateStringByProportions([.. hackfarm.mineralDistribution.Select(x => x.Item2)], [.. hackfarm.mineralDistribution.Select(x => ItemCrafter.MINERALS[x.Item1].ColorCode)], 50)}
-{string.Join(" | ", hackfarm.mineralDistribution.Select(x => $"[color={Util.CC(ItemCrafter.MINERALS[x.Item1].ColorCode)}]{ItemCrafter.MINERALS[x.Item1].Shorthand}[/color]: {Util.Format($"{x.Item2 * 100.0:0.00}", StrType.NUMBER)}%"))}
+{string.Join(" | ", hackfarm.mineralDistribution.Select(x => $"[color={Util.CC(ItemCrafter.MINERALS[x.Item1].ColorCode)}]{ItemCrafter.MINERALS[x.Item1].Shorthand}[/color]: {Util.Format($"{x.Item2 * 100.0:0.00}", StrSty.NUMBER)}%"))}
 ================================================================
-[color={Util.CC(Cc.w)}]Batch size[/color]    | Lvl.{Util.Format($"{hackfarm.BatchSizeLVL}", StrType.NUMBER, "0"), 26} | {Util.Format($"{hackfarm.BatchSize}", StrType.NUMBER):3}
-[color={Util.CC(Cc.w)}]Mining speed[/color]  | Lvl.{Util.Format($"{hackfarm.MineSpeedLVL}", StrType.NUMBER, "0"), 26} | {Util.Format($"{hackfarm.MineSpeed}", StrType.NUMBER):3}
-[color={Util.CC(Cc.w)}]Transfer time[/color] | Lvl.{Util.Format($"{hackfarm.XferDelayLVL}", StrType.NUMBER, "0"), 26} | {Util.Format($"{hackfarm.XferDelay}", StrType.NUMBER):3}
+[color={Util.CC(Cc.w)}]Batch size[/color]    | Lvl.{Util.Format($"{hackfarm.BatchSizeLVL}", StrSty.NUMBER, "0"), 26} | {Util.Format($"{hackfarm.BatchSize}", StrSty.NUMBER):3}
+[color={Util.CC(Cc.w)}]Mining speed[/color]  | Lvl.{Util.Format($"{hackfarm.MineSpeedLVL}", StrSty.NUMBER, "0"), 26} | {Util.Format($"{hackfarm.MineSpeed}", StrSty.NUMBER):3}
+[color={Util.CC(Cc.w)}]Transfer time[/color] | Lvl.{Util.Format($"{hackfarm.XferDelayLVL}", StrSty.NUMBER, "0"), 26} | {Util.Format($"{hackfarm.XferDelay}", StrSty.NUMBER):3}
 ================================================================
 [color={Util.CC(Cc.w)}]Aprox. Time To Live:[/color] {Util.TimeDifferenceFriendly(hackfarm.LifeTime)}");
 	}
@@ -55,7 +55,7 @@ $@"[color={Util.CC(Cc.w)}]Botnet:[/color] {Util.Format(minerName, StrType.HOSTNA
 			int statusCode = BeginFlare();
 			switch (statusCode) {
 				case 0: {
-						Say($"{Util.Format("Kraken activated", StrType.FULL_SUCCESS)}. All node [color={Util.CC(Cc.Y)}]lock[/color] system {Util.Format("~=EXP0SED=~", StrType.ERROR)}");
+						Say($"{Util.Format("Kraken activated", StrSty.FULL_SUCCESS)}. All node [color={Util.CC(Cc.Y)}]lock[/color] system {Util.Format("~=EXP0SED=~", StrSty.ERROR)}");
 						KARrunCMD?.Invoke([(CError.UNKNOWN, "", "", "Flare start")]);
 						break;
 					}
@@ -73,19 +73,19 @@ $@"[color={Util.CC(Cc.w)}]Botnet:[/color] {Util.Format(minerName, StrType.HOSTNA
 				KARrunCMD?.Invoke([(CError.UNKNOWN, "", "", "Flare stop|FAILED")]);
                 return;
 			}
-			Say($"{Util.Format("Kraken deactivated", StrType.FULL_SUCCESS)}. Flare sequence exited. All [color={Util.CC(Cc.Y)}]lock[/color] closed.");
+			Say($"{Util.Format("Kraken deactivated", StrSty.FULL_SUCCESS)}. Flare sequence exited. All [color={Util.CC(Cc.Y)}]lock[/color] closed.");
             KARrunCMD?.Invoke([(CError.UNKNOWN, "", "", "Flare stop")]);
             EndFlare(); return;
 		}
 
 		if (Time.GetUnixTimeFromSystem() > endEpoch) {
-			Say($"{Util.Format("Kraken inactive", StrType.ERROR)}. Run {Util.Format("karaxe --flare", StrType.CMD_FUL)} to activate.");
+			Say($"{Util.Format("Kraken inactive", StrSty.ERROR)}. Run {Util.Format("karaxe --flare", StrSty.CMD_FUL)} to activate.");
             KARrunCMD?.Invoke([(CError.UNKNOWN, "", "", "Flare inactive")]);
             return;
 		}
 
 		if (!parsedArgs.ContainsKey("--attack")) {
-			Say("-r", $"Missing {Util.Format("--attack", StrType.CMD_FLAG)} flag. Use {Util.Format("--attack", StrType.CMD_FLAG)} to attack a node.");
+			Say("-r", $"Missing {Util.Format("--attack", StrSty.CMD_FLAG)} flag. Use {Util.Format("--attack", StrSty.CMD_FLAG)} to attack a node.");
             KARrunCMD?.Invoke([(CError.UNKNOWN, "", "", "Missing --attack")]);
             return;
 		}
@@ -95,37 +95,37 @@ $@"[color={Util.CC(Cc.w)}]Botnet:[/color] {Util.Format(minerName, StrType.HOSTNA
 			(CError, string, string, string) res = result[i];
             if (res.Item1 == CError.OK) {
                 if (i != result.Length - 1) {
-                    ShellCore.Say($"[{Util.Format("SUCCESS", StrType.PART_SUCCESS)}] {Util.Format("Bypassed", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
+                    ShellCore.Say($"[{Util.Format("SUCCESS", StrSty.PART_SUCCESS)}] {Util.Format("Bypassed", StrSty.DECOR)} {Util.Format(res.Item2, StrSty.CMD_FLAG)}");
                     continue;
                 }
-                ShellCore.Say($"{Util.Format("Node defense cracked.", StrType.FULL_SUCCESS)} All security system [color={Util.CC(Cc.gR)}]destroyed[/color].");
-                ShellCore.Say($"Run {Util.Format("analyze", StrType.CMD_FUL)} for all new information.");
+                ShellCore.Say($"{Util.Format("Node defense cracked.", StrSty.FULL_SUCCESS)} All security system [color={Util.CC(Cc.gR)}]destroyed[/color].");
+                ShellCore.Say($"Run {Util.Format("analyze", StrSty.CMD_FUL)} for all new information.");
                 continue;
             }
             if (res.Item1 == CError.MISSING) {
-				ShellCore.Say($"[{Util.Format("N0VALUE", StrType.ERROR)}] {Util.Format("Denied access by", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
-				ShellCore.Say("-r", $"Missing key for {Util.Format(res.Item3, StrType.CMD_FLAG)}");
+				ShellCore.Say($"[{Util.Format("N0VALUE", StrSty.ERROR)}] {Util.Format("Denied access by", StrSty.DECOR)} {Util.Format(res.Item2, StrSty.CMD_FLAG)}");
+				ShellCore.Say("-r", $"Missing key for {Util.Format(res.Item3, StrSty.CMD_FLAG)}");
 				ShellCore.Say($"[color={Util.CC(Cc.W)}]{res.Item4}[/color]");
 				continue;
 			} 
 			if (res.Item1 == CError.INCORRECT) {
-				ShellCore.Say($"[{Util.Format("WRON6KY", StrType.ERROR)}] {Util.Format("Denied access by", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
-				ShellCore.Say("-r", $"Incorrect key for {Util.Format(res.Item3, StrType.CMD_FLAG)}");
+				ShellCore.Say($"[{Util.Format("WRON6KY", StrSty.ERROR)}] {Util.Format("Denied access by", StrSty.DECOR)} {Util.Format(res.Item2, StrSty.CMD_FLAG)}");
+				ShellCore.Say("-r", $"Incorrect key for {Util.Format(res.Item3, StrSty.CMD_FLAG)}");
 				ShellCore.Say($"[color={Util.CC(Cc.W)}]{res.Item4}[/color]");
 				continue;
 			} 
 			if (res.Item1 == CError.MISSING) {
-				ShellCore.Say($"[{Util.Format("MI55ING", StrType.ERROR)}] {Util.Format("Denied access by", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
-				ShellCore.Say("-r", $"Missing flag {Util.Format(res.Item3, StrType.CMD_FLAG)}");
+				ShellCore.Say($"[{Util.Format("MI55ING", StrSty.ERROR)}] {Util.Format("Denied access by", StrSty.DECOR)} {Util.Format(res.Item2, StrSty.CMD_FLAG)}");
+				ShellCore.Say("-r", $"Missing flag {Util.Format(res.Item3, StrSty.CMD_FLAG)}");
 				continue;
 			} 
 			if (res.Item1 == CError.NO_PERMISSION) {
-				ShellCore.Say($"[{Util.Format("N0P3RMS", StrType.ERROR)}] {Util.Format("Denied access by", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
-				ShellCore.Say("-r", $"You do not have permission to use {Util.Format(res.Item3, StrType.CMD_FLAG)}");
+				ShellCore.Say($"[{Util.Format("N0P3RMS", StrSty.ERROR)}] {Util.Format("Denied access by", StrSty.DECOR)} {Util.Format(res.Item2, StrSty.CMD_FLAG)}");
+				ShellCore.Say("-r", $"You do not have permission to use {Util.Format(res.Item3, StrSty.CMD_FLAG)}");
 				continue;
 			}
-			ShellCore.Say($"[{Util.Format("UNK??WN", StrType.ERROR)}] {Util.Format("Denied access by", StrType.DECOR)} {Util.Format(res.Item2, StrType.CMD_FLAG)}");
-			ShellCore.Say("-r", $"Unknown error for {Util.Format(res.Item3, StrType.CMD_FLAG)}");
+			ShellCore.Say($"[{Util.Format("UNK??WN", StrSty.ERROR)}] {Util.Format("Denied access by", StrSty.DECOR)} {Util.Format(res.Item2, StrSty.CMD_FLAG)}");
+			ShellCore.Say("-r", $"Unknown error for {Util.Format(res.Item3, StrSty.CMD_FLAG)}");
 		}
 	}
 	public static event Action KaraxeEnd;
@@ -184,13 +184,13 @@ $@"[color={Util.CC(Cc.w)}]Botnet:[/color] {Util.Format(minerName, StrType.HOSTNA
 		else if (CurrNode.HostName == positionalArgs[0]) analyzeNode = CurrNode;
 		const int padLength = -40;
 		Say("-tl", $@"
-{Util.Format("▶ Node Info", StrType.HEADER)}
-{Util.Format("Host name:", StrType.DECOR),padLength}{Util.Format(analyzeNode.HostName, StrType.HOSTNAME)}
-{Util.Format("IP address:", StrType.DECOR),padLength}{Util.Format(analyzeNode.IP, StrType.IP)}
-{Util.Format("Display name:", StrType.DECOR),padLength}{Util.Format(analyzeNode.DisplayName, StrType.DISPLAY_NAME)}
-{Util.Format("▶ Classification", StrType.HEADER)}
-{Util.Format("Firewall rating:", StrType.DECOR),padLength}{Util.Format($"{analyzeNode.DefLvl}", StrType.DEF_LVL)}
-{Util.Format("Security Level:", StrType.DECOR),padLength}{Util.Format($"{analyzeNode.SecType}", StrType.SEC_TYPE)}
+{Util.Format("▶ Node Info", StrSty.HEADER)}
+{Util.Format("Host name:", StrSty.DECOR),padLength}{Util.Format(analyzeNode.HostName, StrSty.HOSTNAME)}
+{Util.Format("IP address:", StrSty.DECOR),padLength}{Util.Format(analyzeNode.IP, StrSty.IP)}
+{Util.Format("Display name:", StrSty.DECOR),padLength}{Util.Format(analyzeNode.DisplayName, StrSty.DISPLAY_NAME)}
+{Util.Format("▶ Classification", StrSty.HEADER)}
+{Util.Format("Firewall rating:", StrSty.DECOR),padLength}{Util.Format($"{analyzeNode.DefLvl}", StrSty.DEF_LVL)}
+{Util.Format("Security Level:", StrSty.DECOR),padLength}{Util.Format($"{analyzeNode.SecType}", StrSty.SEC_TYPE)}
 ");
 		ANALYZErunCMD?.Invoke(CError.OK, positionalArgs[0]);
 	}

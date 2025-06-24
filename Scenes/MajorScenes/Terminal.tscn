@@ -50,35 +50,6 @@ theme = ExtResource("2_tjxev")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_pn4ql")
 theme_override_styles/normal = SubResource("StyleBoxEmpty_bmejy")
 bbcode_enabled = true
-text = "[color=#000000] ███ Black[/color]
-[color=#282828]    ███ Dark Gray[/color]
-[color=#ffffff]       ███ White[/color]
-[color=#ff0000]          ███ Bright Red[/color]
-[color=#00ff00]             ███ Bright Green[/color]
-[color=#0000ff]                ███ Bright Blue[/color]
-[color=#00ffff]                   ███ Bright Cyan[/color]
-[color=#ff00ff]                      ███ Bright Magenta[/color]
-[color=#ffff00]                         ███ Bright Yellow[/color]
-[color=#cc0000]                            ███ Deep Red[/color]
-[color=#00cc00]                               ███ Deep Green[/color]
-[color=#0000cc]                                  ███ Deep Blue[/color]
-[color=#005C5C]                                     ███ Dark Teal[/color]
-[color=#cc00cc]                                        ███ Deep Magenta[/color]
-[color=#cccc00]                                           ███ Olive Yellow[/color]
-[color=#00aaff]                                              ███ Aqua Blue[/color]
-[color=#aa00ff]                                                 ███ Violet[/color]
-[color=#aaff00]                                                    ███ Lime Green[/color]
-[color=#00ffaa]                                                       ███ Mint Green[/color]
-[color=#ff00aa]                                                          ███ Hot Pink[/color]
-[color=#ffaa00]                                                             ███ Amber[/color]
-[color=#6666ff]                                                                ███ Periwinkle[/color]
-[color=#66ff66]                                                                   ███ Light Green[/color]
-[color=#66ffff]                                                                      ███ Light Cyan[/color]
-[color=#ff6666]                                                                         ███ Light Coral[/color]
-[color=#ff66ff]                                                                            ███ Light Magenta[/color]
-[color=#ffff66]                                                                               ███ Light Yellow[/color]
-
-"
 scroll_following = true
 autowrap_mode = 2
 vertical_alignment = 2

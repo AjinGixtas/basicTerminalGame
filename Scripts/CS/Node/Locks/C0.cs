@@ -13,7 +13,6 @@ public class C0 : Lock {
         clue = "Name the opposition.";
         help = $"{Flag} [string]";
     }
-
     public override void Intialize() {
         int pairIndex = GD.RandRange(0, 3); bool swapped = GD.RandRange(0, 1) == 0;
         ans = [colorPairs[pairIndex].Item1];
@@ -23,5 +22,8 @@ public class C0 : Lock {
         }
         err = $"{inp}";
         base.Intialize();
+    }
+    public override bool UnlockAttempt(string input, int index) {
+        return base.UnlockAttempt(input.ToLower(), index);
     }
 }

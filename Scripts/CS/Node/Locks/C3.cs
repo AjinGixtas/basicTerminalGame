@@ -38,4 +38,7 @@ public class C3 : Lock {
         inp = group.Join(" ");
         base.Intialize();
     }
+    public override bool UnlockAttempt(string input, int index) {
+        return base.UnlockAttempt(input.ToLower(), index);
+    }
 }

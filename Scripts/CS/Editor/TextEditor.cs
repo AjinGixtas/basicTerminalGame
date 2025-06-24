@@ -2,15 +2,15 @@ using Godot;
 
 public partial class TextEditor : MarginContainer {
 	[Export] public RuntimeDirector overseer;
-	[Export] TabBar tabBar; [Export] TabContainer tabContainer; [Export] PackedScene editorTabScene;
+	[Export] public TabBar tabBar; [Export] TabContainer tabContainer; [Export] PackedScene editorTabScene;
 	[Export] RichTextLabel noFileOpenedTab;
 	[Export] ConfirmationDialog saveDialog;
 	public override void _Ready() {
 		InitializeOnReadyVar();
 		noFileOpenedTab.Text =
 @$"No file opened.
-Run {Util.Format("mkf FILENAME", StrType.CMD_FUL)} to make a new file.
-Run {Util.Format("edit FILENAME", StrType.CMD_FUL)} to open that file here.";
+Run {Util.Format("mkf FILENAME", StrSty.CMD_FUL)} to make a new file.
+Run {Util.Format("edit FILENAME", StrSty.CMD_FUL)} to open that file here.";
 	}
 	void InitializeOnReadyVar() {
 	}

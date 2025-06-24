@@ -19,6 +19,8 @@ public partial class EditorTab : CodeEdit
 		if (HasFocus()) {
 			if (Input.IsActionJustPressed("closeTab")) { textEditor.CloseTab(false); }
 			if (Input.IsActionJustPressed("saveFile")) { Save(); }
+			if (file.Content != Text) textEditor.tabBar.SetTabTitle(textEditor.tabBar.CurrentTab, file.Name + "*");
+			else textEditor.tabBar.SetTabTitle(textEditor.tabBar.CurrentTab, file.Name);
         }
 	}
 	public bool IsDirty() {
@@ -26,7 +28,6 @@ public partial class EditorTab : CodeEdit
 	}
 	public void Save() {
 		file.Content = Text;
-		LifeCycleDirector.QuickSave(false);
 	}
 	public void OnCodeCompletionRequested() {
 		AddCodeCompletionOption(CodeCompletionKind.Function, "ax:Say", "ax:Say");

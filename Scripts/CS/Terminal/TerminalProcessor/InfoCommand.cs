@@ -18,8 +18,8 @@ public static partial class ShellCore {
         if (parsedArgs.ContainsKey("-t")) text = text.TrimEnd('\n', '\r');
         if (parsedArgs.ContainsKey("-l")) text = text.TrimStart('\n', '\r');
         if (!parsedArgs.ContainsKey("-n")) text += "\n";
-        if (parsedArgs.ContainsKey("-r")) text = Util.Format(text, StrType.ERROR);
-        if (parsedArgs.ContainsKey("-w")) text = Util.Format(text, StrType.WARNING);
+        if (parsedArgs.ContainsKey("-r")) text = Util.Format(text, StrSty.ERROR);
+        if (parsedArgs.ContainsKey("-w")) text = Util.Format(text, StrSty.WARNING);
         terminalOutputField.AppendText(text);
     }
     public static void SayM(string content) {
@@ -65,8 +65,8 @@ public static partial class ShellCore {
         if (trimLeadingNewline) text = text.TrimStart('\n', '\r');
         if (trimTrailingNewline) text = text.TrimEnd('\n', '\r');
         if (!noNewline) text += "\n";
-        if (makeRed) text = Util.Format(text, StrType.ERROR);
-        if (makeYellow) text = Util.Format(text, StrType.WARNING);
+        if (makeRed) text = Util.Format(text, StrSty.ERROR);
+        if (makeYellow) text = Util.Format(text, StrSty.WARNING);
         terminalOutputField.ScrollToLine(terminalOutputField.GetLineCount() - 1);
         terminalOutputField.AppendText(text);
     }
@@ -78,21 +78,21 @@ public static partial class ShellCore {
         OnHelpCMDrun?.Invoke();
     }
     static void Stats(Dictionary<string, string> parsedArgs, string[] postionalArgs) {
-        Say($"Username: {Util.Format(PlayerDataManager.Username, StrType.USERNAME)}");
-        Say($"Balance:  {Util.Format($"{PlayerDataManager.GC_Cur}", StrType.MONEY)}");
+        Say($"Username: {Util.Format(PlayerDataManager.Username, StrSty.USERNAME)}");
+        Say($"Balance:  {Util.Format($"{PlayerDataManager.GC_Cur}", StrSty.MONEY)}");
         
         Say(
 @$"Resouces: 
-{Util.Format($"{PlayerDataManager.MineInv[0]}", StrType.T_MINERAL, "0")}
-{Util.Format($"{PlayerDataManager.MineInv[1]}", StrType.T_MINERAL, "1")}
-{Util.Format($"{PlayerDataManager.MineInv[2]}", StrType.T_MINERAL, "2")}
-{Util.Format($"{PlayerDataManager.MineInv[3]}", StrType.T_MINERAL, "3")}
-{Util.Format($"{PlayerDataManager.MineInv[4]}", StrType.T_MINERAL, "4")}
-{Util.Format($"{PlayerDataManager.MineInv[5]}", StrType.T_MINERAL, "5")}
-{Util.Format($"{PlayerDataManager.MineInv[6]}", StrType.T_MINERAL, "6")}
-{Util.Format($"{PlayerDataManager.MineInv[7]}", StrType.T_MINERAL, "7")}
-{Util.Format($"{PlayerDataManager.MineInv[8]}", StrType.T_MINERAL, "8")}
-{Util.Format($"{PlayerDataManager.MineInv[9]}", StrType.T_MINERAL, "9")}");
+{Util.Format($"{PlayerDataManager.MineInv[0]}", StrSty.T_MINERAL, "0")}
+{Util.Format($"{PlayerDataManager.MineInv[1]}", StrSty.T_MINERAL, "1")}
+{Util.Format($"{PlayerDataManager.MineInv[2]}", StrSty.T_MINERAL, "2")}
+{Util.Format($"{PlayerDataManager.MineInv[3]}", StrSty.T_MINERAL, "3")}
+{Util.Format($"{PlayerDataManager.MineInv[4]}", StrSty.T_MINERAL, "4")}
+{Util.Format($"{PlayerDataManager.MineInv[5]}", StrSty.T_MINERAL, "5")}
+{Util.Format($"{PlayerDataManager.MineInv[6]}", StrSty.T_MINERAL, "6")}
+{Util.Format($"{PlayerDataManager.MineInv[7]}", StrSty.T_MINERAL, "7")}
+{Util.Format($"{PlayerDataManager.MineInv[8]}", StrSty.T_MINERAL, "8")}
+{Util.Format($"{PlayerDataManager.MineInv[9]}", StrSty.T_MINERAL, "9")}");
     }
     static void Clear(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         Clear();

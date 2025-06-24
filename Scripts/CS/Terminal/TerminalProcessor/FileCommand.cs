@@ -7,13 +7,13 @@ public static partial class ShellCore {
         NodeDirectory targetDir = CurrDir;
         if (parg.Length != 0) {
             targetDir = CurrDir.GetDir(parg[0]);
-            if (targetDir == null) { Say("-r", $"Directory not found: {Util.Format(parg[0], StrType.DIR)}"); return; }
+            if (targetDir == null) { Say("-r", $"Directory not found: {Util.Format(parg[0], StrSty.DIR)}"); return; }
         }
 
         if (targetDir.Childrens.Count == 0) { Say(""); return; }
         string output = "";
         foreach (NodeSystemItem item in targetDir.Childrens) {
-            output += ($"{Util.Format(((item is NodeDirectory) ? "./" : "") + item.Name, (item is NodeDirectory) ? StrType.DIR : StrType.FILE)}" + new string(' ', 5)).PadRight(16);
+            output += ($"{Util.Format(((item is NodeDirectory) ? "./" : "") + item.Name, (item is NodeDirectory) ? StrSty.DIR : StrSty.FILE)}" + new string(' ', 5)).PadRight(16);
         }
         Say(output);
         LSrunCMD?.Invoke(parg.Length > 0 ? parg[0] : "", targetDir.GetPath()); 
@@ -22,7 +22,7 @@ public static partial class ShellCore {
     static void CD(Dictionary<string, string> farg, string[] parg) {
         if (parg.Length == 0) { Say("-r", "No directory provided."); CDrunCMD.Invoke(parg[0], CurrDir.GetPath(), CError.MISSING); return; }
         NodeDirectory targetDir = CurrDir.GetDir(parg[0]);
-        if (targetDir == null) { Say("-r", $"Directory not found: {Util.Format(parg[0], StrType.DIR)}"); CDrunCMD.Invoke(parg[0], CurrDir.GetPath(), CError.NOT_FOUND); return; }
+        if (targetDir == null) { Say("-r", $"Directory not found: {Util.Format(parg[0], StrSty.DIR)}"); CDrunCMD.Invoke(parg[0], CurrDir.GetPath(), CError.NOT_FOUND); return; }
         CurrDir = targetDir;
         CDrunCMD?.Invoke(parg[0], CurrDir.GetPath(), CError.OK);
     }
@@ -36,7 +36,7 @@ public static partial class ShellCore {
         CATrunCMD?.Invoke(fileName, file.GetPath(), CError.OK);
     }
     static void Pwd(Dictionary<string, string> farg, string[] parg) {
-        Say($"{Util.Format(CurrDir.GetPath(), StrType.DIR)}");
+        Say($"{Util.Format(CurrDir.GetPath(), StrSty.DIR)}");
     }
     static void RmF(Dictionary<string, string> farg, string[] parg) {
         if (parg.Length == 0) { Say("-r", $"No file name provided."); return; }
@@ -44,10 +44,10 @@ public static partial class ShellCore {
             CError result = CurrDir.RemoveFile(parg[i]);
             switch (result) {
                 case CError.OK: break;
-                case CError.NOT_FOUND: Say("-r", $"{Util.Format(parg[i], StrType.FILE)} was not found."); break;
-                case CError.INVALID: Say("-r", $"Unexpected error when making {Util.Format(parg[i], StrType.FILE)}. Game bug found and can be reported"); break;
-                case CError.UNKNOWN: Say("-r", $"{Util.Format(parg[i], StrType.FILE)} can't be removed. Game bug found and can be reported."); break;
-                default: Say("-r", $"{Util.Format(parg[i], StrType.FILE)} removal failed. Error code: {result}"); break;
+                case CError.NOT_FOUND: Say("-r", $"{Util.Format(parg[i], StrSty.FILE)} was not found."); break;
+                case CError.INVALID: Say("-r", $"Unexpected error when making {Util.Format(parg[i], StrSty.FILE)}. Game bug found and can be reported"); break;
+                case CError.UNKNOWN: Say("-r", $"{Util.Format(parg[i], StrSty.FILE)} can't be removed. Game bug found and can be reported."); break;
+                default: Say("-r", $"{Util.Format(parg[i], StrSty.FILE)} removal failed. Error code: {result}"); break;
             }
         }
     }
@@ -58,10 +58,10 @@ public static partial class ShellCore {
             CError result = CurrDir.AddFile(parg[i]);
             switch (result) {
                 case CError.OK: break;
-                case CError.NOT_FOUND: Say("-r", $"Parent directory of {Util.Format(parg[i], StrType.FILE)} was not found."); break;
-                case CError.INVALID: Say("-r", $"Unexpected error when making {Util.Format(parg[i], StrType.FILE)}. Game bug found and can be reported."); break;
-                case CError.DUPLICATE: Say($"{Util.Format(parg[i], StrType.FILE)} already exists. Skipped."); break;
-                default: Say("-r", $"{Util.Format(parg[i], StrType.FILE)} creation failed. Error code: ${result}"); break;
+                case CError.NOT_FOUND: Say("-r", $"Parent directory of {Util.Format(parg[i], StrSty.FILE)} was not found."); break;
+                case CError.INVALID: Say("-r", $"Unexpected error when making {Util.Format(parg[i], StrSty.FILE)}. Game bug found and can be reported."); break;
+                case CError.DUPLICATE: Say($"{Util.Format(parg[i], StrSty.FILE)} already exists. Skipped."); break;
+                default: Say("-r", $"{Util.Format(parg[i], StrSty.FILE)} creation failed. Error code: ${result}"); break;
             }
             MKFrunCMD?.Invoke(parg[i], (CurrDir.GetFile(parg[i])?.GetPath()) ?? "", result);
         }
@@ -73,7 +73,7 @@ public static partial class ShellCore {
         for (int i = 0; i < parg.Length; i++) {
             NodeFile file = CurrDir.GetFile(parg[i]);
             if (file == null) {
-                Say("-r", $"File not found: {Util.Format(parg[i], StrType.FILE)}");
+                Say("-r", $"File not found: {Util.Format(parg[i], StrSty.FILE)}");
                 EDITrunCMD?.Invoke(parg[i], "", CError.NOT_FOUND);
             } else { overseer.textEditor.OpenNewFile(CurrNode.HostName, file); ++fileOpened; EDITrunCMD?.Invoke(parg[i], CurrDir.GetFile(parg[i]).GetPath(), CError.OK); }
         }
@@ -85,10 +85,10 @@ public static partial class ShellCore {
             CError result = CurrDir.AddDir(parg[i]);
             switch (result) {
                 case CError.OK: break;
-                case CError.NOT_FOUND: Say("-r", $"Parent directory of {Util.Format(parg[i], StrType.DIR)} was not found."); break;
-                case CError.INVALID: Say("-r", $"Unexpected error when making {Util.Format(parg[i], StrType.DIR)}. Game bug found and can be reported"); break;
-                case CError.DUPLICATE: Say($"{Util.Format(parg[i], StrType.DIR)} already exists. Skipped."); break;
-                default: Say("-r", $"{Util.Format(parg[i], StrType.DIR)} creation failed. Error code: ${result}"); break;
+                case CError.NOT_FOUND: Say("-r", $"Parent directory of {Util.Format(parg[i], StrSty.DIR)} was not found."); break;
+                case CError.INVALID: Say("-r", $"Unexpected error when making {Util.Format(parg[i], StrSty.DIR)}. Game bug found and can be reported"); break;
+                case CError.DUPLICATE: Say($"{Util.Format(parg[i], StrSty.DIR)} already exists. Skipped."); break;
+                default: Say("-r", $"{Util.Format(parg[i], StrSty.DIR)} creation failed. Error code: ${result}"); break;
             }
         }
     }
@@ -101,10 +101,10 @@ public static partial class ShellCore {
             CError result = CurrDir.RemoveDir(parg[i]);
             switch (result) {
                 case CError.OK: break;
-                case CError.NOT_FOUND: Say("-r", $"{Util.Format(parg[i], StrType.DIR)} was not found."); break;
-                case CError.INVALID: Say("-r", $"{Util.Format(parg[i], StrType.DIR)} has no parent directory, which is invalid."); break;
-                case CError.UNKNOWN: Say("-r", $"{Util.Format(parg[i], StrType.DIR)} can't be removed. Game bug found and can be reported."); break;
-                default: Say("-r", $"{Util.Format(parg[i], StrType.DIR)} removal failed. Error code: {result}"); break;
+                case CError.NOT_FOUND: Say("-r", $"{Util.Format(parg[i], StrSty.DIR)} was not found."); break;
+                case CError.INVALID: Say("-r", $"{Util.Format(parg[i], StrSty.DIR)} has no parent directory, which is invalid."); break;
+                case CError.UNKNOWN: Say("-r", $"{Util.Format(parg[i], StrSty.DIR)} can't be removed. Game bug found and can be reported."); break;
+                default: Say("-r", $"{Util.Format(parg[i], StrSty.DIR)} removal failed. Error code: {result}"); break;
             }
         }
     }

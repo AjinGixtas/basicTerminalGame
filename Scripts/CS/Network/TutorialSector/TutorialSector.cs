@@ -346,6 +346,7 @@ public class KaraxeTutorialNode : TutorialNode {
             EnqueueTutorialDialouge("Look, it's a lot. Read the doc, ja? -_-");
             EnqueueTutorialDialouge("That's all now. If you have any problem, email me ^^");
             EnqueueTutorialDialouge("Bye bye ( ´ ▽ `)ﾉシ");
+            PlayerDataManager.CompletedTutorial = true; // Mark the tutorial as completed
             _ = cm.RunDialogueAsync();
             return;
         }

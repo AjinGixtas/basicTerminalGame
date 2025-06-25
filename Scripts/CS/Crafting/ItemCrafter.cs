@@ -1,3 +1,5 @@
+using System;
+
 public static class ItemCrafter {
     public static readonly MineralProfile[] MINERALS = [
         new MineralProfile("Datacite",  "DC", 0, 1, Cc.gB),
@@ -82,24 +84,53 @@ public static class ItemCrafter {
         new ItemRecipe("WardenFrame",                "WAF^", 75, Cc.B,   18.057136, 21233.410278, [new(62, 1), new(68, 1), new(70, 1)]),
     ];
 
-    static int MAX_CRAFTS = 32; // Maximum number of crafts that can be in progress at the same time
-    static ActiveCraft[] InProgressCrafts = new ActiveCraft[32]; // Probably lower, but 32 is a good number to start with
-    public static void AddItemCraft(ItemRecipe recipe) {
+    const int MAX_CRAFTS = 32; // Maximum number of crafts that can be in progress at the same time
+    static CraftThread[] CraftThreads = new CraftThread[MAX_CRAFTS]; // Probably lower, but 32 is a good number to start with
+    static int CRAFT_THREAD_COUNT = 1;
+    public static void AddItemCraft(ItemRecipe recipe, int amount = 1) {
+        amount = Math.Max(amount, 1); // Ensure at least 1 item is crafted
         for (int i = 0; i < recipe.RequiredIngredients.Length; ++i) {
             if (PlayerDataManager.MineInv[recipe.RequiredIngredients[i].ID] < recipe.RequiredIngredients[i].Amount) {
                 ShellCore.Say("-r", $"Not enough {MINERALS[recipe.RequiredIngredients[i].ID]} to craft {recipe.Name}");
                 return;
             }
         }
-        for (int i = 0; i < MAX_CRAFTS; ++i) {
-            if (InProgressCrafts[i].RemainTime <= 0) {
-                InProgressCrafts[i] = new ActiveCraft() { Recipe = recipe, TotalTime = recipe.CraftTime, RemainTime = recipe.CraftTime};
+        for (int i = 0; i < CRAFT_THREAD_COUNT; ++i) {
+            if (CraftThreads[i].RemainTime <= 0) {
+                CraftThreads[i] = new CraftThread() { Recipe = recipe, TotalTime = recipe.CraftTime, RemainTime = recipe.CraftTime};
                 return;
             }
         }
     }
-    struct ActiveCraft {
+    public static void ProcessThreads(double delta) {
+        for (int i = 0; i < CRAFT_THREAD_COUNT; ++i) {
+            if (CraftThreads[i].Amount <= 0) continue;
+            CraftThreads[i].RemainTime -= delta;
+            if (CraftThreads[i].RemainTime > 0) continue;
+            
+            for (int j = 0; j < CraftThreads[i].Recipe.RequiredIngredients.Length; ++j) 
+                PlayerDataManager.MineInv[CraftThreads[i].Recipe.RequiredIngredients[j].ID] -= CraftThreads[i].Recipe.RequiredIngredients[j].Amount;
+            ++PlayerDataManager.MineInv[CraftThreads[i].Recipe.ID];
+            
+            CraftThreads[i].Amount -= 1;
+            CraftThreads[i].RemainTime += CraftThreads[i].TotalTime; // Use += in case delta is too big.
+        }
+    }
+    public static CError UpgradeCraftThreadCost() {
+        if (CRAFT_THREAD_COUNT >= MAX_CRAFTS) return CError.REDUNDANT;
+
+        long cost = GetUpgradeCraftThreadsCost();
+        if (PlayerDataManager.GC_Cur < cost) return CError.INSUFFICIENT;
+
+        PlayerDataManager.WithdrawGC(cost); ++CRAFT_THREAD_COUNT;
+        return CError.OK;
+    }
+    public static long GetUpgradeCraftThreadsCost() {
+        return (CRAFT_THREAD_COUNT + 1) * (CRAFT_THREAD_COUNT + 1) * 1000; // Example cost formula, can be adjusted
+    }
+    struct CraftThread {
         public ItemRecipe Recipe { get; init; }
+        public int Amount { get; set; }
         public double TotalTime { get; init; }
         public double RemainTime { get; set; }
     }

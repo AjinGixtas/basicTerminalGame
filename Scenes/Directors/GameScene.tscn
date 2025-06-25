@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://ccwqfx7w5pm3k"]
+[gd_scene load_steps=10 format=3 uid="uid://ccwqfx7w5pm3k"]
 
 [ext_resource type="Script" uid="uid://cruda7xtodutw" path="res://Scripts/CS/Directors/RuntimeDirector.cs" id="1_40tl5"]
 [ext_resource type="Script" uid="uid://b2ynbwrig2yqu" path="res://Scripts/CS/Directors/MenuDirector.cs" id="2_rv8lf"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://dsqh3owg3cspi" path="res://Scenes/MajorScenes/TextEditor.tscn" id="5_vnf3w"]
 [ext_resource type="PackedScene" uid="uid://blkjllh1u7by7" path="res://Scenes/MajorScenes/OverlayWindow.tscn" id="6_1de4d"]
 [ext_resource type="PackedScene" uid="uid://b6bxlse3m58ck" path="res://Scenes/MajorScenes/BotnetStatusBoard.tscn" id="6_sfmy1"]
+[ext_resource type="PackedScene" uid="uid://b3umcbmdsdyd1" path="res://Scenes/MajorScenes/CraftWindow.tscn" id="7_rcn04"]
 
 [sub_resource type="Environment" id="Environment_y4jh7"]
 background_mode = 3
@@ -114,14 +115,9 @@ layout_mode = 2
 menuDirector = NodePath("../..")
 metadata/_tab_index = 2
 
-[node name="CraftWindow" type="MarginContainer" parent="MenuDirector/MenuWindows"]
+[node name="CraftWindow" parent="MenuDirector/MenuWindows" instance=ExtResource("7_rcn04")]
 visible = false
 layout_mode = 2
-metadata/_tab_index = 3
-
-[node name="ColorRect" type="ColorRect" parent="MenuDirector/MenuWindows/CraftWindow"]
-layout_mode = 2
-color = Color(0, 0, 1, 1)
 
 [node name="OverlayWindow" parent="." instance=ExtResource("6_1de4d")]
 position = Vector2i(427, 64)
@@ -129,3 +125,4 @@ position = Vector2i(427, 64)
 [connection signal="button_down" from="MenuDirector/MenuButtons/TerminalButton" to="MenuDirector" method="TerminalButtonPressed"]
 [connection signal="button_down" from="MenuDirector/MenuButtons/EditorButton" to="MenuDirector" method="EditorButtonPressed"]
 [connection signal="button_down" from="MenuDirector/MenuButtons/BotnetButton" to="MenuDirector" method="BotnetButtonPressed"]
+[connection signal="button_down" from="MenuDirector/MenuButtons/CraftButton" to="MenuDirector" method="CrafterButtonPressed"]

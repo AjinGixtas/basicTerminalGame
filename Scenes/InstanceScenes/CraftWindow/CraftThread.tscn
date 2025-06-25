@@ -1,20 +1,107 @@
-[gd_scene format=3 uid="uid://dgr170h5sh113"]
+[gd_scene load_steps=3 format=3 uid="uid://dgr170h5sh113"]
 
-[node name="CraftThread" type="Control"]
-custom_minimum_size = Vector2(192, 256)
-layout_mode = 3
+[ext_resource type="Script" uid="uid://dddt44da8lpkd" path="res://Scripts/CS/Crafting/CraftThreadButton.cs" id="1_bcy04"]
+[ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="1_w4a3k"]
+
+[node name="MarginContainer" type="MarginContainer" node_paths=PackedStringArray("threadNameLabel", "itemNameLabel", "ingredientLabel", "craftProgressLabel")]
+custom_minimum_size = Vector2(0, 300)
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
+offset_left = -96.0
+offset_top = -128.0
+offset_right = 96.0
+offset_bottom = 128.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
+script = ExtResource("1_bcy04")
+threadNameLabel = NodePath("MarginContainer/ThreadNameLabel")
+itemNameLabel = NodePath("MarginContainer/TextsContainer/ItemCraftName")
+ingredientLabel = NodePath("MarginContainer/TextsContainer/VSplitContainer/ItemCraftIngredients")
+craftProgressLabel = NodePath("MarginContainer/TextsContainer/VSplitContainer/ItemCraftProgress")
 
 [node name="ColorRect" type="ColorRect" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 2
+mouse_filter = 1
+color = Color(0, 0.152941, 0.247059, 0.4)
+
+[node name="CraftThread" type="Button" parent="."]
+custom_minimum_size = Vector2(192, 256)
+layout_mode = 2
+theme = ExtResource("1_w4a3k")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 2
+
+[node name="ThreadNameLabel" type="RichTextLabel" parent="MarginContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 1
+theme = ExtResource("1_w4a3k")
+text = "Thread #1"
+fit_content = true
+autowrap_mode = 0
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="TextsContainer" type="VSplitContainer" parent="MarginContainer"]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+size_flags_vertical = 4
+split_offset = -55
+dragging_enabled = false
+dragger_visibility = 2
+
+[node name="ItemCraftName" type="RichTextLabel" parent="MarginContainer/TextsContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 1
+theme = ExtResource("1_w4a3k")
+theme_override_font_sizes/normal_font_size = 20
+bbcode_enabled = true
+text = "VulnerabilityReportScraper (VRS^)"
+fit_content = true
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VSplitContainer" type="VSplitContainer" parent="MarginContainer/TextsContainer"]
+layout_mode = 2
+split_offset = 225
+dragging_enabled = false
+dragger_visibility = 2
+
+[node name="ItemCraftIngredients" type="RichTextLabel" parent="MarginContainer/TextsContainer/VSplitContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 1
+theme = ExtResource("1_w4a3k")
+bbcode_enabled = true
+text = "DX x1 K9 x3"
+fit_content = true
+horizontal_alignment = 1
+
+[node name="ItemCraftProgress" type="RichTextLabel" parent="MarginContainer/TextsContainer/VSplitContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 1
+theme = ExtResource("1_w4a3k")
+bbcode_enabled = true
+text = "[||||||||||||||||||||]"
+fit_content = true
+autowrap_mode = 0
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="button_down" from="CraftThread" to="CraftThread" method="OnPress"]

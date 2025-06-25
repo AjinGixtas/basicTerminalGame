@@ -47,8 +47,7 @@ public partial class LifeCycleDirector : Node
 
 		// Pick next save number
 		int nextSaveNumber = existingSaves.Count == 0 ? 1 : existingSaves.Max() + 1;
-		string newSaveFolderName = newSave ? $"Game_{nextSaveNumber:D5}" : CurrentSavePath;
-		string newSavePath = StringExtensions.PathJoin(SaveRoot, newSaveFolderName);
+		string newSavePath = newSave ?  StringExtensions.PathJoin(SaveRoot, $"Game_{nextSaveNumber:D5}") : CurrentSavePath;
 
 		// Create new save directory
 		DirAccess.MakeDirAbsolute(ProjectSettings.GlobalizePath(newSavePath));

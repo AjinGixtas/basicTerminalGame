@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 public static class ItemCrafter {
     public static readonly MineralProfile[] MINERALS = [
@@ -77,16 +78,20 @@ public static class ItemCrafter {
         new ItemRecipe("SuperEvilVirus.exe",         "SEV^", 68, Cc.b,   17.630678,  8241.518354, [new(59, 1), new(61, 1)]),
         new ItemRecipe("GhostCrucible",              "GCR^", 69, Cc.C,   16.663028,  3408.533886, [new(56, 1), new(65, 1), new(19, 1)]),
         new ItemRecipe("CyberLink",                  "CYL^", 70, Cc.y,   13.923977,  5703.486576, [new(57, 1), new(65, 1)]),
-        new ItemRecipe("VulnerabilityReportScraper", "SID^", 71, Cc.m,   20.275170, 14821.624845, [new(63, 1), new(68, 1)]),
+        new ItemRecipe("VulnerabilityReportScraper", "VRS^", 71, Cc.m,   20.275170, 14821.624845, [new(63, 1), new(68, 1)]),
         new ItemRecipe("SpectralTunnel",             "SPT^", 72, Cc.LY,  17.259360,  8785.637352, [new(63, 1), new(69, 1)]),
         new ItemRecipe("ReflectionCore",             "RFC^", 73, Cc.LR,  24.005042, 20830.565812, [new(68, 1), new(67, 1)]),
         new ItemRecipe("NexusAnchor",                "NEA^", 74, Cc.LM,  16.306412, 14940.571511, [new(66, 1), new(67, 1), new(19, 1)]),
         new ItemRecipe("WardenFrame",                "WAF^", 75, Cc.B,   18.057136, 21233.410278, [new(62, 1), new(68, 1), new(70, 1)]),
     ];
 
-    const int MAX_CRAFTS = 32; // Maximum number of crafts that can be in progress at the same time
-    static CraftThread[] CraftThreads = new CraftThread[MAX_CRAFTS]; // Probably lower, but 32 is a good number to start with
-    static int CRAFT_THREAD_COUNT = 1;
+    public static readonly ItemRecipe[] ALL_RECIPES =
+        [.. REFINED_MATERIALS, .. COMPONENTS];
+
+    public const int MAX_THREADS = 32; // Maximum number of crafts that can be in progress at the same time
+    public static CraftThread[] CraftThreads = new CraftThread[MAX_THREADS]; // Probably lower, but 32 is a good number to start with
+    static int curThreads = 1;
+    public static int CUR_THREADS { get => curThreads; private set => curThreads = value; }
     public static void AddItemCraft(ItemRecipe recipe, int amount = 1) {
         amount = Math.Max(amount, 1); // Ensure at least 1 item is crafted
         for (int i = 0; i < recipe.RequiredIngredients.Length; ++i) {
@@ -95,7 +100,7 @@ public static class ItemCrafter {
                 return;
             }
         }
-        for (int i = 0; i < CRAFT_THREAD_COUNT; ++i) {
+        for (int i = 0; i < CUR_THREADS; ++i) {
             if (CraftThreads[i].RemainTime <= 0) {
                 CraftThreads[i] = new CraftThread() { Recipe = recipe, TotalTime = recipe.CraftTime, RemainTime = recipe.CraftTime};
                 return;
@@ -103,7 +108,7 @@ public static class ItemCrafter {
         }
     }
     public static void ProcessThreads(double delta) {
-        for (int i = 0; i < CRAFT_THREAD_COUNT; ++i) {
+        for (int i = 0; i < CUR_THREADS; ++i) {
             if (CraftThreads[i].Amount <= 0) continue;
             CraftThreads[i].RemainTime -= delta;
             if (CraftThreads[i].RemainTime > 0) continue;
@@ -117,25 +122,26 @@ public static class ItemCrafter {
         }
     }
     public static CError UpgradeCraftThreadCost() {
-        if (CRAFT_THREAD_COUNT >= MAX_CRAFTS) return CError.REDUNDANT;
+        if (CUR_THREADS >= MAX_THREADS) return CError.REDUNDANT;
 
         long cost = GetUpgradeCraftThreadsCost();
         if (PlayerDataManager.GC_Cur < cost) return CError.INSUFFICIENT;
 
-        PlayerDataManager.WithdrawGC(cost); ++CRAFT_THREAD_COUNT;
+        PlayerDataManager.WithdrawGC(cost); ++CUR_THREADS;
         return CError.OK;
     }
     public static long GetUpgradeCraftThreadsCost() {
-        return (CRAFT_THREAD_COUNT + 1) * (CRAFT_THREAD_COUNT + 1) * 1000; // Example cost formula, can be adjusted
+        return (CUR_THREADS + 1) * (CUR_THREADS + 1) * 1000; // Example cost formula, can be adjusted
     }
-    struct CraftThread {
+
+    public struct CraftThread {
         public ItemRecipe Recipe { get; init; }
         public int Amount { get; set; }
         public double TotalTime { get; init; }
         public double RemainTime { get; set; }
     }
-
 }
+
 public struct Ingredient {
     public int ID { get; init; }
     public long Amount { get; init; }

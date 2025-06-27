@@ -10,7 +10,7 @@ public partial class ItemCrafterDataSaveResource : Resource {
         ItemCrafterDataSaveResource result = new();
         result.id = ItemCrafter.CraftThreads.Select(x => x.Recipe?.ID ?? -1).ToArray();
         result.remainTime = ItemCrafter.CraftThreads.Select(x => x.RemainTime).ToArray();
-        result.CurThread = ItemCrafter.curThreads;
+        result.CurThread = ItemCrafter.CurThreads;
         return result;
     }
 }

@@ -13,6 +13,8 @@ public partial class CraftThreadButton : MarginContainer {
         itemNameLabel.Text = "null";
         ingredientLabel.Text = "N/A";
         craftProgressLabel.Text = GenerateProgressBarText(ItemCrafter.CraftThreads[ID]);
+        Visible = ID < ItemCrafter.CurThreads;
+        ItemCrafter.ThreadAmountChanged += OnThreadAmountChanged;
     }
 	public void OnPress() {
 		owner.PullupCraftRecipeWindow(ID);
@@ -31,5 +33,8 @@ public partial class CraftThreadButton : MarginContainer {
             ? string.Join(", ", ItemCrafter.CraftThreads[ID].Recipe.RequiredIngredients.Select(ing => $"[color={Util.CC(ItemCrafter.ALL_RECIPES[ing.ID].ColorCode)}]{ItemCrafter.ALL_RECIPES[ing.ID].Shorthand}[/color]  x{ing.Amount}"))
             : "N/A";
         craftProgressLabel.Text = GenerateProgressBarText(ItemCrafter.CraftThreads[ID]);
+    }
+    void OnThreadAmountChanged(int thread) {
+        Visible = ID < thread;
     }
 }

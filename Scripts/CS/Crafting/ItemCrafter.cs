@@ -1,4 +1,5 @@
 using Godot;
+using System;
 using System.Linq;
 
 public static class ItemCrafter {
@@ -15,16 +16,16 @@ public static class ItemCrafter {
         new MineralProfile("Oblivium",  "OB", 9, 32, Cc.gR),
     ];
     public static readonly ItemRecipe[] REFINED_MATERIALS = [
-    new ItemRecipe("RefinedDatacite"   , "DC&", 10, Cc.gB,  1.000000,    2, [new(0, 5)]),
-    new ItemRecipe("RefinedBitron"     , "BT&", 11, Cc.LM,  1.200000,    4, [new(1, 5)]),
-    new ItemRecipe("RefinedCachelium"  , "CH&", 12, Cc.r,   1.400000,    6, [new(2, 5)]),
-    new ItemRecipe("RefinedFerrosync"  , "FS&", 13, Cc.LM,  1.600000,    8, [new(3, 5)]),
-    new ItemRecipe("RefinedNexium"     , "NX&", 14, Cc.G,   1.800000,   12, [new(4, 5)]),
-    new ItemRecipe("RefinedFractyl"    , "FT&", 15, Cc.bG,  2.000000,   16, [new(5, 5)]),
-    new ItemRecipe("RefinedAlgorite"   , "AG&", 16, Cc.LY,  2.200000,   24, [new(6, 5)]),
-    new ItemRecipe("RefinedQuantar"    , "QT&", 17, Cc.LB,  2.400000,   32, [new(7, 5)]),
-    new ItemRecipe("RefinedSynthite"   , "SY&", 18, Cc.LC,  2.600000,   48, [new(8, 5)]),
-    new ItemRecipe("RefinedOblivium"   , "OB&", 19, Cc.gR,  2.800000,   64, [new(9, 5)]),
+        new ItemRecipe("RefinedDatacite"            , "DC&" , 10, Cc.gB,   1.000000,        2, [new(0, 5)]),
+        new ItemRecipe("RefinedBitron"              , "BT&" , 11, Cc.LM,   1.200000,        4, [new(1, 5)]),
+        new ItemRecipe("RefinedCachelium"           , "CH&" , 12, Cc.r,    1.400000,        6, [new(2, 5)]),
+        new ItemRecipe("RefinedFerrosync"           , "FS&" , 13, Cc.LM,   1.600000,        8, [new(3, 5)]),
+        new ItemRecipe("RefinedNexium"              , "NX&" , 14, Cc.G,    1.800000,       12, [new(4, 5)]),
+        new ItemRecipe("RefinedFractyl"             , "FT&" , 15, Cc.bG,   2.000000,       16, [new(5, 5)]),
+        new ItemRecipe("RefinedAlgorite"            , "AG&" , 16, Cc.LY,   2.200000,       24, [new(6, 5)]),
+        new ItemRecipe("RefinedQuantar"             , "QT&" , 17, Cc.LB,   2.400000,       32, [new(7, 5)]),
+        new ItemRecipe("RefinedSynthite"            , "SY&" , 18, Cc.LC,   2.600000,       48, [new(8, 5)]),
+        new ItemRecipe("RefinedOblivium"            , "OB&" , 19, Cc.gR,   2.800000,       64, [new(9, 5)]),
     ];
     public static readonly ItemRecipe[] COMPONENTS = [
         new ItemRecipe("ExploitTemplate"            , "XTP^", 20, Cc.gB,   2.804499 ,      23, [new(10, 1)]),
@@ -88,8 +89,9 @@ public static class ItemCrafter {
 
     public const int MAX_THREADS = 32; // Maximum number of crafts that can be in progress at the same time
     public static CraftThread[] CraftThreads = new CraftThread[MAX_THREADS]; // Probably lower, but 32 is a good number to start with
-    public static int curThreads = 32;
-    public static int CUR_THREADS { get => curThreads; private set => curThreads = value; }
+    static int curThreads = 1;
+    public static event Action<int> ThreadAmountChanged;
+    public static int CurThreads { get => curThreads; private set { curThreads = value; ThreadAmountChanged?.Invoke(CurThreads); } }
     public static void AddItemCraft(ItemRecipe recipe, int threadID) {
         if (recipe == null) {
             CraftThreads[threadID] = new CraftThread() {
@@ -110,7 +112,7 @@ public static class ItemCrafter {
         };  
     }
     public static void ProcessThreads(double delta) {
-        for (int i = 0; i < CUR_THREADS; ++i) {
+        for (int i = 0; i < CurThreads; ++i) {
             if (CraftThreads[i].Recipe == null) continue; // No recipe assigned to this thread
 
             bool enoughMaterial = true;
@@ -130,17 +132,19 @@ public static class ItemCrafter {
             CraftThreads[i].RemainTime += CraftThreads[i].Recipe.CraftTime; // Use += in case delta is too big.
         }
     }
+
     public static CError UpgradeCraftThreadCost() {
-        if (CUR_THREADS >= MAX_THREADS) return CError.REDUNDANT;
+        if (CurThreads >= MAX_THREADS) return CError.REDUNDANT;
 
         long cost = GetUpgradeCraftThreadsCost();
         if (PlayerDataManager.GC_Cur < cost) return CError.INSUFFICIENT;
 
-        PlayerDataManager.WithdrawGC(cost); ++CUR_THREADS;
+        PlayerDataManager.WithdrawGC(cost); ++CurThreads;
+        
         return CError.OK;
     }
     public static long GetUpgradeCraftThreadsCost() {
-        return (CUR_THREADS + 1) * (CUR_THREADS + 1) * 1000; // Example cost formula, can be adjusted
+        return (CurThreads + 1) * (CurThreads + 1) * 1000; // Example cost formula, can be adjusted
     }
 
     public static int SaveItemCrafterData(string filePath) {
@@ -153,7 +157,8 @@ public static class ItemCrafter {
         ItemCrafterDataSaveResource data;
         try { data = GD.Load<ItemCrafterDataSaveResource>(filePath); } catch { return 2; }
         if (data == null) return 3;
-        CraftThreads = new CraftThread[CUR_THREADS];
+        CurThreads = data.CurThread;
+        CraftThreads = new CraftThread[MAX_THREADS];
         for (int i = 0; i < data.CurThread; i++) {
             CraftThreads[i].RemainTime = data.remainTime[i];
             CraftThreads[i].Recipe = ALL_RECIPES.FirstOrDefault(r => r.ID == data.id[i]);

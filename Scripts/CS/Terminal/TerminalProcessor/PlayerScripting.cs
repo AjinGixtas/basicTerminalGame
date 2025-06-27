@@ -21,7 +21,7 @@ public static partial class ShellCore {
         }
         try {
             string scriptContent = file.Content;
-            ScriptRunner.RunPlayerScript(scriptContent, farg, parg[1..]);
+            ScriptRunner.RunPlayerScript(ScriptRunner.DetectLanguageFromExtension(scriptPath), scriptContent, farg, parg[1..]);
             RUNrunCMD?.Invoke(scriptPath, file.GetPath(), CError.OK);
         } catch (System.Exception ex) {
             ShellCore.Say("r", $"Error running script '{scriptPath}': {ex.Message}");

@@ -1,4 +1,5 @@
 using Godot;
+using System.Linq;
 public partial class CraftThreadButton : MarginContainer {
 	ItemCraftingUserInterface owner;
 	[Export] RichTextLabel threadNameLabel;
@@ -11,15 +12,24 @@ public partial class CraftThreadButton : MarginContainer {
 		threadNameLabel.Text = $"Thread #{ID}";
         itemNameLabel.Text = "null";
         ingredientLabel.Text = "N/A";
-        craftProgressLabel.Text = GenerateProgressBarText(ItemCrafter.CraftThreads[ID].TotalTime, ItemCrafter.CraftThreads[ID].RemainTime);
+        craftProgressLabel.Text = GenerateProgressBarText(ItemCrafter.CraftThreads[ID]);
     }
 	public void OnPress() {
 		owner.PullupCraftRecipeWindow(ID);
 	}
-	string GenerateProgressBarText(double totalTime, double remainingTime) {
-        double progress = (totalTime - remainingTime) / totalTime;
-        int percentage = (int)(progress * 100);
-        string bar = new string('|', percentage / 20) + new string('-', 20 - percentage / 20);
-        return $"[{bar}] {percentage}%";
+	string GenerateProgressBarText(ItemCrafter.CraftThread thread) {
+        double progress = thread.Recipe == null ? 0 : (thread.Recipe.CraftTime - thread.RemainTime) / thread.Recipe.CraftTime;
+        int percentage = (int)(progress * 100); int _bar = percentage / 5;
+        string bar = new string('|', _bar) + new string('-', 20 - _bar);
+        return $"[{bar}] {percentage,3}%";
+    }
+    public override void _Process(double delta) {
+        itemNameLabel.Text = ItemCrafter.CraftThreads[ID].Recipe != null
+    ? $"([color={Util.CC(ItemCrafter.CraftThreads[ID].Recipe?.ColorCode ?? Cc.W)}]{ItemCrafter.CraftThreads[ID].Recipe.Shorthand}[/color])\n[color={Util.CC(ItemCrafter.CraftThreads[ID].Recipe?.ColorCode ?? Cc.W)}]{ItemCrafter.CraftThreads[ID].Recipe.Name}[/color]"
+    : $"[color={Util.CC(Cc.W)}]null[/color]";
+        ingredientLabel.Text = ItemCrafter.CraftThreads[ID].Recipe?.RequiredIngredients.Length > 0
+            ? string.Join(", ", ItemCrafter.CraftThreads[ID].Recipe.RequiredIngredients.Select(ing => $"[color={Util.CC(ItemCrafter.ALL_RECIPES[ing.ID].ColorCode)}]{ItemCrafter.ALL_RECIPES[ing.ID].Shorthand}[/color]  x{ing.Amount}"))
+            : "N/A";
+        craftProgressLabel.Text = GenerateProgressBarText(ItemCrafter.CraftThreads[ID]);
     }
 }

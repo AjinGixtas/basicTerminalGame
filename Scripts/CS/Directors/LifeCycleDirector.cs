@@ -6,12 +6,13 @@ using System.Text.RegularExpressions;
 public partial class LifeCycleDirector : Node
 {
 	[Export] PackedScene gameScene;
-	RuntimeDirector runtimeDirector;
+	public static RuntimeDirector runtimeDirector;
 	public static event Action FinishScene;
 	public override void _Ready() {
 		// Load the game scene
 		if (gameScene != null) {
 			// Intialize default state
+            RemakeScene();
 			PlayerDataManager.Setup();
             PlayerFileManager.Setup();
             NetworkManager.Setup();
@@ -20,7 +21,7 @@ public partial class LifeCycleDirector : Node
             NetworkManager.Ready();
             RemakeScene();
             FinishScene?.Invoke();
-			foreach (Delegate d in FinishScene.GetInvocationList()) FinishScene -= (Action)d; // Clear the event to prevent multiple invocations
+            foreach (Delegate d in FinishScene.GetInvocationList()) FinishScene -= (Action)d; // Clear the event to prevent multiple invocations
 		} else { GD.PrintErr("Game scene not set in LifeCycleDirector."); }
     }
     public override void _Process(double delta) {
@@ -47,7 +48,7 @@ public partial class LifeCycleDirector : Node
 
 		// Pick next save number
 		int nextSaveNumber = existingSaves.Count == 0 ? 1 : existingSaves.Max() + 1;
-		string newSavePath = newSave ?  StringExtensions.PathJoin(SaveRoot, $"Game_{nextSaveNumber:D5}") : CurrentSavePath;
+		string newSavePath = newSave ? StringExtensions.PathJoin(SaveRoot, $"Game_{nextSaveNumber:D5}") : CurrentSavePath;
 
 		// Create new save directory
 		DirAccess.MakeDirAbsolute(ProjectSettings.GlobalizePath(newSavePath));
@@ -56,12 +57,14 @@ public partial class LifeCycleDirector : Node
         int[][] saveStatus = [
             [PlayerDataManager.SavePlayerData(StringExtensions.PathJoin(newSavePath, "PlayerData.tres"))],
             [PlayerFileManager.SaveFileSysData(StringExtensions.PathJoin(newSavePath, "FileSys"))],
-            NetworkManager.SaveNetworkData(StringExtensions.PathJoin(newSavePath, "NetworkData"))
+            NetworkManager.SaveNetworkData(StringExtensions.PathJoin(newSavePath, "NetworkData")),
+			[ItemCrafter.SaveItemCrafterData(StringExtensions.PathJoin(newSavePath, "ItemCrafter.tres"))],
         ];
-		if (saveStatus.All(row => row.All(cell => cell == 0))) {
-            if (newSave) ShellCore.Say($"Saved game to {newSavePath}");
-            else ShellCore.Say($"Overwrote save to {newSavePath}");
+        if (saveStatus.All(row => row.All(cell => cell == 0))) {
+            if (newSave) runtimeDirector.MakeNotification($"Saved to {newSavePath}");
+            else runtimeDirector.MakeNotification($"Overwrite to {newSavePath}");
         } else {
+			runtimeDirector.MakeNotification("Save problem found. Check terminal output.");
 			ShellCore.Say("-n", PlayerDataManager.GetSaveStatusMsg(saveStatus[0][0]) + "... ");
 			ShellCore.Say("-n", PlayerFileManager.GetSaveStatusMsg(saveStatus[1][0]) + "... ");
 			ShellCore.Say("-n", NetworkManager.GetSaveStatusMsg(saveStatus[2]));
@@ -85,20 +88,17 @@ public partial class LifeCycleDirector : Node
 
 		ShellCore.Say($"Loading save from: {latestFolder}");
 		// Load global data
-		int[][] statusCodes = [
+		int[][] loadStatus = [
 			// Wrap singletons in arrays to match the expected type
 			[PlayerDataManager.LoadPlayerData(StringExtensions.PathJoin($"{SaveRoot}/{latestFolder}", "PlayerData.tres"))],
 			[PlayerFileManager.LoadFileSysData(StringExtensions.PathJoin($"{SaveRoot}/{latestFolder}", "FileSys"))],
-			NetworkManager.LoadNetworkData(StringExtensions.PathJoin($"{SaveRoot}/{latestFolder}", "NetworkData"))
+			NetworkManager.LoadNetworkData(StringExtensions.PathJoin($"{SaveRoot}/{latestFolder}", "NetworkData")),
+			[ItemCrafter.LoadItemCrafterData(StringExtensions.PathJoin($"{SaveRoot}/{latestFolder}", "ItemCrafter.tres"))],
 		];
-
-		ShellCore.Say("Quick loading save...");
-		ShellCore.Say("-n", PlayerDataManager.GetLoadStatusMsg(statusCodes[0][0]) + "... ");
-		ShellCore.Say("-n", PlayerFileManager.GetLoadStatusMsg(statusCodes[1][0]) + "... ");
-        // The two above use int[][] to match the expected type, but this one is a single int
-        ShellCore.Say("-n", NetworkManager.GetLoadStatusMsg(statusCodes[2]) + "... ");
-		ShellCore.Say($"\nIf there are any error related to save file, feel free to email {Util.Format("ajingixtascontact", StrSty.USERNAME)}@{Util.Format("gmail.com", StrSty.HOSTNAME)}");
-
+        ShellCore.Say("-n", PlayerDataManager.GetLoadStatusMsg(loadStatus[0][0]) + "... ");
+		ShellCore.Say("-n", PlayerFileManager.GetLoadStatusMsg(loadStatus[1][0]) + "... ");
+		ShellCore.Say("-n", NetworkManager.GetLoadStatusMsg(loadStatus[2]));
+        ShellCore.Say($"\nIf error are unexpected. Email {Util.Format("ajingixtascontact", StrSty.USERNAME)}@{Util.Format("gmail.com", StrSty.HOSTNAME)}");
 		CurrentSavePath = StringExtensions.PathJoin(SaveRoot, latestFolder); // Update current save path
     }
 	void RemakeScene() {

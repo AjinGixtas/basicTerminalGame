@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -476,7 +477,24 @@ public static partial class Util {
             hash = (hash ^ b) * FNV_prime;
         return hash;
     }
+    public static string InvertHexColor(string hex) {
+        // Remove the '#' if it's there
+        hex = hex.TrimStart('#');
 
+        // Parse RGB components
+        int r = int.Parse(hex.Substring(0, 2), NumberStyles.HexNumber);
+        int g = int.Parse(hex.Substring(2, 2), NumberStyles.HexNumber);
+        int b = int.Parse(hex.Substring(4, 2), NumberStyles.HexNumber);
+
+        // Invert each component
+        int rInv = 255 - r;
+        int gInv = 255 - g;
+        int bInv = 255 - b;
+
+        // Return inverted color as hex string
+        return $"#{rInv:X2}{gInv:X2}{bInv:X2}";
+    }
+    
     [GeneratedRegex(@"\[(\/?)(b|i|u|color|size|url|img|quote|code|spoiler|lb|rb|br)[^\]]*\]", RegexOptions.IgnoreCase, "en-150")]
     private static partial Regex SelectBBCode();
 }

@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://ccwqfx7w5pm3k"]
+[gd_scene load_steps=11 format=3 uid="uid://ccwqfx7w5pm3k"]
 
 [ext_resource type="Script" uid="uid://cruda7xtodutw" path="res://Scripts/CS/Directors/RuntimeDirector.cs" id="1_40tl5"]
 [ext_resource type="Script" uid="uid://b2ynbwrig2yqu" path="res://Scripts/CS/Directors/MenuDirector.cs" id="2_rv8lf"]
@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://blkjllh1u7by7" path="res://Scenes/MajorScenes/OverlayWindow.tscn" id="6_1de4d"]
 [ext_resource type="PackedScene" uid="uid://b6bxlse3m58ck" path="res://Scenes/MajorScenes/BotnetStatusBoard.tscn" id="6_sfmy1"]
 [ext_resource type="PackedScene" uid="uid://b3umcbmdsdyd1" path="res://Scenes/MajorScenes/CraftWindow.tscn" id="7_rcn04"]
+[ext_resource type="PackedScene" uid="uid://do6l8y3ak8g27" path="res://Scenes/InstanceScenes/NotifyBox.tscn" id="9_lj5g1"]
 
 [sub_resource type="Environment" id="Environment_y4jh7"]
 background_mode = 3
@@ -27,6 +28,7 @@ script = ExtResource("1_40tl5")
 terminal = NodePath("MenuDirector/MenuWindows/Terminal")
 textEditor = NodePath("MenuDirector/MenuWindows/TextEditor")
 overlayWindow = NodePath("OverlayWindow")
+notificationScene = ExtResource("9_lj5g1")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_y4jh7")

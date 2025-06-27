@@ -1,17 +1,18 @@
-[gd_scene load_steps=5 format=3 uid="uid://do6l8y3ak8g27"]
+[gd_scene load_steps=7 format=3 uid="uid://do6l8y3ak8g27"]
 
 [ext_resource type="Script" uid="uid://27cr32s3yfj1" path="res://Scripts/CS/NotifyBox/NotifyBoxBehaviour.cs" id="1_qcenx"]
+[ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="2_awg2f"]
 
 [sub_resource type="Animation" id="Animation_vw8d6"]
 resource_name = "Disappear"
 tracks/0/type = "method"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("..")
+tracks/0/path = NodePath("../..")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(1),
+"times": PackedFloat32Array(1.03333),
 "transitions": PackedFloat32Array(1),
 "values": [{
 "args": [],
@@ -25,47 +26,75 @@ tracks/1/path = NodePath("..:modulate")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 1),
-"transitions": PackedFloat32Array(3.36358, 3.36358),
+"times": PackedFloat32Array(0.0333333, 1),
+"transitions": PackedFloat32Array(4.14106, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
 }
 
 [sub_resource type="Animation" id="Animation_qcenx"]
 resource_name = "Popup"
-length = 10.0
+length = 5.0
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath(".:position")
+tracks/0/path = NodePath("AnimationPlayer:current_animation")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.3),
-"transitions": PackedFloat32Array(0.517634, 0.517634),
-"update": 0,
-"values": [Vector2(-158, 0), Vector2(-158, -96)]
+"times": PackedFloat32Array(5),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [&"Disappear"]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("AnimationPlayer:current_animation")
+tracks/1/path = NodePath("..:position")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(10),
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(-350, 0), Vector2(-350, -64)]
+}
+
+[sub_resource type="Animation" id="Animation_awg2f"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("..:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [&"Disappear"]
+"update": 0,
+"values": [Vector2(-320, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("..:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_awg2f"]
 _data = {
 &"Disappear": SubResource("Animation_vw8d6"),
-&"Popup": SubResource("Animation_qcenx")
+&"Popup": SubResource("Animation_qcenx"),
+&"RESET": SubResource("Animation_awg2f")
 }
 
-[node name="NotifyBoxAnchor" type="Control" node_paths=PackedStringArray("NotificationBox")]
+[node name="NotifyBoxAnchor" type="Control" node_paths=PackedStringArray("NotificationBox", "NotificationLabel", "CloseButton", "Background", "AnimationPlayer")]
 layout_mode = 3
 anchors_preset = 3
 anchor_left = 1.0
@@ -75,20 +104,74 @@ anchor_bottom = 1.0
 grow_horizontal = 0
 grow_vertical = 0
 script = ExtResource("1_qcenx")
-NotificationBox = NodePath("MarginContainer")
+NotificationBox = NodePath("MarginContainer_2/MarginContainer")
+NotificationLabel = NodePath("MarginContainer_2/MarginContainer/MarginContainer/HSplitContainer/NotifTitle")
+CloseButton = NodePath("MarginContainer_2/MarginContainer/MarginContainer/HSplitContainer/CloseButton")
+Background = NodePath("MarginContainer_2/MarginContainer/Background")
+AnimationPlayer = NodePath("MarginContainer_2/MarginContainer/AnimationPlayer")
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
-custom_minimum_size = Vector2(256, 32)
+[node name="MarginContainer_2" type="MarginContainer" parent="."]
+custom_minimum_size = Vector2(320, 48)
 layout_mode = 0
 offset_left = -320.0
-offset_right = -64.0
-offset_bottom = 32.0
+offset_right = 48.0
+offset_bottom = 48.0
+theme_override_constants/margin_right = 32
 
-[node name="ColorRect" type="ColorRect" parent="MarginContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer_2"]
 layout_mode = 2
-color = Color(0.329158, 0.329158, 0.329158, 1)
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="MarginContainer"]
+[node name="Background" type="ColorRect" parent="MarginContainer_2/MarginContainer"]
+layout_mode = 2
+color = Color(0.2, 0.2, 0.2, 0.980392)
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer_2/MarginContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 4
+
+[node name="HSplitContainer" type="HSplitContainer" parent="MarginContainer_2/MarginContainer/MarginContainer"]
+layout_mode = 2
+dragging_enabled = false
+dragger_visibility = 2
+
+[node name="NotifTitle" type="RichTextLabel" parent="MarginContainer_2/MarginContainer/MarginContainer/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 10
+text = "lo 2ie joie roi2 rio 2r fhui12f hiu31hf iuh ifuh31uifhe3iu fh43iu fhui3 hgiu3h 4gu3h giu3h gi4uf3h4 iguh3i ufdh1iu4 hfi134h foi13h4i ufhi 4ouhfc4iu3h ifoh 4iohoi3f hi3 4hfiu34hfi uhf3i4u"
+vertical_alignment = 1
+
+[node name="CloseButton" type="Button" parent="MarginContainer_2/MarginContainer/MarginContainer/HSplitContainer"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+theme = ExtResource("2_awg2f")
+
+[node name="X_symbol" type="RichTextLabel" parent="MarginContainer_2/MarginContainer/MarginContainer/HSplitContainer/CloseButton"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -4.0
+offset_top = -8.5
+offset_right = 4.0
+offset_bottom = 8.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+theme = ExtResource("2_awg2f")
+bbcode_enabled = true
+text = "[color=#a0a0a0]X[/color]"
+fit_content = true
+autowrap_mode = 0
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="MarginContainer_2/MarginContainer"]
 libraries = {
 &"": SubResource("AnimationLibrary_awg2f")
 }
+autoplay = "Popup"
+
+[connection signal="pressed" from="MarginContainer_2/MarginContainer/MarginContainer/HSplitContainer/CloseButton" to="." method="HideNotification"]

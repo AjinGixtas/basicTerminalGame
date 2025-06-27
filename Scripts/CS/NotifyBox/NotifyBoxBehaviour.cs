@@ -6,12 +6,12 @@ public partial class NotifyBoxBehaviour : Control {
 	[Export] Button CloseButton;
 	[Export] ColorRect Background;
 	[Export] AnimationPlayer AnimationPlayer;
-	public void ShowNotification(string message, StrSty boxStyle, string bgC = "0xDEADBEEF") {
+	public void ShowNotification(string message, string bgC = "0xDEADBEEF") {
 		NotificationLabel.Text = message;
 		if (bgC != "0xDEADBEEF") Background.Color = new Color(bgC);
 		AnimationPlayer.Play("Popup");
     }
 	public void HideNotification() {
-		this.Visible = false;
+		Visible = false;
 	}
 }

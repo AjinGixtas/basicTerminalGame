@@ -4,9 +4,9 @@ public partial class RuntimeDirector : Control {
 	[Export] public TextEditor textEditor;
 	[Export] public OverlayWindow overlayWindow;
 	[Export] public PackedScene notificationScene;
-	public void MakeNotification(string msg) {
-		NotifyBoxBehaviour notifBox = notificationScene.Instantiate<NotifyBoxBehaviour>();
+	public static void MakeNotification(string msg) {
+		NotifyBoxBehaviour notifBox = ShellCore.Overseer.notificationScene.Instantiate<NotifyBoxBehaviour>();
 		notifBox.ShowNotification(msg);
-		AddChild(notifBox);
+        ShellCore.Overseer.AddChild(notifBox);
 	}
 }

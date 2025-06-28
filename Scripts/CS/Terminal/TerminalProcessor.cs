@@ -2,7 +2,7 @@ using Godot;
 using System.Collections.Generic;
 
 public static partial class ShellCore {
-	static RuntimeDirector overseer;
+	static RuntimeDirector overseer; public static RuntimeDirector Overseer => overseer;
 	static RichTextLabel terminalOutputField; static RichTextLabel terminalCommandPrompt; 
 	static TextEdit terminalCommandField; 
 	static Timer crackDurationTimer;

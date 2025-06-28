@@ -1,7 +1,16 @@
-[gd_scene load_steps=3 format=3 uid="uid://dgr170h5sh113"]
+[gd_scene load_steps=4 format=3 uid="uid://dgr170h5sh113"]
 
 [ext_resource type="Script" uid="uid://dddt44da8lpkd" path="res://Scripts/CS/Crafting/CraftThreadButton.cs" id="1_bcy04"]
 [ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="1_w4a3k"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w4a3k"]
+draw_center = false
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0.529412, 0.607843, 0.615686)
+corner_detail = 1
 
 [node name="MarginContainer" type="MarginContainer" node_paths=PackedStringArray("threadNameLabel", "itemNameLabel", "ingredientLabel", "craftProgressLabel")]
 custom_minimum_size = Vector2(224, 300)
@@ -36,6 +45,7 @@ color = Color(0, 0.0196078, 0.0313726, 0.4)
 [node name="CraftThread" type="Button" parent="."]
 layout_mode = 2
 theme = ExtResource("1_w4a3k")
+theme_override_styles/hover = SubResource("StyleBoxFlat_w4a3k")
 
 [node name="MarginContainer" type="MarginContainer" parent="CraftThread"]
 layout_mode = 1

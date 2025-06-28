@@ -1,3 +1,4 @@
+using Acornima.Ast;
 using Godot;
 
 public partial class ItemCraftingUserInterface : MarginContainer {
@@ -6,7 +7,9 @@ public partial class ItemCraftingUserInterface : MarginContainer {
 	[Export] HFlowContainer craftThreadButtonContainer;
 	[Export] Container craftRecipeButtonContainer;
 	[Export] ScrollContainer craftRecipeScrollContainer;
-	public override void _Ready() {
+	[Export] RichTextLabel WindowDescriptionLabel;
+
+    public override void _Ready() {
 		craftThreadButtons = new CraftThreadButton[ItemCrafter.MAX_THREADS];
 		for (int i = 0; i < ItemCrafter.MAX_THREADS; ++i) {
 			craftThreadButtons[i] = craftThreadButtonScene.Instantiate<CraftThreadButton>();
@@ -22,7 +25,10 @@ public partial class ItemCraftingUserInterface : MarginContainer {
 			recipeButton.Intialize(ItemCrafter.ALL_RECIPES[i].ID, this);
 			craftRecipeButtonContainer.AddChild(recipeButton);
 		}
-	}
+		ItemCrafter.ThreadAmountChanged += OnCraftThreadCountChange;
+		OnCraftThreadCountChange(ItemCrafter.CurThreads);
+		WindowDescriptionLabel.Text = @$"Each thread help craft items. Items increase in value as you go deeper into the crafting system. See {Util.Format("CraftModule", StrSty.CODE_MODULE)} in scripting to see how you can automate it.";
+    }
 	public override void _Process(double delta) {
 		ItemCrafter.ProcessThreads(delta);
     }
@@ -38,4 +44,16 @@ public partial class ItemCraftingUserInterface : MarginContainer {
 		else ItemCrafter.AddItemCraft(null, selectedThreadID);
             selectedThreadID = -1; // Reset selected thread ID after crafting
     }
+	[Export] RichTextLabel threadCountUpgradeButtonText;
+	public void OnCraftThreadCountChange(int thread) {
+		threadCountUpgradeButtonText.Text = $"Increase thread count - {Util.Format($"{ItemCrafter.GetUpgradeCraftThreadsCost()}", StrSty.MONEY)}";
+	}
+	public void OnUpgradeThreadCountButtonPressed() {
+		CError cer = ItemCrafter.UpgradeCraftThreadCount();
+		switch (cer) {
+			case CError.OK: break;
+			case CError.REDUNDANT: RuntimeDirector.MakeNotification(Util.Format("Max thread reached", StrSty.WARNING)); break;
+			case CError.INSUFFICIENT: RuntimeDirector.MakeNotification(Util.Format("Not enough money", StrSty.ERROR)); break;
+		}
+	}
 }

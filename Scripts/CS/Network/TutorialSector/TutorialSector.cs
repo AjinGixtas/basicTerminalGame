@@ -153,12 +153,12 @@ public class ScriptTutorialNode : TutorialNode {
         TutorialSpeak0();
     }
     async void TutorialSpeak0() {
-        NodeFile fileSuprise = new("FunniFile.lua", @$"MainModule:Say(""Hi:)"")");
+        NodeFile fileSuprise = new("FunniFile.lua", @$"MainModule:Say(""Hi :)\n"")");
         EnqueueTutorialDialouge("Hey! Catch this >:)", 0);
         await cm.RunDialogueAsync();
         PlayerFileManager.FileSystem.AddDir("Download"); PlayerFileManager.FileSystem.GetDir("Download").Add(fileSuprise);
         ShellCore.Say($"{Util.Format("FunniFile.lua", StrSty.FILE)} {Util.Format("has been added to your file system", StrSty.DECOR)}");
-        await Task.Delay(300);
+        await Task.Delay(1000);
         EnqueueTutorialDialouge($"Try running it with `{Util.Format("run /Download/FunniFile.lua", StrSty.CMD_FUL)}`");
         _ = cm.RunDialogueAsync();
 
@@ -192,7 +192,7 @@ public class ScriptTutorialNode : TutorialNode {
         await Task.Delay(1000);
         EnqueueTutorialDialouge("Great! Now you know how to edit scripts.");
         EnqueueTutorialDialouge($"You can also create new scripts with `{Util.Format("mkf <file_name>", StrSty.CMD_FUL)}`");
-        EnqueueTutorialDialouge($"Scripting is quite complicated. So the [color={Util.CC(Cc.gR)}]Documentaion[/color] will be very helpful.");
+        EnqueueTutorialDialouge($"Scripting is quite complicated. So the {Util.Format("Documentation", StrSty.GAME_WINDOW)} will be very helpful.");
         EnqueueTutorialDialouge("Here's a little gift.");
         await cm.RunDialogueAsync();
         NodeFile fileGift = new("Attack.lua",
@@ -242,7 +242,7 @@ public class KaraxeTutorialNode : TutorialNode {
     async void TutorialSpeak0() {
         await Task.Delay(1_000);
         EnqueueTutorialDialouge("I'm gonna teach you \"hacking\" in this game.");
-        EnqueueTutorialDialouge("You're not allowed to hack us though. Go to the next node and I will teach ya.");
+        EnqueueTutorialDialouge("You're not allowed to hack me though. Go to the next node and I will teach ya.");
         _ = cm.RunDialogueAsync();
         ShellCore.CONNECTrunCMD += TutorialSpeak1;
     }
@@ -253,8 +253,7 @@ public class KaraxeTutorialNode : TutorialNode {
             if (ShellCore.CurrNode.HostName == "cthuwu") {
                 if (tutorialSpeak1Block0) tutorialSpeak1Block0 = true;
                 await Task.Delay(333);
-                EnqueueTutorialDialouge("Don't be a smartass, you know what I meant by the \"next node\".");
-                EnqueueTutorialDialouge("Keep pestering the guy. It will never works.");
+                EnqueueTutorialDialouge("Are you stupid or do you not see my VM? Go there now.");
                 _ = cm.RunDialogueAsync();
                 return;
             }
@@ -275,9 +274,9 @@ public class KaraxeTutorialNode : TutorialNode {
     async void TutorialSpeak2(CError cer, string target) {
         await Task.Delay(500); // Give player time to read the previous message
         if (ShellCore.CurrNode == this) {
-            EnqueueTutorialDialouge("...", 3);
-            EnqueueTutorialDialouge("uh huh.", 2);
-            EnqueueTutorialDialouge("Pretty interesting yeah?");
+            EnqueueTutorialDialouge("...", 1);
+            EnqueueTutorialDialouge("uh huh.", 3);
+            EnqueueTutorialDialouge("Now go scan my vm.");
             _ = cm.RunDialogueAsync();
             return;
         }

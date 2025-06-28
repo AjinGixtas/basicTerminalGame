@@ -3,53 +3,53 @@ using System.Collections.Generic;
 using System.Linq;
 
 public class BotFarm {
-	const double baseHack = 10.1, baseGrow = .1, baseTime = 60.0;
+	const double base_BatchSize = 10.1, base_MineSpeed = .1, base_XferDelay = 60.0;
 	const double MAX_LVL = 255;
-	public (double, double, double, double) HackCostCurve { get; init; }
-	public (double, double, double, double) GrowCostCurve { get; init; }
-	public (double, double, double, double) TimeCostCurve { get; init; }
-	public (double, double, double, double) HackValuCurve { get; init; }
-	public (double, double, double, double) GrowValuCurve { get; init; }
-	public (double, double, double, double) TimeValuCurve { get; init; }
-	double _hackVal = baseHack, _growVal = baseGrow, _timeVal = baseTime;
+	public (double, double, double, double) BatchSizeCostCurve { get; init; }
+	public (double, double, double, double) MineSpeedCostCurve { get; init; }
+	public (double, double, double, double) XferDelayCostCurve { get; init; }
+	public (double, double, double, double) BatchSizeValuCurve { get; init; }
+	public (double, double, double, double) MineSpeedValuCurve { get; init; }
+	public (double, double, double, double) XferDelayValuCurve { get; init; }
+	double _batchSize = base_BatchSize, _mineSpeed = base_MineSpeed, _xferDelay = base_XferDelay;
 	public double BatchSize {
-		get => _hackVal;
+		get => _batchSize;
 		private set {
-			_hackVal = value;
+			_batchSize = value;
 		}
 	}
 	public double MineSpeed {
-		get => _growVal;
+		get => _mineSpeed;
 		private set {
-			_growVal = value;
+			_mineSpeed = value;
 		}
 	}
 	public double XferDelay {
-		get => _timeVal;
+		get => _xferDelay;
 		private set {
-			_timeVal = value;
+			_xferDelay = value;
 		}
 	}
 	int _hackLvl = 1, _growLvl = 1, _timeLvl = 1;
 	public int BatchSizeLVL {
 		get => _hackLvl;
 		private set {
-			_hackLvl = value; _hackVal = GetValu(HackValuCurve, _hackLvl); // Use the same curve as cost, just scaled down.
+			_hackLvl = value; _batchSize = GetValu(BatchSizeValuCurve, _hackLvl); // Use the same curve as cost, just scaled down.
 		}
 	}
 	public int MineSpeedLVL {
 		get => _growLvl;
 		private set {
 			_growLvl = value;
-			_growVal =
-				GetValu(HackValuCurve, _growLvl * GrowValuCurve.Item3) /
-				GetTime(TimeValuCurve, _growLvl * GrowValuCurve.Item4);
+			_mineSpeed =
+				GetValu(BatchSizeValuCurve, _growLvl * MineSpeedValuCurve.Item3) /
+				GetTime(XferDelayValuCurve, _growLvl * MineSpeedValuCurve.Item4);
 		}
 	}
 	public int XferDelayLVL {
 		get => _timeLvl;
 		private set {
-			_timeLvl = value; _timeVal = GetTime(TimeValuCurve, _timeLvl);
+			_timeLvl = value; _xferDelay = GetTime(XferDelayValuCurve, _timeLvl);
 		}
 	}
 	static double GetTime((double, double, double, double) c, double x) => c.Item1 / (c.Item4 * Mathf.Pow(c.Item2, x) + c.Item3 * x);
@@ -71,17 +71,17 @@ public class BotFarm {
         // defLvl in [1, 10] range, mineralTier in [0, 9] range.
         mineralDistribution = GenerateMiningWeightDistribution(defLvl-1);
 		HostName = driftNode.HostName; DisplayName = driftNode.DisplayName; IP = driftNode.IP;
-		MAX_LIFE_TIME = 3600 * Mathf.Pow(Mathf.E / 2.5, -5.57180 * defLvl) * Mathf.Log(defLvl) + 1800 * GD.Randf();
+		MAX_LIFE_TIME = 600 * Mathf.Pow(Mathf.E / 2.5, -5.57180 * defLvl) * Mathf.Log(defLvl) + 60 * GD.Randf();
 		LifeTime = MAX_LIFE_TIME;
-		HackCostCurve = (GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0), GD.RandRange(10.0, 25.0));
-		GrowCostCurve = (GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0), GD.RandRange(10.0, 25.0));
-		TimeCostCurve = (GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0), GD.RandRange(10.0, 25.0));
-		HackValuCurve = (GD.RandRange(1e-5, 1e-4), GD.RandRange(1e-4, 1e-3), GD.RandRange(4.0, 5.0), GD.RandRange(5, 10));
+		BatchSizeCostCurve = (GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0), GD.RandRange(10.0, 25.0));
+		MineSpeedCostCurve = (GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0), GD.RandRange(10.0, 25.0));
+		XferDelayCostCurve = (GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0), GD.RandRange(10.0, 25.0));
+		BatchSizeValuCurve = (GD.RandRange(1e-5, 1e-4), GD.RandRange(1e-4, 1e-3), GD.RandRange(1.0, 3.0), GD.RandRange(1.0, 2.0));
 		// This is essentially stores the offset of hackValu curve level and timeValu curve level to calc its own value, thus, it will relies on the other 2 curve being accurate.
-		GrowValuCurve = (0, 0, GD.RandRange(.8, 1.2), GD.RandRange(.8, 1.2));
+		MineSpeedValuCurve = (0, 0, GD.RandRange(.8, 1.2), GD.RandRange(.8, 1.2));
 		// This one essentially a speed increase algorithm, with v = d*(b^level)+c*level
 		// a being the distance
-		TimeValuCurve = (GD.RandRange(10.0, 60.0), 1.0 + GD.RandRange(.01, .02), GD.RandRange(.5, 1.0), 1.0);
+		XferDelayValuCurve = (GD.RandRange(30.0, 60.0), 1.0 + GD.RandRange(.01, .02), GD.RandRange(.5, 1.0), 1.0);
 		BatchSizeLVL = MineSpeedLVL = XferDelayLVL = 1;
 
     }
@@ -105,9 +105,9 @@ public class BotFarm {
 		XferDelayLVL += 1; return CError.OK;
     }
 
-	public long GetBatchSizeCost() => (long)Mathf.Ceil(GetValu(HackCostCurve, BatchSizeLVL)/10.0);
-	public long GetMineSpeedCost() => (long)Mathf.Ceil(GetValu(GrowCostCurve, MineSpeedLVL)/10.0);
-	public long GetXferDelayCost() => (long)Mathf.Ceil(GetValu(TimeCostCurve, XferDelayLVL)/10.0);
+	public long GetBatchSizeCost() => (long)Mathf.Ceil(GetValu(BatchSizeCostCurve, BatchSizeLVL)/10.0);
+	public long GetMineSpeedCost() => (long)Mathf.Ceil(GetValu(MineSpeedCostCurve, MineSpeedLVL)/10.0);
+	public long GetXferDelayCost() => (long)Mathf.Ceil(GetValu(XferDelayCostCurve, XferDelayLVL)/10.0);
 	double _mineralBacklog, _cycleTimeRemain;
 	public double MBacklog { get => _mineralBacklog; private set => _mineralBacklog = value; }
 	public double CycleTimeRemain { get => _cycleTimeRemain; private set => _cycleTimeRemain = value; }
@@ -127,12 +127,12 @@ public class BotFarm {
 		return output;
 	}
 	public BotFarm(HackFarmDataSaveResource res) {
-		HackCostCurve = (res.cHackA, res.cHackB, res.cHackC, res.cHackD);
-		GrowCostCurve = (res.cGrowA, res.cGrowB, res.cGrowC, res.cGrowD);
-		TimeCostCurve = (res.cTimeA, res.cTimeB, res.cTimeC, res.cTimeD);
-		HackValuCurve = (res.vHackA, res.vHackB, res.vHackC, res.vHackD);
-		GrowValuCurve = (res.vGrowA, res.vGrowB, res.vGrowC, res.vGrowD);
-		TimeValuCurve = (res.vTimeA, res.vTimeB, res.vTimeC, res.vTimeD);
+		BatchSizeCostCurve = (res.cHackA, res.cHackB, res.cHackC, res.cHackD);
+		MineSpeedCostCurve = (res.cGrowA, res.cGrowB, res.cGrowC, res.cGrowD);
+		XferDelayCostCurve = (res.cTimeA, res.cTimeB, res.cTimeC, res.cTimeD);
+		BatchSizeValuCurve = (res.vHackA, res.vHackB, res.vHackC, res.vHackD);
+		MineSpeedValuCurve = (res.vGrowA, res.vGrowB, res.vGrowC, res.vGrowD);
+		XferDelayValuCurve = (res.vTimeA, res.vTimeB, res.vTimeC, res.vTimeD);
 		BatchSizeLVL = (int)res.HackLvl; MineSpeedLVL = (int)res.GrowLvl; XferDelayLVL = (int)res.TimeLvl;
 		HostName = res.HostName; DisplayName = res.DisplayName; IP = res.IP;
 		LifeTime = res.LifeTime; _mineralBacklog = res.MineralBacklog; _cycleTimeRemain = Mathf.Min(res.CycleTimeRemain, XferDelay);
@@ -141,13 +141,13 @@ public class BotFarm {
 	}
 	public static HackFarmDataSaveResource SerializeBotnet(BotFarm obj) {
 		return new() {
-			cHackA = obj.HackCostCurve.Item1, cHackB = obj.HackCostCurve.Item2, cHackC = obj.HackCostCurve.Item3, cHackD = obj.HackCostCurve.Item4,
-			cGrowA = obj.GrowCostCurve.Item1, cGrowB = obj.GrowCostCurve.Item2, cGrowC = obj.GrowCostCurve.Item3, cGrowD = obj.GrowCostCurve.Item4,
-			cTimeA = obj.TimeCostCurve.Item1, cTimeB = obj.TimeCostCurve.Item2, cTimeC = obj.TimeCostCurve.Item3, cTimeD = obj.TimeCostCurve.Item4,
+			cHackA = obj.BatchSizeCostCurve.Item1, cHackB = obj.BatchSizeCostCurve.Item2, cHackC = obj.BatchSizeCostCurve.Item3, cHackD = obj.BatchSizeCostCurve.Item4,
+			cGrowA = obj.MineSpeedCostCurve.Item1, cGrowB = obj.MineSpeedCostCurve.Item2, cGrowC = obj.MineSpeedCostCurve.Item3, cGrowD = obj.MineSpeedCostCurve.Item4,
+			cTimeA = obj.XferDelayCostCurve.Item1, cTimeB = obj.XferDelayCostCurve.Item2, cTimeC = obj.XferDelayCostCurve.Item3, cTimeD = obj.XferDelayCostCurve.Item4,
 
-			vHackA = obj.HackValuCurve.Item1, vHackB = obj.HackValuCurve.Item2, vHackC = obj.HackValuCurve.Item3, vHackD = obj.HackValuCurve.Item4,
-			vGrowA = obj.GrowValuCurve.Item1, vGrowB = obj.GrowValuCurve.Item2, vGrowC = obj.GrowValuCurve.Item3, vGrowD = obj.GrowValuCurve.Item4,
-			vTimeA = obj.TimeValuCurve.Item1, vTimeB = obj.TimeValuCurve.Item2, vTimeC = obj.TimeValuCurve.Item3, vTimeD = obj.TimeValuCurve.Item4,
+			vHackA = obj.BatchSizeValuCurve.Item1, vHackB = obj.BatchSizeValuCurve.Item2, vHackC = obj.BatchSizeValuCurve.Item3, vHackD = obj.BatchSizeValuCurve.Item4,
+			vGrowA = obj.MineSpeedValuCurve.Item1, vGrowB = obj.MineSpeedValuCurve.Item2, vGrowC = obj.MineSpeedValuCurve.Item3, vGrowD = obj.MineSpeedValuCurve.Item4,
+			vTimeA = obj.XferDelayValuCurve.Item1, vTimeB = obj.XferDelayValuCurve.Item2, vTimeC = obj.XferDelayValuCurve.Item3, vTimeD = obj.XferDelayValuCurve.Item4,
 
 			HackLvl = obj.BatchSizeLVL, GrowLvl = obj.MineSpeedLVL, TimeLvl = obj.XferDelayLVL,
 			HostName = obj.HostName, DisplayName = obj.DisplayName, IP = obj.IP,

@@ -1,7 +1,15 @@
-[gd_scene load_steps=3 format=3 uid="uid://b7ieqe7gs64yc"]
+[gd_scene load_steps=4 format=3 uid="uid://b7ieqe7gs64yc"]
 
 [ext_resource type="Script" uid="uid://c16pvji7aol4j" path="res://Scripts/CS/Crafting/CraftRecipeButton.cs" id="1_o1sbf"]
 [ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="2_f5otb"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f5otb"]
+draw_center = false
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.0705882, 0.172549, 0.439216, 0.552941)
 
 [node name="CraftRecipeButton" type="MarginContainer" node_paths=PackedStringArray("itemLabel", "ingredientsLabel", "timeCraftLabel", "priceLabel", "notEnoughMaterialOverlay")]
 custom_minimum_size = Vector2(192, 192)
@@ -30,6 +38,7 @@ color = Color(0, 0.0117647, 0.0117647, 1)
 [node name="Button" type="Button" parent="."]
 layout_mode = 2
 theme = ExtResource("2_f5otb")
+theme_override_styles/hover = SubResource("StyleBoxFlat_f5otb")
 
 [node name="MarginContainer" type="MarginContainer" parent="Button"]
 layout_mode = 1
@@ -135,7 +144,7 @@ offset_bottom = 37.0
 grow_horizontal = 2
 grow_vertical = 2
 rotation = -0.523599
-pivot_offset = Vector2(106, 37)
+pivot_offset = Vector2(120, 37)
 theme = ExtResource("2_f5otb")
 theme_override_font_sizes/normal_font_size = 32
 text = "NOT ENOUGH

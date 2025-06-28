@@ -4,7 +4,7 @@ using System.Linq;
 
 public partial class CraftRecipeButton : MarginContainer {
 	int _id = -1; public int ID { get => _id; set { if (_id >= 0) return; _id = value; } }
-	ItemRecipe _recipe;
+	CraftableItemData _recipe;
 	[Export] RichTextLabel itemLabel, ingredientsLabel, timeCraftLabel, priceLabel;
 	[Export] ColorRect notEnoughMaterialOverlay;
 	ItemCraftingUserInterface owner;
@@ -19,20 +19,12 @@ public partial class CraftRecipeButton : MarginContainer {
 			return;
 		}
 
-
-
-
 		for (int i = 0; i < ItemCrafter.ALL_RECIPES.Length; i++) {
 			if (ItemCrafter.ALL_RECIPES[i].ID != ID) continue;
 			_recipe = ItemCrafter.ALL_RECIPES[i];
 		}
-		ItemRecipe[]   ingredients = _recipe.RequiredIngredients.Select(ing => ItemCrafter.ALL_RECIPES.FirstOrDefault(r => r.ID == ing.ID)).Where(r => r != null).ToArray();
-		MineralProfile[] materials = _recipe.RequiredIngredients.Select(ing => ItemCrafter.MINERALS.FirstOrDefault(r => r.ID == ing.ID)).Where(r => r != null).ToArray();
+		ItemData[] materials = _recipe.RequiredIngredients.Select(ing => ItemCrafter.ALL_ITEMS.FirstOrDefault(r => r.ID == ing.ID)).Where(r => r != null).ToArray();
 		string ingredientsText = "";
-		for (int i = 0; i < ingredients.Length; i++) {
-			if (ingredientsText.Length > 0) ingredientsText += ", ";
-			ingredientsText += $"[color={Util.CC(ingredients[i].ColorCode)}]{ingredients[i].Shorthand}[/color] x{_recipe.RequiredIngredients[i].Amount}";
-		}
 		for (int i = 0; i < materials.Length; i++) {
 			if (ingredientsText.Length > 0) ingredientsText += ", ";
 			ingredientsText += $"[color={Util.CC(materials[i].ColorCode)}]{materials[i].Shorthand}[/color] x{_recipe.RequiredIngredients[i].Amount}";

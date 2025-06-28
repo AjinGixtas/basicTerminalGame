@@ -30,7 +30,7 @@ public partial class CraftThreadButton : MarginContainer {
     ? $"([color={Util.CC(ItemCrafter.CraftThreads[ID].Recipe?.ColorCode ?? Cc.W)}]{ItemCrafter.CraftThreads[ID].Recipe.Shorthand}[/color])\n[color={Util.CC(ItemCrafter.CraftThreads[ID].Recipe?.ColorCode ?? Cc.W)}]{ItemCrafter.CraftThreads[ID].Recipe.Name}[/color]"
     : $"[color={Util.CC(Cc.W)}]null[/color]";
         ingredientLabel.Text = ItemCrafter.CraftThreads[ID].Recipe?.RequiredIngredients.Length > 0
-            ? string.Join(", ", ItemCrafter.CraftThreads[ID].Recipe.RequiredIngredients.Select(ing => $"[color={Util.CC(ItemCrafter.ALL_RECIPES[ing.ID].ColorCode)}]{ItemCrafter.ALL_RECIPES[ing.ID].Shorthand}[/color]  x{ing.Amount}"))
+            ? string.Join(", ", ItemCrafter.CraftThreads[ID].Recipe.RequiredIngredients.Select(ing => $"[color={Util.CC(ItemCrafter.ALL_ITEMS[ing.ID].ColorCode)}]{ItemCrafter.ALL_ITEMS[ing.ID].Shorthand}[/color]  x{ing.Amount}"))
             : "N/A";
         craftProgressLabel.Text = GenerateProgressBarText(ItemCrafter.CraftThreads[ID]);
     }

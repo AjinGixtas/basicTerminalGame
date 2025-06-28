@@ -13,7 +13,7 @@ public static partial class Util {
     /// <summary>
     /// Skip dialogues in the game, used for testing purposes.
     /// </summary>
-    public const bool SkipDialogues = true;
+    public const bool SkipDialogues = false;
     public static T[] Shuffle<T>(T[] array) {
         for (int i = 0; i < array.Length; i++) {
             int j = GD.RandRange(0, array.Length - 1); 
@@ -139,6 +139,8 @@ public static partial class Util {
     ///   <item><description><c>StrType.PART_SUCCESS</c>: [color=<c>Cc.C</c>]</description></item>
     ///   <item><description><c>StrType.FULL_SUCCESS</c>: [color=<c>Cc.G</c>]</description></item>
     ///   <item><description><c>StrType.UNKNOWN_ERROR</c>: calls <see cref="Format(string, StrSty)"/> recursively with error text in [color=<c>Cc.R</c>]</description></item>
+    ///   <item><description><c>StrType.GAME_WINDOW</c>: [color=<c>Cc.gR</c>]</description></item>
+    ///   <item><description><c>StrType.CODE_MODULE</c>: [color=<c>Cc.LB</c>]</description></item>
     ///   <item><description>default: returns <paramref name="input"/> unchanged.</description></item>
     /// </list>
     /// </returns>
@@ -235,7 +237,7 @@ public static partial class Util {
                     if (!double.TryParse(input, out double value))
                         return Util.Format("NUMBER_PARSE_FAILED", StrSty.ERROR);
                     int index = int.Parse(addons[0]);
-                    MineralProfile profile = ItemCrafter.MINERALS[index];
+                    ItemData profile = ItemCrafter.MINERALS[index];
                     string[] units = ["S", "Q", "T", "B", "M", "K"];
                     double[] divisors = [1e21, 1e15, 1e12, 1e9, 1e6, 1e3];
                     Cc[] unitColors = [Cc.R, Cc.Y, Cc.M, Cc.G, Cc.B, Cc.C];
@@ -267,6 +269,10 @@ public static partial class Util {
                 return $"[color={Util.CC(Cc.G)}]{input}[/color]";
             case StrSty.UNKNOWN_ERROR:
                 return Util.Format($"Unknown error encountered{(addons.Length != 0 ? $" with {addons[0]}" : "")}. Error code: {input}", StrSty.ERROR);
+            case StrSty.GAME_WINDOW:
+                return $"[color={Util.CC(Cc.gR)}]{input}[/color]";
+            case StrSty.CODE_MODULE:
+                return $"[color={Util.CC(Cc.LB)}]{input}[/color]";
             default:
                 return input;
         }

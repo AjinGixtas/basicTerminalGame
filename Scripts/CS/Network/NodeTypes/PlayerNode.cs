@@ -25,7 +25,7 @@ public class PlayerNode : ScriptedNetworkNode {
     }
     async void TutorialSpeak0() {
         if (PlayerDataManager.CompletedTutorial) return;
-        await Task.Delay(3_000);
+        await Task.Delay(5_000);
         cm.Enqueue("Hey, it's your first time here right?");
         cm.Enqueue("Well, there's a lot of things in around here, so let me give you a quick tour.");
         cm.Enqueue("But I ain't have time to teach you about it.");

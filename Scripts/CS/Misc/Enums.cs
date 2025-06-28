@@ -133,6 +133,8 @@ public enum StrSty {
     SECTOR = 25,
     T_MINERAL = 26,
     G_MINERAL = 27,
+    GAME_WINDOW = 28,
+    CODE_MODULE = 29,
 }
 public enum LockType {
     I4X = 0,

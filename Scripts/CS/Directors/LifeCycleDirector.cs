@@ -61,10 +61,10 @@ public partial class LifeCycleDirector : Node
 			[ItemCrafter.SaveItemCrafterData(StringExtensions.PathJoin(newSavePath, "ItemCrafter.tres"))],
         ];
         if (saveStatus.All(row => row.All(cell => cell == 0))) {
-            if (newSave) runtimeDirector.MakeNotification($"Saved to {newSavePath}");
-            else runtimeDirector.MakeNotification($"Overwrite to {newSavePath}");
+            if (newSave) RuntimeDirector.MakeNotification($"Saved to {newSavePath}");
+            else RuntimeDirector.MakeNotification($"Overwrite to {newSavePath}");
         } else {
-			runtimeDirector.MakeNotification("Save problem found. Check terminal output.");
+            RuntimeDirector.MakeNotification("Save problem found. Check terminal output.");
 			ShellCore.Say("-n", PlayerDataManager.GetSaveStatusMsg(saveStatus[0][0]) + "... ");
 			ShellCore.Say("-n", PlayerFileManager.GetSaveStatusMsg(saveStatus[1][0]) + "... ");
 			ShellCore.Say("-n", NetworkManager.GetSaveStatusMsg(saveStatus[2]));

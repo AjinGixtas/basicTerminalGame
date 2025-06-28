@@ -138,7 +138,9 @@ dragger_visibility = 2
 [node name="NotifTitle" type="RichTextLabel" parent="MarginContainer_2/MarginContainer/MarginContainer/HSplitContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+theme = ExtResource("2_awg2f")
 theme_override_font_sizes/normal_font_size = 10
+bbcode_enabled = true
 text = "lo 2ie joie roi2 rio 2r fhui12f hiu31hf iuh ifuh31uifhe3iu fh43iu fhui3 hgiu3h 4gu3h giu3h gi4uf3h4 iguh3i ufdh1iu4 hfi134h foi13h4i ufhi 4ouhfc4iu3h ifoh 4iohoi3f hi3 4hfiu34hfi uhf3i4u"
 vertical_alignment = 1
 

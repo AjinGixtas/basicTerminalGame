@@ -1,11 +1,30 @@
-[gd_scene load_steps=5 format=3 uid="uid://b3umcbmdsdyd1"]
+[gd_scene load_steps=8 format=3 uid="uid://b3umcbmdsdyd1"]
 
 [ext_resource type="Script" uid="uid://chuhd1chc0kpq" path="res://Scripts/CS/Crafting/ItemCraftingUserInterface.cs" id="1_2d5gl"]
 [ext_resource type="PackedScene" uid="uid://dgr170h5sh113" path="res://Scenes/InstanceScenes/CraftWindow/CraftThread.tscn" id="2_26v5y"]
 [ext_resource type="PackedScene" uid="uid://b7ieqe7gs64yc" path="res://Scenes/InstanceScenes/CraftWindow/CraftRecipeButton.tscn" id="3_sxfth"]
 [ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="4_27raq"]
 
-[node name="CraftWindow" type="MarginContainer" node_paths=PackedStringArray("craftThreadButtonContainer", "craftRecipeButtonContainer", "craftRecipeScrollContainer")]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wuo1n"]
+bg_color = Color(0.494118, 0.890196, 0.839216, 0.2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5loc3"]
+bg_color = Color(0.737255, 0.6, 0.882353, 0.2)
+border_color = Color(0, 0.678431, 0.109804, 1)
+corner_detail = 1
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_27raq"]
+bg_color = Color(0.6, 0.6, 0.6, 0.2)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0.533333, 0.266667, 1)
+corner_detail = 1
+shadow_color = Color(1, 0, 1, 1)
+anti_aliasing = false
+
+[node name="CraftWindow" type="MarginContainer" node_paths=PackedStringArray("craftThreadButtonContainer", "craftRecipeButtonContainer", "craftRecipeScrollContainer", "WindowDescriptionLabel", "threadCountUpgradeButtonText")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -22,6 +41,8 @@ craftRecipeButtonScene = ExtResource("3_sxfth")
 craftThreadButtonContainer = NodePath("VSplitContainer/ScrollContainer/CraftThreadButtonContainer")
 craftRecipeButtonContainer = NodePath("ScrollContainer_2/Container/MarginContainer/VFlowContainer")
 craftRecipeScrollContainer = NodePath("ScrollContainer_2")
+WindowDescriptionLabel = NodePath("VSplitContainer/MarginContainer/VBoxContainer/WindowDescriptionLabel")
+threadCountUpgradeButtonText = NodePath("VSplitContainer/MarginContainer/VBoxContainer/UpgradeThreadCountButton/UpgradeThreadCountText")
 metadata/_tab_index = 3
 
 [node name="VSplitContainer" type="VSplitContainer" parent="."]
@@ -33,25 +54,46 @@ layout_mode = 2
 [node name="VBoxContainer" type="VBoxContainer" parent="VSplitContainer/MarginContainer"]
 layout_mode = 2
 
-[node name="RichTextLabel" type="RichTextLabel" parent="VSplitContainer/MarginContainer/VBoxContainer"]
+[node name="WindowDescriptionLabel" type="RichTextLabel" parent="VSplitContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
-text = " Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus convallis tristique ante sed aliquet. Integer faucibus nisi non sapien finibus, et consequat ex feugiat. Curabitur ut lacus ac ex aliquet luctus nec et turpis. Integer sollicitudin ligula dapibus risus efficitur tincidunt in ac nulla. Phasellus massa diam, iaculis vitae urna eget, luctus faucibus arcu. Morbi ipsum libero, porta laoreet feugiat vel, efficitur quis nisl. Duis interdum magna sed neque hendrerit, et fringilla velit convallis. Aliquam erat volutpat. Curabitur vitae mattis dui. Sed condimentum ex at ligula hendrerit eleifend. Phasellus convallis dapibus accumsan.
-
-Cras iaculis egestas enim, et egestas dolor interdum ut. Sed laoreet, arcu nec facilisis viverra, nisi dolor dignissim lacus, id venenatis nisl sem vitae augue. Nulla facilisi. Duis volutpat pulvinar diam et elementum. Aenean sodales risus turpis, quis auctor nibh egestas condimentum. Integer blandit quam in scelerisque varius. Pellentesque et venenatis odio, at ultricies erat. Pellentesque ullamcorper interdum mauris, ut tempor ante semper eu. Vivamus rhoncus quis ex eget lacinia. Phasellus turpis sapien, suscipit id dui congue, porta volutpat libero. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Nullam metus sem, luctus nec sapien nec, congue pharetra tortor. Nam venenatis, dui quis porta varius, augue turpis pellentesque tortor, ut luctus elit quam id ante. "
+theme = ExtResource("4_27raq")
+bbcode_enabled = true
 fit_content = true
-autowrap_mode = 1
+autowrap_mode = 2
 
-[node name="Button" type="Button" parent="VSplitContainer/MarginContainer/VBoxContainer"]
-custom_minimum_size = Vector2(96, 32)
+[node name="UpgradeThreadCountButton" type="Button" parent="VSplitContainer/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(320, 32)
 layout_mode = 2
 size_flags_horizontal = 4
 theme = ExtResource("4_27raq")
+theme_override_styles/hover = SubResource("StyleBoxFlat_wuo1n")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_5loc3")
+theme_override_styles/normal = SubResource("StyleBoxFlat_27raq")
 
-[node name="ColorRect" type="ColorRect" parent="VSplitContainer/MarginContainer/VBoxContainer/Button"]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-color = Color(0.211765, 0, 0.0862745, 0.188235)
+[node name="UpgradeThreadCountBg" type="ColorRect" parent="VSplitContainer/MarginContainer/VBoxContainer/UpgradeThreadCountButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0.043672, 0.122621, 2.40654e-08, 0.188235)
+
+[node name="UpgradeThreadCountText" type="RichTextLabel" parent="VSplitContainer/MarginContainer/VBoxContainer/UpgradeThreadCountButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+bbcode_enabled = true
+text = "43f oo f3h ufhi u3hfui h3ug h4g"
+fit_content = true
+autowrap_mode = 0
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="VSplitContainer"]
 layout_mode = 2
@@ -87,3 +129,5 @@ theme_override_constants/margin_bottom = 64
 layout_mode = 2
 theme_override_constants/h_separation = 24
 theme_override_constants/v_separation = 24
+
+[connection signal="pressed" from="VSplitContainer/MarginContainer/VBoxContainer/UpgradeThreadCountButton" to="." method="OnUpgradeThreadCountButtonPressed"]

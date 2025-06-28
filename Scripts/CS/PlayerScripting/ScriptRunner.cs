@@ -20,7 +20,7 @@ public static class ScriptRunner {
         UserData.RegisterType<CError>();
         UserData.RegisterType<MainModule>();
     }
-    public static void RunPlayerScript(ScriptLanguage lang, string scriptContent, System.Collections.Generic.Dictionary<string, string> farg, string[] parg) {
+    public static void RunPlayerScript(ScriptLanguage lang, string scriptContent, Dictionary<string, string> farg, string[] parg) {
         switch (lang) {
             case ScriptLanguage.Lua:
                 RunLua(scriptContent, farg, parg);
@@ -40,7 +40,7 @@ public static class ScriptRunner {
         }
     }
 
-    public static void RunPlayerScript(string scriptContent, System.Collections.Generic.Dictionary<string, string> farg, string[] parg) {
+    public static void RunPlayerScript(string scriptContent, Dictionary<string, string> farg, string[] parg) {
         throw new Exception("DEPERACATED");
         return;
         var script = new MoonSharp.Interpreter.Script();
@@ -88,19 +88,20 @@ public static class ScriptRunner {
         }
         RunPlayerScript(file.Content, [], []);
     }
-    private static System.Collections.Generic.Dictionary<string, object> GetCoreModules() {
-        return new System.Collections.Generic.Dictionary<string, object> {
+    private static Dictionary<string, object> GetCoreModules() {
+        return new Dictionary<string, object> {
             { "NetworkModule", new NetworkModule() },
             { "KaraxeModule", new CrackModule() },
             { "BotNetModule", new HackFarmModule() },
             { "FileModule", new FileModule() },
             { "CError", new CError() },
             { "SecurityType", new SecurityType() },
-            { "MainModule", new MainModule() }
+            { "MainModule", new MainModule() },
+            { "CraftModule", new CraftModule() },
         };
     }
 
-    private static void RunLua(string scriptContent, System.Collections.Generic.Dictionary<string, string> farg, string[] parg) {
+    private static void RunLua(string scriptContent, Dictionary<string, string> farg, string[] parg) {
         var script = new MoonSharp.Interpreter.Script();
 
         // Inject modules
@@ -137,7 +138,7 @@ public static class ScriptRunner {
             ShellCore.Say("-r", "Internal error, please report this: " + ex.Message);
         }
     }
-    private static void RunJS(string scriptContent, System.Collections.Generic.Dictionary<string, string> farg, string[] parg) {
+    private static void RunJS(string scriptContent, Dictionary<string, string> farg, string[] parg) {
         var engine = new Jint.Engine(cfg => cfg
             .AllowClr()
             .LimitRecursion(64)
@@ -160,7 +161,7 @@ public static class ScriptRunner {
             ShellCore.Say("-r", $"JS Error: {ex.Message}");
         }
     }
-    private static void RunPy(string scriptContent, System.Collections.Generic.Dictionary<string, string> farg, string[] parg) {
+    private static void RunPy(string scriptContent, Dictionary<string, string> farg, string[] parg) {
         ShellCore.Say("-r", "Python support has been put off indefinitely"); return;
         var engine = IronPython.Hosting.Python.CreateEngine();
         var scope = engine.CreateScope();
@@ -183,9 +184,9 @@ public static class ScriptRunner {
             ShellCore.Say("Exception:\n" + errorText);
         }
     }
-    private static async void RunCS(string scriptContent, System.Collections.Generic.Dictionary<string, string> farg, string[] parg) {
+    private static async void RunCS(string scriptContent, Dictionary<string, string> farg, string[] parg) {
         ShellCore.Say("-r", "C# support has been put off indefinitely"); return;
-        var globals = new System.Collections.Generic.Dictionary<string, object>(GetCoreModules()) {
+        var globals = new Dictionary<string, object>(GetCoreModules()) {
             { "arf", farg },
             { "arp", parg },
             { "print", new Action<string>((msg) => {

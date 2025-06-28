@@ -9,4 +9,9 @@ public partial class RuntimeDirector : Control {
 		notifBox.ShowNotification(msg);
         ShellCore.Overseer.AddChild(notifBox);
 	}
+    public override void _Process(double delta) {
+        ShellCore.Process(delta);
+        ItemCrafter.Process(delta);
+        NetworkManager.Process(delta);
+    }
 }

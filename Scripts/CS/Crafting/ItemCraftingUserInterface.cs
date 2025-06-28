@@ -30,7 +30,6 @@ public partial class ItemCraftingUserInterface : MarginContainer {
 		WindowDescriptionLabel.Text = @$"Each thread help craft items. Items increase in value as you go deeper into the crafting system. See {Util.Format("CraftModule", StrSty.CODE_MODULE)} in scripting to see how you can automate it.";
     }
 	public override void _Process(double delta) {
-		ItemCrafter.ProcessThreads(delta);
     }
 
     int selectedThreadID = -1;

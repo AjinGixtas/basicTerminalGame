@@ -15,8 +15,6 @@ public partial class Terminal : MarginContainer {
 	}
 	public override void _Process(double delta) {
 		base._Process(delta);
-		ShellCore.Process(delta);
-		NetworkManager.Process(delta);
 	}
 	public void OnCommandFieldTextChanged() { ShellCore.OnCommandFieldTextChanged(); }
 	public void OnCrackDurationTimerTimeout() { ShellCore.OnCrackDurationTimerTimeout(); }

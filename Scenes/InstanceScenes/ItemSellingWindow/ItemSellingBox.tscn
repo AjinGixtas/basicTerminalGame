@@ -1,0 +1,58 @@
+[gd_scene load_steps=3 format=3 uid="uid://cr68a6i3krnae"]
+
+[ext_resource type="Script" uid="uid://b1w8vhydab7eh" path="res://Scripts/CS/ItemSeller/ItemSaleBox.cs" id="1_5iki4"]
+[ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="1_elxuj"]
+
+[node name="ItemSellingBox" type="MarginContainer" node_paths=PackedStringArray("priceGraph", "BasePriceOverlay")]
+custom_minimum_size = Vector2(256, 0)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+script = ExtResource("1_5iki4")
+priceGraph = NodePath("MarginContainer/PriceGraph")
+BasePriceOverlay = NodePath("MarginContainer/BasePriceOverlay")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 2
+color = Color(0.00105138, 0.00271237, 0.015968, 0.172549)
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 2
+
+[node name="PriceGraph" type="RichTextLabel" parent="MarginContainer"]
+layout_mode = 2
+theme = ExtResource("1_elxuj")
+theme_override_font_sizes/normal_font_size = 8
+bbcode_enabled = true
+text = "  ┌┐                  
+  ││                  
+  ││                  
+  ││                  
+  ││                  
+┌┐││    ┌┐    ┌┐    ┌┐
+││││    ││    ││  ┌┐││
+││││    ││    ││  ││││
+││││┌┐  ││┌┐┌┐││  ││││
+││││││  ││││││││┌┐││││
+││││││  ││││││││││││││
+││││││┌┐││││││││││││││
+││││││││││││││││││││││
+││││││││││││││││││││││
+││││││││││││││││││││││
+││││││││││││││││││││││
+└┘└┘└┘└┘└┘└┘└┘└┘└┘└┘└┘"
+fit_content = true
+
+[node name="BasePriceOverlay" type="RichTextLabel" parent="MarginContainer"]
+layout_mode = 2
+theme = ExtResource("1_elxuj")
+theme_override_font_sizes/normal_font_size = 8
+bbcode_enabled = true
+text = "eeeeeeeeeeeeeeeeeeeeeeeeee"

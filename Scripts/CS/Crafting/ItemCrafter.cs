@@ -113,7 +113,7 @@ public static class ItemCrafter {
         };
         return CError.OK;
     }
-    public static void ProcessThreads(double delta) {
+    public static void Process(double delta) {
         for (int i = 0; i < CurThreads; ++i) {
             if (CraftThreads[i].Recipe == null) continue; // No recipe assigned to this thread
 

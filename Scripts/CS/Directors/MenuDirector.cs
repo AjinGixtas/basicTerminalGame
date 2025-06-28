@@ -16,7 +16,7 @@ public partial class MenuDirector : HBoxContainer {
 	}
 	public override void _Process(double delta) {
 	}
-	public static int TERMINAL_INDEX = 0, EDITOR_INDEX = 1, BOTNET_INDEX = 2, CRAFTER_INDEX = 3;
+	public static int TERMINAL_INDEX = 0, EDITOR_INDEX = 1, BOTNET_INDEX = 2, CRAFTER_INDEX = 3, SELL_INDEX = 4;
 	public void TerminalButtonPressed() {
 		MenuWindowIndex = TERMINAL_INDEX;
 	}
@@ -25,8 +25,11 @@ public partial class MenuDirector : HBoxContainer {
 	}
 	public void BotnetButtonPressed() {
 		MenuWindowIndex = BOTNET_INDEX;
-    }
+	}
 	public void CrafterButtonPressed() {
-        MenuWindowIndex = CRAFTER_INDEX;
-    }
+		MenuWindowIndex = CRAFTER_INDEX;
+	}
+	public void SellButtonPressed() {
+		MenuWindowIndex = SELL_INDEX;
+	}
 }

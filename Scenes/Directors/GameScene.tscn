@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://ccwqfx7w5pm3k"]
+[gd_scene load_steps=12 format=3 uid="uid://ccwqfx7w5pm3k"]
 
 [ext_resource type="Script" uid="uid://cruda7xtodutw" path="res://Scripts/CS/Directors/RuntimeDirector.cs" id="1_40tl5"]
 [ext_resource type="Script" uid="uid://b2ynbwrig2yqu" path="res://Scripts/CS/Directors/MenuDirector.cs" id="2_rv8lf"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://b6bxlse3m58ck" path="res://Scenes/MajorScenes/BotnetStatusBoard.tscn" id="6_sfmy1"]
 [ext_resource type="PackedScene" uid="uid://b3umcbmdsdyd1" path="res://Scenes/MajorScenes/CraftWindow.tscn" id="7_rcn04"]
 [ext_resource type="PackedScene" uid="uid://do6l8y3ak8g27" path="res://Scenes/InstanceScenes/NotifyBox.tscn" id="9_lj5g1"]
+[ext_resource type="PackedScene" uid="uid://y72ynn4kcniq" path="res://Scenes/MajorScenes/ItemSellingWindow.tscn" id="9_on0y2"]
 
 [sub_resource type="Environment" id="Environment_y4jh7"]
 background_mode = 3
@@ -83,7 +84,13 @@ theme = ExtResource("3_0n3pm")
 text = "Crafting"
 alignment = 0
 
-[node name="Other_3" type="Button" parent="MenuDirector/MenuButtons"]
+[node name="SellButton" type="Button" parent="MenuDirector/MenuButtons"]
+layout_mode = 2
+theme = ExtResource("3_0n3pm")
+text = "SellItem"
+alignment = 0
+
+[node name="Other_4" type="Button" parent="MenuDirector/MenuButtons"]
 layout_mode = 2
 theme = ExtResource("3_0n3pm")
 text = "Other
@@ -121,6 +128,11 @@ metadata/_tab_index = 2
 visible = false
 layout_mode = 2
 
+[node name="ItemSellingWindow" parent="MenuDirector/MenuWindows" instance=ExtResource("9_on0y2")]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 4
+
 [node name="OverlayWindow" parent="." instance=ExtResource("6_1de4d")]
 position = Vector2i(427, 64)
 
@@ -128,3 +140,4 @@ position = Vector2i(427, 64)
 [connection signal="button_down" from="MenuDirector/MenuButtons/EditorButton" to="MenuDirector" method="EditorButtonPressed"]
 [connection signal="button_down" from="MenuDirector/MenuButtons/BotnetButton" to="MenuDirector" method="BotnetButtonPressed"]
 [connection signal="button_down" from="MenuDirector/MenuButtons/CraftButton" to="MenuDirector" method="CrafterButtonPressed"]
+[connection signal="pressed" from="MenuDirector/MenuButtons/SellButton" to="MenuDirector" method="SellButtonPressed"]

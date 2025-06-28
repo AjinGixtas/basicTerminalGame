@@ -11,29 +11,32 @@ public partial class LifeCycleDirector : Node
 	public override void _Ready() {
 		// Load the game scene
 		if (gameScene != null) {
-			// Intialize default state
-            RemakeScene();
-			PlayerDataManager.Setup();
-            PlayerFileManager.Setup();
-            NetworkManager.Setup();
-            QuickLoad(this);
-            ShellCore.Ready();
-            NetworkManager.Ready();
-            RemakeScene();
-            FinishScene?.Invoke();
-            foreach (Delegate d in FinishScene.GetInvocationList()) FinishScene -= (Action)d; // Clear the event to prevent multiple invocations
+			LoadGame(true);
 		} else { GD.PrintErr("Game scene not set in LifeCycleDirector."); }
     }
     public override void _Process(double delta) {
 		if (Input.IsActionJustPressed("sequentialSave")) { 
 			QuickSave(true);
 		}
-		if (Input.IsActionJustPressed("quickLoadGame")) { 
-			QuickLoad(this);
-		}
+		if (Input.IsActionJustPressed("quickLoadGame")) {
+			LoadGame(true);
+        }
 		if (Input.IsActionJustPressed("overwriteSave")) {
 			QuickSave(false);
 		}
+    }
+	void LoadGame(bool quickLoad) {
+		RemakeScene();
+		PlayerDataManager.Setup();
+		PlayerFileManager.Setup();
+		NetworkManager.Setup();
+		if (quickLoad) QuickLoad(this);
+		ShellCore.Ready();
+		NetworkManager.Ready();
+		ItemSeller.Ready();
+		RemakeScene();
+		FinishScene?.Invoke();
+		foreach (Delegate d in FinishScene.GetInvocationList()) FinishScene -= (Action)d;
 	}
 	private const string SaveRoot = "user://Saves";
 	static string CurrentSavePath = "";
@@ -101,6 +104,7 @@ public partial class LifeCycleDirector : Node
         ShellCore.Say($"\nIf error are unexpected. Email {Util.Format("ajingixtascontact", StrSty.USERNAME)}@{Util.Format("gmail.com", StrSty.HOSTNAME)}");
 		CurrentSavePath = StringExtensions.PathJoin(SaveRoot, latestFolder); // Update current save path
     }
+	
 	void RemakeScene() {
 		if (runtimeDirector != null) RemoveChild(runtimeDirector);
 		runtimeDirector = gameScene.Instantiate<RuntimeDirector>();

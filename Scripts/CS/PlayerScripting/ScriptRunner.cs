@@ -19,6 +19,7 @@ public static class ScriptRunner {
         UserData.RegisterType<FileModule>();
         UserData.RegisterType<CError>();
         UserData.RegisterType<MainModule>();
+        UserData.RegisterType<CraftModule>();
     }
     public static void RunPlayerScript(ScriptLanguage lang, string scriptContent, Dictionary<string, string> farg, string[] parg) {
         switch (lang) {

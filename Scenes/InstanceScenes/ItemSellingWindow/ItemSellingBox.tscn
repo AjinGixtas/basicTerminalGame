@@ -3,56 +3,207 @@
 [ext_resource type="Script" uid="uid://b1w8vhydab7eh" path="res://Scripts/CS/ItemSeller/ItemSaleBox.cs" id="1_5iki4"]
 [ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="1_elxuj"]
 
-[node name="ItemSellingBox" type="MarginContainer" node_paths=PackedStringArray("priceGraph", "BasePriceOverlay")]
-custom_minimum_size = Vector2(256, 0)
+[node name="ItemSellingBox" type="MarginContainer" node_paths=PackedStringArray("sellAmountInput", "CurrentPriceDisplay", "InStockAmountDisplay", "ItemSymbol")]
+custom_minimum_size = Vector2(640, 0)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -256.0
+offset_top = -16.0
+offset_right = 256.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+script = ExtResource("1_5iki4")
+sellAmountInput = NodePath("HFlowContainer/VSplitContainer/SellAmountControl/MarginContainer/HFlowContainer/LineEdit")
+CurrentPriceDisplay = NodePath("HFlowContainer/Control/PriceSection/HFlowContainer/PriceDisplay")
+InStockAmountDisplay = NodePath("HFlowContainer/Control/InStockDisplay/HFlowContainer/InStockDisplay")
+ItemSymbol = NodePath("HFlowContainer/MarginContainer/ItemSymbolDisplay")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 2
+color = Color(1, 1, 1, 0.0196078)
+
+[node name="HFlowContainer" type="HFlowContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="MarginContainer" type="MarginContainer" parent="HFlowContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+
+[node name="ItemSymbolDisplay" type="RichTextLabel" parent="HFlowContainer/MarginContainer"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+theme = ExtResource("1_elxuj")
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "[color=#00ffff]ABV^[/color]"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Control" type="HSplitContainer" parent="HFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+split_offset = 64
+dragging_enabled = false
+dragger_visibility = 2
+
+[node name="PriceSection" type="Control" parent="HFlowContainer/Control"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HFlowContainer" type="HFlowContainer" parent="HFlowContainer/Control/PriceSection"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -8.5
+offset_bottom = 8.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PriceDesc" type="RichTextLabel" parent="HFlowContainer/Control/PriceSection/HFlowContainer"]
+layout_mode = 2
+theme = ExtResource("1_elxuj")
+theme_override_colors/default_color = Color(1, 1, 1, 0.4)
+theme_override_font_sizes/normal_font_size = 10
+bbcode_enabled = true
+text = "Price:"
+fit_content = true
+autowrap_mode = 0
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PriceDisplay" type="RichTextLabel" parent="HFlowContainer/Control/PriceSection/HFlowContainer"]
+layout_mode = 2
+theme = ExtResource("1_elxuj")
+bbcode_enabled = true
+text = "323M333K287GC   -30.00%^"
+fit_content = true
+autowrap_mode = 0
+vertical_alignment = 1
+
+[node name="InStockDisplay" type="Control" parent="HFlowContainer/Control"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HFlowContainer" type="HFlowContainer" parent="HFlowContainer/Control/InStockDisplay"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -8.5
+offset_bottom = 8.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="InStockDesc" type="RichTextLabel" parent="HFlowContainer/Control/InStockDisplay/HFlowContainer"]
+layout_mode = 2
+theme = ExtResource("1_elxuj")
+theme_override_colors/default_color = Color(1, 1, 1, 0.4)
+theme_override_font_sizes/normal_font_size = 10
+bbcode_enabled = true
+text = "InStock:"
+fit_content = true
+autowrap_mode = 0
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="InStockDisplay" type="RichTextLabel" parent="HFlowContainer/Control/InStockDisplay/HFlowContainer"]
+layout_mode = 2
+theme = ExtResource("1_elxuj")
+bbcode_enabled = true
+text = "12345678910"
+fit_content = true
+autowrap_mode = 0
+vertical_alignment = 1
+
+[node name="VSplitContainer" type="HSplitContainer" parent="HFlowContainer"]
+layout_mode = 2
+dragging_enabled = false
+dragger_visibility = 2
+
+[node name="SellAmountControl" type="Control" parent="HFlowContainer/VSplitContainer"]
+custom_minimum_size = Vector2(128, 0)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="HFlowContainer/VSplitContainer/SellAmountControl"]
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-size_flags_horizontal = 3
-script = ExtResource("1_5iki4")
-priceGraph = NodePath("MarginContainer/PriceGraph")
-BasePriceOverlay = NodePath("MarginContainer/BasePriceOverlay")
-
-[node name="ColorRect" type="ColorRect" parent="."]
-layout_mode = 2
-color = Color(0.00105138, 0.00271237, 0.015968, 0.172549)
-
-[node name="MarginContainer" type="MarginContainer" parent="."]
-layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 2
 
-[node name="PriceGraph" type="RichTextLabel" parent="MarginContainer"]
+[node name="HFlowContainer" type="HFlowContainer" parent="HFlowContainer/VSplitContainer/SellAmountControl/MarginContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="InStockDesc" type="RichTextLabel" parent="HFlowContainer/VSplitContainer/SellAmountControl/MarginContainer/HFlowContainer"]
 layout_mode = 2
 theme = ExtResource("1_elxuj")
-theme_override_font_sizes/normal_font_size = 8
+theme_override_colors/default_color = Color(1, 1, 1, 0.4)
+theme_override_font_sizes/normal_font_size = 10
 bbcode_enabled = true
-text = "  ┌┐                  
-  ││                  
-  ││                  
-  ││                  
-  ││                  
-┌┐││    ┌┐    ┌┐    ┌┐
-││││    ││    ││  ┌┐││
-││││    ││    ││  ││││
-││││┌┐  ││┌┐┌┐││  ││││
-││││││  ││││││││┌┐││││
-││││││  ││││││││││││││
-││││││┌┐││││││││││││││
-││││││││││││││││││││││
-││││││││││││││││││││││
-││││││││││││││││││││││
-││││││││││││││││││││││
-└┘└┘└┘└┘└┘└┘└┘└┘└┘└┘└┘"
+text = "Amount:"
 fit_content = true
+autowrap_mode = 0
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="BasePriceOverlay" type="RichTextLabel" parent="MarginContainer"]
+[node name="LineEdit" type="LineEdit" parent="HFlowContainer/VSplitContainer/SellAmountControl/MarginContainer/HFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("1_elxuj")
+text = "0"
+
+[node name="ColorRect" type="ColorRect" parent="HFlowContainer/VSplitContainer/SellAmountControl/MarginContainer/HFlowContainer/LineEdit"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0.105882, 0.286275, 0.211765, 0.32549)
+
+[node name="SellButton" type="Button" parent="HFlowContainer/VSplitContainer"]
+custom_minimum_size = Vector2(96, 0)
 layout_mode = 2
 theme = ExtResource("1_elxuj")
-theme_override_font_sizes/normal_font_size = 8
-bbcode_enabled = true
-text = "eeeeeeeeeeeeeeeeeeeeeeeeee"
+
+[node name="ColorRect" type="ColorRect" parent="HFlowContainer/VSplitContainer/SellButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0, 0.227451, 0, 1)
+
+[node name="RichTextLabel" type="RichTextLabel" parent="HFlowContainer/VSplitContainer/SellButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+theme = ExtResource("1_elxuj")
+theme_override_font_sizes/normal_font_size = 16
+text = "Sell"
+fit_content = true
+autowrap_mode = 0
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="pressed" from="HFlowContainer/VSplitContainer/SellButton" to="." method="OnSellItems"]

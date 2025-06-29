@@ -220,17 +220,18 @@ public static partial class Util {
                     double[] divisors = [1e21, 1e15, 1e12, 1e9, 1e6, 1e3];
                     Cc[] colors = [Cc.R, Cc.Y, Cc.M, Cc.G, Cc.B, Cc.C];
                     string sb = ""; double remainder = value;
+                    Cc numberColor = addons.Length == 0 ? Cc.w : (Cc)int.Parse(addons[0]);
                     for (int i = 0; i < units.Length; i++) {
                         if (remainder >= divisors[i]) {
                             int unitValue = (int)System.Math.Floor(remainder / divisors[i]);
                             remainder -= unitValue * divisors[i];
-                            sb += $"[color={Util.CC(Cc.w)}]{unitValue}[/color][color={Util.CC(colors[i])}]{units[i]}[/color]";
+                            sb += $"[color={Util.CC(numberColor)}]{unitValue}[/color][color={Util.CC(colors[i])}]{units[i]}[/color]";
                         }
                     }
                     string gcValue;
                     gcValue = Mathf.Ceil(remainder).ToString("F0");
                     if (gcValue == "000") { gcValue = ""; }
-                    return sb + $"[color={Util.CC(Cc.w)}]{gcValue}[/color][color={Util.CC(Cc.Y)}]GC[/color]";
+                    return sb + $"[color={Util.CC(numberColor)}]{gcValue}[/color][color={Util.CC(Cc.Y)}]GC[/color]";
                 }
             case StrSty.T_MINERAL: {
                     if (string.IsNullOrWhiteSpace(input)) return "";

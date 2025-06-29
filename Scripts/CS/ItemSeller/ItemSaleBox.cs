@@ -1,55 +1,27 @@
 using Godot;
-using System.Linq;
-using System.Text;
 
 public partial class ItemSaleBox : Control {
 	public void Init(int id) { itemID = id; }
-	[Export] RichTextLabel priceGraph;
-	const int LINE_COUNT = 18, LINE_LENGTH = 40;
-	static readonly (char, double)[] graphChar = new (char, double)[] {
-		(' ', 1.0 / LINE_COUNT / 8.0 * 0.0),
-		('▁', 1.0 / LINE_COUNT / 8.0 * 1.0),
-		('▂', 1.0 / LINE_COUNT / 8.0 * 2.0),
-		('▃', 1.0 / LINE_COUNT / 8.0 * 3.0),
-		('▄', 1.0 / LINE_COUNT / 8.0 * 4.0),
-		('▅', 1.0 / LINE_COUNT / 8.0 * 5.0),
-		('▆', 1.0 / LINE_COUNT / 8.0 * 6.0),
-		('▇', 1.0 / LINE_COUNT / 8.0 * 7.0),
-		('█', 1.0 / LINE_COUNT / 8.0 * 8.0),
-	};
+	[Export] LineEdit sellAmountInput;
+	[Export] RichTextLabel CurrentPriceDisplay, InStockAmountDisplay, ItemSymbol;
 	[Export] int itemID = -1;
-	StringBuilder[] sbs = new StringBuilder[LINE_COUNT];
-    const string pattern = "[color=#123456]-[/color]";
-
-	[Export] RichTextLabel BasePriceOverlay;
     public override void _Ready() {
-        string repeated = string.Concat(Enumerable.Repeat(pattern, LINE_LENGTH));
-        for (int i = 0; i < LINE_COUNT; i++) sbs[i] = new(repeated);
-		BasePriceOverlay.Text = $"[color={Util.CC(Cc.w)}]" + 
-			string.Concat(Enumerable.Repeat(new string('-', LINE_LENGTH) + '\n', LINE_COUNT/3)) +
-            string.Concat(Enumerable.Repeat(new string('-', LINE_LENGTH) + '\n', LINE_COUNT/3-1)) +
-            string.Concat(Enumerable.Repeat(new string('─', LINE_LENGTH) + '\n', 1)) +
-            string.Concat(Enumerable.Repeat(new string('-', LINE_LENGTH) + '\n', LINE_COUNT/3)) + "[/color]";
-    }
-	public void RenderGraph() {
-		string[] queue = GenerateGraphComponent(itemID);
-		StringBuilder sb = new();
-		for (int i = 0; i < sbs.Length; i++) {
-			sbs[i].Remove(0, pattern.Length); sbs[i].Append(queue[i]);
-			sb.Append(sbs[i]);
-			sb.Append('\n');
-		}
-		priceGraph.Text = sb.ToString();
+		ItemSymbol.Text = $"[color={Util.CC(ItemCrafter.ALL_ITEMS[itemID].ColorCode)}]{ItemCrafter.ALL_ITEMS[itemID].Shorthand}[/color]";
 	}
-	static string[] GenerateGraphComponent(int itemID) {
-		double percentage = (ItemSeller.ItemPricesModel[itemID].value - ItemSeller.ItemPricesModel[itemID].dMiVal) / ItemSeller.ItemPricesModel[itemID].raVal;
-        string[] result = new string[LINE_COUNT];
-		int bI = graphChar.Length-1; /* Index iterate backward */
-		for (int i = LINE_COUNT-1; i > -1; --i) {
-			while (percentage < graphChar[bI].Item2 && bI > 0) --bI;
-			result[i] = $"[color={Util.CC((ItemSeller.ItemPricesModel[itemID].value > ItemSeller.ItemPricesModel[itemID].pastValue) ? Cc.g : (ItemSeller.ItemPricesModel[itemID].value < ItemSeller.ItemPricesModel[itemID].pastValue) ? Cc.r : Cc.y)}]{graphChar[bI].Item1}[/color]";
-			percentage -= graphChar[bI].Item2;
-		}
-		return result;
+    public void Render() {
+		double percentDiffer = ((ItemSeller.ItemPricesModel[itemID].value - ItemCrafter.ALL_ITEMS[itemID].Value) / ItemCrafter.ALL_ITEMS[itemID].Value * 100);
+		int deltaCode = ItemSeller.ItemPricesModel[itemID].value > ItemSeller.ItemPricesModel[itemID].pastValue ? 1 : ItemSeller.ItemPricesModel[itemID].value < ItemSeller.ItemPricesModel[itemID].pastValue ? -1 : 0;
+		string arrow = deltaCode == 1 ? "▴" : deltaCode == -1 ? "▾" : "-";
+		CurrentPriceDisplay.Text = Util.Format($"{ItemSeller.ItemPricesModel[itemID].value}", StrSty.NUMBER).PadLeft(35)
+			+ $"[color={Util.CC(Cc.Y)}]GC[/color]"
+			+ $"     [color={Util.CC(percentDiffer > 0 ? Cc.g : percentDiffer < 0 ? Cc.r : Cc.y)}]{percentDiffer,6:F2}%"
+			+ $"[color={Util.CC(deltaCode == 1 ? Cc.LG : deltaCode == -1 ? Cc.LR : Cc.LY)}]{arrow}[/color][/color]";
+
+        InStockAmountDisplay.Text = Util.Format($"{PlayerDataManager.MineInv[itemID]}", StrSty.NUMBER, "0");
+	}
+	public void OnSellItems() {
+		if (!long.TryParse(sellAmountInput.Text, out long amount)) {RuntimeDirector.MakeNotification(Util.Format("Invalid amount provided!", StrSty.ERROR)); return; }
+		if (PlayerDataManager.WithdrawMineral(itemID, amount) != CError.OK) { RuntimeDirector.MakeNotification(Util.Format("Not enough in stock to sell!", StrSty.ERROR)); return; }
+		PlayerDataManager.DepositGC((long)(ItemSeller.ItemPricesModel[itemID].value * amount));
 	}
 }

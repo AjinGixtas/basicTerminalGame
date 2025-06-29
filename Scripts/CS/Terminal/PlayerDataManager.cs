@@ -69,15 +69,21 @@ public static partial class PlayerDataManager {
 		} else ShellCore.Say($"Deposited {Util.Format($"{amount}", StrSty.MONEY)}");
 		return CError.OK;
 	}
-	public static long WithdrawMineral(long[] amounts) {
-		if (amounts.Length != _mineInv.Length) return 1; // Invalid amount
+	public static CError WithdrawMineral(long[] amounts) {
+		if (amounts.Length != _mineInv.Length) return CError.INVALID; // Invalid amount
 		for (int i = 0; i < amounts.Length; ++i) {
-			if (amounts[i] < 0 || amounts[i] > _mineInv[i]) return 2; // Invalid amount
+			if (amounts[i] < 0 || amounts[i] > _mineInv[i]) return CError.INSUFFICIENT; // Invalid amount
 		}
 		for (int i = 0; i < amounts.Length; ++i) {
 			_mineInv[i] -= amounts[i];
 		}   
-		return 0;
+		return CError.OK;
+	}
+	public static CError WithdrawMineral(int type, long amount) {
+		if (_mineInv.Length <= type) return CError.INVALID;
+		if (amount < 0 || amount > _mineInv[type]) return CError.INSUFFICIENT;
+		_mineInv[type] -= amount;
+		return CError.OK;
 	}
 	public static long DepositMineral(long[] amounts) {
 		if (amounts.Length != _mineInv.Length) return 1; // Invalid amount

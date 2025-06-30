@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://ccwqfx7w5pm3k"]
+[gd_scene load_steps=13 format=3 uid="uid://ccwqfx7w5pm3k"]
 
 [ext_resource type="Script" uid="uid://cruda7xtodutw" path="res://Scripts/CS/Directors/RuntimeDirector.cs" id="1_40tl5"]
 [ext_resource type="Script" uid="uid://b2ynbwrig2yqu" path="res://Scripts/CS/Directors/MenuDirector.cs" id="2_rv8lf"]
@@ -17,6 +17,12 @@ glow_enabled = true
 glow_intensity = 8.0
 glow_hdr_scale = 0.0
 glow_hdr_luminance_cap = 0.05
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_on0y2"]
+content_margin_left = 16.0
+bg_color = Color(1, 0, 1, 0)
+draw_center = false
+corner_detail = 1
 
 [node name="RuntimeDirector" type="Control" node_paths=PackedStringArray("terminal", "textEditor", "overlayWindow")]
 layout_mode = 3
@@ -63,30 +69,35 @@ alignment = 1
 [node name="TerminalButton" type="Button" parent="MenuDirector/MenuButtons"]
 layout_mode = 2
 theme = ExtResource("3_0n3pm")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_on0y2")
 text = "Terminal"
 alignment = 0
 
 [node name="EditorButton" type="Button" parent="MenuDirector/MenuButtons"]
 layout_mode = 2
 theme = ExtResource("3_0n3pm")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_on0y2")
 text = "Editor"
 alignment = 0
 
 [node name="BotnetButton" type="Button" parent="MenuDirector/MenuButtons"]
 layout_mode = 2
 theme = ExtResource("3_0n3pm")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_on0y2")
 text = "BitMiner"
 alignment = 0
 
 [node name="CraftButton" type="Button" parent="MenuDirector/MenuButtons"]
 layout_mode = 2
 theme = ExtResource("3_0n3pm")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_on0y2")
 text = "Crafting"
 alignment = 0
 
 [node name="SellButton" type="Button" parent="MenuDirector/MenuButtons"]
 layout_mode = 2
 theme = ExtResource("3_0n3pm")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_on0y2")
 text = "SellItem"
 alignment = 0
 

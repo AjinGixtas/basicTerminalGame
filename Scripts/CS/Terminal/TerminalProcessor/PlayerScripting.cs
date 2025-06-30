@@ -8,7 +8,7 @@ public static partial class ShellCore {
     /// <param name="parg">Positional arguments, follow the order they are provided in by the player.</param>
     static void Run(System.Collections.Generic.Dictionary<string, string> farg, string[] parg) {
         if (parg.Length == 0) {
-            ShellCore.Say("y", "Usage: run <script_file>");
+            ShellCore.Say("-r", "No file name provided.");
             RUNrunCMD?.Invoke("", "", CError.MISSING);
             return;
         }

@@ -47,8 +47,8 @@ $@"[color={Util.CC(Cc.w)}]Botnet:[/color] {Util.Format(minerName, StrSty.HOSTNAM
     public static event Action<(CError, string, string, string)[]> KARrunCMD;
 	static void Karaxe(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		if (parsedArgs.ContainsKey("--axe") && parsedArgs.ContainsKey("--flare")) {
-			Say("-r", "You can not use --axe and --flare at the same time.");
-			KARrunCMD?.Invoke([(CError.UNKNOWN, "", "", "--flare and --axe incompatible")]);
+			Say("-r", $"You can not use {Util.Format("--axe", StrSty.CMD_FLAG)} and {Util.Format("--flare",StrSty.CMD_FLAG)} at the same time.");
+			KARrunCMD?.Invoke([(CError.UNKNOWN, "", "", "--axe and --flare incompatible")]);
 			return;
 		}
         if (parsedArgs.ContainsKey("--flare")) {

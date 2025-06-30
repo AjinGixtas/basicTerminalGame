@@ -15,11 +15,11 @@ public static partial class ShellCore {
         string text = string.Join(" ", positionalArgs);
         if (parsedArgs.ContainsKey("-e")) text = Regex.Unescape(text); // handles \n, \t, etc.
         if (!parsedArgs.ContainsKey("-b")) text = Util.EscapeBBCode(text);
-        if (parsedArgs.ContainsKey("-t")) text = text.TrimEnd('\n', '\r');
-        if (parsedArgs.ContainsKey("-l")) text = text.TrimStart('\n', '\r');
+        //if (parsedArgs.ContainsKey("-t")) text = text.TrimEnd('\n', '\r');
+        //if (parsedArgs.ContainsKey("-l")) text = text.TrimStart('\n', '\r');
         if (!parsedArgs.ContainsKey("-n")) text += "\n";
-        if (parsedArgs.ContainsKey("-r")) text = Util.Format(text, StrSty.ERROR);
-        if (parsedArgs.ContainsKey("-w")) text = Util.Format(text, StrSty.WARNING);
+        //if (parsedArgs.ContainsKey("-r")) text = Util.Format(text, StrSty.ERROR);
+        //if (parsedArgs.ContainsKey("-w")) text = Util.Format(text, StrSty.WARNING);
         terminalOutputField.AppendText(text);
     }
     public static void SayM(string content) {
@@ -124,6 +124,7 @@ public static partial class ShellCore {
         }
         SetCommandPrompt();
     }
+    
     static void SeeColor(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         var colorNames = new (Cc, string)[] {
         (Cc._, "Black"),

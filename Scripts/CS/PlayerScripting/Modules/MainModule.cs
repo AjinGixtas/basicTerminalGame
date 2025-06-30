@@ -7,8 +7,16 @@ public class MainModule {
     /// </summary>
     /// <param name="content">The string to be said.</param>
     public void Say(string content) {
-		ShellCore.SayM(content);
-	}
+        ShellCore.Say(content);
+    }
+    /// <summary>
+    /// Says the given content to the terminal processor without '\n' at the end.
+    /// 
+    /// </summary>
+    /// <param name="content">The string to be said.</param>
+    public void SayM(string content) {
+        ShellCore.SayM(content);
+    }
     /// <summary>
     /// Clears the terminal processor.
     /// </summary>

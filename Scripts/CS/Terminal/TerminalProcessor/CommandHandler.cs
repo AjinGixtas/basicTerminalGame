@@ -36,12 +36,12 @@ public static partial class ShellCore {
             case "rmf": RmF(farg, parg); break; // Remove file
             case "pwd": Pwd(farg, parg); break; // List current folder path
             case "run": Run(farg, parg); break; // Run a script file
-            case "cat": Cat(farg, parg); break; // Output file content to terminal
             case "say" or "echo": Say(farg, parg); break; // Output to terminal
             case "help": Help(farg, parg); break; // List how commands work
             case "home": Home(farg, parg); break; // Go to the player's node
             case "edit" or "nano" or "vim": Edit(farg, parg); break; // Open a file for edit
             case "scan" or "nmap": Scan(farg, parg); break; // Scan neighbouring node
+            case "read": Read(farg, parg); break; // Output file content to terminal
             case "farm": Farm(farg, parg); break; // Interact with a node's HackFarm (GCminer)
             case "link": Link(farg, parg); break; // Connect to sector(s)
             case "stats": Stats(farg, parg); break;
@@ -55,6 +55,8 @@ public static partial class ShellCore {
             case "connect": Connect(farg, parg); break; // Connect to node
             case "analyze": Analyze(farg, parg); break; // Give data about a node
             case "setname": SetName(farg, parg); break; // Set name of user and node
+            case "bitrader": BiTrader(farg, parg); break;
+            case "bitcrafter": BitCrafter(farg, parg);break;
 
             case "xyzzy": Say("Nothing happens"); break; // Classic Easter egg command
 

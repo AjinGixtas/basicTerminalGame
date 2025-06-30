@@ -1,6 +1,6 @@
 using Godot;
 
-public partial class EditorTab : CodeEdit
+public partial class EditorTab : TextEdit
 {
 	NodeFile file;
 	TextEditor textEditor;
@@ -9,17 +9,11 @@ public partial class EditorTab : CodeEdit
 		Text = file.Content;
 		this.textEditor = textEditor;
 	}
-	public override void _Ready() {
-		AddStringDelimiter("[[", "]]", false);
-		AddStringDelimiter("[=", "=]", false);
-		AddCommentDelimiter("--", "", true);
-		AddCommentDelimiter("--[[", "]]", false);
-	}
 	public override void _Process(double delta) {
 		if (HasFocus()) {
-			if (Input.IsActionJustPressed("closeTab")) { textEditor.CloseTab(false); }
 			if (Input.IsActionJustPressed("saveFile")) { Save(); }
-			if (file.Content != Text) textEditor.tabBar.SetTabTitle(textEditor.tabBar.CurrentTab, file.Name + "*");
+			else if (Input.IsActionJustPressed("closeTab")) { textEditor.CloseTab(false); }
+			else if (file.Content != Text) textEditor.tabBar.SetTabTitle(textEditor.tabBar.CurrentTab, file.Name + "*");
 			else textEditor.tabBar.SetTabTitle(textEditor.tabBar.CurrentTab, file.Name);
         }
 	}
@@ -28,12 +22,5 @@ public partial class EditorTab : CodeEdit
 	}
 	public void Save() {
 		file.Content = Text;
-	}
-	public void OnCodeCompletionRequested() {
-		AddCodeCompletionOption(CodeCompletionKind.Function, "ax:Say", "ax:Say");
-		UpdateCodeCompletionOptions(false);
-	}
-	public void OnTextChanged() {
-		RequestCodeCompletion();
 	}
 }

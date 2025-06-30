@@ -1,17 +1,24 @@
-[gd_scene load_steps=6 format=3 uid="uid://b6bxlse3m58ck"]
+[gd_scene load_steps=8 format=3 uid="uid://b6bxlse3m58ck"]
 
 [ext_resource type="PackedScene" uid="uid://yios1pd5iiwu" path="res://Scenes/InstanceScenes/BotnetScene/BotStatusBoard.tscn" id="1_6dl4o"]
 [ext_resource type="Script" uid="uid://6tyyj67b4g5a" path="res://Scripts/CS/BotnetDashboard/BotnetDashboard.cs" id="1_fnrm0"]
 [ext_resource type="PackedScene" uid="uid://bdnxo2pmmm0v8" path="res://Scenes/InstanceScenes/BotnetScene/BotSlide.tscn" id="2_fnrm0"]
 [ext_resource type="Theme" uid="uid://b1ho65js5h7y7" path="res://Utilities/Themes/Botnet.tres" id="4_uighi"]
+[ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="4_x43ih"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uighi"]
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+bg_color = Color(0.207843, 0.207843, 0.207843, 0.6)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.8, 0.8, 1, 1)
 
-[node name="MarginContainer" type="MarginContainer" node_paths=PackedStringArray("slideContainer", "botStatusBoard")]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x43ih"]
+bg_color = Color(0.6, 0.6, 0.6, 0.262745)
+corner_detail = 1
+
+[node name="MarginContainer" type="MarginContainer" node_paths=PackedStringArray("slideContainer", "botStatusBoard", "pageAmountLabel", "curPageIO")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -24,6 +31,8 @@ slideScene = ExtResource("2_fnrm0")
 slideContainer = NodePath("SplitContainer/Control/ScrollContainer/MarginContainer/HFlowContainer")
 botStatusBoard = NodePath("SplitContainer/BotStatusBoard")
 _pageLength = 20
+pageAmountLabel = NodePath("SplitContainer/Control/MarginContainer/PageControlBar/PageControl/RichTextLabel")
+curPageIO = NodePath("SplitContainer/Control/MarginContainer/PageControlBar/PageControl/LineEdit")
 
 [node name="SplitContainer" type="VSplitContainer" parent="."]
 layout_mode = 2
@@ -36,6 +45,8 @@ layout_mode = 2
 [node name="Control" type="VSplitContainer" parent="SplitContainer"]
 layout_mode = 2
 split_offset = 48
+dragging_enabled = false
+dragger_visibility = 2
 
 [node name="MarginContainer" type="MarginContainer" parent="SplitContainer/Control"]
 layout_mode = 2
@@ -52,53 +63,101 @@ layout_mode = 2
 offset_right = 315.0
 offset_bottom = 32.0
 
+[node name="RichTextLabel" type="RichTextLabel" parent="SplitContainer/Control/MarginContainer/PageControlBar/HFlowContainer"]
+layout_mode = 2
+theme = ExtResource("4_x43ih")
+theme_override_font_sizes/normal_font_size = 20
+bbcode_enabled = true
+text = "Page size:"
+fit_content = true
+autowrap_mode = 0
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="PageSize10" type="Button" parent="SplitContainer/Control/MarginContainer/PageControlBar/HFlowContainer"]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
+theme = ExtResource("4_x43ih")
 theme_override_styles/normal = SubResource("StyleBoxFlat_uighi")
+text = "10"
 
 [node name="PageSize20" type="Button" parent="SplitContainer/Control/MarginContainer/PageControlBar/HFlowContainer"]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_uighi")
+text = "20"
 
 [node name="PageSize50" type="Button" parent="SplitContainer/Control/MarginContainer/PageControlBar/HFlowContainer"]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_uighi")
+text = "50"
 
 [node name="PageSize100" type="Button" parent="SplitContainer/Control/MarginContainer/PageControlBar/HFlowContainer"]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_uighi")
+text = "100
+"
 
 [node name="PageControl" type="HFlowContainer" parent="SplitContainer/Control/MarginContainer/PageControlBar"]
-custom_minimum_size = Vector2(0, 32)
-layout_mode = 2
-offset_left = 315.0
-offset_right = 1104.0
-offset_bottom = 32.0
+custom_minimum_size = Vector2(192, 32)
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -37.0
+grow_horizontal = 0
+grow_vertical = 2
 alignment = 2
 
 [node name="LeftButton" type="Button" parent="SplitContainer/Control/MarginContainer/PageControlBar/PageControl"]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
+theme = ExtResource("4_x43ih")
 theme_override_styles/normal = SubResource("StyleBoxFlat_uighi")
+text = "<<"
 
 [node name="LineEdit" type="LineEdit" parent="SplitContainer/Control/MarginContainer/PageControlBar/PageControl"]
 layout_mode = 2
+theme = ExtResource("4_x43ih")
+
+[node name="ColorRect" type="ColorRect" parent="SplitContainer/Control/MarginContainer/PageControlBar/PageControl/LineEdit"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0.8, 1, 0.8, 0.121569)
 
 [node name="RichTextLabel" type="RichTextLabel" parent="SplitContainer/Control/MarginContainer/PageControlBar/PageControl"]
 layout_mode = 2
+theme = ExtResource("4_x43ih")
+theme_override_font_sizes/normal_font_size = 20
 text = "/30"
 fit_content = true
 autowrap_mode = 0
 vertical_alignment = 1
 
+[node name="ColorRect" type="ColorRect" parent="SplitContainer/Control/MarginContainer/PageControlBar/PageControl/RichTextLabel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.552941, 1, 1, 0)
+
 [node name="RightButton" type="Button" parent="SplitContainer/Control/MarginContainer/PageControlBar/PageControl"]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
+theme = ExtResource("4_x43ih")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_x43ih")
 theme_override_styles/normal = SubResource("StyleBoxFlat_uighi")
+text = ">>"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="SplitContainer/Control"]
 layout_mode = 2
@@ -130,4 +189,6 @@ wait_time = 0.1
 [connection signal="pressed" from="SplitContainer/Control/MarginContainer/PageControlBar/HFlowContainer/PageSize20" to="." method="SetPageLength" binds= [20]]
 [connection signal="pressed" from="SplitContainer/Control/MarginContainer/PageControlBar/HFlowContainer/PageSize50" to="." method="SetPageLength" binds= [50]]
 [connection signal="pressed" from="SplitContainer/Control/MarginContainer/PageControlBar/HFlowContainer/PageSize100" to="." method="SetPageLength" binds= [100]]
+[connection signal="pressed" from="SplitContainer/Control/MarginContainer/PageControlBar/PageControl/LeftButton" to="." method="PrevPage"]
+[connection signal="pressed" from="SplitContainer/Control/MarginContainer/PageControlBar/PageControl/RightButton" to="." method="NextPage"]
 [connection signal="timeout" from="TimerContainer/RefreshDashboardTimer" to="." method="OnRefreshTimerTimeout"]

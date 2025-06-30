@@ -6,13 +6,10 @@ public partial class TextEditor : MarginContainer {
 	[Export] RichTextLabel noFileOpenedTab;
 	[Export] ConfirmationDialog saveDialog;
 	public override void _Ready() {
-		InitializeOnReadyVar();
 		noFileOpenedTab.Text =
 @$"No file opened.
 Run {Util.Format("mkf FILENAME", StrSty.CMD_FUL)} to make a new file.
 Run {Util.Format("edit FILENAME", StrSty.CMD_FUL)} to open that file here.";
-	}
-	void InitializeOnReadyVar() {
 	}
 	public void OpenNewFile(string HostName, NodeFile nodeFile) {
 		tabBar.AddTab($"{nodeFile.Name}", null);
@@ -30,14 +27,14 @@ Run {Util.Format("edit FILENAME", StrSty.CMD_FUL)} to open that file here.";
 		if (tabBar.CurrentTab == -1) return; // No tab is selected
 		EditorTab tab = tabContainer.GetChild<EditorTab>(tabContainer.CurrentTab);
 		if (tab.IsDirty() && !forced) { saveDialog.Show(); saveDialog.GrabFocus(); return; }
-		tabBar.RemoveTab(tabContainer.CurrentTab-1);
+		tabBar.RemoveTab(tabContainer.CurrentTab - 1);
 		tabContainer.RemoveChild(tab);
 		if (tabBar.TabCount > 0) { 
 			tabBar.CurrentTab = tabBar.TabCount - 1; 
 			tabContainer.CurrentTab = tabContainer.GetTabCount()  - 1;
 		}
 	}
-	public void ConfirmedClosing() {
+    public void ConfirmedClosing() {
 		CloseTab(true);
 	}
 	public void ConfirmedCanceled() {

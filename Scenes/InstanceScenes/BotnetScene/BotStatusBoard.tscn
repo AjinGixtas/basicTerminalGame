@@ -35,17 +35,8 @@ offset_bottom = 167.0
 focus_mode = 2
 theme = ExtResource("2_7b57d")
 bbcode_enabled = true
-text = "$@\"[color={Util.CC(Cc.w)}]Botnet:[/color] {Util.Format(minerName, StrType.HOSTNAME)}
-{Util.GenerateStringByProportions([.. hackfarm.mineralDistribution.Select(x => x.Item2)], [.. hackfarm.mineralDistribution.Select(x => Util.MINERAL_PROFILES[x.Item1].ColorCode)], 50)}
-{string.Join(\" | \", hackfarm.mineralDistribution.Select(x => $\"[color={Util.MINERAL_PROFILES[x.Item1].ColorCode}]{Util.MINERAL_PROFILES[x.Item1].Shorthand}[/color]: {Util.Format($\"{x.Item2 * 100.0:0.00}\", StrType.NUMBER)}%\"))}
-================================================================
-[color={Util.CC(Cc.w)}]Batch size[/color]    | Lvl.{Util.Format($\"{hackfarm.HackLVL}\", StrType.NUMBER):3} | {Util.Format($\"{hackfarm.HackVal}\", StrType.NUMBER):3}
-[color={Util.CC(Cc.w)}]Mining speed[/color]  | Lvl.{Util.Format($\"{hackfarm.GrowLVL}\", StrType.NUMBER):3} | {Util.Format($\"{hackfarm.GrowVal}\", StrType.NUMBER):3}
-[color={Util.CC(Cc.w)}]Transfer time[/color] | Lvl.{Util.Format($\"{hackfarm.TimeLVL}\", StrType.NUMBER):3} | {Util.Format($\"{hackfarm.TimeVal}\", StrType.NUMBER):3}
-================================================================
-[color={Util.CC(Cc.w)}]Aprox. Time To Live:[/color] {Util.TimeDifferenceFriendly(hackfarm.LifeTime)}
-
-!NODE UPGRADABLE THROUGH SCRIPTING!\""
+text = "
+                                 No bot selected."
 fit_content = true
 autowrap_mode = 0
 vertical_alignment = 1
@@ -64,9 +55,6 @@ grow_vertical = 2
 focus_mode = 2
 theme = ExtResource("2_7b57d")
 bbcode_enabled = true
-text = ",--
-|
-|"
 fit_content = true
 autowrap_mode = 0
 horizontal_alignment = 2

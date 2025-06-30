@@ -109,7 +109,7 @@ public enum StrSty {
     HOSTNAME = 1,
     DISPLAY_NAME = 2,
     DESC = 3,
-    SYMBOL = 4,
+    VARIABLE = 4,
     UNIT = 5,
     SEC_LVL = 6,
     DEF_LVL = 7,
@@ -132,9 +132,11 @@ public enum StrSty {
     CMD_ACT = 24,
     SECTOR = 25,
     T_MINERAL = 26,
-    G_MINERAL = 27,
+    COLORED_ITEM_NAME = 27,
     GAME_WINDOW = 28,
     CODE_MODULE = 29,
+    AUTO_KWORD = 30,
+    CMD_FARG = 31,
 }
 public enum LockType {
     I4X = 0,

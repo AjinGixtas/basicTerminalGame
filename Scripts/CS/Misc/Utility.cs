@@ -102,7 +102,7 @@ public static partial class Util {
     ///   <item><description><see cref="StrSty.UNIT"/>: addons[0] is the unit suffix (e.g. “MB”).</description></item>
     ///   <item><description><see cref="StrSty.NUMBER"/>: addons[0] is the number of decimal places.</description></item>
     ///   <item><description><see cref="StrSty.T_MINERAL"/>: addons[0] is the mineral index.</description></item>
-    ///   <item><description><see cref="StrSty.G_MINERAL"/>: addons[0] is the mineral index for lookup.</description></item>
+    ///   <item><description><see cref="StrSty.COLORED_ITEM_NAME"/>: addons[0] is the mineral index for lookup.</description></item>
     ///   <item><description><see cref="StrSty.UNKNOWN_ERROR"/>: addons[0] is optional extra context.</description></item>
     /// </list>
     /// </param>
@@ -170,8 +170,8 @@ public static partial class Util {
                 return $"[color={Util.CC(Cc.M)}]{input}[/color]";
             case StrSty.DESC:
                 return $"[color={Util.CC(Cc.g)}]{input}[/color]";
-            case StrSty.SYMBOL:
-                return $"[color={Util.CC(Cc.m)}]{input}[/color]";
+            case StrSty.VARIABLE:
+                return $"[color={Util.CC(Cc.LR)}]{input}[/color]";
             case StrSty.NUMBER:
                 string number = addons.Length > 0 ? double.Parse(input).ToString($"F{addons[0]}") :
                     double.Parse(input).ToString("F2");
@@ -208,19 +208,25 @@ public static partial class Util {
                 return $"[color={Util.CC(Cc.LR)}]{input}[/color]";
             case StrSty.CMD_ACT:
                 return $"[color={Util.CC(Cc.gB)}]{input}[/color]";
+            case StrSty.CMD_FARG: {
+                    string[] parts = input.Split([' '], StringSplitOptions.RemoveEmptyEntries);
+                    return string.Join(" ", parts.Select(static p =>
+                        p.StartsWith('-') ? Util.Format(p, StrSty.CMD_FLAG) : Util.Format(p, StrSty.CMD_ARG)
+                    ));
+                }
             case StrSty.ERROR:
                 return $"[color={Util.CC(Cc.R)}]{input}[/color]";
             case StrSty.HEADER:
                 return $"[color={Util.CC(Cc.gR)}]{input}[/color]";
             case StrSty.MONEY: { // GC is short for Gold Coin. That's all. lol
                     if (string.IsNullOrWhiteSpace(input)) return "";
-                    if (!long.TryParse(input, out long value))
+                    if (!double.TryParse(input, out double value))
                         return Util.Format("NUMBER_PARSE_FAILED", StrSty.ERROR);
                     string[] units = ["S", "Q", "T", "B", "M", "K"];
                     double[] divisors = [1e21, 1e15, 1e12, 1e9, 1e6, 1e3];
-                    Cc[] colors = [Cc.R, Cc.Y, Cc.M, Cc.G, Cc.B, Cc.C];
+                    Cc[] colors = [Cc.r, Cc.y, Cc.m, Cc.c, Cc.g, Cc.b];
                     string sb = ""; double remainder = value;
-                    Cc numberColor = addons.Length == 0 ? Cc.w : (Cc)int.Parse(addons[0]);
+                    Cc numberColor = (addons.Length > 0 && addons[0].Length > 0) ? (Cc)int.Parse(addons[0]) : Cc.C;
                     for (int i = 0; i < units.Length; i++) {
                         if (remainder >= divisors[i]) {
                             int unitValue = (int)System.Math.Floor(remainder / divisors[i]);
@@ -229,9 +235,10 @@ public static partial class Util {
                         }
                     }
                     string gcValue;
-                    gcValue = Mathf.Ceil(remainder).ToString("F0");
+                    string lastPartLength = (addons.Length > 1 && addons[1].Length > 0) ? addons[1] : "0";
+                    gcValue = remainder.ToString($"F{lastPartLength}");
                     if (gcValue == "000") { gcValue = ""; }
-                    return sb + $"[color={Util.CC(numberColor)}]{gcValue}[/color][color={Util.CC(Cc.Y)}]GC[/color]";
+                    return sb + $"[color={Util.CC(numberColor)}]{gcValue}[/color]{Util.Format("GC", StrSty.AUTO_KWORD)}";
                 }
             case StrSty.T_MINERAL: {
                     if (string.IsNullOrWhiteSpace(input)) return "";
@@ -257,10 +264,10 @@ public static partial class Util {
                     if (gcValue == "000") { gcValue = ""; }
                     return sb + $"[color={Util.CC(Cc.w)}]{gcValue}[/color][color={mineralColor}]{profile.Shorthand}[/color]";
                 }
-            case StrSty.G_MINERAL: { // General mineral formatting
-                    if (!long.TryParse(addons[0], out long index))
-                        return Util.Format("MINERAL_TYPE_INDEX_PARSE_FAILED", StrSty.ERROR);
-                    return $"[color={Util.CC(ItemCrafter.MINERALS[index].ColorCode)}]{input}[/color]";
+            case StrSty.COLORED_ITEM_NAME: {
+                    if (!long.TryParse(addons[0], out long index)) return Util.Format("ITEM_INDEX_PARSE_FAILED", StrSty.ERROR);
+                    if (index >= ItemCrafter.ALL_ITEMS.Length && index < 0) return Util.Format("ITEM_INDEX_NOT_EXISTS", StrSty.ERROR);
+                    return $"[color={Util.CC(ItemCrafter.ALL_ITEMS[index].ColorCode)}]{input}[/color]";
                 }
             case StrSty.WARNING:
                 return $"[color={Util.CC(Cc.Y)}][WARNING] {input}[/color]";
@@ -274,6 +281,11 @@ public static partial class Util {
                 return $"[color={Util.CC(Cc.gR)}]{input}[/color]";
             case StrSty.CODE_MODULE:
                 return $"[color={Util.CC(Cc.LB)}]{input}[/color]";
+            case StrSty.AUTO_KWORD: {
+                    if (input == "GC") return $"[color={Util.CC(Cc.Y)}]GC[/color]";
+                    if (input == "g01d-pouch") return $"[color={Util.CC(Cc.Y)}]g01d-pouch[/color]";
+                    return Util.Format("NOT_SUPPORTED", StrSty.ERROR);
+                }
             default:
                 return input;
         }
@@ -468,8 +480,8 @@ public static partial class Util {
     public static readonly NodeData PLAYER_NODE_DATA_DEFAULT = new([], [], [],
         [.. System.Enum.GetValues(typeof(LockType)).Cast<int>()], NodeType.PLAYER, "home",
             "Home", 1, 1, 1, 1);
-    public static string GetArg(Dictionary<string, string> dict, params string[] aliases) 
-        => aliases.FirstOrDefault(flag => dict.ContainsKey(flag)) is string found ? dict[found] : null;
+    public static string GetArg(Dictionary<string, string> dict, params string[] aliases) => aliases.FirstOrDefault(flag => dict.ContainsKey(flag)) is string found ? dict[found] : null;
+    public static bool ContainKeys(Dictionary<string, string> dict, params string[] aliases) => aliases.Any(flag => dict.ContainsKey(flag));
     public static string GenerateRandomString(int length, string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789") {
         StringBuilder result = new StringBuilder(length);
         for (int i = 0; i < length; i++) {
@@ -483,6 +495,10 @@ public static partial class Util {
         foreach (byte b in input)
             hash = (hash ^ b) * FNV_prime;
         return hash;
+    }
+    public static string GetFnv1aTimeHash() {
+        uint hash = Util.GetFn1vHash(BitConverter.GetBytes(Util.GetFn1vHash(BitConverter.GetBytes(Util.GetFn1vHash(BitConverter.GetBytes(Time.GetUnixTimeFromSystem()))))));
+        return Convert.ToBase64String(BitConverter.GetBytes(hash)).TrimEnd('=');
     }
     public static string InvertHexColor(string hex) {
         // Remove the '#' if it's there
@@ -501,7 +517,8 @@ public static partial class Util {
         // Return inverted color as hex string
         return $"#{rInv:X2}{gInv:X2}{bInv:X2}";
     }
-    
+
+
     [GeneratedRegex(@"\[(\/?)(b|i|u|color|size|url|img|quote|code|spoiler|lb|rb|br)[^\]]*\]", RegexOptions.IgnoreCase, "en-150")]
     private static partial Regex SelectBBCode();
 }

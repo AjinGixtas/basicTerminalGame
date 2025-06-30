@@ -1,0 +1,177 @@
+[gd_scene load_steps=3 format=3 uid="uid://djx8y0a0jj3wp"]
+
+[ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="1_u63kp"]
+[ext_resource type="Script" uid="uid://dj2qubvfbcgyi" path="res://Scenes/Temp/GraphNegativeSpace.cs" id="1_uwima"]
+
+[node name="MarginContainer" type="MarginContainer" node_paths=PackedStringArray("Overlay", "GrnZoneContainer", "RedZoneContainer")]
+script = ExtResource("1_uwima")
+Overlay = NodePath("Graph/Control/Overlay")
+GrnZoneContainer = NodePath("Graph/Control/Control/GrnZone")
+RedZoneContainer = NodePath("Graph/Control/Control/RedZone")
+
+[node name="Graph" type="MarginContainer" parent="."]
+custom_minimum_size = Vector2(502, 150)
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Control" type="Control" parent="Graph"]
+layout_mode = 2
+
+[node name="Control" type="Control" parent="Graph/Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GrnZone" type="VBoxContainer" parent="Graph/Control/Control"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = -3
+
+[node name="Line_1" type="RichTextLabel" parent="Graph/Control/Control/GrnZone"]
+custom_minimum_size = Vector2(0, 15)
+layout_mode = 2
+theme = ExtResource("1_u63kp")
+theme_override_colors/default_color = Color(0, 1, 0, 1)
+text = "█"
+autowrap_mode = 0
+horizontal_alignment = 2
+
+[node name="Line_2" type="RichTextLabel" parent="Graph/Control/Control/GrnZone"]
+custom_minimum_size = Vector2(0, 15)
+layout_mode = 2
+theme = ExtResource("1_u63kp")
+theme_override_colors/default_color = Color(0, 1, 0, 1)
+text = "█"
+autowrap_mode = 0
+horizontal_alignment = 2
+
+[node name="Line_3" type="RichTextLabel" parent="Graph/Control/Control/GrnZone"]
+custom_minimum_size = Vector2(0, 15)
+layout_mode = 2
+theme = ExtResource("1_u63kp")
+theme_override_colors/default_color = Color(0, 1, 0, 1)
+autowrap_mode = 0
+horizontal_alignment = 2
+
+[node name="Line_4" type="RichTextLabel" parent="Graph/Control/Control/GrnZone"]
+custom_minimum_size = Vector2(0, 15)
+layout_mode = 2
+theme = ExtResource("1_u63kp")
+theme_override_colors/default_color = Color(0, 1, 0, 1)
+autowrap_mode = 0
+horizontal_alignment = 2
+
+[node name="Line_5" type="RichTextLabel" parent="Graph/Control/Control/GrnZone"]
+custom_minimum_size = Vector2(0, 15)
+layout_mode = 2
+theme = ExtResource("1_u63kp")
+theme_override_colors/default_color = Color(0, 1, 0, 1)
+autowrap_mode = 0
+horizontal_alignment = 2
+
+[node name="Line_6" type="RichTextLabel" parent="Graph/Control/Control/GrnZone"]
+custom_minimum_size = Vector2(0, 15)
+layout_mode = 2
+theme = ExtResource("1_u63kp")
+theme_override_colors/default_color = Color(0, 1, 0, 1)
+autowrap_mode = 0
+horizontal_alignment = 2
+
+[node name="Line_7" type="RichTextLabel" parent="Graph/Control/Control/GrnZone"]
+custom_minimum_size = Vector2(0, 15)
+layout_mode = 2
+theme = ExtResource("1_u63kp")
+theme_override_colors/default_color = Color(0, 1, 0, 1)
+autowrap_mode = 0
+horizontal_alignment = 2
+
+[node name="Line_8" type="RichTextLabel" parent="Graph/Control/Control/GrnZone"]
+custom_minimum_size = Vector2(0, 15)
+layout_mode = 2
+theme = ExtResource("1_u63kp")
+theme_override_colors/default_color = Color(0, 1, 0, 1)
+text = "▁ ▂ ▃ ▄ ▅ ▆ ▇ █"
+autowrap_mode = 0
+horizontal_alignment = 2
+
+[node name="RedZone" type="VBoxContainer" parent="Graph/Control/Control"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 2.0
+anchor_bottom = 2.0
+rotation = 3.14159
+theme_override_constants/separation = -3
+
+[node name="Line_4" type="RichTextLabel" parent="Graph/Control/Control/RedZone"]
+custom_minimum_size = Vector2(0, 15)
+layout_mode = 2
+theme = ExtResource("1_u63kp")
+theme_override_colors/default_color = Color(1, 0, 0, 1)
+text = "································································"
+autowrap_mode = 0
+horizontal_alignment = 2
+vertical_alignment = 1
+text_direction = 2
+
+[node name="Line_3" type="RichTextLabel" parent="Graph/Control/Control/RedZone"]
+custom_minimum_size = Vector2(0, 15)
+layout_mode = 2
+theme = ExtResource("1_u63kp")
+theme_override_colors/default_color = Color(1, 0, 0, 1)
+autowrap_mode = 0
+horizontal_alignment = 2
+vertical_alignment = 1
+text_direction = 2
+
+[node name="Line_2" type="RichTextLabel" parent="Graph/Control/Control/RedZone"]
+custom_minimum_size = Vector2(0, 15)
+layout_mode = 2
+theme = ExtResource("1_u63kp")
+theme_override_colors/default_color = Color(1, 0, 0, 1)
+autowrap_mode = 0
+horizontal_alignment = 2
+vertical_alignment = 1
+text_direction = 2
+
+[node name="Line_1" type="RichTextLabel" parent="Graph/Control/Control/RedZone"]
+custom_minimum_size = Vector2(0, 15)
+layout_mode = 2
+theme = ExtResource("1_u63kp")
+theme_override_colors/default_color = Color(1, 0, 0, 1)
+text = "▁ ▂ ▃ ▄ ▅ ▆ ▇ █"
+autowrap_mode = 0
+horizontal_alignment = 2
+vertical_alignment = 1
+text_direction = 2
+
+[node name="Overlay" type="RichTextLabel" parent="Graph/Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_u63kp")
+theme_override_colors/default_color = Color(1, 1, 1, 0.0588235)
+theme_override_constants/line_separation = -5
+text = "1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12"

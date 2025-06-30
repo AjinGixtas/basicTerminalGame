@@ -425,7 +425,7 @@ public class ChatManager {
             _pauseEvent.Wait(); // Wait here if paused
             (string content, double delay) = _dialogueQueue.Dequeue();
             _pauseEvent.Wait(); // Check again before printing
-            string timeHash = GetFnv1aTimeHash();
+            string timeHash = Util.GetFnv1aTimeHash();
             ShellCore.Say($"[{Util.Format(timeHash, StrSty.DECOR)}] <{Util.Format(CharacterName, StrSty.USERNAME)}> {content}");
             await Task.Delay(Util.SkipDialogues ? 0 : delay >= 0 ? Mathf.CeilToInt(delay * 1000) : Mathf.CeilToInt(EstimateReadingTime(content) * 1000), token);
             cache += $"[{timeHash}] <{CharacterName}> {Util.RemoveBBCode(content)}\n";
@@ -446,14 +446,6 @@ public class ChatManager {
             PlayerFileManager.FileSystem.AddFile(file);
         PlayerFileManager.FileSystem.GetFile(file).Content += msg;
         ShellCore.Say($"[color={Util.CC(Cc.w)}]Communication log saved to {Util.Format(file, StrSty.FILE)}[/color]");
-    }
-    /// <summary>
-    /// Hash the currect time using Fnv1a Hash twice in a row.
-    /// </summary>
-    /// <returns></returns>
-    public static string GetFnv1aTimeHash() {
-        uint hash = Util.GetFn1vHash(BitConverter.GetBytes(Util.GetFn1vHash(BitConverter.GetBytes(Util.GetFn1vHash(BitConverter.GetBytes(Time.GetUnixTimeFromSystem()))))));
-        return Convert.ToBase64String(BitConverter.GetBytes(hash)).TrimEnd('=');
     }
     /// <summary>
     /// Estimate the reading time for a message based on its length.

@@ -34,12 +34,12 @@ public static partial class PlayerDataManager {
 		get => saveObj.MineralInventory;
 		set {
 			if (value.Length != saveObj.MineralInventory.Length) {
-				GD.PushError("Invalid mineral inventory length.");
+				GD.PrintErr("Invalid mineral inventory length.");
 				return;
 			}
 			for (int i = 0; i < value.Length; i++) {
 				if (value[i] < 0) {
-					GD.PushError($"Invalid mineral amount for type {i}: {value[i]}");
+					GD.PrintErr($"Invalid mineral amount for type {i}: {value[i]}");
 					return;
 				}
 			}
@@ -55,7 +55,8 @@ public static partial class PlayerDataManager {
 		if (amount < 0) return CError.INVALID;
 		if (amount > _gc_max) return CError.INSUFFICIENT;
 		_gc_cur -= amount;
-		return CError.OK;
+        ShellCore.Say($"[{Util.Format(Util.GetFnv1aTimeHash(), StrSty.DECOR)}] <{Util.Format("g01d-pouch", StrSty.AUTO_KWORD)}> Withdrew {Util.Format($"{amount}", StrSty.MONEY)}");
+        return CError.OK;
 	}
 	static bool needWarn = false, warned = false;
 	public static CError DepositGC(long amount) {
@@ -64,9 +65,9 @@ public static partial class PlayerDataManager {
 
 		if (_gc_cur <= GC_Max) { needWarn = false; warned = false; } else needWarn = true;
 		if (needWarn) {
-			if (!warned) ShellCore.Say(Util.Format($"GC total is over the limit of {GC_Max}. Remaining GC lost.", StrSty.WARNING));
+			if (!warned) ShellCore.Say(Util.Format($"[{Util.Format(Util.GetFnv1aTimeHash(), StrSty.DECOR)}] <{Util.Format("g01d-pouch", StrSty.AUTO_KWORD)}> GC total is over the limit of {GC_Max}. Remaining GC [color={Util.CC(Cc.R)}]LOST[/color].", StrSty.WARNING));
 			warned = true;
-		} else ShellCore.Say($"Deposited {Util.Format($"{amount}", StrSty.MONEY)}");
+		} else ShellCore.Say($"[{Util.Format(Util.GetFnv1aTimeHash(),StrSty.DECOR)}] <{Util.Format("g01d-pouch", StrSty.AUTO_KWORD)}> Deposited {Util.Format($"{amount}", StrSty.MONEY)}");
 		return CError.OK;
 	}
 	public static CError WithdrawMineral(long[] amounts) {
@@ -101,8 +102,6 @@ public static partial class PlayerDataManager {
         _mineInv[type] += amount;
 		return 0;
 	}
-
-
 
 	public static string GetLoadStatusMsg(int statusCode) {
 		string[] LOAD_STATUS_MSG = [

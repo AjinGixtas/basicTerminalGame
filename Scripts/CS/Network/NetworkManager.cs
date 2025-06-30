@@ -227,6 +227,7 @@ public static partial class NetworkManager {
             RemoveNodeAndChildrenFromDNS(node); node.ParentNode = null;
         }
         driftSectors.Remove(sector);
+        driftSectors.Add(new());
         return CError.OK;
     }
     public static CError RemoveSector(StaticSector sector) {
@@ -351,6 +352,7 @@ public static partial class NetworkManager {
     
     const string BotnetFileName = "Botnet.tres", PlayerNodeFileName = "PlayerNode.tres";
     public static string GetSaveStatusMsg(int[] statusCodes) {
+        statusCodes = statusCodes.Select(x => Mathf.Abs(x)).ToArray();
         string[] botnetMsgs = {
             Util.Format("Saved botnet data", StrSty.FULL_SUCCESS),
             Util.Format("No botnet to save", StrSty.WARNING),
@@ -386,7 +388,7 @@ public static partial class NetworkManager {
         return (int)error; // Return error code
     }
     static int SaveBotNet(string filePath) {
-        if (BotNet.Count == 0) return 1; // No bots to serialize
+        if (BotNet.Count == 0) return -1; // No bots to serialize
         HackFarmsDataSaveResource botnetData = new();
         botnetData.BotNet = new HackFarmDataSaveResource[BotNet.Count];
         for (int i = 0; i < BotNet.Count; ++i) {

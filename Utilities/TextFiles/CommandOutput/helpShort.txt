@@ -1,36 +1,77 @@
-[color=cyan]mkf[/color] [color=yellow][file_name][/color] – Create a new file.
-    [color=yellow][file_name][/color] – Name of the file to create. Supports paths.
-[color=cyan]rmf[/color] [color=yellow][file_name][/color] – Remove a file.
-    [color=yellow][file_name][/color] – Name of the file to remove. Supports paths.
-[color=cyan]ls[/color] [color=yellow][directory][/color] – List files and directories.
-    [color=yellow][directory][/color] – Target directory (optional). Defaults to the current directory.
-[color=cyan]cd[/color] [color=yellow][directory][/color] – Change to the specified directory.
-    [color=yellow][directory][/color] – Target directory to navigate to.
-[color=cyan]pwd[/color] – Print the current directory.
-[color=cyan]say[/color] [color=yellow][message][/color] [color=yellow][-n][/color] [color=yellow][-e][/color] [color=yellow][-r][/color]
-    [color=yellow][message][/color] – Message to display.
-    [color=yellow]-n[/color] – Suppress trailing newline.
-    [color=yellow]-e[/color] – Enable escape sequences (e.g., `\n`).
-    [color=yellow]-r[/color] – Display the message in red.
-[color=cyan]help[/color] [color=yellow][-v][/color] – Display help information.
-    [color=yellow]-v[/color] – Show verbose help.
-[color=cyan]home[/color] – Return to the home directory.
-[color=cyan]edit[/color] [color=yellow][file_name][/color] – Open a file in the text editor.
-    [color=yellow][file_name][/color] – Name of the file to edit. Supports paths.
-[color=cyan]scan[/color] [color=yellow][-d [depth_val]][/color] [color=yellow][-v][/color]
-    [color=yellow]-d [depth_val][/color] – Scan depth (optional).
-    [color=yellow]-v[/color] – Verbose output.
-[color=cyan]clear[/color] – Clear the terminal screen.
-[color=cyan]mkdir[/color] [color=yellow][directory_name][/color] – Create a new directory.
-    [color=yellow][directory_name][/color] – Name of the directory to create. Supports paths.
-[color=cyan]rmdir[/color] [color=yellow][directory_name][/color] – Remove an empty directory.
-    [color=yellow][directory_name][/color] – Name of the directory to remove. Supports paths.
-[color=cyan]crack[/color] [color=yellow]--init[/color] OR [color=yellow][flags][/color]
-    [color=green]Crack[/color] locks with specified values.
-[color=cyan]inspect[/color] – Reserved for future functionality.
-[color=cyan]connect[/color] [color=yellow][ip_or_hostname][/color] – Connect to a remote host.
-    [color=yellow][ip_or_hostname][/color] – Target IP or hostname.
-[color=cyan]analyze[/color] [color=yellow][ip_or_hostname][/color]
-    [color=green]Analyze[/color] target host or current system.
-    [color=yellow][ip_or_hostname][/color] – Target IP/hostname (optional).
-    [color=green]Output:[/color] IP, Hostname, Host type, Defense Value, Security Type
+[color=#00aaff]ls[/color] [color=#ff6666]<dir>[/color] - List item in directories.
+	[color=#ff6666]<dir>[/color] - Target directory.
+
+[color=#00aaff]cd[/color] [color=#ff6666]<dir>[/color] - Change directory.
+	[color=#ff6666]<dir>[/color] - Target directory.
+
+[color=#00aaff]pwd[/color] - Output working directory.
+
+[color=#00aaff]run[/color] [color=#ff6666]<file>[/color] - Run file as script.
+	[color=#ff6666]<file>[/color] - File name.
+
+[color=#00aaff]read[/color] [color=#ff6666]<file>[/color] - Output file content.
+	[color=#ff6666]<file>[/color] - File name.
+
+[color=#00aaff]say[/color] [color=#ffaa00]-[n|e|b][/color] [color=#ff6666]<msg>[/color] - Output message to the screen.
+	[color=#ffaa00]-n[/color] - Suppress trailing newline.
+	[color=#ffaa00]-e[/color] - Enable escape sequences.
+	[color=#ffaa00]-b[/color] - Escape BBCode.
+	[color=#ff6666]<msg>[/color] - Message to output.
+
+[color=#00aaff]help[/color] - Display help.
+
+[color=#00aaff]home[/color] - Go back to your node.
+
+[color=#ff6666]scan[/color] [color=#ffaa00]-[v][/color] - Scan adjacent node.
+	[color=#ffaa00]-v[/color] - Verbose output.
+
+[color=#00aaff]connect[/color] [color=#ff6666]<hostname|ip>[/color] - Connect to node.
+	[color=#ff6666]<hostname|ip>[/color] - Node to connect.
+
+[color=#00aaff]analyze[/color] [color=#ff6666][hostname|ip][/color] - Analyze node.
+	[color=#ff6666][hostname|ip][/color] - Node to analyze.
+
+[color=#00aaff]sector[/color] [color=#ffaa00]-[c][/color] [color=#ffaa00]-[l[/color] [color=#ff6666]<sector_level>][/color] - List sectors.
+	[color=#ffaa00]-c[/color] [color=#ffaa00]--connected[/color] - Connected sectors only.
+	[color=#ffaa00]-l,[/color] [color=#ffaa00]--level[/color] [color=#ff6666]<sector_level>[/color] - Sectors with this level only.
+
+[color=#00aaff]link[/color] [color=#ff6666]<sector_names>[/color] - Link sectors.
+	[color=#ff6666]<sector_names>[/color] - Sectors to link.
+
+[color=#00aaff]unlink[/color] [color=#ff6666]<sector_names>[/color] - Unlink sectors.
+	[color=#ff6666]<sector_names>[/color] - Sectors to unlink.
+
+[color=#00aaff]stats[/color] - Display player stats.
+
+[color=#00aaff]xyzzy[/color] - Nothing happens
+
+[color=#00aaff]clear[/color] - Clear terminal.
+
+[color=#00aaff]mkf[/color] [color=#ff6666]<files>[/color] - Make files.
+	[color=#ff6666]<files>[/color] - File names.
+
+[color=#00aaff]rmf[/color] [color=#ff6666]<files>[/color] - Remove files.
+	[color=#ff6666]<files>[/color] - File names.
+
+[color=#00aaff]mkdir[/color] [color=#ff6666]<dirs>[/color] - Make directories.
+	[color=#ff6666]<dir>[/color] - Directory names.
+
+[color=#00aaff]rmdir[/color] [color=#ff6666]<dirs>[/color] - Remove directores.
+	[color=#ff6666]<dir>[/color] - Directory names.
+
+[color=#00aaff]karaxe[/color] [color=#ffaa00]--[help][/color] - Run karaxe.exe
+	[color=#ffaa00]--help[/color] - Provide details.
+
+[color=#00aaff]myneswarm[/color] [color=#ffaa00]--[help][/color] - Run myneswarm.exe
+	[color=#ffaa00]--help[/color] - Provide details.
+
+[color=#00aaff]bitrader[/color] [color=#ffaa00]--[help][/color] - Run bitrader.exe
+	[color=#ffaa00]--help[/color] - Provide details.
+
+[color=#00aaff]bitcrafter[/color] [color=#ffaa00]--[help][/color] - Run bitcrafter.exe
+	[color=#ffaa00]--help[/color] - Provide details.
+
+[color=#00aaff]setname[/color] [color=#ff6666][-u[/color] [color=#ff6666]<new_username>][/color] [color=#ff6666][-h[/color] [color=#ff6666]<new_hostname>][/color] [color=#ff6666][-d[/color] [color=#ff6666]<new_displayname>[/color] - Change names of your node.
+	[color=#ff6666][-u[/color] [color=#ff6666]<new_username>][/color] - New username to change to.
+	[color=#ff6666][-h[/color] [color=#ff6666]<new_hostname>][/color] - New hostname to change to.
+	[color=#ff6666][-d[/color] [color=#ff6666]<new_displayname>][/color] - New displayname to change to.

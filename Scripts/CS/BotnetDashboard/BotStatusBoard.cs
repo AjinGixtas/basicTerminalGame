@@ -47,7 +47,7 @@ Next batch in: {Util.Format($"{hackfarm.CycleTimeRemain}", StrSty.NUMBER, "2"), 
 		string[] box = new string[5];
 		string I = $"[color={Util.CC(Cc.w)}]|[/color]";
 		box[0] = $"[color={Util.CC(Cc.w)}]------------+[/color]";
-		box[1] = $"     {Util.Format($"{ItemCrafter.MINERALS[hackfarm.mineralDistribution[index].Item1].Shorthand}", StrSty.G_MINERAL, $"{hackfarm.mineralDistribution[index].Item1}")}     {I}";
+		box[1] = $"     {Util.Format($"{ItemCrafter.MINERALS[hackfarm.mineralDistribution[index].Item1].Shorthand}", StrSty.COLORED_ITEM_NAME, $"{hackfarm.mineralDistribution[index].Item1}")}    {I}";
 		string content = (hackfarm.MBacklog * hackfarm.mineralDistribution[index].Item2).ToString("F2");
 		int padLeft = (10 - content.Length) / 2; int padRight = 10 - content.Length - padLeft;
 		box[2] = $" {new string(' ', padRight)}{Util.Format(content, StrSty.NUMBER)}{new string(' ', padLeft)} {I}";
@@ -58,7 +58,7 @@ Next batch in: {Util.Format($"{hackfarm.CycleTimeRemain}", StrSty.NUMBER, "2"), 
 	string GenerateBatchDistVisual(BotFarm hackfarm) {
 		string result = "";
 		for (int i = 0; i < hackfarm.mineralDistribution.Length; ++i) {
-			result += $" +{Util.Format($"{hackfarm.mineralDistribution[i].Item2 * hackfarm.BatchSize}", StrSty.NUMBER, "1")}[color={Util.CC(Cc.w)}]u[/color]{Util.Format($"{ItemCrafter.MINERALS[hackfarm.mineralDistribution[i].Item1].Shorthand}", StrSty.G_MINERAL, $"{hackfarm.mineralDistribution[i].Item1}")}";
+			result += $" +{Util.Format($"{hackfarm.mineralDistribution[i].Item2 * hackfarm.BatchSize}", StrSty.NUMBER, "1")}[color={Util.CC(Cc.w)}]u[/color]{Util.Format($"{ItemCrafter.MINERALS[hackfarm.mineralDistribution[i].Item1].Shorthand}", StrSty.COLORED_ITEM_NAME, $"{hackfarm.mineralDistribution[i].Item1}")}";
 		}
 		return result;
 	}

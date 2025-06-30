@@ -4,16 +4,16 @@ using System.Linq;
 
 public static class ItemCrafter {
     public static readonly ItemData[] MINERALS = [
-        new ItemData("Datacite",  "DC", 0, 1, Cc.gB),
-        new ItemData("Bitron",    "BT", 1, 2, Cc.LM),
-        new ItemData("Cachelium", "CH", 2, 3, Cc.r),
-        new ItemData("Ferrosync", "FS", 3, 4, Cc.c),
-        new ItemData("Nexium",    "NX", 4, 6, Cc.G),
-        new ItemData("Fractyl",   "FT", 5, 8, Cc.bG),
-        new ItemData("Algorite",  "AG", 6, 12, Cc.LY),
-        new ItemData("Quantar",   "QT", 7, 16, Cc.LB),
-        new ItemData("Synthite",  "SY", 8, 24, Cc.LC),
-        new ItemData("Oblivium",  "OB", 9, 32, Cc.gR),
+        new ItemData("Datacite",  "DC!", 0, 1, Cc.gB),
+        new ItemData("Bitron",    "BT!", 1, 2, Cc.LM),
+        new ItemData("Cachelium", "CH!", 2, 3, Cc.r),
+        new ItemData("Ferrosync", "FS!", 3, 4, Cc.c),
+        new ItemData("Nexium",    "NX!", 4, 6, Cc.G),
+        new ItemData("Fractyl",   "FT!", 5, 8, Cc.bG),
+        new ItemData("Algorite",  "AG!", 6, 12, Cc.LY),
+        new ItemData("Quantar",   "QT!", 7, 16, Cc.LB),
+        new ItemData("Synthite",  "SY!", 8, 24, Cc.LC),
+        new ItemData("Oblivium",  "OB!", 9, 32, Cc.gR),
     ];
     public static readonly CraftableItemData[] REFINED_MATERIALS = [
         new CraftableItemData("RefinedDatacite"            , "DC&" , 10, Cc.gB,  1.000000,       2, [new(0, 5)]),
@@ -169,7 +169,7 @@ public static class ItemCrafter {
         return 0;
     }
 
-
+    public static CraftableItemData GetRecipe(int id) => ALL_RECIPES[id - 10];
     public struct CraftThread {
         public CraftableItemData Recipe { get; set; }
         public double RemainTime { get; set; }

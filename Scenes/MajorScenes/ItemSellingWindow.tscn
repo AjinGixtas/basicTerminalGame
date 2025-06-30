@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://cr68a6i3krnae" path="res://Scenes/InstanceScenes/ItemSellingWindow/ItemSellingBox.tscn" id="1_x163c"]
 [ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="3_wdj7e"]
 
-[node name="ItemSellingWindow" type="MarginContainer" node_paths=PackedStringArray("saleBoxContainer", "Overlay", "MidZ", "GrnZ", "RedZ")]
+[node name="ItemSellingWindow" type="MarginContainer" node_paths=PackedStringArray("saleBoxContainer")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -17,243 +17,40 @@ theme_override_constants/margin_bottom = 2
 script = ExtResource("1_55c0a")
 ItemSaleBoxScene = ExtResource("1_x163c")
 saleBoxContainer = NodePath("VSplitContainer/ScrollContainer/HFlowContainer")
-Overlay = NodePath("VSplitContainer/MarginContainer/Graph/Control/Overlay")
-MidZ = NodePath("VSplitContainer/MarginContainer/Graph/Control/MidZone")
-GrnZ = [NodePath("VSplitContainer/MarginContainer/Graph/Control/GrnZone/Line_8"), NodePath("VSplitContainer/MarginContainer/Graph/Control/GrnZone/Line_7"), NodePath("VSplitContainer/MarginContainer/Graph/Control/GrnZone/Line_6"), NodePath("VSplitContainer/MarginContainer/Graph/Control/GrnZone/Line_5"), NodePath("VSplitContainer/MarginContainer/Graph/Control/GrnZone/Line_4"), NodePath("VSplitContainer/MarginContainer/Graph/Control/GrnZone/Line_3"), NodePath("VSplitContainer/MarginContainer/Graph/Control/GrnZone/Line_2"), NodePath("VSplitContainer/MarginContainer/Graph/Control/GrnZone/Line_1")]
-RedZ = [NodePath("VSplitContainer/MarginContainer/Graph/Control/RedZone/Line_8"), NodePath("VSplitContainer/MarginContainer/Graph/Control/RedZone/Line_7"), NodePath("VSplitContainer/MarginContainer/Graph/Control/RedZone/Line_6"), NodePath("VSplitContainer/MarginContainer/Graph/Control/RedZone/Line_5"), NodePath("VSplitContainer/MarginContainer/Graph/Control/RedZone/Line_4"), NodePath("VSplitContainer/MarginContainer/Graph/Control/RedZone/Line_3"), NodePath("VSplitContainer/MarginContainer/Graph/Control/RedZone/Line_2"), NodePath("VSplitContainer/MarginContainer/Graph/Control/RedZone/Line_1")]
 
 [node name="VSplitContainer" type="VSplitContainer" parent="."]
 layout_mode = 2
 dragging_enabled = false
 dragger_visibility = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="VSplitContainer"]
+[node name="ColorRect" type="ColorRect" parent="VSplitContainer"]
+custom_minimum_size = Vector2(0, 104)
 layout_mode = 2
+color = Color(1, 1, 0.270588, 0.0352941)
 
-[node name="Graph" type="MarginContainer" parent="VSplitContainer/MarginContainer"]
-custom_minimum_size = Vector2(308, 138)
-layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="Control" type="Control" parent="VSplitContainer/MarginContainer/Graph"]
-layout_mode = 2
-
-[node name="GrnZone" type="VBoxContainer" parent="VSplitContainer/MarginContainer/Graph/Control"]
-layout_mode = 1
-anchors_preset = -1
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_bottom = -4.0
-theme_override_constants/separation = -2
-
-[node name="Line_1" type="RichTextLabel" parent="VSplitContainer/MarginContainer/Graph/Control/GrnZone"]
-custom_minimum_size = Vector2(0, 10)
-layout_mode = 2
-theme = ExtResource("3_wdj7e")
-theme_override_colors/default_color = Color(0, 1, 0, 1)
-theme_override_font_sizes/normal_font_size = 8
-autowrap_mode = 0
-horizontal_alignment = 2
-vertical_alignment = 1
-
-[node name="Line_2" type="RichTextLabel" parent="VSplitContainer/MarginContainer/Graph/Control/GrnZone"]
-custom_minimum_size = Vector2(0, 10)
-layout_mode = 2
-theme = ExtResource("3_wdj7e")
-theme_override_colors/default_color = Color(0, 1, 0, 1)
-theme_override_font_sizes/normal_font_size = 8
-autowrap_mode = 0
-horizontal_alignment = 2
-vertical_alignment = 1
-
-[node name="Line_3" type="RichTextLabel" parent="VSplitContainer/MarginContainer/Graph/Control/GrnZone"]
-custom_minimum_size = Vector2(0, 10)
-layout_mode = 2
-theme = ExtResource("3_wdj7e")
-theme_override_colors/default_color = Color(0, 1, 0, 1)
-theme_override_font_sizes/normal_font_size = 8
-autowrap_mode = 0
-horizontal_alignment = 2
-vertical_alignment = 1
-
-[node name="Line_4" type="RichTextLabel" parent="VSplitContainer/MarginContainer/Graph/Control/GrnZone"]
-custom_minimum_size = Vector2(0, 10)
-layout_mode = 2
-theme = ExtResource("3_wdj7e")
-theme_override_colors/default_color = Color(0, 1, 0, 1)
-theme_override_font_sizes/normal_font_size = 8
-autowrap_mode = 0
-horizontal_alignment = 2
-vertical_alignment = 1
-
-[node name="Line_5" type="RichTextLabel" parent="VSplitContainer/MarginContainer/Graph/Control/GrnZone"]
-custom_minimum_size = Vector2(0, 10)
-layout_mode = 2
-theme = ExtResource("3_wdj7e")
-theme_override_colors/default_color = Color(0, 1, 0, 1)
-theme_override_font_sizes/normal_font_size = 8
-autowrap_mode = 0
-horizontal_alignment = 2
-vertical_alignment = 1
-
-[node name="Line_6" type="RichTextLabel" parent="VSplitContainer/MarginContainer/Graph/Control/GrnZone"]
-custom_minimum_size = Vector2(0, 10)
-layout_mode = 2
-theme = ExtResource("3_wdj7e")
-theme_override_colors/default_color = Color(0, 1, 0, 1)
-theme_override_font_sizes/normal_font_size = 8
-autowrap_mode = 0
-horizontal_alignment = 2
-vertical_alignment = 1
-
-[node name="Line_7" type="RichTextLabel" parent="VSplitContainer/MarginContainer/Graph/Control/GrnZone"]
-custom_minimum_size = Vector2(0, 10)
-layout_mode = 2
-theme = ExtResource("3_wdj7e")
-theme_override_colors/default_color = Color(0, 1, 0, 1)
-theme_override_font_sizes/normal_font_size = 8
-autowrap_mode = 0
-horizontal_alignment = 2
-vertical_alignment = 1
-
-[node name="Line_8" type="RichTextLabel" parent="VSplitContainer/MarginContainer/Graph/Control/GrnZone"]
-custom_minimum_size = Vector2(0, 10)
-layout_mode = 2
-theme = ExtResource("3_wdj7e")
-theme_override_colors/default_color = Color(0, 1, 0, 1)
-theme_override_font_sizes/normal_font_size = 8
-autowrap_mode = 0
-horizontal_alignment = 2
-vertical_alignment = 1
-
-[node name="MidZone" type="RichTextLabel" parent="VSplitContainer/MarginContainer/Graph/Control"]
-custom_minimum_size = Vector2(0, 10)
-layout_mode = 1
-anchors_preset = -1
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_top = -5.0
-offset_bottom = 3.0
-grow_horizontal = 2
-grow_vertical = 2
-theme = ExtResource("3_wdj7e")
-theme_override_font_sizes/normal_font_size = 8
-bbcode_enabled = true
-text = "--------------------------"
-autowrap_mode = 0
-horizontal_alignment = 2
-
-[node name="RedZone" type="VBoxContainer" parent="VSplitContainer/MarginContainer/Graph/Control"]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 2.0
-anchor_bottom = 1.5
-offset_bottom = -4.0
-rotation = 3.14159
-theme_override_constants/separation = -2
-
-[node name="Line_1" type="RichTextLabel" parent="VSplitContainer/MarginContainer/Graph/Control/RedZone"]
-custom_minimum_size = Vector2(0, 10)
-layout_mode = 2
-theme = ExtResource("3_wdj7e")
-theme_override_colors/default_color = Color(1, 0, 0, 1)
-theme_override_font_sizes/normal_font_size = 8
-autowrap_mode = 0
-vertical_alignment = 1
-
-[node name="Line_2" type="RichTextLabel" parent="VSplitContainer/MarginContainer/Graph/Control/RedZone"]
-custom_minimum_size = Vector2(0, 10)
-layout_mode = 2
-theme = ExtResource("3_wdj7e")
-theme_override_colors/default_color = Color(1, 0, 0, 1)
-theme_override_font_sizes/normal_font_size = 8
-autowrap_mode = 0
-vertical_alignment = 1
-
-[node name="Line_3" type="RichTextLabel" parent="VSplitContainer/MarginContainer/Graph/Control/RedZone"]
-custom_minimum_size = Vector2(0, 10)
-layout_mode = 2
-theme = ExtResource("3_wdj7e")
-theme_override_colors/default_color = Color(1, 0, 0, 1)
-theme_override_font_sizes/normal_font_size = 8
-autowrap_mode = 0
-vertical_alignment = 1
-
-[node name="Line_4" type="RichTextLabel" parent="VSplitContainer/MarginContainer/Graph/Control/RedZone"]
-custom_minimum_size = Vector2(0, 10)
-layout_mode = 2
-theme = ExtResource("3_wdj7e")
-theme_override_colors/default_color = Color(1, 0, 0, 1)
-theme_override_font_sizes/normal_font_size = 8
-autowrap_mode = 0
-vertical_alignment = 1
-
-[node name="Line_5" type="RichTextLabel" parent="VSplitContainer/MarginContainer/Graph/Control/RedZone"]
-custom_minimum_size = Vector2(0, 10)
-layout_mode = 2
-theme = ExtResource("3_wdj7e")
-theme_override_colors/default_color = Color(1, 0, 0, 1)
-theme_override_font_sizes/normal_font_size = 8
-autowrap_mode = 0
-vertical_alignment = 1
-
-[node name="Line_6" type="RichTextLabel" parent="VSplitContainer/MarginContainer/Graph/Control/RedZone"]
-custom_minimum_size = Vector2(0, 10)
-layout_mode = 2
-theme = ExtResource("3_wdj7e")
-theme_override_colors/default_color = Color(1, 0, 0, 1)
-theme_override_font_sizes/normal_font_size = 8
-autowrap_mode = 0
-vertical_alignment = 1
-
-[node name="Line_7" type="RichTextLabel" parent="VSplitContainer/MarginContainer/Graph/Control/RedZone"]
-custom_minimum_size = Vector2(0, 10)
-layout_mode = 2
-theme = ExtResource("3_wdj7e")
-theme_override_colors/default_color = Color(1, 0, 0, 1)
-theme_override_font_sizes/normal_font_size = 8
-autowrap_mode = 0
-vertical_alignment = 1
-
-[node name="Line_8" type="RichTextLabel" parent="VSplitContainer/MarginContainer/Graph/Control/RedZone"]
-custom_minimum_size = Vector2(0, 10)
-layout_mode = 2
-theme = ExtResource("3_wdj7e")
-theme_override_colors/default_color = Color(1, 0, 0, 1)
-theme_override_font_sizes/normal_font_size = 8
-autowrap_mode = 0
-vertical_alignment = 1
-
-[node name="Overlay" type="RichTextLabel" parent="VSplitContainer/MarginContainer/Graph/Control"]
-visible = false
+[node name="MarginContainer" type="MarginContainer" parent="VSplitContainer/ColorRect"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_top = 16
+
+[node name="RichTextLabel" type="RichTextLabel" parent="VSplitContainer/ColorRect/MarginContainer"]
+layout_mode = 2
+focus_mode = 2
 theme = ExtResource("3_wdj7e")
-theme_override_font_sizes/normal_font_size = 8
-text = "1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-▁▂▃▄▅▆▇█▁▂▃▄▅▆▇█▁▂▃▄▅▆▇█▁▂▃▄▅▆▇█▁▂▃▄▅▆▇█▁▂▃▄▅▆▇█▁▂▃▄▅▆▇█▁▂▃▄▅▆▇█"
+theme_override_font_sizes/normal_font_size = 18
+bbcode_enabled = true
+text = "Every bit of this world has been capitalized.
+Plz pretend this is some cool || useful text :)
+
+Also, the sale gets round down, sorry :p"
+fit_content = true
+autowrap_mode = 0
+horizontal_alignment = 1
+selection_enabled = true
 
 [node name="ScrollContainer" type="ScrollContainer" parent="VSplitContainer"]
 layout_mode = 2
@@ -266,7 +63,7 @@ theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 4
 
 [node name="MarketChangeTimer" type="Timer" parent="."]
-wait_time = 0.05
+wait_time = 5.0
 autostart = true
 ignore_time_scale = true
 

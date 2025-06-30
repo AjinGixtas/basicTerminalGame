@@ -14,9 +14,9 @@ grow_vertical = 2
 focus_mode = 2
 script = ExtResource("1_nbc5l")
 tabBar = NodePath("VSplitContainer/TabBar")
-tabContainer = NodePath("VSplitContainer/TabContainer")
+tabContainer = NodePath("VSplitContainer/VSplitContainer/TabContainer")
 editorTabScene = ExtResource("2_640ve")
-noFileOpenedTab = NodePath("VSplitContainer/TabContainer/NoFileOpenedTab")
+noFileOpenedTab = NodePath("VSplitContainer/VSplitContainer/TabContainer/NoFileOpenedTab")
 saveDialog = NodePath("ConfirmationDialog")
 
 [node name="VSplitContainer" type="VSplitContainer" parent="."]
@@ -31,12 +31,18 @@ size_flags_vertical = 0
 theme = ExtResource("3_30p6h")
 drag_to_rearrange_enabled = true
 
-[node name="TabContainer" type="TabContainer" parent="VSplitContainer"]
+[node name="VSplitContainer" type="VSplitContainer" parent="VSplitContainer"]
 layout_mode = 2
+dragging_enabled = false
+dragger_visibility = 2
+
+[node name="TabContainer" type="TabContainer" parent="VSplitContainer/VSplitContainer"]
+layout_mode = 2
+size_flags_vertical = 3
 current_tab = 0
 tabs_visible = false
 
-[node name="NoFileOpenedTab" type="RichTextLabel" parent="VSplitContainer/TabContainer"]
+[node name="NoFileOpenedTab" type="RichTextLabel" parent="VSplitContainer/VSplitContainer/TabContainer"]
 self_modulate = Color(16, 16, 16, 0.12)
 layout_mode = 2
 focus_mode = 2
@@ -48,6 +54,31 @@ horizontal_alignment = 1
 vertical_alignment = 1
 selection_enabled = true
 metadata/_tab_index = 0
+
+[node name="ColorRect" type="ColorRect" parent="VSplitContainer/VSplitContainer"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_vertical = 8
+color = Color(0.0784314, 1, 0, 0.0705882)
+
+[node name="MarginContainer" type="MarginContainer" parent="VSplitContainer/VSplitContainer/ColorRect"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 8
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_right = 16
+
+[node name="RichTextLabel" type="RichTextLabel" parent="VSplitContainer/VSplitContainer/ColorRect/MarginContainer"]
+layout_mode = 2
+theme = ExtResource("3_0ojv2")
+theme_override_font_sizes/normal_font_size = 20
+text = "Ctrl + W: Close a tab                Ctrl + S: Save file"
+vertical_alignment = 1
 
 [node name="ConfirmationDialog" type="ConfirmationDialog" parent="."]
 initial_position = 2

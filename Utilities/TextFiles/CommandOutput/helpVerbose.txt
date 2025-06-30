@@ -1,125 +1,99 @@
-[color=cyan]mkf[/color] [color=yellow][file_name][/color]
-    [color=green]Creates[/color] a new file in the current or specified directory.
-    [color=yellow]Arguments:[/color]
-      [color=yellow][file_name][/color] – The name of the file to create. Supports paths.
-    [color=green]Example:[/color]
-      [color=yellow]mkf example.txt[/color] – Creates a file named `example.txt` in the current directory.
-      [color=yellow]mkf folder/example.txt[/color] – Creates a file named `example.txt` in the `folder` directory.
+[color=#00aaff]ls[/color] [color=#ff6666]<dir>[/color]  
+  List all files and subdirectories in the specified directory.  
+  [color=#ff6666]<dir>[/color] - The target directory to list. If omitted, uses the current directory.
 
-[color=cyan]rmf[/color] [color=yellow][file_name][/color]
-    [color=green]Removes[/color] a file from the current or specified directory.
-    [color=yellow]Arguments:[/color]
-      [color=yellow][file_name][/color] – The name of the file to remove. Supports paths.
-    [color=green]Example:[/color]
-      [color=yellow]rmf example.txt[/color] – Removes the file `example.txt` from the current directory.
-      [color=yellow]rmf folder/example.txt[/color] – Removes the file `example.txt` from the `folder` directory.
+[color=#00aaff]cd[/color] [color=#ff6666]<dir>[/color]  
+  Change the current working directory to another location.  
+  [color=#ff6666]<dir>[/color] - The target directory path.
 
-[color=cyan]ls[/color] [color=yellow][directory][/color]
-    [color=green]Lists[/color] all files and directories in the specified or current directory.
-    [color=yellow]Arguments:[/color]
-      [color=yellow][directory][/color] – Optional. The directory to list. Defaults to the current directory.
-    [color=green]Example:[/color]
-      [color=yellow]ls[/color] – Lists the contents of the current directory.
-      [color=yellow]ls folder[/color] – Lists the contents of the `folder` directory.
+[color=#00aaff]pwd[/color]  
+  Display the full path of the current working directory.
 
-[color=cyan]cd[/color] [color=yellow][directory][/color]
-    [color=green]Changes[/color] the current working directory to the specified directory.
-    [color=yellow]Arguments:[/color]
-      [color=yellow][directory][/color] – The target directory to navigate to.
-    [color=green]Example:[/color]
-      [color=yellow]cd folder[/color] – Changes the current directory to `folder`.
+[color=#00aaff]run[/color] [color=#ff6666]<file>[/color]  
+  Execute a file as a script or program.  
+  [color=#ff6666]<file>[/color] - The script or executable file to run.
 
-[color=cyan]pwd[/color]
-    [color=green]Prints[/color] the current working directory.
-    [color=green]Example:[/color]
-      [color=yellow]pwd[/color] – Displays the full path of the current directory.
+[color=#00aaff]read[/color] [color=#ff6666]<file>[/color]  
+  Output the contents of a file to the terminal.  
+  [color=#ff6666]<file>[/color] - The file name to read.
 
-[color=cyan]say[/color] [color=yellow][message][/color] [color=yellow][-n][/color] [color=yellow][-e][/color] [color=yellow][-r][/color]
-    [color=green]Outputs[/color] the specified message to the terminal.
-    [color=yellow]Arguments:[/color]
-      [color=yellow][message][/color] – The message to display.
-      [color=yellow]-n[/color] – Optional. Suppress the trailing newline.
-      [color=yellow]-e[/color] – Optional. Enable escape sequences (e.g., `\n` for newline).
-      [color=yellow]-r[/color] – Optional. Display the message in red.
-    [color=green]Example:[/color]
-      [color=yellow]say Hello, World![/color] – Displays `Hello, World!` in the terminal.
-      [color=yellow]say -n "Hello"`[/color] – Displays `Hello` without a newline.
+[color=#00aaff]say[/color] [color=#ffaa00]-[n|e|b][/color] [color=#ff6666]<msg>[/color]  
+  Print a message to the screen, with optional formatting.  
+  [color=#ffaa00]-n[/color] - Do not output a trailing newline.  
+  [color=#ffaa00]-e[/color] - Interpret escape sequences in the message.  
+  [color=#ffaa00]-b[/color] - Escape BBCode in the output.  
+  [color=#ff6666]<msg>[/color] - The message to display.
 
-[color=cyan]help[/color] [color=yellow][-v][/color]
-    [color=green]Displays[/color] help information for available commands.
-    [color=yellow]Arguments:[/color]
-      [color=yellow]-v[/color] – Optional. Show verbose help.
-    [color=green]Example:[/color]
-      [color=yellow]help[/color] – Displays a brief overview of commands.
-      [color=yellow]help -v[/color] – Displays detailed help for all commands.
+[color=#00aaff]help[/color]  
+  Display this help message with a list of available commands.
 
-[color=cyan]home[/color]
-    [color=green]Returns[/color] to the home directory.
-    [color=green]Example:[/color]
-      [color=yellow]home[/color] – Navigates back to the home directory.
+[color=#00aaff]home[/color]  
+  Return to your own node immediately.
 
-[color=cyan]edit[/color] [color=yellow][file_name][/color]
-    [color=green]Opens[/color] a file in the text editor.
-    [color=yellow]Arguments:[/color]
-      [color=yellow][file_name][/color] – The name of the file to edit. Supports paths.
-    [color=green]Example:[/color]
-      [color=yellow]edit example.txt[/color] – Opens `example.txt` in the text editor.
+[color=#00aaff]scan[/color] [color=#ffaa00]-v[/color]  
+  Scan the current network for adjacent nodes.  
+  [color=#ffaa00]-v[/color] - Verbose output; shows additional details.
 
-[color=cyan]scan[/color] [color=yellow][-d [depth_val]][/color] [color=yellow][-v][/color]
-    [color=green]Scans[/color] the network for vulnerabilities or connections.
-    [color=yellow]Arguments:[/color]
-      [color=yellow]-d [depth_val][/color] – Optional. Set the scan depth (number of levels to scan).
-      [color=yellow]-v[/color] – Optional. Enable verbose output.
-    [color=green]Example:[/color]
-      [color=yellow]scan[/color] – Scans the network with default depth.
-      [color=yellow]scan -d 3 -v[/color] – Scans the network up to 3 levels deep with verbose output.
+[color=#00aaff]connect[/color] [color=#ff6666]<hostname|ip>[/color]  
+  Connect to another node by hostname or IP address.  
+  [color=#ff6666]<hostname|ip>[/color] - The target node to connect to.
 
-[color=cyan]clear[/color]
-    [color=green]Clears[/color] the terminal screen.
-    [color=green]Example:[/color]
-      [color=yellow]clear[/color] – Clears all text from the terminal.
+[color=#00aaff]analyze[/color] [color=#ff6666][hostname|ip][/color]  
+  Analyze information about the specified node.  
+  [color=#ff6666][hostname|ip][/color] - The node to analyze (optional; defaults to current).
 
-[color=cyan]mkdir[/color] [color=yellow][directory_name][/color]
-    [color=green]Creates[/color] a new directory with the specified name.
-    [color=yellow]Arguments:[/color]
-      [color=yellow][directory_name][/color] – The name of the directory to create. Supports paths.
-    [color=green]Example:[/color]
-      [color=yellow]mkdir folder[/color] – Creates a directory named `folder`.
+[color=#00aaff]sector[/color] [color=#ffaa00]-c[/color] [color=#ffaa00]-l[/color] [color=#ff6666]<sector_level>[/color]  
+  List all sectors in the network.  
+  [color=#ffaa00]-c[/color], [color=#ffaa00]--connected[/color] - Show only connected sectors.  
+  [color=#ffaa00]-l[/color], [color=#ffaa00]--level[/color] [color=#ff6666]<sector_level>[/color] - Filter by sector level.
 
-[color=cyan]rmdir[/color] [color=yellow][directory_name][/color]
-    [color=green]Removes[/color] an empty directory.
-    [color=yellow]Arguments:[/color]
-      [color=yellow][directory_name][/color] – The name of the directory to remove. Supports paths.
-    [color=green]Example:[/color]
-      [color=yellow]rmdir folder[/color] – Removes the directory named `folder`.
+[color=#00aaff]link[/color] [color=#ff6666]<sector_names>[/color]  
+  Create links between the specified sectors.  
+  [color=#ff6666]<sector_names>[/color] - Names of sectors to link together.
 
-[color=cyan]crack[/color] [color=yellow]--init[/color] OR [color=yellow][flags][/color]
-    [color=green]Cracks[/color] locks with specified values.
-    [color=yellow]Arguments:[/color]
-      [color=yellow]--init[/color] – Initializes the cracking process.
-      [color=yellow][flags][/color] – Specify lock types and values (e.g., `-i5 3`).
-    [color=green]Example:[/color]
-      [color=yellow]crack init[/color] – Starts the cracking process.
-      [color=yellow]crack -i5 3 -p9 7[/color] – Attempts to crack locks with the specified values.
+[color=#00aaff]unlink[/color] [color=#ff6666]<sector_names>[/color]  
+  Remove links between the specified sectors.  
+  [color=#ff6666]<sector_names>[/color] - Names of sectors to unlink.
 
-[color=cyan]inspect[/color]
-    [color=green]Reserved[/color] for future functionality.
+[color=#00aaff]stats[/color]  
+  Display your player’s current statistics.
 
-[color=cyan]connect[/color] [color=yellow][ip_or_hostname][/color]
-    [color=green]Connects[/color] to a remote host.
-    [color=yellow]Arguments:[/color]
-      [color=yellow][ip_or_hostname][/color] – The target IP address or hostname.
-    [color=green]Example:[/color]
-      [color=yellow]connect 192.168.1.1[/color] – Connects to the host at `192.168.1.1`.
+[color=#00aaff]xyzzy[/color]  
+  Does nothing. A hidden Easter egg.
 
-[color=cyan]analyze[/color] [color=yellow][ip_or_hostname][/color]
-    [color=green]Analyzes[/color] the target host or current system for information.
-    [color=yellow]Arguments:[/color]
-      [color=yellow][ip_or_hostname][/color] – Optional. The target IP address or hostname.
-    [color=green]Output:[/color]
-      Displays information about the system, such as:
-        - IP address
-        - Hostname
-        - Host type (e.g., [color=purple]PERSON[/color], [color=purple]BUSINESS[/color])
-        - Defense value
-        - Security type
+[color=#00aaff]clear[/color]  
+  Clear all text from the terminal screen.
+
+[color=#00aaff]mkf[/color] [color=#ff6666]<files>[/color]  
+  Create new files in the current directory.  
+  [color=#ff6666]<files>[/color] - One or more file names to create.
+
+[color=#00aaff]rmf[/color] [color=#ff6666]<files>[/color]  
+  Remove files from the current directory.  
+  [color=#ff6666]<files>[/color] - One or more file names to delete.
+
+[color=#00aaff]mkdir[/color] [color=#ff6666]<dirs>[/color]  
+  Create new directories.  
+  [color=#ff6666]<dirs>[/color] - One or more directory names to create.
+
+[color=#00aaff]rmdir[/color] [color=#ff6666]<dirs>[/color]  
+  Remove directories.  
+  [color=#ff6666]<dirs>[/color] - One or more directory names to remove.
+
+[color=#00aaff]karaxe[/color] [color=#ffaa00]--help[/color]  
+  Run `karaxe.exe`. Use `--help` to show details about its usage.
+
+[color=#00aaff]myneswarm[/color] [color=#ffaa00]--help[/color]  
+  Run `myneswarm.exe`. Use `--help` for detailed help.
+
+[color=#00aaff]bitrader[/color] [color=#ffaa00]--help[/color]  
+  Run `bitrader.exe`. Use `--help` to get help information.
+
+[color=#00aaff]bitcrafter[/color] [color=#ffaa00]--help[/color]  
+  Run `bitcrafter.exe`. Use `--help` to show command options.
+
+[color=#00aaff]setname[/color] [color=#ff6666]-u[/color] [color=#ff6666]<new_username>[/color] [color=#ff6666]-h[/color] [color=#ff6666]<new_hostname>[/color] [color=#ff6666]-d[/color] [color=#ff6666]<new_displayname>[/color]  
+  Change your current node’s username, hostname, or display name.  
+  [color=#ff6666]-u[/color] [color=#ff6666]<new_username>[/color] - Set a new username.  
+  [color=#ff6666]-h[/color] [color=#ff6666]<new_hostname>[/color] - Set a new hostname.  
+  [color=#ff6666]-d[/color] [color=#ff6666]<new_displayname>[/color] - Set a new display name.

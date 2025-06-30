@@ -1,8 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://dcg54ljq6rpbt"]
+[gd_scene load_steps=3 format=3 uid="uid://dcg54ljq6rpbt"]
 
 [ext_resource type="Script" uid="uid://cuyyg5uy7qah7" path="res://Scripts/CS/Editor/EditorTab.cs" id="1_qpxni"]
 [ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="1_wulu7"]
-[ext_resource type="CodeHighlighter" uid="uid://k788co3pmj6y" path="res://Utilities/Styling/EditorHighligher.tres" id="2_wnuhq"]
 
 [node name="CodeEdit" type="CodeEdit"]
 self_modulate = Color(16, 16, 16, 0.05)
@@ -18,8 +17,6 @@ deselect_on_focus_loss_enabled = false
 wrap_mode = 1
 indent_wrapped_lines = true
 minimap_draw = true
-syntax_highlighter = ExtResource("2_wnuhq")
-highlight_all_occurrences = true
 line_folding = true
 gutters_draw_breakpoints_gutter = true
 gutters_draw_bookmarks = true
@@ -34,6 +31,3 @@ auto_brace_completion_enabled = true
 auto_brace_completion_highlight_matching = true
 script = ExtResource("1_qpxni")
 metadata/_tab_index = 0
-
-[connection signal="code_completion_requested" from="." to="." method="OnCodeCompletionRequested"]
-[connection signal="text_changed" from="." to="." method="OnTextChanged"]

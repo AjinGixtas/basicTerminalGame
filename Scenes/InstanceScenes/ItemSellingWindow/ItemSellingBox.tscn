@@ -1,7 +1,10 @@
-[gd_scene load_steps=3 format=3 uid="uid://cr68a6i3krnae"]
+[gd_scene load_steps=4 format=3 uid="uid://cr68a6i3krnae"]
 
 [ext_resource type="Script" uid="uid://b1w8vhydab7eh" path="res://Scripts/CS/ItemSeller/ItemSaleBox.cs" id="1_5iki4"]
 [ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="1_elxuj"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5iki4"]
+bg_color = Color(1, 1, 1, 1)
 
 [node name="ItemSellingBox" type="MarginContainer" node_paths=PackedStringArray("sellAmountInput", "CurrentPriceDisplay", "InStockAmountDisplay", "ItemSymbol")]
 custom_minimum_size = Vector2(640, 0)
@@ -25,7 +28,7 @@ ItemSymbol = NodePath("HFlowContainer/MarginContainer/ItemSymbolDisplay")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 2
-color = Color(1, 1, 1, 0.0196078)
+color = Color(1, 0, 1, 0.0588235)
 
 [node name="HFlowContainer" type="HFlowContainer" parent="."]
 layout_mode = 2
@@ -179,6 +182,7 @@ color = Color(0.105882, 0.286275, 0.211765, 0.32549)
 custom_minimum_size = Vector2(96, 0)
 layout_mode = 2
 theme = ExtResource("1_elxuj")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_5iki4")
 
 [node name="ColorRect" type="ColorRect" parent="HFlowContainer/VSplitContainer/SellButton"]
 layout_mode = 1
@@ -188,7 +192,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
-color = Color(0, 0.227451, 0, 1)
+color = Color(0, 0.227451, 0, 0.501961)
 
 [node name="RichTextLabel" type="RichTextLabel" parent="HFlowContainer/VSplitContainer/SellButton"]
 layout_mode = 1

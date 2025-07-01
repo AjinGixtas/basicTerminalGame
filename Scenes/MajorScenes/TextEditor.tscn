@@ -75,9 +75,22 @@ theme_override_constants/margin_right = 16
 
 [node name="RichTextLabel" type="RichTextLabel" parent="VSplitContainer/VSplitContainer/ColorRect/MarginContainer"]
 layout_mode = 2
+size_flags_horizontal = 0
 theme = ExtResource("3_0ojv2")
 theme_override_font_sizes/normal_font_size = 20
-text = "Ctrl + W: Close a tab                Ctrl + S: Save file"
+text = "Ctrl + W: Close a tab         Ctrl + S: Save file"
+fit_content = true
+autowrap_mode = 0
+vertical_alignment = 1
+
+[node name="RichTextLabel_2" type="RichTextLabel" parent="VSplitContainer/VSplitContainer/ColorRect/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+theme = ExtResource("3_0ojv2")
+theme_override_font_sizes/normal_font_size = 20
+text = "No syntext highlighting!"
+fit_content = true
+autowrap_mode = 0
 vertical_alignment = 1
 
 [node name="ConfirmationDialog" type="ConfirmationDialog" parent="."]

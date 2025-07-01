@@ -155,17 +155,17 @@ public static partial class Util {
             case StrSty.DISPLAY_NAME:
                 return $"[color={Util.CC(Cc.G)}]{input}[/color]";
             case StrSty.SECTOR:
-                return $"[color={ColorMapperSecLvl(input, NetworkManager.GetDriftSectorByName(input)?.SectorLevel ?? 0)}]{input}[/color]";
+                return $"[color={ColorMapperSecLvl(NetworkManager.GetDriftSectorByName(input)?.SectorLevel ?? 0)}]{input}[/color]";
             case StrSty.UNIT: {
                     if (string.IsNullOrWhiteSpace(input)) return "";
                     return $"{Util.Format(input, StrSty.NUMBER)}[color={Util.CC(Cc.W)}]{addons[0]}[/color]";
                 }
             case StrSty.SEC_LVL:
-                    return $"[color={ColorMapperSecLvl(input, input)}]{input}[/color]";
+                    return $"[color={ColorMapperSecLvl(input)}]{input}[/color]";
             case StrSty.SEC_TYPE:
-                return $"[color={ColorMapperSecLvl(input, input)}]{input}[/color]";
+                return $"[color={ColorMapperSecLvl(input)}]{input}[/color]";
             case StrSty.DEF_LVL:
-                return $"[color={ColorMapperSecLvl(input, input)}]{input}[/color]";
+                return $"[color={ColorMapperSecLvl(input)}]{input}[/color]";
             case StrSty.USERNAME:
                 return $"[color={Util.CC(Cc.M)}]{input}[/color]";
             case StrSty.DESC:
@@ -286,19 +286,12 @@ public static partial class Util {
                     if (input == "g01d-pouch") return $"[color={Util.CC(Cc.Y)}]g01d-pouch[/color]";
                     return Util.Format("NOT_SUPPORTED", StrSty.ERROR);
                 }
+            case StrSty.NODE_LOCK:
+                return $"[color={Util.CC(Cc.rG)}]{input}[/color]";
             default:
                 return input;
         }
-        string ColorMapperSecLvl(string input, object lvl) {
-            return $"{lvl switch {
-                "NOSEC" or 0 or "0" => Util.CC(Cc.G),
-                "LOSEC" or 1 or 2 or 3 or "1" or "2" or "3" => Util.CC(Cc.LB),
-                "MISEC" or 4 or 5 or 6 or "4" or "5" or "6" => Util.CC(Cc.y),
-                "HISEC" or 7 or 8 or 9 or "7" or "8" or "9" => Util.CC(Cc.r),
-                "MASEC" or "10" => Util.CC(Cc.m),
-                _ => Util.CC(Cc.m)
-            }}";
-        }
+
     }
     public static TEnum MapEnum<TEnum>(int value) where TEnum : System.Enum {
         System.Type enumType = typeof(TEnum);
@@ -517,7 +510,16 @@ public static partial class Util {
         // Return inverted color as hex string
         return $"#{rInv:X2}{gInv:X2}{bInv:X2}";
     }
-
+    public static string ColorMapperSecLvl(object lvl) {
+        return $"{lvl switch {
+            "NOSEC" or SecurityType.NOSEC or 0 or "0" => Util.CC(Cc.G),
+            "LOSEC" or SecurityType.LOSEC or 1 or 2 or 3 or "1" or "2" or "3" => Util.CC(Cc.LB),
+            "MISEC" or SecurityType.MISEC or 4 or 5 or 6 or "4" or "5" or "6" => Util.CC(Cc.y),
+            "HISEC" or SecurityType.HISEC or 7 or 8 or 9 or "7" or "8" or "9" => Util.CC(Cc.r),
+            "MASEC" or SecurityType.MASEC or "10" => Util.CC(Cc.m),
+            _ => Util.CC(Cc.m)
+        }}";
+    }
 
     [GeneratedRegex(@"\[(\/?)(b|i|u|color|size|url|img|quote|code|spoiler|lb|rb|br)[^\]]*\]", RegexOptions.IgnoreCase, "en-150")]
     private static partial Regex SelectBBCode();

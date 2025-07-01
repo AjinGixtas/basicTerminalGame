@@ -42,21 +42,23 @@ public static partial class ShellCore {
             case "edit" or "nano" or "vim": Edit(farg, parg); break; // Open a file for edit
             case "scan" or "nmap": Scan(farg, parg); break; // Scan neighbouring node
             case "read": Read(farg, parg); break; // Output file content to terminal
-            case "farm": Farm(farg, parg); break; // Interact with a node's HackFarm (GCminer)
             case "link": Link(farg, parg); break; // Connect to sector(s)
             case "stats": Stats(farg, parg); break;
             case "clear": Clear(farg, parg); break; // Clear all text on the terminal
             case "mkdir": MkDir(farg, parg); break; // Make folder
             case "rmdir": RmDir(farg, parg); break; // Remove folder
             case "sector": Sector(farg, parg); break; // List out sectors
-            case "karaxe": Karaxe(farg, parg); break; // Interact with the rush hacking system
             case "unlink": Unlink(farg, parg); break; // Disconnect from sector(s)
             case "inspect": Inspect(farg, parg); break; // Doesn't do anything yet
             case "connect": Connect(farg, parg); break; // Connect to node
             case "analyze": Analyze(farg, parg); break; // Give data about a node
             case "setname": SetName(farg, parg); break; // Set name of user and node
-            case "bitrader": BiTrader(farg, parg); break;
-            case "bitcrafter": BitCrafter(farg, parg);break;
+            
+            
+            case "karaxe": Karaxe(farg, parg); break; // karaxe.exe
+            case "mifarm": MiFarm(farg, parg); break; // mifarm.exe
+            case "bitrader": BiTrader(farg, parg); break; // bitrader.exe
+            case "bitcraft": BitCraft(farg, parg); break; // bitcraft.exe
 
             case "xyzzy": Say("Nothing happens"); break; // Classic Easter egg command
 
@@ -79,9 +81,9 @@ public static partial class ShellCore {
             }
             if (args[i].StartsWith('-')) {
                 if (args[i].Length == 2) {
-                    if (i + 1 < args.Length && !args[i + 1].StartsWith('-')) parsedArgs[args[i]] = args[i + 1];
+                    if (i + 1 < args.Length && !args[i + 1].StartsWith('-')) { parsedArgs[args[i]] = args[i + 1]; ++i; }
                     else parsedArgs[args[i]] = "";
-                    ++i;
+                    
                 } else for (int j = 1; j < args[i].Length; ++j) { parsedArgs[$"-{args[i][j]}"] = ""; }
             } else { positionalArgs.Add(args[i]); }
         }

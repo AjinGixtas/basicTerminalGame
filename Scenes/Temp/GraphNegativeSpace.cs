@@ -29,8 +29,8 @@ public partial class GraphNegativeSpace : MarginContainer
         for (int i = 0; i < RedZ.Length; ++i) RedZ[i].Text = "································································";
         for (int i = 0; i < GrnZ.Length; ++i) GrnZ[i].Text = "································································";
     }
-    public void RenderPriceGraph() {
-        double percentageDelta = (ItemSeller.PriceModels[focusedID].value / ItemCrafter.ALL_ITEMS[focusedID].Value - 1.0);
+    public void RenderPriceGraph(double curVal, double basVal) {
+        double percentageDelta = (curVal / basVal - 1.0);
         double budgetPercent = Mathf.Abs(percentageDelta);
         int curCharI = blocks.Length - 1;
         if (percentageDelta > 0) {

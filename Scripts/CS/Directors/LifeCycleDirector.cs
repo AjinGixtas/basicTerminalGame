@@ -13,85 +13,6 @@ public partial class LifeCycleDirector : Node
 		if (gameScene != null) {
 			LoadGame(true);
 		} else { GD.PrintErr("Game scene not set in LifeCycleDirector."); }
-		GD.Print(@$"
-{Util.Format("ls <dir>", StrSty.CMD_FUL)} - List item in directories.
-	{Util.Format("<dir>", StrSty.CMD_FARG)} - Target directory.
-
-{Util.Format("cd <dir>", StrSty.CMD_FUL)} - Change directory.
-	{Util.Format("<dir>", StrSty.CMD_FARG)} - Target directory.
-
-{Util.Format("pwd", StrSty.CMD_FUL)} - Output working directory.
-
-{Util.Format("run <file>", StrSty.CMD_FUL)} - Run file as script.
-	{Util.Format("<file>", StrSty.CMD_FARG)} - File name.
-
-{Util.Format("read <file>", StrSty.CMD_FUL)} - Output file content.
-	{Util.Format("<file>", StrSty.CMD_FARG)} - File name.
-
-{Util.Format("say -[n|e|b] <msg>", StrSty.CMD_FUL)} - Output message to the screen.
-	{Util.Format("-n", StrSty.CMD_FARG)} - Suppress trailing newline.
-	{Util.Format("-e", StrSty.CMD_FARG)} - Enable escape sequences.
-	{Util.Format("-b", StrSty.CMD_FARG)} - Escape BBCode.
-	{Util.Format("<msg>", StrSty.CMD_FARG)} - Message to output.
-
-{Util.Format("help", StrSty.CMD_FUL)} - Display help.
-
-{Util.Format("home", StrSty.CMD_FUL)} - Go back to your node.
-
-{Util.Format("scan -[v]", StrSty.CMD_FARG)} - Scan adjacent node.
-	{Util.Format("-v", StrSty.CMD_FARG)} - Verbose output.
-
-{Util.Format("connect <hostname|ip>", StrSty.CMD_FUL)} - Connect to node.
-	{Util.Format("<hostname|ip>", StrSty.CMD_FARG)} - Node to connect.
-
-{Util.Format("analyze [hostname|ip]", StrSty.CMD_FUL)} - Analyze node.
-	{Util.Format("[hostname|ip]", StrSty.CMD_FARG)} - Node to analyze.
-
-{Util.Format("sector -[c] -[l <sector_level>]", StrSty.CMD_FUL)} - List sectors.
-	{Util.Format("-c --connected", StrSty.CMD_FARG)} - Connected sectors only.
-	{Util.Format("-l, --level <sector_level>", StrSty.CMD_FARG)} - Sectors with this level only.
-
-{Util.Format("link <sector_names>", StrSty.CMD_FUL)} - Link sectors.
-	{Util.Format("<sector_names>", StrSty.CMD_FARG)} - Sectors to link.
-
-{Util.Format("unlink <sector_names>", StrSty.CMD_FUL)} - Unlink sectors.
-	{Util.Format("<sector_names>", StrSty.CMD_FARG)} - Sectors to unlink.
-
-{Util.Format("stats", StrSty.CMD_FUL)} - Display player stats.
-
-{Util.Format("xyzzy", StrSty.CMD_FUL)} - Nothing happens
-
-{Util.Format("clear", StrSty.CMD_FUL)} - Clear terminal.
-
-{Util.Format("mkf <files>", StrSty.CMD_FUL)} - Make files.
-	{Util.Format("<files>", StrSty.CMD_FARG)} - File names.
-
-{Util.Format("rmf <files>", StrSty.CMD_FUL)} - Remove files.
-	{Util.Format("<files>", StrSty.CMD_FARG)} - File names.
-
-{Util.Format("mkdir <dirs>", StrSty.CMD_FUL)} - Make directories.
-	{Util.Format("<dir>", StrSty.CMD_FARG)} - Directory names.
-
-{Util.Format("rmdir <dirs>", StrSty.CMD_FUL)} - Remove directores.
-	{Util.Format("<dir>", StrSty.CMD_FARG)} - Directory names.
-
-{Util.Format("karaxe --[help]", StrSty.CMD_FUL)} - Run karaxe.exe
-	{Util.Format("--help", StrSty.CMD_FARG)} - Provide details.
-
-{Util.Format("myneswarm --[help]", StrSty.CMD_FUL)} - Run myneswarm.exe
-	{Util.Format("--help", StrSty.CMD_FARG)} - Provide details.
-
-{Util.Format("bitrader --[help]", StrSty.CMD_FUL)} - Run bitrader.exe
-	{Util.Format("--help", StrSty.CMD_FARG)} - Provide details.
-
-{Util.Format("bitcrafter --[help]", StrSty.CMD_FUL)} - Run bitcrafter.exe
-	{Util.Format("--help", StrSty.CMD_FARG)} - Provide details.
-
-{Util.Format("setname [-u <new_username>] [-h <new_hostname>] [-d <new_displayname>", StrSty.CMD_FUL)} - Change names of your node.
-	{Util.Format("[-u <new_username>]", StrSty.CMD_FARG)} - New username to change to.
-	{Util.Format("[-h <new_hostname>]", StrSty.CMD_FARG)} - New hostname to change to.
-	{Util.Format("[-d <new_displayname>]", StrSty.CMD_FARG)} - New displayname to change to.
-");
     }
     public override void _Process(double delta) {
 		if (Input.IsActionJustPressed("sequentialSave")) { 
@@ -112,7 +33,6 @@ public partial class LifeCycleDirector : Node
 		if (quickLoad) QuickLoad(this);
 		ShellCore.Ready();
 		NetworkManager.Ready();
-		ItemSeller.Ready();
 		RemakeScene();
 		FinishScene?.Invoke();
 		foreach (Delegate d in FinishScene.GetInvocationList()) FinishScene -= (Action)d;
@@ -194,4 +114,82 @@ public partial class LifeCycleDirector : Node
 	public void OnAutosaveTimerTimeout() {
 		QuickSave(false);
 	}
+	readonly string DOC = @$"
+{Util.Format("ls <dir>", StrSty.CMD_FUL)} - List item in directories.
+	{Util.Format("<dir>", StrSty.CMD_FARG)} - Target directory.
+
+{Util.Format("cd <dir>", StrSty.CMD_FUL)} - Change directory.
+	{Util.Format("<dir>", StrSty.CMD_FARG)} - Target directory.
+
+{Util.Format("pwd", StrSty.CMD_FUL)} - Output working directory.
+
+{Util.Format("run <file>", StrSty.CMD_FUL)} - Run file as script.
+	{Util.Format("<file>", StrSty.CMD_FARG)} - File name.
+
+{Util.Format("read <file>", StrSty.CMD_FUL)} - Output file content.
+	{Util.Format("<file>", StrSty.CMD_FARG)} - File name.
+
+{Util.Format("say -[n|e|b] <msg>", StrSty.CMD_FUL)} - Output message to the screen.
+	{Util.Format("-n", StrSty.CMD_FARG)} - Suppress trailing newline.
+	{Util.Format("-e", StrSty.CMD_FARG)} - Enable escape sequences.
+	{Util.Format("-b", StrSty.CMD_FARG)} - Escape BBCode.
+	{Util.Format("<msg>", StrSty.CMD_FARG)} - Message to output.
+
+{Util.Format("help", StrSty.CMD_FUL)} - Display help.
+
+{Util.Format("home", StrSty.CMD_FUL)} - Go back to your node.
+
+{Util.Format("scan -[v]", StrSty.CMD_FARG)} - Scan adjacent node.
+	{Util.Format("-v", StrSty.CMD_FARG)} - Verbose output.
+
+{Util.Format("connect <hostname|ip>", StrSty.CMD_FUL)} - Connect to node.
+	{Util.Format("<hostname|ip>", StrSty.CMD_FARG)} - Node to connect.
+
+{Util.Format("analyze [hostname|ip]", StrSty.CMD_FUL)} - Analyze node.
+	{Util.Format("[hostname|ip]", StrSty.CMD_FARG)} - Node to analyze.
+
+{Util.Format("sector -[c] -[l <sector_level>]", StrSty.CMD_FUL)} - List sectors.
+	{Util.Format("-c --connected", StrSty.CMD_FARG)} - Connected sectors only.
+	{Util.Format("-l, --level <sector_level>", StrSty.CMD_FARG)} - Sectors with this level only.
+
+{Util.Format("link <sector_names>", StrSty.CMD_FUL)} - Link sectors.
+	{Util.Format("<sector_names>", StrSty.CMD_FARG)} - Sectors to link.
+
+{Util.Format("unlink <sector_names>", StrSty.CMD_FUL)} - Unlink sectors.
+	{Util.Format("<sector_names>", StrSty.CMD_FARG)} - Sectors to unlink.
+
+{Util.Format("stats", StrSty.CMD_FUL)} - Display player stats.
+
+{Util.Format("xyzzy", StrSty.CMD_FUL)} - Nothing happens
+
+{Util.Format("clear", StrSty.CMD_FUL)} - Clear terminal.
+
+{Util.Format("mkf <files>", StrSty.CMD_FUL)} - Make files.
+	{Util.Format("<files>", StrSty.CMD_FARG)} - File names.
+
+{Util.Format("rmf <files>", StrSty.CMD_FUL)} - Remove files.
+	{Util.Format("<files>", StrSty.CMD_FARG)} - File names.
+
+{Util.Format("mkdir <dirs>", StrSty.CMD_FUL)} - Make directories.
+	{Util.Format("<dir>", StrSty.CMD_FARG)} - Directory names.
+
+{Util.Format("rmdir <dirs>", StrSty.CMD_FUL)} - Remove directores.
+	{Util.Format("<dir>", StrSty.CMD_FARG)} - Directory names.
+
+{Util.Format("karaxe --[help]", StrSty.CMD_FUL)} - Run karaxe.exe
+	{Util.Format("--help", StrSty.CMD_FARG)} - Provide details.
+
+{Util.Format("myneswarm --[help]", StrSty.CMD_FUL)} - Run myneswarm.exe
+	{Util.Format("--help", StrSty.CMD_FARG)} - Provide details.
+
+{Util.Format("bitrader --[help]", StrSty.CMD_FUL)} - Run bitrader.exe
+	{Util.Format("--help", StrSty.CMD_FARG)} - Provide details.
+
+{Util.Format("bitcrafter --[help]", StrSty.CMD_FUL)} - Run bitcrafter.exe
+	{Util.Format("--help", StrSty.CMD_FARG)} - Provide details.
+
+{Util.Format("setname [-u <new_username>] [-h <new_hostname>] [-d <new_displayname>", StrSty.CMD_FUL)} - Change names of your node.
+	{Util.Format("[-u <new_username>]", StrSty.CMD_FARG)} - New username to change to.
+	{Util.Format("[-h <new_hostname>]", StrSty.CMD_FARG)} - New hostname to change to.
+	{Util.Format("[-d <new_displayname>]", StrSty.CMD_FARG)} - New displayname to change to.";
 }

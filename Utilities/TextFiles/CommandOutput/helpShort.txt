@@ -62,13 +62,13 @@
 [color=#00aaff]karaxe[/color] [color=#ffaa00]--[help][/color] - Run karaxe.exe
 	[color=#ffaa00]--help[/color] - Provide details.
 
-[color=#00aaff]myneswarm[/color] [color=#ffaa00]--[help][/color] - Run myneswarm.exe
+[color=#00aaff]mifarm[/color] [color=#ffaa00]--[help][/color] - Run mifarm.exe
 	[color=#ffaa00]--help[/color] - Provide details.
 
 [color=#00aaff]bitrader[/color] [color=#ffaa00]--[help][/color] - Run bitrader.exe
 	[color=#ffaa00]--help[/color] - Provide details.
 
-[color=#00aaff]bitcrafter[/color] [color=#ffaa00]--[help][/color] - Run bitcrafter.exe
+[color=#00aaff]bitcraft[/color] [color=#ffaa00]--[help][/color] - Run bitcraft.exe
 	[color=#ffaa00]--help[/color] - Provide details.
 
 [color=#00aaff]setname[/color] [color=#ff6666][-u[/color] [color=#ff6666]<new_username>][/color] [color=#ff6666][-h[/color] [color=#ff6666]<new_hostname>][/color] [color=#ff6666][-d[/color] [color=#ff6666]<new_displayname>[/color] - Change names of your node.

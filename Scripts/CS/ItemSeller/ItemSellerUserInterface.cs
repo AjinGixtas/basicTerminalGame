@@ -16,11 +16,4 @@ public partial class ItemSellerUserInterface : Control {
             LifeCycleDirector.FinishScene += saleBoxes[i].Render;
         }
     }
-    public void OnPriceUpdated() {
-        ItemSeller.UpdateMineralPrices(1.0);
-        for (int i = 0; i < saleBoxes.Length; ++i) {
-            saleBoxes[i].Render();
-        }
-    }
-
 }

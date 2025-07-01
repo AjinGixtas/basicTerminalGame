@@ -77,28 +77,28 @@ alignment = 0
 layout_mode = 2
 theme = ExtResource("3_0n3pm")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_on0y2")
-text = "Editor"
+text = "TextEditor"
 alignment = 0
 
 [node name="BotnetButton" type="Button" parent="MenuDirector/MenuButtons"]
 layout_mode = 2
 theme = ExtResource("3_0n3pm")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_on0y2")
-text = "BitMiner"
+text = "MiFarm"
 alignment = 0
 
 [node name="CraftButton" type="Button" parent="MenuDirector/MenuButtons"]
 layout_mode = 2
 theme = ExtResource("3_0n3pm")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_on0y2")
-text = "Crafting"
+text = "BitCraft"
 alignment = 0
 
 [node name="SellButton" type="Button" parent="MenuDirector/MenuButtons"]
 layout_mode = 2
 theme = ExtResource("3_0n3pm")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_on0y2")
-text = "SellItem"
+text = "BiTrader"
 alignment = 0
 
 [node name="Other_4" type="Button" parent="MenuDirector/MenuButtons"]

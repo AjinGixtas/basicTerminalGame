@@ -67,7 +67,10 @@ public class BotFarm {
 			_lifetime = value;
 		}
 	}
+	public int DefLvl { get; init; }
 	public BotFarm(int defLvl, DriftNode driftNode) {
+		DefLvl = defLvl;
+
         // defLvl in [1, 10] range, mineralTier in [0, 9] range.
         mineralDistribution = GenerateMiningWeightDistribution(defLvl-1);
 		HostName = driftNode.HostName; DisplayName = driftNode.DisplayName; IP = driftNode.IP;
@@ -127,6 +130,7 @@ public class BotFarm {
 		return output;
 	}
 	public BotFarm(HackFarmDataSaveResource res) {
+		DefLvl = res.DefLvl;
 		BatchSizeCostCurve = (res.cHackA, res.cHackB, res.cHackC, res.cHackD);
 		MineSpeedCostCurve = (res.cGrowA, res.cGrowB, res.cGrowC, res.cGrowD);
 		XferDelayCostCurve = (res.cTimeA, res.cTimeB, res.cTimeC, res.cTimeD);
@@ -141,7 +145,9 @@ public class BotFarm {
 	}
 	public static HackFarmDataSaveResource SerializeBotnet(BotFarm obj) {
 		return new() {
-			cHackA = obj.BatchSizeCostCurve.Item1, cHackB = obj.BatchSizeCostCurve.Item2, cHackC = obj.BatchSizeCostCurve.Item3, cHackD = obj.BatchSizeCostCurve.Item4,
+			DefLvl = obj.DefLvl,
+
+            cHackA = obj.BatchSizeCostCurve.Item1, cHackB = obj.BatchSizeCostCurve.Item2, cHackC = obj.BatchSizeCostCurve.Item3, cHackD = obj.BatchSizeCostCurve.Item4,
 			cGrowA = obj.MineSpeedCostCurve.Item1, cGrowB = obj.MineSpeedCostCurve.Item2, cGrowC = obj.MineSpeedCostCurve.Item3, cGrowD = obj.MineSpeedCostCurve.Item4,
 			cTimeA = obj.XferDelayCostCurve.Item1, cTimeB = obj.XferDelayCostCurve.Item2, cTimeC = obj.XferDelayCostCurve.Item3, cTimeD = obj.XferDelayCostCurve.Item4,
 

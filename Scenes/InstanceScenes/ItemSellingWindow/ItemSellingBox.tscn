@@ -1,21 +1,36 @@
-[gd_scene load_steps=4 format=3 uid="uid://cr68a6i3krnae"]
+[gd_scene load_steps=6 format=3 uid="uid://cr68a6i3krnae"]
 
 [ext_resource type="Script" uid="uid://b1w8vhydab7eh" path="res://Scripts/CS/ItemSeller/ItemSaleBox.cs" id="1_5iki4"]
 [ext_resource type="Theme" uid="uid://cu26m1463lwkc" path="res://Utilities/Themes/Terminal.tres" id="1_elxuj"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_16c1e"]
+bg_color = Color(0.6, 0.6, 0.6, 0.2)
+border_width_bottom = 4
+border_color = Color(0.360784, 0.168627, 1, 1)
+corner_detail = 1
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bhk86"]
+draw_center = false
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.294403, 0.174847, 0.174779, 1)
+corner_detail = 1
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5iki4"]
 bg_color = Color(1, 1, 1, 1)
 
 [node name="ItemSellingBox" type="MarginContainer" node_paths=PackedStringArray("sellAmountInput", "CurrentPriceDisplay", "InStockAmountDisplay", "ItemSymbol")]
-custom_minimum_size = Vector2(640, 0)
+custom_minimum_size = Vector2(800, 0)
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -256.0
+offset_left = -400.0
 offset_top = -16.0
-offset_right = 256.0
+offset_right = 400.0
 offset_bottom = 16.0
 grow_horizontal = 2
 grow_vertical = 2
@@ -32,9 +47,9 @@ color = Color(1, 0, 1, 0.0588235)
 
 [node name="HFlowContainer" type="HFlowContainer" parent="."]
 layout_mode = 2
-size_flags_vertical = 4
 
 [node name="MarginContainer" type="MarginContainer" parent="HFlowContainer"]
+custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 theme_override_constants/margin_left = 8
 
@@ -49,10 +64,11 @@ fit_content = true
 autowrap_mode = 0
 
 [node name="Control" type="HSplitContainer" parent="HFlowContainer"]
+custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
-split_offset = 64
+split_offset = 40
 dragging_enabled = false
 dragger_visibility = 2
 
@@ -129,6 +145,7 @@ autowrap_mode = 0
 vertical_alignment = 1
 
 [node name="VSplitContainer" type="HSplitContainer" parent="HFlowContainer"]
+custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 dragging_enabled = false
 dragger_visibility = 2
@@ -144,11 +161,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_right = 8
 
-[node name="HFlowContainer" type="HFlowContainer" parent="HFlowContainer/VSplitContainer/SellAmountControl/MarginContainer"]
+[node name="HFlowContainer" type="HBoxContainer" parent="HFlowContainer/VSplitContainer/SellAmountControl/MarginContainer"]
 layout_mode = 2
-size_flags_vertical = 4
 
 [node name="InStockDesc" type="RichTextLabel" parent="HFlowContainer/VSplitContainer/SellAmountControl/MarginContainer/HFlowContainer"]
 layout_mode = 2
@@ -163,9 +178,12 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="LineEdit" type="LineEdit" parent="HFlowContainer/VSplitContainer/SellAmountControl/MarginContainer/HFlowContainer"]
+custom_minimum_size = Vector2(0, 28)
 layout_mode = 2
 size_flags_horizontal = 3
 theme = ExtResource("1_elxuj")
+theme_override_styles/focus = SubResource("StyleBoxFlat_16c1e")
+theme_override_styles/normal = SubResource("StyleBoxFlat_bhk86")
 text = "0"
 
 [node name="ColorRect" type="ColorRect" parent="HFlowContainer/VSplitContainer/SellAmountControl/MarginContainer/HFlowContainer/LineEdit"]
@@ -178,13 +196,18 @@ grow_vertical = 2
 mouse_filter = 1
 color = Color(0.105882, 0.286275, 0.211765, 0.32549)
 
-[node name="SellButton" type="Button" parent="HFlowContainer/VSplitContainer"]
+[node name="HSplitContainer" type="HSplitContainer" parent="HFlowContainer/VSplitContainer"]
+layout_mode = 2
+dragging_enabled = false
+dragger_visibility = 2
+
+[node name="SellButton" type="Button" parent="HFlowContainer/VSplitContainer/HSplitContainer"]
 custom_minimum_size = Vector2(96, 0)
 layout_mode = 2
 theme = ExtResource("1_elxuj")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_5iki4")
 
-[node name="ColorRect" type="ColorRect" parent="HFlowContainer/VSplitContainer/SellButton"]
+[node name="ColorRect" type="ColorRect" parent="HFlowContainer/VSplitContainer/HSplitContainer/SellButton"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -192,9 +215,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
-color = Color(0, 0.227451, 0, 0.501961)
+color = Color(0, 0.4, 0, 0.501961)
 
-[node name="RichTextLabel" type="RichTextLabel" parent="HFlowContainer/VSplitContainer/SellButton"]
+[node name="RichTextLabel" type="RichTextLabel" parent="HFlowContainer/VSplitContainer/HSplitContainer/SellButton"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -210,4 +233,4 @@ autowrap_mode = 0
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[connection signal="pressed" from="HFlowContainer/VSplitContainer/SellButton" to="." method="OnSellItems"]
+[connection signal="pressed" from="HFlowContainer/VSplitContainer/HSplitContainer/SellButton" to="." method="OnSellItems"]

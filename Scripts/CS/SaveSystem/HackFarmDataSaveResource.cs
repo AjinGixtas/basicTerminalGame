@@ -1,6 +1,7 @@
 using Godot;
 
 public partial class HackFarmDataSaveResource : Resource {
+    [Export] public int DefLvl;
     [Export] public double cHackA, cHackB, cHackC, cHackD;
     [Export] public double cGrowA, cGrowB, cGrowC, cGrowD;
     [Export] public double cTimeA, cTimeB, cTimeC, cTimeD;

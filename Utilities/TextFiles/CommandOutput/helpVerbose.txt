@@ -1,99 +1,99 @@
 [color=#00aaff]ls[/color] [color=#ff6666]<dir>[/color]  
-  List all files and subdirectories in the specified directory.  
-  [color=#ff6666]<dir>[/color] - The target directory to list. If omitted, uses the current directory.
+    List all files and subdirectories in the specified directory.    
+    [color=#ff6666]<dir>[/color] - The target directory to list. If omitted, uses the current directory.
 
-[color=#00aaff]cd[/color] [color=#ff6666]<dir>[/color]  
-  Change the current working directory to another location.  
-  [color=#ff6666]<dir>[/color] - The target directory path.
+[color=#00aaff]cd[/color] [color=#ff6666]<dir>[/color]    
+    Change the current working directory to another location.    
+    [color=#ff6666]<dir>[/color] - The target directory path.
 
-[color=#00aaff]pwd[/color]  
-  Display the full path of the current working directory.
+[color=#00aaff]pwd[/color]    
+    Display the full path of the current working directory.
 
-[color=#00aaff]run[/color] [color=#ff6666]<file>[/color]  
-  Execute a file as a script or program.  
-  [color=#ff6666]<file>[/color] - The script or executable file to run.
+[color=#00aaff]run[/color] [color=#ff6666]<file>[/color]    
+    Execute a file as a script or program.    
+    [color=#ff6666]<file>[/color] - The script or executable file to run.
 
-[color=#00aaff]read[/color] [color=#ff6666]<file>[/color]  
-  Output the contents of a file to the terminal.  
-  [color=#ff6666]<file>[/color] - The file name to read.
+[color=#00aaff]read[/color] [color=#ff6666]<file>[/color]    
+    Output the contents of a file to the terminal.    
+    [color=#ff6666]<file>[/color] - The file name to read.
 
-[color=#00aaff]say[/color] [color=#ffaa00]-[n|e|b][/color] [color=#ff6666]<msg>[/color]  
-  Print a message to the screen, with optional formatting.  
-  [color=#ffaa00]-n[/color] - Do not output a trailing newline.  
-  [color=#ffaa00]-e[/color] - Interpret escape sequences in the message.  
-  [color=#ffaa00]-b[/color] - Escape BBCode in the output.  
-  [color=#ff6666]<msg>[/color] - The message to display.
+[color=#00aaff]say[/color] [color=#ffaa00]-[n|e|b][/color] [color=#ff6666]<msg>[/color]    
+    Print a message to the screen, with optional formatting.    
+    [color=#ffaa00]-n[/color] - Do not output a trailing newline.    
+    [color=#ffaa00]-e[/color] - Interpret escape sequences in the message.    
+    [color=#ffaa00]-b[/color] - Escape BBCode in the output.    
+    [color=#ff6666]<msg>[/color] - The message to display.
 
-[color=#00aaff]help[/color]  
-  Display this help message with a list of available commands.
+[color=#00aaff]help[/color]    
+    Display this help message with a list of available commands.
 
-[color=#00aaff]home[/color]  
-  Return to your own node immediately.
+[color=#00aaff]home[/color]    
+    Return to your own node immediately.
 
-[color=#00aaff]scan[/color] [color=#ffaa00]-v[/color]  
-  Scan the current network for adjacent nodes.  
-  [color=#ffaa00]-v[/color] - Verbose output; shows additional details.
+[color=#00aaff]scan[/color] [color=#ffaa00]-v[/color]    
+    Scan the current network for adjacent nodes.    
+    [color=#ffaa00]-v[/color] - Verbose output; shows additional details.
 
-[color=#00aaff]connect[/color] [color=#ff6666]<hostname|ip>[/color]  
-  Connect to another node by hostname or IP address.  
-  [color=#ff6666]<hostname|ip>[/color] - The target node to connect to.
+[color=#00aaff]connect[/color] [color=#ff6666]<hostname|ip>[/color]    
+    Connect to another node by hostname or IP address.    
+    [color=#ff6666]<hostname|ip>[/color] - The target node to connect to.
 
-[color=#00aaff]analyze[/color] [color=#ff6666][hostname|ip][/color]  
-  Analyze information about the specified node.  
-  [color=#ff6666][hostname|ip][/color] - The node to analyze (optional; defaults to current).
+[color=#00aaff]analyze[/color] [color=#ff6666][hostname|ip][/color]    
+    Analyze information about the specified node.    
+    [color=#ff6666][hostname|ip][/color] - The node to analyze (optional; defaults to current).
 
-[color=#00aaff]sector[/color] [color=#ffaa00]-c[/color] [color=#ffaa00]-l[/color] [color=#ff6666]<sector_level>[/color]  
-  List all sectors in the network.  
-  [color=#ffaa00]-c[/color], [color=#ffaa00]--connected[/color] - Show only connected sectors.  
-  [color=#ffaa00]-l[/color], [color=#ffaa00]--level[/color] [color=#ff6666]<sector_level>[/color] - Filter by sector level.
+[color=#00aaff]sector[/color] [color=#ffaa00]-c[/color] [color=#ffaa00]-l[/color] [color=#ff6666]<sector_level>[/color]    
+    List all sectors in the network.    
+    [color=#ffaa00]-c[/color], [color=#ffaa00]--connected[/color] - Show only connected sectors.    
+    [color=#ffaa00]-l[/color], [color=#ffaa00]--level[/color] [color=#ff6666]<sector_level>[/color] - Filter by sector level.
 
-[color=#00aaff]link[/color] [color=#ff6666]<sector_names>[/color]  
-  Create links between the specified sectors.  
-  [color=#ff6666]<sector_names>[/color] - Names of sectors to link together.
+[color=#00aaff]link[/color] [color=#ff6666]<sector_names>[/color]    
+    Create links between the specified sectors.    
+    [color=#ff6666]<sector_names>[/color] - Names of sectors to link together.
 
-[color=#00aaff]unlink[/color] [color=#ff6666]<sector_names>[/color]  
-  Remove links between the specified sectors.  
-  [color=#ff6666]<sector_names>[/color] - Names of sectors to unlink.
+[color=#00aaff]unlink[/color] [color=#ff6666]<sector_names>[/color]    
+    Remove links between the specified sectors.    
+    [color=#ff6666]<sector_names>[/color] - Names of sectors to unlink.
 
-[color=#00aaff]stats[/color]  
-  Display your player’s current statistics.
+[color=#00aaff]stats[/color]    
+    Display your player’s current statistics.
 
-[color=#00aaff]xyzzy[/color]  
-  Does nothing. A hidden Easter egg.
+[color=#00aaff]xyzzy[/color]    
+    Does nothing.
 
-[color=#00aaff]clear[/color]  
-  Clear all text from the terminal screen.
+[color=#00aaff]clear[/color]    
+    Clear all text from the terminal screen.
 
-[color=#00aaff]mkf[/color] [color=#ff6666]<files>[/color]  
-  Create new files in the current directory.  
-  [color=#ff6666]<files>[/color] - One or more file names to create.
+[color=#00aaff]mkf[/color] [color=#ff6666]<files>[/color]    
+    Create new files in the current directory.    
+    [color=#ff6666]<files>[/color] - One or more file names to create.
 
-[color=#00aaff]rmf[/color] [color=#ff6666]<files>[/color]  
-  Remove files from the current directory.  
-  [color=#ff6666]<files>[/color] - One or more file names to delete.
+[color=#00aaff]rmf[/color] [color=#ff6666]<files>[/color]    
+    Remove files from the current directory.    
+    [color=#ff6666]<files>[/color] - One or more file names to delete.
 
-[color=#00aaff]mkdir[/color] [color=#ff6666]<dirs>[/color]  
-  Create new directories.  
-  [color=#ff6666]<dirs>[/color] - One or more directory names to create.
+[color=#00aaff]mkdir[/color] [color=#ff6666]<dirs>[/color]    
+    Create new directories.    
+    [color=#ff6666]<dirs>[/color] - One or more directory names to create.
 
-[color=#00aaff]rmdir[/color] [color=#ff6666]<dirs>[/color]  
-  Remove directories.  
-  [color=#ff6666]<dirs>[/color] - One or more directory names to remove.
+[color=#00aaff]rmdir[/color] [color=#ff6666]<dirs>[/color]    
+    Remove directories.    
+    [color=#ff6666]<dirs>[/color] - One or more directory names to remove.
 
-[color=#00aaff]karaxe[/color] [color=#ffaa00]--help[/color]  
-  Run `karaxe.exe`. Use `--help` to show details about its usage.
+[color=#00aaff]karaxe[/color] [color=#ffaa00]--help[/color]    
+    Run `karaxe.exe`. Use `--help` to show details about its usage.
 
-[color=#00aaff]myneswarm[/color] [color=#ffaa00]--help[/color]  
-  Run `myneswarm.exe`. Use `--help` for detailed help.
+[color=#00aaff]mifarm[/color] [color=#ffaa00]--help[/color]    
+    Run `mifarm.exe`. Use `--help` for detailed help.
 
-[color=#00aaff]bitrader[/color] [color=#ffaa00]--help[/color]  
-  Run `bitrader.exe`. Use `--help` to get help information.
+[color=#00aaff]bitrader[/color] [color=#ffaa00]--help[/color]    
+    Run `bitrader.exe`. Use `--help` to get help information.
 
-[color=#00aaff]bitcrafter[/color] [color=#ffaa00]--help[/color]  
-  Run `bitcrafter.exe`. Use `--help` to show command options.
+[color=#00aaff]bitcraft[/color] [color=#ffaa00]--help[/color]    
+    Run `bitcraft.exe`. Use `--help` to show command options.
 
-[color=#00aaff]setname[/color] [color=#ff6666]-u[/color] [color=#ff6666]<new_username>[/color] [color=#ff6666]-h[/color] [color=#ff6666]<new_hostname>[/color] [color=#ff6666]-d[/color] [color=#ff6666]<new_displayname>[/color]  
-  Change your current node’s username, hostname, or display name.  
-  [color=#ff6666]-u[/color] [color=#ff6666]<new_username>[/color] - Set a new username.  
-  [color=#ff6666]-h[/color] [color=#ff6666]<new_hostname>[/color] - Set a new hostname.  
-  [color=#ff6666]-d[/color] [color=#ff6666]<new_displayname>[/color] - Set a new display name.
+[color=#00aaff]setname[/color] [color=#ff6666]-u[/color] [color=#ff6666]<new_username>[/color] [color=#ff6666]-h[/color] [color=#ff6666]<new_hostname>[/color] [color=#ff6666]-d[/color] [color=#ff6666]<new_displayname>[/color]    
+    Change your current node’s username, hostname, or display name.    
+    [color=#ff6666]-u[/color] [color=#ff6666]<new_username>[/color] - Set a new username.    
+    [color=#ff6666]-h[/color] [color=#ff6666]<new_hostname>[/color] - Set a new hostname.    
+    [color=#ff6666]-d[/color] [color=#ff6666]<new_displayname>[/color] - Set a new display name.

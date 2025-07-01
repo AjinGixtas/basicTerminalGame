@@ -80,7 +80,7 @@ public static partial class PlayerDataManager {
 		}   
 		return CError.OK;
 	}
-	public static CError WithdrawMineral(int type, long amount) {
+	public static CError WithdrawItem(int type, long amount) {
 		if (_mineInv.Length <= type) return CError.INVALID;
 		if (amount < 0 || amount > _mineInv[type]) return CError.INSUFFICIENT;
 		_mineInv[type] -= amount;

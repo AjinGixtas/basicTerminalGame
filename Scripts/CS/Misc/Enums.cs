@@ -137,6 +137,7 @@ public enum StrSty {
     CODE_MODULE = 29,
     AUTO_KWORD = 30,
     CMD_FARG = 31,
+    NODE_LOCK = 32,
 }
 public enum LockType {
     I4X = 0,

@@ -88,8 +88,8 @@ syntax_highlighter = ExtResource("3_c8ipk")
 indent_use_spaces = true
 auto_brace_completion_enabled = true
 
-[node name="Sidebar" type="MarginContainer" parent="TerminalSplitPart" node_paths=PackedStringArray("statSwitchTimer", "artDiplayer", "playerStatDisplayer", "notePad")]
-custom_minimum_size = Vector2(300, 0)
+[node name="Sidebar" type="MarginContainer" parent="TerminalSplitPart" node_paths=PackedStringArray("statSwitchTimer", "artDiplayer", "playerStatDisplayer", "notePad", "helpCmdSection")]
+custom_minimum_size = Vector2(384, 0)
 layout_mode = 2
 theme = ExtResource("4_oclfs")
 script = ExtResource("5_pn4ql")
@@ -97,24 +97,42 @@ statSwitchTimer = NodePath("../../TimersContainer/StatSwitchTimer")
 artDiplayer = NodePath("VSplitContainer/ArtDisplay")
 playerStatDisplayer = NodePath("VSplitContainer/PlayerStatDisplay")
 notePad = NodePath("VSplitContainer/NotePad")
+helpCmdSection = NodePath("VSplitContainer/HelpCommand")
 
 [node name="VSplitContainer" type="VBoxContainer" parent="TerminalSplitPart/Sidebar"]
 layout_mode = 2
 
 [node name="ArtDisplay" type="RichTextLabel" parent="TerminalSplitPart/Sidebar/VSplitContainer"]
+self_modulate = Color(16, 16, 16, 0.25)
 layout_mode = 2
+size_flags_horizontal = 3
 theme = ExtResource("2_tjxev")
+theme_override_font_sizes/normal_font_size = 20
 bbcode_enabled = true
+text = "efwefuweufhew"
 fit_content = true
 horizontal_alignment = 1
 
 [node name="PlayerStatDisplay" type="RichTextLabel" parent="TerminalSplitPart/Sidebar/VSplitContainer"]
-self_modulate = Color(16, 16, 16, 0.125)
+self_modulate = Color(16, 16, 16, 0.1)
 layout_mode = 2
 size_flags_vertical = 3
 focus_mode = 2
 theme = ExtResource("2_tjxev")
 bbcode_enabled = true
+text = "DC!  [------------------------------] 30% (null [------------------------------])"
+scroll_active = false
+selection_enabled = true
+
+[node name="HelpCommand" type="RichTextLabel" parent="TerminalSplitPart/Sidebar/VSplitContainer"]
+self_modulate = Color(16, 16, 16, 0.167)
+layout_mode = 2
+focus_mode = 2
+theme = ExtResource("2_tjxev")
+bbcode_enabled = true
+fit_content = true
+horizontal_alignment = 1
+vertical_alignment = 1
 selection_enabled = true
 
 [node name="NotePad" type="TextEdit" parent="TerminalSplitPart/Sidebar/VSplitContainer"]
@@ -130,8 +148,9 @@ caret_multiple = false
 one_shot = true
 
 [node name="StatSwitchTimer" type="Timer" parent="TimersContainer"]
-wait_time = 2.0
+wait_time = 3000.0
 autostart = true
+ignore_time_scale = true
 
 [connection signal="focus_entered" from="." to="." method="OnFocusEntered"]
 [connection signal="text_changed" from="TerminalSplitPart/TerminalZone/CommandLine/CommandField" to="." method="OnCommandFieldTextChanged"]

@@ -8,6 +8,7 @@ public partial class ItemCraftingUserInterface : MarginContainer {
 	[Export] Container craftRecipeButtonContainer;
 	[Export] ScrollContainer craftRecipeScrollContainer;
 	[Export] RichTextLabel WindowDescriptionLabel;
+	[Export] MenuDirector menuDirector;
 
     public override void _Ready() {
 		craftThreadButtons = new CraftThreadButton[ItemCrafter.MAX_THREADS];
@@ -30,7 +31,11 @@ public partial class ItemCraftingUserInterface : MarginContainer {
 		WindowDescriptionLabel.Text = @$"Each thread help craft items. Items increase in value as you go deeper into the crafting system. See {Util.Format("CraftModule", StrSty.CODE_MODULE)} in scripting to see how you can automate it.";
     }
 	public override void _Process(double delta) {
-    }
+		if (menuDirector.MenuWindowIndex != MenuDirector.CRAFTER_INDEX) return;
+		for (int i = 0; i < craftThreadButtons.Length; ++i) {
+			craftThreadButtons[i].Update();
+        }
+	}
 
     int selectedThreadID = -1;
     public void PullupCraftRecipeWindow(int requested_ID) {

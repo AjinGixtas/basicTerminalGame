@@ -70,21 +70,22 @@ public class BotFarm {
 	public int DefLvl { get; init; }
 	public BotFarm(int defLvl, DriftNode driftNode) {
 		DefLvl = defLvl;
-
-        // defLvl in [1, 10] range, mineralTier in [0, 9] range.
+        
+		// defLvl in [1, 10] range, mineralTier in [0, 9] range.
         mineralDistribution = GenerateMiningWeightDistribution(defLvl-1);
 		HostName = driftNode.HostName; DisplayName = driftNode.DisplayName; IP = driftNode.IP;
-		MAX_LIFE_TIME = 600 * Mathf.Pow(Mathf.E / 2.5, -5.57180 * defLvl) * Mathf.Log(defLvl) + 60 * GD.Randf();
+		MAX_LIFE_TIME = 600 * (.2 + Mathf.Log((defLvl+1)/2.0) + GD.Randf());
 		LifeTime = MAX_LIFE_TIME;
 		BatchSizeCostCurve = (GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0), GD.RandRange(10.0, 25.0));
 		MineSpeedCostCurve = (GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0), GD.RandRange(10.0, 25.0));
 		XferDelayCostCurve = (GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0), GD.RandRange(1.0, 10.0), GD.RandRange(10.0, 25.0));
+		
 		BatchSizeValuCurve = (GD.RandRange(1e-5, 1e-4), GD.RandRange(1e-4, 1e-3), GD.RandRange(1.0, 3.0), GD.RandRange(1.0, 2.0));
 		// This is essentially stores the offset of hackValu curve level and timeValu curve level to calc its own value, thus, it will relies on the other 2 curve being accurate.
 		MineSpeedValuCurve = (0, 0, GD.RandRange(.8, 1.2), GD.RandRange(.8, 1.2));
 		// This one essentially a speed increase algorithm, with v = d*(b^level)+c*level
 		// a being the distance
-		XferDelayValuCurve = (GD.RandRange(30.0, 60.0), 1.0 + GD.RandRange(.01, .02), GD.RandRange(.5, 1.0), 1.0);
+		XferDelayValuCurve = (GD.RandRange(1.0, 8.0), 1.0 + GD.RandRange(.01, .05), GD.RandRange(.1, 1.0), 1.0);
 		BatchSizeLVL = MineSpeedLVL = XferDelayLVL = 1;
 
     }
@@ -172,9 +173,8 @@ public class BotFarm {
 
 		int swap = GD.Randf() < .5 ? 1 : 0;
         List<(int, double)> result = [(baseLvl-1, randDist[swap]), (baseLvl, randDist[2]), (baseLvl+1, randDist[1-swap])];
-        // If baseLvl is less than 0, we need to add a negative level to the center of the distribution.
         if (baseLvl < 0) result[1] = (baseLvl, result[1].Item2 + result[0].Item2);
 		if (baseLvl > 9) result[1] = (baseLvl, result[1].Item2 + result[2].Item2);
-        return result.Where(item => item.Item1 >= 0 && item.Item1 <= 9).ToArray();
+        return result.Where(item => item.Item1 >= 0 && item.Item1 <= 9).OrderByDescending(v => v.Item2).ToArray();
     }
 }

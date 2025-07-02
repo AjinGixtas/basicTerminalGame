@@ -111,6 +111,7 @@ This program allows you to trade items with the market.
                     $"{Util.Format(ItemCrafter.ALL_ITEMS[itemID].Shorthand, StrSty.COLORED_ITEM_NAME, $"{itemID}"),-27} ");
                 sellValue += (long)(ItemCrafter.ALL_ITEMS[itemID].Value * amount);
             }
+            PlayerDataManager.DepositGC(sellValue);
             return;
         }
         if (doDesc) {

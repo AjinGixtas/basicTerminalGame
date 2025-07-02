@@ -11,7 +11,7 @@ public static partial class NetworkManager {
     static List<StaticSector> staticSectors;
     static Dictionary<string, WeakReference<NetworkNode>> DNS;
     public static List<BotFarm> BotNet { get; private set; } = [];
-    const int DRIFT_SECTOR_COUNT = 128;
+    static int DRIFT_SECTOR_COUNT = 128;
 
     public static void Setup() {
         DNS = []; driftSectors = []; connectedSectors = []; staticSectors = []; BotNet = [];
@@ -21,7 +21,7 @@ public static partial class NetworkManager {
     public static void Ready() {
         _playerNode ??= new PlayerNode(Util.PLAYER_NODE_DATA_DEFAULT);
     }
-    const double CYCLE_TIME = 60*15; // 15min in seconds
+    const double CYCLE_TIME = 60 * 5; // second
     static double TimeRemains = CYCLE_TIME;
     public static void Process(double delta) {
         ManageHackFarm(delta);

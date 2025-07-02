@@ -25,7 +25,7 @@ public partial class CraftThreadButton : MarginContainer {
         string bar = new string('|', _bar) + new string('-', 20 - _bar);
         return $"[{bar}] {percentage,3}%";
     }
-    public override void _Process(double delta) {
+    public void Update() {
         itemNameLabel.Text = ItemCrafter.CraftThreads[ID].Recipe != null
     ? $"([color={Util.CC(ItemCrafter.CraftThreads[ID].Recipe?.ColorCode ?? Cc.W)}]{ItemCrafter.CraftThreads[ID].Recipe.Shorthand}[/color])\n[color={Util.CC(ItemCrafter.CraftThreads[ID].Recipe?.ColorCode ?? Cc.W)}]{ItemCrafter.CraftThreads[ID].Recipe.Name}[/color]"
     : $"[color={Util.CC(Cc.W)}]null[/color]";

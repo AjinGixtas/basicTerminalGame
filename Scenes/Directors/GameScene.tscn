@@ -135,13 +135,15 @@ layout_mode = 2
 menuDirector = NodePath("../..")
 metadata/_tab_index = 2
 
-[node name="CraftWindow" parent="MenuDirector/MenuWindows" instance=ExtResource("7_rcn04")]
+[node name="CraftWindow" parent="MenuDirector/MenuWindows" node_paths=PackedStringArray("menuDirector") instance=ExtResource("7_rcn04")]
 visible = false
 layout_mode = 2
+menuDirector = NodePath("../..")
 
-[node name="ItemSellingWindow" parent="MenuDirector/MenuWindows" instance=ExtResource("9_on0y2")]
+[node name="ItemSellingWindow" parent="MenuDirector/MenuWindows" node_paths=PackedStringArray("menuDirector") instance=ExtResource("9_on0y2")]
 visible = false
 layout_mode = 2
+menuDirector = NodePath("../..")
 metadata/_tab_index = 4
 
 [node name="OverlayWindow" parent="." instance=ExtResource("6_1de4d")]

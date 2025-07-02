@@ -50,6 +50,7 @@ public partial class BotnetDashboard : MarginContainer {
     public void OnRefreshTimerTimeout() {
 		if (menuDirector.MenuWindowIndex != MenuDirector.BOTNET_INDEX) return;
 		RenderDashboardPage();
+		botStatusBoard.Update();
         pageAmountLabel.Text = $"/{Mathf.CeilToInt((double)NetworkManager.BotNet.Count / PageLength)}";
     }
     public void RenderDashboardPage() {

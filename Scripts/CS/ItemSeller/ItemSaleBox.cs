@@ -12,7 +12,7 @@ public partial class ItemSaleBox : Control {
 		string gcStr = Util.Format($"{ItemCrafter.ALL_ITEMS[itemID].Value}", StrSty.MONEY);
 		CurrentPriceDisplay.Text = gcStr.PadLeft(gcStr.Length + (17 - Util.RemoveBBCode(gcStr).Length));
 	}
-    public override void _Process(double delta) {
+    public void Update() {
         InStockAmountDisplay.Text = Util.Format($"{PlayerDataManager.MineInv[itemID]}", StrSty.NUMBER, "0");
     }
     public void OnSellItems() {

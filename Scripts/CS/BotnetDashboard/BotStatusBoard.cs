@@ -4,7 +4,7 @@ using System.Linq;
 public partial class BotStatusBoard : Control {
 	System.WeakReference<BotFarm> botFarmRef = new(null);
 	[Export] RichTextLabel leftLabel, rightLabel;
-	public override void _Process(double delta) {
+	public void Update() {
 		botFarmRef.TryGetTarget(out BotFarm hackfarm);
 		if (hackfarm == null) return;
 		leftLabel.Text =

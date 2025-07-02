@@ -520,7 +520,13 @@ public static partial class Util {
             _ => Util.CC(Cc.m)
         }}";
     }
-
+    public static string GenerateSimpleBar(double value, double maxValue, int length = 50, bool reverse = false, char fc = '|', char ec = '-',  Cc? fcc = null, Cc? ecc = null) {
+        string filledPart = new(fc, Mathf.CeilToInt(value / maxValue * length));
+        if (fcc != null) { filledPart = $"[color={Util.CC(fcc.Value)}]{filledPart}[/color]"; }
+        string emptyPart = new(ec, length - filledPart.Length);
+        if (ecc != null) { emptyPart = $"[color={Util.CC(ecc.Value)}]{emptyPart}[/color]"; }
+        return reverse ? emptyPart + filledPart : filledPart + emptyPart;
+    }
     [GeneratedRegex(@"\[(\/?)(b|i|u|color|size|url|img|quote|code|spoiler|lb|rb|br)[^\]]*\]", RegexOptions.IgnoreCase, "en-150")]
     private static partial Regex SelectBBCode();
 }

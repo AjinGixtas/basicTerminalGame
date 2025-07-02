@@ -6,19 +6,28 @@ using System.Text;
 public static partial class ShellCore {
     public static void BiTrader(Dictionary<string, string> farg, string[] parg) {
         bool help = Util.ContainKeys(farg, "--help"); if (help) {
-            Say(
-$@"Welcome to {Util.Format("BitTrader", StrSty.CMD_ACT)}
+            ShellCore.Say(
+            $@"Welcome to {Util.Format("BitTrader", StrSty.CMD_ACT)}
 This program allows you to trade items with the market.
-Usage: {Util.Format("bitrader --[option] --<(item&amount)^all> --<sell|detail>", StrSty.CMD_FUL)}
-    {Util.Format("-o --option", StrSty.CMD_FLAG)}: List out valid item codes.
-    
-    {Util.Format("-d --desc", StrSty.CMD_FLAG)}: Set mode to list out details of item.
-    {Util.Format("-s --sell", StrSty.CMD_FLAG)}: Set mode to sell item.
 
-    {Util.Format("-i --item <item_code>", StrSty.CMD_FLAG)}: Specify the item code to sell or buy.
-    {Util.Format("-a --amount <amount_int>", StrSty.CMD_FLAG)}: Specify the amount of items to sell or buy.
-    
-    {Util.Format("-A --all", StrSty.CMD_FLAG)}: Set action to all item.
+{Util.Format("Usage:", StrSty.CMD_FUL)}
+  {Util.Format("bitrader [OPTIONS] [ACTION]", StrSty.CMD_FUL)}
+
+{Util.Format("OPTIONS:", StrSty.HEADER)}
+  {Util.Format("-o, --option", StrSty.CMD_FLAG)}       List all valid item codes.
+  {Util.Format("-i, --item <item_code>", StrSty.CMD_FLAG)}  Specify the item code to act on.
+  {Util.Format("-a, --amount <amount_int>", StrSty.CMD_FLAG)} Specify the amount of items.
+  {Util.Format("-A, --all", StrSty.CMD_FLAG)}          Apply action to all items.
+
+{Util.Format("ACTIONS:", StrSty.HEADER)}
+  {Util.Format("-s, --sell", StrSty.CMD_FLAG)}         Sell the specified item(s).
+  {Util.Format("-d, --desc", StrSty.CMD_FLAG)}         Show details for the specified item(s).
+
+{Util.Format("NOTES:", StrSty.HEADER)}
+  - You must specify **either** {Util.Format("--item", StrSty.CMD_FLAG)} or {Util.Format("--all", StrSty.CMD_FLAG)}.  
+  - You cannot use both {Util.Format("--all", StrSty.CMD_FLAG)} and {Util.Format("--item", StrSty.CMD_FLAG)}/{Util.Format("--amount", StrSty.CMD_FLAG)} together.
+  - {Util.Format("--sell", StrSty.CMD_FLAG)} requires an amount if selling a specific item.
+  - {Util.Format("--option", StrSty.CMD_FLAG)} lists all valid item codes.
 "); return;
         }
         bool doOption = Util.ContainKeys(farg, "-o", "--option");
@@ -47,9 +56,10 @@ Usage: {Util.Format("bitrader --[option] --<(item&amount)^all> --<sell|detail>",
         
         if (doOne) {
             // Parse data
-            if (string.IsNullOrEmpty(amountCode)) { ShellCore.Say("-r", $"Missing value for {Util.Format("--amount", StrSty.CMD_FLAG)}"); return; }
-            if (!long.TryParse(amountCode, out amount)) { ShellCore.Say("-r", $"Invalid value for {Util.Format("--amount", StrSty.CMD_FLAG)}, must be a number"); return; }
-            
+            if (doSell) {
+                if (string.IsNullOrEmpty(amountCode)) { ShellCore.Say("-r", $"Missing value for {Util.Format("--amount", StrSty.CMD_FLAG)}"); return; }
+                if (!long.TryParse(amountCode, out amount)) { ShellCore.Say("-r", $"Invalid value for {Util.Format("--amount", StrSty.CMD_FLAG)}, must be a number"); return; }
+            }
             if (string.IsNullOrEmpty(itemCode)) { ShellCore.Say("-r", $"Missing value for {Util.Format("--item", StrSty.CMD_FLAG)}"); return; }
             itemID = ItemCrafter.ALL_ITEMS.FirstOrDefault(x => x.Shorthand == itemCode)?.ID ?? (int.TryParse(itemCode, out int parsedId) ? parsedId : -1);
             if (itemID == -1) { ShellCore.Say("-r", $"No item with {Util.Format("item_code", StrSty.CMD_ARG)}={itemCode} found."); return; }
@@ -108,30 +118,49 @@ Usage: {Util.Format("bitrader --[option] --<(item&amount)^all> --<sell|detail>",
                 gcStr = Util.Format($"{ItemCrafter.ALL_ITEMS[itemID].Value}", StrSty.MONEY);
 
                 ShellCore.Say($"{Util.Format(ItemCrafter.ALL_ITEMS[itemID].Shorthand, StrSty.COLORED_ITEM_NAME, $"{itemID}"),-27} " +
-                    $"Price: {gcStr.PadLeft(gcStr.Length + (17 - Util.RemoveBBCode(gcStr).Length))}   ");
+                    $"Price: {gcStr.PadLeft(gcStr.Length + (15 - Util.RemoveBBCode(gcStr).Length))}   " +
+                    $"InStock: {Util.Format($"{PlayerDataManager.MineInv[itemID]}", StrSty.COLORED_ITEM_NAME, $"{itemID}")}");
                 return;
             }
             for (itemID = 0; itemID < ItemCrafter.ALL_ITEMS.Length; ++itemID) {
                 gcStr = Util.Format($"{ItemCrafter.ALL_ITEMS[itemID].Value}", StrSty.MONEY);
                 ShellCore.Say($"{Util.Format(ItemCrafter.ALL_ITEMS[itemID].Shorthand, StrSty.COLORED_ITEM_NAME, $"{itemID}"),-27} " +
-                    $"Price: {gcStr.PadLeft(gcStr.Length + (17 - Util.RemoveBBCode(gcStr).Length))}   ");
+                    $"Price: {gcStr.PadLeft(gcStr.Length + (15 - Util.RemoveBBCode(gcStr).Length))}   " +
+                    $"InStock: {Util.Format($"{PlayerDataManager.MineInv[itemID]}", StrSty.NUMBER, "0")}");
             }
             return;
         }
     }
     public static void BitCraft(Dictionary<string, string> farg, string[] parg) {
-        bool help = Util.ContainKeys(farg, "--help"); if (help) {
-            Say(
+        bool help = Util.ContainKeys(farg, "--help", "-h"); if (help) {
+            ShellCore.Say(
 $@"Welcome to {Util.Format("BitCraft", StrSty.CMD_ACT)}
-This program allows you to craft items using the resources you have.
-Usage: {Util.Format("bitcraft --[list] --[option] --[item&threadid] --[upgrade]", StrSty.CMD_FUL)}
-    {Util.Format("--list", StrSty.CMD_FLAG)}: List out details of each craft thread.
-    {Util.Format("--option", StrSty.CMD_FLAG)}: List out valid item codes.
-    {Util.Format("--item", StrSty.CMD_FLAG)}: Specify the item code to craft.
-    {Util.Format("--threadid", StrSty.CMD_FLAG)}: Specify the thread ID to assign the item to.
-    {Util.Format("--upgrade", StrSty.CMD_FLAG)}: Upgrade the number of craft threads available.
-");
-            return;
+This program allows you to craft items using your available resources.
+
+{Util.Format("Usage:", StrSty.CMD_FUL)}
+    {Util.Format("bitcraft [OPTIONS] [ACTION]", StrSty.CMD_FUL)}
+
+{Util.Format("OPTIONS:", StrSty.HEADER)}
+    {Util.Format("-l, --list", StrSty.CMD_FLAG)}           List the status of all craft threads.
+    {Util.Format("-o, --option", StrSty.CMD_FLAG)}         List all valid item codes.
+    {Util.Format("-i, --item <item_code>", StrSty.CMD_FLAG)}   Specify the item code to craft.
+    {Util.Format("-t, --threadid <thread_id>", StrSty.CMD_FLAG)}  Specify the craft thread ID to assign the item to.
+
+{Util.Format("ACTIONS:", StrSty.HEADER)}
+    {Util.Format("-u, --upgrade", StrSty.CMD_FLAG)}        Upgrade the number of craft threads available.
+
+{Util.Format("NOTES:", StrSty.HEADER)}
+    - Use {Util.Format("--list", StrSty.CMD_FLAG)} to view all current threads and their progress.
+    - Use {Util.Format("--option", StrSty.CMD_FLAG)} to see all items you can craft.
+    - To craft an item, you must provide both {Util.Format("--item", StrSty.CMD_FLAG)} and {Util.Format("--threadid", StrSty.CMD_FLAG)}.
+    - {Util.Format("--upgrade", StrSty.CMD_FLAG)} increases the maximum number of craft threads.
+
+{Util.Format("Examples:", StrSty.HEADER)}
+    {Util.Format("bitcraft --list", StrSty.CMD_FUL)}
+    {Util.Format("bitcraft --option", StrSty.CMD_FUL)}
+    {Util.Format("bitcraft --item XTP^ --threadid 0", StrSty.CMD_FUL)}
+    {Util.Format("bitcraft --upgrade", StrSty.CMD_FUL)}
+"); return;
         }
         bool didSomething = false;
 
@@ -160,7 +189,6 @@ Usage: {Util.Format("bitcraft --[list] --[option] --[item&threadid] --[upgrade]"
                 + $"RemainingTime: {Util.Format($"{ItemCrafter.CraftThreads[i].RemainTime}", StrSty.NUMBER)}{Util.Format("s", StrSty.DECOR)}\n");
             }
             ShellCore.Say(sb.ToString());
-            GD.Print(ItemCrafter.CurThreads);
         }
         if (doOption) {
             didSomething = true;
@@ -168,17 +196,41 @@ Usage: {Util.Format("bitcraft --[list] --[option] --[item&threadid] --[upgrade]"
             StringBuilder sb = new(""); for (int i = 0; i < ItemCrafter.ALL_ITEMS.Length; ++i) sb.Append(Util.Format(ItemCrafter.ALL_ITEMS[i].Shorthand, StrSty.COLORED_ITEM_NAME, $"{i}").PadRight(30));
             ShellCore.Say(sb.ToString());
         }
+        
+        if (doList || doOption) return;
+        
         if (doSetThread) {
             didSomething = true;
             if (!int.TryParse(t_threadID, out threadID)) { ShellCore.Say("-r", $"Invalid value for {Util.Format("--threadid", StrSty.CMD_FLAG)}, must be a number"); return; }
-            if (threadID >= ItemCrafter.CurThreads) { ShellCore.Say("-r", $"{Util.Format("--threadid", StrSty.CMD_FLAG)} " +
+            if (threadID >= ItemCrafter.CurThreads) {
+                ShellCore.Say("-r", $"{Util.Format("--threadid", StrSty.CMD_FLAG)} " +
                 $"value must be smaller than " +
-                $"{Util.Format("CraftThreadCount", StrSty.VARIABLE)}={Util.Format($"{ItemCrafter.CurThreads}", StrSty.NUMBER)}"); return; }
+                $"{Util.Format("CraftThreadCount", StrSty.VARIABLE)}={Util.Format($"{ItemCrafter.CurThreads}", StrSty.NUMBER)}"); return;
+            }
             itemID = ItemCrafter.ALL_ITEMS.FirstOrDefault(x => x.Shorthand == itemCode)?.ID ?? (int.TryParse(itemCode, out int parsedId) ? parsedId : -1);
             if (itemID == -1) { ShellCore.Say("-r", "No item with such ID or symbol found."); return; }
-            
-            ItemCrafter.AddItemCraft(ItemCrafter.GetRecipe(itemID), threadID);
-            ShellCore.Say($"Assigned Thread #{Util.Format($"{threadID}", StrSty.NUMBER)} with {Util.Format(ItemCrafter.ALL_ITEMS[itemID].Shorthand, StrSty.COLORED_ITEM_NAME, $"{itemID}")}");
+
+            CError cer = ItemCrafter.AddItemCraft(ItemCrafter.GetRecipe(itemID), threadID);
+            switch (cer) {
+                case CError.OK:
+                    ShellCore.Say($"Assigned Thread #{Util.Format($"{threadID}", StrSty.NUMBER, "0")} with {Util.Format(ItemCrafter.ALL_ITEMS[itemID].Shorthand, StrSty.COLORED_ITEM_NAME, $"{itemID}")}");
+                    break;
+                case CError.INSUFFICIENT: {
+                        ShellCore.Say("-r", $"Not enough material to craft {Util.Format(ItemCrafter.ALL_ITEMS[itemID].Shorthand, StrSty.COLORED_ITEM_NAME, $"{itemID}")}");
+                        ShellCore.Say("-r", $"Required amount:");
+                        for (int i = 0; i < ItemCrafter.ALL_RECIPES[itemID-10].RequiredIngredients.Length;++i) {
+                            int t_id = ItemCrafter.ALL_RECIPES[itemID - 10].RequiredIngredients[i].ID;
+                            int t_amount = ItemCrafter.ALL_RECIPES[itemID - 10].RequiredIngredients[i].Amount;
+                            ShellCore.Say($"{Util.Format(ItemCrafter.ALL_ITEMS[t_id].Shorthand, StrSty.COLORED_ITEM_NAME, $"{t_id}"),-27} " +
+                                $"{Util.Format($"{PlayerDataManager.MineInv[t_id]}", StrSty.NUMBER, "0")}/{Util.Format($"{t_amount}", StrSty.NUMBER, "0")}".PadRight(60) +
+                                $"[color={Util.CC(PlayerDataManager.MineInv[t_id] >= t_amount ? Cc.G : Cc.R)}]{(PlayerDataManager.MineInv[t_id] >= t_amount ? CError.OK : CError.INSUFFICIENT)}[/color]");
+                        }
+                        break;
+                    }
+                default:
+                    ShellCore.Say("-r", $"Unexpected error occurred while assigning item to thread. Error code: {cer}");
+                    break;
+            }
         }
         if (doUpgrade) {
             didSomething = true;

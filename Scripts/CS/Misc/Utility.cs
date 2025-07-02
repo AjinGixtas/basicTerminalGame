@@ -131,7 +131,7 @@ public static partial class Util {
     ///   <item><description><c>StrType.CMD_ARG</c>:  [color=<c>Cc.LR</c>]</description></item>
     ///   <item><description><c>StrType.CMD_ACT</c>:  [color=<c>Cc.gB</c>]</description></item>
     ///   <item><description><c>StrType.ERROR</c>:    [color=<c>Cc.R</c>]</description></item>
-    ///   <item><description><c>StrType.HEADER</c>:   [color=<c>Cc.gR</c>]</description></item>
+    ///   <item><description><c>StrType.HEADER</c>:   [color=<c>Cc.m</c>]</description></item>
     ///   <item><description><c>StrType.MONEY</c>: formats large integer into units [<c>Cc.w</c>]&lt;value&gt; + [<c>Cc.*</c>]&lt;unit&gt; + “GC” in [<c>Cc.Y</c>]</description></item>
     ///   <item><description><c>StrType.T_MINERAL</c>: splits large value into mineral units with [<c>Cc.w</c>] value + [<c>Cc.*</c>] unit + profile shorthand color</description></item>
     ///   <item><description><c>StrType.G_MINERAL</c>: [color=<c>Cc.ItemCrafter.MINERALS[index].ColorCode</c>]</description></item>
@@ -217,7 +217,7 @@ public static partial class Util {
             case StrSty.ERROR:
                 return $"[color={Util.CC(Cc.R)}]{input}[/color]";
             case StrSty.HEADER:
-                return $"[color={Util.CC(Cc.gR)}]{input}[/color]";
+                return $"[color={Util.CC(Cc.m)}]{input}[/color]";
             case StrSty.MONEY: { // GC is short for Gold Coin. That's all. lol
                     if (string.IsNullOrWhiteSpace(input)) return "";
                     if (!double.TryParse(input, out double value))

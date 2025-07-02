@@ -111,7 +111,7 @@ public class BotFarm {
 	public long GetBatchSizeCost() => (long)Mathf.Ceil(GetValu(BatchSizeCostCurve, BatchSizeLVL)/10.0);
 	public long GetMineSpeedCost() => (long)Mathf.Ceil(GetValu(MineSpeedCostCurve, MineSpeedLVL)/10.0);
 	public long GetXferDelayCost() => (long)Mathf.Ceil(GetValu(XferDelayCostCurve, XferDelayLVL)/10.0);
-	double _mineralBacklog, _cycleTimeRemain;
+	double _mineralBacklog, _cycleTimeRemain, _transferBacklog;
 	public double MBacklog { get => _mineralBacklog; private set => _mineralBacklog = value; }
 	public double CycleTimeRemain { get => _cycleTimeRemain; private set => _cycleTimeRemain = value; }
 	public (int, long)[] ProcessMinerals(double delta) {
@@ -119,11 +119,13 @@ public class BotFarm {
 		CycleTimeRemain -= delta; LifeTime -= delta;
 		MBacklog += MineSpeed * delta;
 		if (CycleTimeRemain > 0) { return output; }
-
-		double batch = Mathf.Min(MBacklog, BatchSize);
+		
+		_transferBacklog += BatchSize;
+		double batch = Mathf.Min(MBacklog, _transferBacklog);
 		for (int i = 0; i < mineralDistribution.Length; ++i) {
 			output[i] = (mineralDistribution[i].Item1, (long)Mathf.Ceil(mineralDistribution[i].Item2 * batch));
-		}
+			_transferBacklog -= (long)Mathf.Ceil(mineralDistribution[i].Item2 * batch);
+        }
 		MBacklog -= batch;
 		CycleTimeRemain += XferDelay;
 

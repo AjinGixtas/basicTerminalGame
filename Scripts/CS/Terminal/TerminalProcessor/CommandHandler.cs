@@ -15,7 +15,7 @@ public static partial class ShellCore {
         Say("-n", $"{terminalCommandPrompt.Text.Replace("\r", "").Replace("\n", "")}{Util.Format(Util.EscapeBBCode(newCMD), StrSty.CMD_FUL)}");
         queuedAction = ExecuteCommands;
         queuedCommands = commands;
-        StartProcess(GD.Randf()*1.0+.5);
+        StartProcess(GD.Randf()*.5+.2);
         return 0;
         static void ExecuteCommands(string[] cmd) {
             for (int i = 0; i < cmd.Length; i++) {

@@ -8,7 +8,7 @@ public static partial class ShellCore {
 	static void MiFarm(Dictionary<string, string> farg, string[] parg) {
 		bool needHelp = Util.ContainKeys(farg, "-h", "--help");
 		bool listAll = Util.ContainKeys(farg, "-a", "--all");
-        bool analyzeOne = Util.ContainKeys(farg, "-n", "--name"); string minerName = Util.GetArg(farg, "-n", "--name");
+        bool analyzeOne = Util.ContainKeys(farg, "-m", "--miner"); string minerName = Util.GetArg(farg, "-m", "--miner");
 
 		if (listAll) {
             if (NetworkManager.BotNet.Count == 0) { Say(Util.Format("No miners in the botnet.", StrSty.WARNING)); return; }
@@ -25,15 +25,15 @@ public static partial class ShellCore {
 		BotFarm hackfarm = NetworkManager.GetBotByName(minerName);
 		if (hackfarm == null) { Say("-r", "No miner with such name."); return; }
 		Say(
-$@"[color={Util.CC(Cc.w)}]Botnet:[/color] {Util.Format(minerName, StrSty.HOSTNAME)}
+$@"{Util.Format("Botnet:", StrSty.DECOR)} {Util.Format(minerName, StrSty.HOSTNAME)}
 {Util.GenerateStringByProportions([.. hackfarm.mineralDistribution.Select(x => x.Item2)], [.. hackfarm.mineralDistribution.Select(x => ItemCrafter.MINERALS[x.Item1].ColorCode)], 50)}
 {string.Join(" | ", hackfarm.mineralDistribution.Select(x => $"[color={Util.CC(ItemCrafter.MINERALS[x.Item1].ColorCode)}]{ItemCrafter.MINERALS[x.Item1].Shorthand}[/color]: {Util.Format($"{x.Item2 * 100.0:0.00}", StrSty.NUMBER)}%"))}
 ================================================================
-[color={Util.CC(Cc.w)}]Batch size[/color]    | Lvl.{Util.Format($"{hackfarm.BatchSizeLVL}", StrSty.NUMBER, "0"), 26} | {Util.Format($"{hackfarm.BatchSize}", StrSty.NUMBER):3}
-[color={Util.CC(Cc.w)}]Mining speed[/color]  | Lvl.{Util.Format($"{hackfarm.MineSpeedLVL}", StrSty.NUMBER, "0"), 26} | {Util.Format($"{hackfarm.MineSpeed}", StrSty.NUMBER):3}
-[color={Util.CC(Cc.w)}]Transfer time[/color] | Lvl.{Util.Format($"{hackfarm.XferDelayLVL}", StrSty.NUMBER, "0"), 26} | {Util.Format($"{hackfarm.XferDelay}", StrSty.NUMBER):3}
+{Util.Format("Batch size", StrSty.DECOR)}    | Lvl.{Util.Format($"{hackfarm.BatchSizeLVL}", StrSty.NUMBER, "0"), 26} | {Util.Format($"{hackfarm.BatchSize}", StrSty.NUMBER):3}
+{Util.Format("Mining speed", StrSty.DECOR)}  | Lvl.{Util.Format($"{hackfarm.MineSpeedLVL}", StrSty.NUMBER, "0"), 26} | {Util.Format($"{hackfarm.MineSpeed}", StrSty.NUMBER):3}
+{Util.Format("Transfer time", StrSty.DECOR)} | Lvl.{Util.Format($"{hackfarm.XferDelayLVL}", StrSty.NUMBER, "0"), 26} | {Util.Format($"{hackfarm.XferDelay}", StrSty.NUMBER):3}
 ================================================================
-[color={Util.CC(Cc.w)}]Aprox. Time To Live:[/color] {Util.TimeDifferenceFriendly(hackfarm.LifeTime)}");
+{Util.Format("Aprox. Time To Live:", StrSty.DECOR)} {Util.TimeDifferenceFriendly(hackfarm.LifeTime)}");
 	}
 	const double FLARE_TIME = 120.0;
 	static double startEpoch = 0, endEpoch = 0, remainingTime = 0;
@@ -54,20 +54,43 @@ $@"[color={Util.CC(Cc.w)}]Botnet:[/color] {Util.Format(minerName, StrSty.HOSTNAM
     public static event Action<(CError, string, string, string)[]> KARrunCMD;
 	static void Karaxe(Dictionary<string, string> farg, string[] parg) {
 		bool help = Util.ContainKeys(farg, "--help"); if (help) {
-			Say(
-@$"Welcome to {Util.Format("Karaxe", StrSty.CMD_ACT)}
-This program allows you to attack nodes and bypass their security system.
-Usage:
-    {Util.Format("karaxe --flr", StrSty.CMD_FUL)}: Activate karaxe. This will expose all node locks for a limited time.
-    {Util.Format("karaxe --atk <flag_key_pairs>", StrSty.CMD_FUL)}: Attack a node. This will attempt to bypass the node's security system using {Util.Format("<flag_key_pairs>", StrSty.CMD_FARG)}.
-        Example:
-			`{Util.Format("karaxe --atk --i4 1 --2xtractor fl1p", StrSty.CMD_FUL)}`: Attempt to unlock {Util.Format("I4X", StrSty.NODE_LOCK)} lock with {Util.Format("i4", StrSty.CMD_FLAG)}={Util.Format("1", StrSty.CMD_ARG)}, {Util.Format("2xtractor", StrSty.CMD_FLAG)}={Util.Format("fl1p", StrSty.CMD_ARG)}
-    {Util.Format("karaxe --axe", StrSty.CMD_FUL)}: Deactivate karaxe. This will close all node locks and stop the flare.
-    {Util.Format("karaxe --help", StrSty.CMD_FUL)}: Show this help message.
+            Say(
+$@"Welcome to {Util.Format("Karaxe", StrSty.CMD_ACT)}
+This program allows you to attack nodes and bypass their security systems.
 
-{Util.Format("--flr", StrSty.CMD_FLAG)}, {Util.Format("--atk", StrSty.CMD_FLAG)}, {Util.Format("--axe", StrSty.CMD_FLAG)} are mutually exclusive, i.e. you can only use one at a time.");
-            return;
-		}
+{Util.Format("Usage:", StrSty.CMD_FUL)}
+	{Util.Format("karaxe --flr", StrSty.CMD_FUL)}
+		Activate Karaxe. Exposes all node locks for a limited time.
+
+	{Util.Format("karaxe --atk <flag_key_pairs>", StrSty.CMD_FUL)}
+		Attack a node. Bypasses the node’s security system using the specified flag-key pairs.
+
+		Example:
+			{Util.Format("karaxe --atk --i4 1 --2xtractor fl1p", StrSty.CMD_FUL)}
+			Attempts to unlock {Util.Format("I4X", StrSty.NODE_LOCK)} lock with
+				{Util.Format("--i4", StrSty.CMD_FLAG)}={Util.Format("1", StrSty.CMD_ARG)},
+				{Util.Format("--2xtractor", StrSty.CMD_FLAG)}={Util.Format("fl1p", StrSty.CMD_ARG)}
+
+	{Util.Format("karaxe --axe", StrSty.CMD_FUL)}
+		Deactivate Karaxe. Closes all node locks and stops the flare.
+
+	{Util.Format("karaxe --help", StrSty.CMD_FUL)}
+		Show this help message.
+
+{Util.Format("NOTES:", StrSty.HEADER)}
+	- {Util.Format("--flr", StrSty.CMD_FLAG)}, {Util.Format("--atk", StrSty.CMD_FLAG)}, and {Util.Format("--axe", StrSty.CMD_FLAG)}
+		are mutually exclusive. You can only use one at a time.
+	- To attack, you must run {Util.Format("--flr", StrSty.CMD_FLAG)} first to expose the node locks.
+	- After a successful attack, run {Util.Format("analyze", StrSty.CMD_FUL)} to retrieve new information.
+	- When the Karaxe duration ends, normal sectors will ban you (the sector will disappear).
+	  Exceptions: tutorial, mission, or training sectors will remain accessible.
+
+{Util.Format("Examples:", StrSty.HEADER)}
+	{Util.Format("karaxe --flr", StrSty.CMD_FUL)}
+	{Util.Format("karaxe --atk --i4 1 --2xtractor fl1p", StrSty.CMD_FUL)}
+	{Util.Format("karaxe --axe", StrSty.CMD_FUL)}
+"); return;
+        }
 
         bool startKaraxe = Util.ContainKeys(farg, "--flr"), doKaraxe = Util.ContainKeys(farg, "--atk"), endKaraxe = Util.ContainKeys(farg, "--axe");
 		if (startKaraxe && endKaraxe) {

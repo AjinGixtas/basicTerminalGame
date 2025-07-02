@@ -3,6 +3,19 @@ using System;
 using System.Linq;
 
 public static class ItemCrafter {
+/*
+ *  MineralAccessLevel                                                      HighestCraftableIDs
+                  0                                                                     [20]
+                  1                                                                     [21]
+                  2                                                             [21, 24, 25]
+                  3                                                     [21, 24, 25, 27, 40]
+                  4                                             [21, 24, 25, 27, 31, 40, 45]
+                  5                                         [21, 24, 25, 27, 31, 36, 40, 45]
+                  6                                     [21, 24, 25, 27, 31, 36, 40, 42, 45]
+                  7                             [21, 24, 25, 27, 31, 36, 40, 42, 45, 48, 50]
+                  8             [21, 24, 25, 27, 31, 36, 40, 42, 45, 48, 50, 54, 71, 73, 75]
+                  9 [21, 24, 25, 27, 31, 36, 40, 42, 45, 48, 50, 54, 60, 71, 72, 73, 74, 75]
+ */
     public static readonly ItemData[] MINERALS = [
         new ItemData("Datacite",  "DC!", 0, 1, Cc.gB),
         new ItemData("Bitron",    "BT!", 1, 2, Cc.LM),
@@ -56,7 +69,7 @@ public static class ItemCrafter {
         new CraftableItemData("StealthCradle"              , "SCR^", 45, Cc.LR,  8.721571,    1769, [new(39, 1), new(35, 1)]),
         new CraftableItemData("NeuralPhantom"              , "NPH^", 46, Cc.B ,  8.183034,     347, [new(35, 1), new(14, 1)]),
         new CraftableItemData("ExoPhantom"                 , "EXP^", 47, Cc.c ,  9.000472,    2508, [new(39, 1), new(41, 1), new(38, 1)]),
-        new CraftableItemData("InhumaneHumanPretender"     , "IHP^", 48, Cc.LB,  2.681638,     106, [new(17, 1)]),
+        new CraftableItemData("InhumanPretender"           , "IHP^", 48, Cc.LB,  2.681638,     106, [new(17, 1)]),
         new CraftableItemData("PhantomFork"                , "PFK^", 49, Cc.LM, 13.199542,    2276, [new(37, 1), new(46, 1)]),
         new CraftableItemData("ZalgoScript"                , "ZSC^", 50, Cc.m ,  6.617419,     421, [new(16, 1), new(41, 1), new(17, 1)]),
         new CraftableItemData("StealthBranch"              , "STB^", 51, Cc.rG, 14.948797,    7115, [new(37, 1), new(47, 1)]),
@@ -83,7 +96,7 @@ public static class ItemCrafter {
         new CraftableItemData("SpectralTunnel"             , "SPT^", 72, Cc.LY, 21.550311,  314385, [new(63, 1), new(69, 1)]),
         new CraftableItemData("ReflectionCore"             , "RFC^", 73, Cc.LR, 18.227775, 1240569, [new(68, 1), new(67, 1)]),
         new CraftableItemData("NexusAnchor"                , "NEA^", 74, Cc.LM, 20.348825,  730682, [new(66, 1), new(67, 1), new(19, 1)]),
-        new CraftableItemData("WardenFrame"                , "WAF^", 75, Cc.B , 19.925959, 1323959, [new(62, 1), new(68, 1), new(70, 1)]),
+        new CraftableItemData("WardenFrame"                , "WAF^", 75, Cc.B , 19.925959, 1323959, [new(62, 1), new(68, 1), new(69, 1)]),
     ];
     public static readonly CraftableItemData[] ALL_RECIPES = [ .. REFINED_MATERIALS, .. COMPONENTS];
     public static readonly ItemData[] ALL_ITEMS = [.. MINERALS, .. ALL_RECIPES];
@@ -103,7 +116,6 @@ public static class ItemCrafter {
         }
         for (int i = 0; i < recipe.RequiredIngredients.Length; ++i) {
             if (PlayerDataManager.MineInv[recipe.RequiredIngredients[i].ID] < recipe.RequiredIngredients[i].Amount) {
-                ShellCore.Say("-r", $"Not enough {MINERALS[recipe.RequiredIngredients[i].ID].Shorthand} to craft {recipe.Name}");
                 return CError.INSUFFICIENT;
             }
         }
@@ -117,15 +129,14 @@ public static class ItemCrafter {
         for (int i = 0; i < CurThreads; ++i) {
             if (CraftThreads[i].Recipe == null) continue; // No recipe assigned to this thread
 
-            bool enoughMaterial = true;
-            for (int j = 0; j < CraftThreads[i].Recipe.RequiredIngredients.Length; ++j)
+            CraftThreads[i].RemainTime -= delta; if (CraftThreads[i].RemainTime > 0) continue;
+            bool enoughMaterial = true; for (int j = 0; j < CraftThreads[i].Recipe.RequiredIngredients.Length; ++j){
                 if (PlayerDataManager.MineInv[CraftThreads[i].Recipe.RequiredIngredients[j].ID] < CraftThreads[i].Recipe.RequiredIngredients[j].Amount) {
                     enoughMaterial = false; break;
                 }
-            if (!enoughMaterial) continue;
+            } if (!enoughMaterial) { CraftThreads[i].Recipe = null; continue; }
+            
 
-
-            CraftThreads[i].RemainTime -= delta; if (CraftThreads[i].RemainTime > 0) continue;
             
             for (int j = 0; j < CraftThreads[i].Recipe.RequiredIngredients.Length; ++j) 
                 PlayerDataManager.MineInv[CraftThreads[i].Recipe.RequiredIngredients[j].ID] -= CraftThreads[i].Recipe.RequiredIngredients[j].Amount;

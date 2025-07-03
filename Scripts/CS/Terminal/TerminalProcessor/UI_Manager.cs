@@ -4,7 +4,7 @@ public static partial class ShellCore {
     public static void Sidebar(Dictionary<string, string> farg, string[] parg) {
         bool help = Util.ContainKeys(farg, "--help"); if (help) {
             Say(
-@$"Usage: {Util.Format("sidebar --[help] --[lock] --[switch < index >]", StrSty.CMD_FUL)}
+@$"Usage: {Util.Format("sidebar --[help] --[lock] --[switch <index>]", StrSty.CMD_FUL)}
 
 Open the sidebar menu to access various features and tools.
 
@@ -15,7 +15,7 @@ Options:
                     When locked, the sidebar stays on the current page.
 
     {Util.Format("--switch, -s", StrSty.CMD_FLAG)}    Switch the sidebar to a specific page index.
-                    Must be a number between 0 and the total number of pages.
+                    Must be a number between 0 and 3.
 
 Examples:
     {Util.Format("sidebar --help", StrSty.CMD_FUL)}            Show help.
@@ -36,6 +36,6 @@ Examples:
             T_Sidebar.PageIndex = index;
             return;
         }
-        Say($"No action taken. Use {Util.Format("cmd --help", StrSty.CMD_FUL)} for usage.");
+        Say($"No action taken. Use {Util.Format("sidebar --help", StrSty.CMD_FUL)} for usage.");
     }
 }

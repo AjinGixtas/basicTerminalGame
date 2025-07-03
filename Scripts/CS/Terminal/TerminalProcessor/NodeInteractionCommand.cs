@@ -93,6 +93,11 @@ This program allows you to attack nodes and bypass their security systems.
         }
 
         bool startKaraxe = Util.ContainKeys(farg, "--flr"), doKaraxe = Util.ContainKeys(farg, "--atk"), endKaraxe = Util.ContainKeys(farg, "--axe");
+		if (!(startKaraxe || doKaraxe || endKaraxe)) {
+			ShellCore.Say($"No action taken. Use {Util.Format("karaxe --help", StrSty.CMD_FUL)} for usage");
+			return;
+		}
+		
 		if (startKaraxe && endKaraxe) {
 			Say("-r", $"You can not use {Util.Format("--axe", StrSty.CMD_FLAG)} and {Util.Format("--flare",StrSty.CMD_FLAG)} at the same time.");
 			KARrunCMD?.Invoke([(CError.UNKNOWN, "", "", "--axe and --flare incompatible")]);
@@ -167,7 +172,7 @@ This program allows you to attack nodes and bypass their security systems.
 				continue;
 			} 
 			if (res.Item1 == CError.NO_PERMISSION) {
-				ShellCore.Say($"[{Util.Format("N0P3RMS", StrSty.ERROR)}] {Util.Format("Denied access by", StrSty.DECOR)} {Util.Format(res.Item2, StrSty.NODE_LOCK)}");
+				ShellCore.Say($"[{Util.Format("N0PERMS", StrSty.ERROR)}] {Util.Format("Denied access by", StrSty.DECOR)} {Util.Format(res.Item2, StrSty.NODE_LOCK)}");
 				ShellCore.Say("-r", $"You do not have permission to use {Util.Format(res.Item3, StrSty.CMD_FLAG)}");
 				continue;
 			}

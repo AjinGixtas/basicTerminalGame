@@ -7,9 +7,18 @@ public abstract class NetworkNode {
 	public string DisplayName { get; set; }
 	public string IP { get; protected set; }
 	// ^ cosmetic info
-	int _secLvl, _defLvl, _retLvl; // Defense = Sec+Ret
-	public SecurityType SecType { get; protected set; }
-	public NodeType NodeType { get; protected set; }
+	SecLvl _secLvl; int _defLvl, _retLvl; // Defense = Sec+Ret
+	public SecLvl SecLvl {
+		get => _secLvl;
+		protected set {
+            _secLvl = value;
+        }
+	}
+    public int DefLvl {
+        get => _defLvl;
+        protected set { _defLvl = Mathf.Clamp(value, 0, 5); }
+    }
+    public NodeType NodeType { get; protected set; }
 
 	NetworkNode _parentNode; 
 	public NetworkNode ParentNode { 
@@ -22,30 +31,8 @@ public abstract class NetworkNode {
 	}
 	public List<NetworkNode> ChildNode { get; init; }
 	public LockSystem LockSystem { get; private set; }
-	public int SecLvl {
-		get => _secLvl;
-		protected set {
-			value = Mathf.Clamp(value, 0, _defLvl);
-			if (_secLvl == value) return;
-			_secLvl = value;
-			LockSystem?.LockIntialization(_secLvl);
-			_retLvl = _defLvl - _secLvl;
-			SecType = Util.MapEnum<SecurityType>(_secLvl);
-		}
-	}
-	public int DefLvl {
-		get => _defLvl;
-		protected set {
-			value = Mathf.Clamp(value, 0, 10);
-			SecLvl += value - _defLvl;
-			_defLvl = value;
-		}
-	}
-	public int RetLvl {
-		get => _retLvl;
-	}
-	
-	public NetworkNode(string hostName, string displayName, string IP, NodeType NodeType, NetworkNode parentNode, bool ownedByPlayer, LockType[] lockCode) {
+
+	public NetworkNode(string hostName, string displayName, string IP, NodeType NodeType, NetworkNode parentNode, bool ownedByPlayer, LocT[] lockCode) {
 		HostName = hostName; DisplayName = displayName; this.IP = IP; this.NodeType = NodeType;
 		OwnedByPlayer = ownedByPlayer; ParentNode = parentNode; ChildNode = [];
 		LockSystem = new(lockCode);
@@ -55,11 +42,12 @@ public abstract class NetworkNode {
     /// <summary>
     /// Set the initial security and defense levels of this node.
     /// </summary>
-    /// <param name="DefLvl">The "Firewall rating" of a node.</param>
+    /// <param name="defLvl">The "Firewall rating" of a node.</param>
     /// <param name="SecLvl">Obfuscate from player with SecLvl, always smaller or equal to DefLvl</param>
-    public virtual void Init(int DefLvl, int SecLvl) {
-		this.DefLvl = DefLvl; this.SecLvl = SecLvl;
-	}
+    public virtual void Init(int defLvl, SecLvl secLvl) {
+		DefLvl = defLvl; SecLvl = secLvl;
+        LockSystem?.LockIntialization(SecLvl, DefLvl);
+    }
 
     /// <summary>
     /// Get the depth of this node in the network tree. Cause infinite loop for non-true tree structures.
@@ -80,9 +68,8 @@ public abstract class NetworkNode {
 			HostName = HostName,
 			DisplayName = DisplayName,
 			DefLvl = DefLvl,
-			SecLvl = SecLvl,
 			RetLvl = _retLvl,
-			SecType = SecType,
+			SecLvl = SecLvl,
 			NodeType = NodeType
 		};
 	}
@@ -97,10 +84,13 @@ public abstract class NetworkNode {
 			_gcDeposit = value;
 		}
 	}
+    /// <summary>
+    /// DEPRACATED: Empty array of mineral deposit. So it won't do anything.
+    /// </summary>
     long[] _mineralDeposit = new long[10]; public long[] MineralDeposit {
 		get => _mineralDeposit;
 		set {
-			if (value.Length != MineralDeposit.Length) { GD.PrintErr("Different length was submitted"); return; }
+			if (value.Length != 10) { GD.PrintErr("Different length was submitted"); return; }
 			_mineralDeposit = value;
 		}
 	}
@@ -108,12 +98,17 @@ public abstract class NetworkNode {
 		set {
 			if (_isSecure == true && value == false) {
 				PlayerDataManager.DepositGC(GCdeposit);
-				PlayerDataManager.DepositMineral(MineralDeposit);
+                GCdeposit = 0;
+				for (int i = 0; i < _mineralDeposit.Length; i++) {
+                    PlayerDataManager.MineInv[i] += _mineralDeposit[i];
+                    _mineralDeposit[i] = 0;
+                }
             }
             _isSecure = value;
 		}
 	}
-    /// <summary>
+    
+	/// <summary>
     /// Attempt to crack the node with the provided answers.
     /// </summary>
     /// <param name="ans">Example: { "--longFlag1": "value1", "--longFlag2": "value2", "--longFlag3": "value3" }</param>
@@ -124,7 +119,7 @@ public abstract class NetworkNode {
 		(CError, string, string, string)[] result = LockSystem.CrackAttempt(ans, endEpoch);
 		if (result[^1].Item1 == CError.OK) {
 			IsSecure = false; LockSystem = null;
-			SecLvl = 0; DefLvl = 0;
+			SecLvl = SecLvl.NOSEC; DefLvl = 0;
 		}
 		return result;
 	}

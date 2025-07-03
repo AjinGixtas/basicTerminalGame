@@ -4,8 +4,8 @@ public class DriftSector : Sector {
 	static readonly string[] DRIFT_NODE_NAMES = StringExtensions.Split(FileAccess.Open("res://Utilities/TextFiles/ServerNames/DriftNode.txt", FileAccess.ModeFlags.Read).GetAsText(), "\n", false);
 	static readonly string[] DRIFT_SECTOR_NAMES = StringExtensions.Split(FileAccess.Open("res://Utilities/TextFiles/ServerNames/DriftSector.txt", FileAccess.ModeFlags.Read).GetAsText(), "\n", false);
 
-	int _sectorLevel = 1;
-	public int SectorLevel => _sectorLevel;
+	SecLvl _sectorLevel = SecLvl.NOSEC;
+	public SecLvl SectorLevel => _sectorLevel;
 
     bool _lockedDown = false;
 	public bool LockedDown { 
@@ -20,7 +20,7 @@ public class DriftSector : Sector {
 	public DriftSector() {
         Name = GenSectorName();
 		int type = GD.RandRange(0, 3);
-		_sectorLevel = GD.RandRange(0, 10);
+		_sectorLevel = GD.Randf() < .02 ? SecLvl.NOSEC : (SecLvl)GD.RandRange(1, 4);
 		switch (type) {
 			case 0: GenerateBusNetwork(_sectorLevel); break;
 			case 1: GenerateStarNetwork(_sectorLevel); break;
@@ -37,7 +37,7 @@ public class DriftSector : Sector {
 	
 	int AddSurfaceNode(DriftNode node) { if (_isIntialized) return 1; SurfaceNodes.Add(node); return 0; }
 	public int MarkIntializationCompleted() { _isIntialized = true; return 0; }
-	void GenerateBusNetwork(int secLvl) {
+	void GenerateBusNetwork(SecLvl secLvl) {
 		if (_isIntialized) return;
 		int layer = 3, node = 3;
 		(string displayName, string hostName) = GenNodeName();
@@ -55,7 +55,7 @@ public class DriftSector : Sector {
 			chainNode = chainNode.ChildNode[0] as DriftNode;
 		}
 	}
-	void GenerateStarNetwork(int secLvl) {
+	void GenerateStarNetwork(SecLvl secLvl) {
 		if (_isIntialized) return;
 		int node = 5;
 		for (int i = 0; i < node; ++i) {
@@ -63,7 +63,7 @@ public class DriftSector : Sector {
 			AddSurfaceNode(new(hostName, displayName, NetworkManager.GetRandomIP(), null, this, secLvl));
 		}
 	}
-	void GenerateVineNetwork(int secLvl) {
+	void GenerateVineNetwork(SecLvl secLvl) {
 		if (_isIntialized) return;
 		int vine = 2, node = 3;
 		for(int i = 0; i < vine; ++i) {
@@ -76,7 +76,7 @@ public class DriftSector : Sector {
 			}
 		}
 	}
-	void GenerateTreeNetwork(int secLvl) {
+	void GenerateTreeNetwork(SecLvl secLvl) {
 		if (_isIntialized) return;
 		int layer = 3, node = 2;
 		for(int i = 0; i < 1; ++i) {

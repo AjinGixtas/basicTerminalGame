@@ -22,7 +22,7 @@ public class NetworkModule {
     public int? GetNodeFirewallRating(string IP) {
         return NetworkManager.GetNodeByIP(IP)?.DefLvl;
     }
-    public SecurityType? GetNodeSecurity(string IP) {
-        return NetworkManager.GetNodeByIP(IP)?.SecType;
+    public SecLvl? GetNodeSecurity(string IP) {
+        return NetworkManager.GetNodeByIP(IP)?.SecLvl;
     }
 }

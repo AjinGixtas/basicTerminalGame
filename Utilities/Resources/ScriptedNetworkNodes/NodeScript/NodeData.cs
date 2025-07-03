@@ -8,8 +8,9 @@ public partial class NodeData : Resource
 {
 	private MiningWeight[] _miningWeights;
 	private NodeData[] _childNodes;
-	private LockType[] _locks;
-	private int _defLvl, _secLvl, _retLvl;
+	private LocT[] _locks;
+	private int _defLvl;
+	private SecLvl _secLvl;
 	private long _gcDeposit;
 	[ExportGroup("Node Info")]
     [Export] public NodeType NodeType;
@@ -31,17 +32,11 @@ public partial class NodeData : Resource
 		}
 	}
 	[Export] public int SecLvl {
-		get => _secLvl;
+		get => (int)_secLvl;
 		set {
-			_secLvl = value;
+			_secLvl = (SecLvl)value;
 		}
 	}
-	[Export] public int RetLvl {
-		get => _retLvl;
-        set {
-            _retLvl = value;
-        }
-    }
 	[ExportGroup("Node security sys")]
     // GC reward for breaking the node
     [Export] public long GcDeposit {
@@ -55,9 +50,9 @@ public partial class NodeData : Resource
     [Export] public int[] Locks {
 		get => _locks.Select(e => (int)e).ToArray();
 		set {
-			_locks = new LockType[value.Length];
+			_locks = new LocT[value.Length];
             for (int i = 0; i < value.Length; i++) {
-                _locks[i] = (LockType)value[i];
+                _locks[i] = (LocT)value[i];
             }
 		}
     }
@@ -133,11 +128,11 @@ public partial class NodeData : Resource
     public NodeData(NodeData[] childNodes, MiningWeight[] miningWeights, long[] mineralDeposit,
     int[] locks, NodeType type = NodeType.VM,
     string hostName = "HOST_NOT_FOUND", string displayName = "HOST_NOT_FOUND",
-    long gcDeposit = 0, int hacklvl = 1, int growlvl = 1, int timelvl = 1) {
-
+    long gcDeposit = 0, int hacklvl = 1, int growlvl = 1, int timelvl = 1, int defLvl = 0, SecLvl secLvl = global::SecLvl.NOSEC) {
         ChildNodes = childNodes; MiningWeights = miningWeights; MineralsDeposit = mineralDeposit;
         Locks = locks; NodeType = type;
         HostName = hostName; DisplayName = displayName;
         GcDeposit = gcDeposit; hackLvl = hacklvl; timeLvl = timelvl; growLvl = growlvl;
+        _defLvl = defLvl; _secLvl = secLvl;
     }
 }

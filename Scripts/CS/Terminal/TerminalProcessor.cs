@@ -78,8 +78,7 @@ public struct NodeAnalysis {
 	public string HostName { get; init; }
 	public string DisplayName { get; init; }
 	public int DefLvl { get; init; }
-	public int SecLvl { get; init; }
 	public int RetLvl { get; init; }
-	public SecurityType SecType { get; init; }
+	public SecLvl SecLvl { get; init; }
 	public NodeType NodeType { get; init; }
 }

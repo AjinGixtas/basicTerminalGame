@@ -16,7 +16,7 @@ public enum NodeType {
 // security_point is dressed in these enum to introduce ambugitiy
 // 10-security_point = retaliation level.
 [Flags]
-public enum SecurityType {
+public enum SecLvl {
     NOSEC = 0, LOSEC = 1, MISEC = 2, HISEC = 3, MASEC = 4
 }
 /// <summary>
@@ -139,17 +139,11 @@ public enum StrSty {
     CMD_FARG = 31,
     NODE_LOCK = 32,
 }
-public enum LockType {
-    I4X = 0,
-    F8X = 1,
-    I16 = 2,
-    P16X= 3,
-    P90 = 4,
-    M2  = 5,
-    M3  = 6,
-    C0  = 7,
-    C1  = 8,
-    C3  = 9
+public enum LocT {
+    T0, I4X, M2, C0, C1, C3, /*Ignore =>*/ F8X, I16, P16X, P90, M3,
+    T1, XRL, S3M, VSP, M1NV, FRAJ,
+    T2,
+    T3,
 }
 public enum CError {
     OK = 0,

@@ -38,7 +38,7 @@ public static partial class NetworkManager {
         List<string> names = [];
         int i = -1; foreach (var sector in driftSectors) {
             ++i; if (sector == null) { QueueRemoveDriftSector(i); continue; }
-            if (level > -1 && sector.SectorLevel != level) continue; // Skip sectors that don't match the level
+            if (level > -1 && (int)sector.SectorLevel != level) continue; // Skip sectors that don't match the level
             if (mustConnected && !connectedSectors.Contains(sector)) continue; // Skip if mustConnected is true and sector is not connected
             names.Add(sector.Name);
         }

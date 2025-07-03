@@ -26,7 +26,7 @@ public static partial class ShellCore {
 			if (parsedArgs.ContainsKey("-v")) {
 				string descPrefix = getDescPrefix(depthMarks) + ((tdepth == MAX_DEPTH ? 0 : ((node.ParentNode != null ? 0 : -1) + node.ChildNode.Count)) > 0 ? " │" : "  ");
 				output += $"{Util.Format(descPrefix, StrSty.DECOR)}  {Util.Format("Display name:", StrSty.DECOR),padLength}{Util.Format(analyzeResult.DisplayName, StrSty.DISPLAY_NAME)}\n";
-				output += $"{Util.Format(descPrefix, StrSty.DECOR)}  {Util.Format("Firewall rating:",StrSty.DECOR),padLength}{Util.Format($"{analyzeResult.DefLvl}", StrSty.DEF_LVL),-2}  {Util.Format("Security:", StrSty.DECOR)} {Util.Format($"{analyzeResult.SecType}", StrSty.SEC_TYPE)}\n";
+				output += $"{Util.Format(descPrefix, StrSty.DECOR)}  {Util.Format("Firewall rating:",StrSty.DECOR),padLength}{Util.Format($"{analyzeResult.DefLvl}", StrSty.DEF_LVL),-2}  {Util.Format("Security:", StrSty.DECOR)} {Util.Format($"{analyzeResult.SecLvl}", StrSty.SEC_TYPE)}\n";
 				if (!string.IsNullOrWhiteSpace(descPrefix))
 					output += $"{Util.Format(descPrefix, StrSty.DECOR)}\n";
 			}
@@ -91,7 +91,7 @@ public static partial class ShellCore {
 	static void Link(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
 		if (positionalArgs.Length == 0) { Say("-r", "No sector name provided."); return; }
 		for (int i = 0; i < positionalArgs.Length; ++i) {
-			CError status = NetworkManager.ConnectToSector(positionalArgs[0]);
+			CError status = NetworkManager.ConnectToSector(positionalArgs[i]);
 			string msg = status switch {
 				CError.OK => $"{Util.Format("Linked", StrSty.FULL_SUCCESS)}: {Util.Format(positionalArgs[i], StrSty.SECTOR)}",
 				CError.INVALID => $"Link failed: {Util.Format(positionalArgs[i], StrSty.SECTOR)}. Sector is null. This behavior is unexpected and should be reported to the developer.",

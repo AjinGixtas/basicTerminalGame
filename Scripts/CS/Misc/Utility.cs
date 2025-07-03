@@ -296,13 +296,13 @@ public static partial class Util {
     public static TEnum MapEnum<TEnum>(int value) where TEnum : System.Enum {
         System.Type enumType = typeof(TEnum);
 
-        if (enumType == typeof(SecurityType)) {
-            SecurityType result = value switch {
-                < 1 => SecurityType.NOSEC,
-                < 4 => SecurityType.LOSEC,
-                < 8 => SecurityType.MISEC,
-                < 10 => SecurityType.HISEC,
-                >= 10 => SecurityType.MASEC,
+        if (enumType == typeof(SecLvl)) {
+            SecLvl result = value switch {
+                < 1 => SecLvl.NOSEC,
+                < 4 => SecLvl.LOSEC,
+                < 8 => SecLvl.MISEC,
+                < 10 => SecLvl.HISEC,
+                >= 10 => SecLvl.MASEC,
             };
 
             return (TEnum)(object)result;
@@ -455,23 +455,9 @@ public static partial class Util {
         if (min < 1) return $"Less than {Util.Format("1", StrSty.UNIT, "min")}";
         return $"Aprox.{Util.Format($"{min}", StrSty.UNIT, "min")} remaining";
     }
-    public static Lock LockEnumMapper(LockType type) {
-        return type switch {
-            LockType.I4X => new I4X(),
-            LockType.F8X => new F8X(),
-            LockType.I16 => new I16(),
-            LockType.P16X => new P16X(),
-            LockType.P90 => new P90(),
-            LockType.M2 => new M2(),
-            LockType.M3 => new M3(),
-            LockType.C0 => new C0(),
-            LockType.C1 => new C1(),
-            LockType.C3 => new C3(),
-            _ => throw new System.NotImplementedException($"Lock type {type} is not implemented.")
-        };
-    }
+
     public static readonly NodeData PLAYER_NODE_DATA_DEFAULT = new([], [], [],
-        [.. System.Enum.GetValues(typeof(LockType)).Cast<int>()], NodeType.PLAYER, "home",
+        [.. System.Enum.GetValues(typeof(LocT)).Cast<int>()], NodeType.PLAYER, "home",
             "Home", 1, 1, 1, 1);
     public static string GetArg(Dictionary<string, string> dict, params string[] aliases) => aliases.FirstOrDefault(flag => dict.ContainsKey(flag)) is string found ? dict[found] : null;
     public static bool ContainKeys(Dictionary<string, string> dict, params string[] aliases) => aliases.Any(flag => dict.ContainsKey(flag));
@@ -482,15 +468,21 @@ public static partial class Util {
         }
         return result.ToString();
     }
-    public static uint GetFn1vHash(byte[] input) {
+    public static uint GetFnv1aHash(byte[] input) {
         const uint FNV_prime = 0x01000193;
         uint hash = 0x811C9DC5;
         foreach (byte b in input)
             hash = (hash ^ b) * FNV_prime;
         return hash;
     }
+    public static string GetFnv1aHash(string input, bool trimEnd=true) {
+        byte[] bytes = Encoding.UTF8.GetBytes(input);
+        uint hash = GetFnv1aHash(bytes);
+        if (trimEnd) return Convert.ToBase64String(BitConverter.GetBytes(hash)).TrimEnd('=');
+        return Convert.ToHexString(BitConverter.GetBytes(hash));
+    }
     public static string GetFnv1aTimeHash() {
-        uint hash = Util.GetFn1vHash(BitConverter.GetBytes(Util.GetFn1vHash(BitConverter.GetBytes(Util.GetFn1vHash(BitConverter.GetBytes(Time.GetUnixTimeFromSystem()))))));
+        uint hash = Util.GetFnv1aHash(BitConverter.GetBytes(Util.GetFnv1aHash(BitConverter.GetBytes(Util.GetFnv1aHash(BitConverter.GetBytes(Time.GetUnixTimeFromSystem()))))));
         return Convert.ToBase64String(BitConverter.GetBytes(hash)).TrimEnd('=');
     }
     public static string InvertHexColor(string hex) {
@@ -512,11 +504,11 @@ public static partial class Util {
     }
     public static string ColorMapperSecLvl(object lvl) {
         return $"{lvl switch {
-            "NOSEC" or SecurityType.NOSEC or 0 or "0" => Util.CC(Cc.G),
-            "LOSEC" or SecurityType.LOSEC or 1 or 2 or 3 or "1" or "2" or "3" => Util.CC(Cc.LB),
-            "MISEC" or SecurityType.MISEC or 4 or 5 or 6 or "4" or "5" or "6" => Util.CC(Cc.y),
-            "HISEC" or SecurityType.HISEC or 7 or 8 or 9 or "7" or "8" or "9" => Util.CC(Cc.r),
-            "MASEC" or SecurityType.MASEC or "10" => Util.CC(Cc.m),
+            "NOSEC" or SecLvl.NOSEC or 0 or "0" => Util.CC(Cc.G),
+            "LOSEC" or SecLvl.LOSEC or 1 or 2 or 3 or "1" or "2" or "3" => Util.CC(Cc.LB),
+            "MISEC" or SecLvl.MISEC or 4 or 5 or 6 or "4" or "5" or "6" => Util.CC(Cc.y),
+            "HISEC" or SecLvl.HISEC or 7 or 8 or 9 or "7" or "8" or "9" => Util.CC(Cc.r),
+            "MASEC" or SecLvl.MASEC or "10" => Util.CC(Cc.m),
             _ => Util.CC(Cc.m)
         }}";
     }

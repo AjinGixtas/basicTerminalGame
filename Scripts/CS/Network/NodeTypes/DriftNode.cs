@@ -3,16 +3,16 @@ using System.Collections.Generic;
 
 public class DriftNode : NetworkNode {
 	public DriftSector Sector { get; init; }
-	public DriftNode(string hostName, string displayName, string IP, NetworkNode parentNode, DriftSector sector, int secLvl) : 
+	public DriftNode(string hostName, string displayName, string IP, NetworkNode parentNode, DriftSector sector, SecLvl secLvl) : 
 		base(hostName, displayName, IP, NodeType.DRIFT, parentNode, false, []){
 		Sector = sector;
-		DefLvl = (int)Mathf.Clamp(GD.Randfn(secLvl + .5, Mathf.E/2), 0, 10);
-		SecLvl = (int)Mathf.Clamp(GD.Randfn(DefLvl/2+3.5, .2 * Mathf.E * Mathf.Pi), Mathf.Min(1,DefLvl), DefLvl);
+		Init(GD.Randf() < .02 ? 0 : GD.RandRange(1, 5), secLvl);
 		_hackFarm = new BotFarm(DefLvl, this);
 		GCdeposit = GD.RandRange(
 			Mathf.CeilToInt(Mathf.Pow(2, DefLvl) * Mathf.Pow(10, (DefLvl-3.0)/4.0)),
             Mathf.CeilToInt(Mathf.Pow(2, DefLvl) * Mathf.Pow(10, (DefLvl+3.0)/4.0))
 		);
+
     }
 	BotFarm _hackFarm = null;
 	public BotFarm HackFarm {

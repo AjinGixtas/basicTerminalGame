@@ -1,21 +1,21 @@
 using Godot;
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 public class TutorialSector : StaticSector {
+    public const string TUTORIAL_SECTOR_NAME = "YES_I_AM_THE_SECTOR_YOU_ARE_LOOKING_FOR_PLEASE_LINK_2_ME_NOW";
     public TutorialSector() {
-        Name = "SCALE_HOUSE_MetroClean_847137_nw";
+        Name = TUTORIAL_SECTOR_NAME;
         NetworkNode node0 = new FileSysTutorialNode(null);
         NetworkNode node1 = new ScriptTutorialNode(node0);
         NetworkNode node2 = new KaraxeTutorialNode(node1);
-        NetworkNode node3 = new ScriptedNetworkNode(new([], [new() { mineralProfile = ItemCrafter.MINERALS[0], weight = 1.0 }], [], [0,7], NodeType.VM, "robo-cl4m-vm", "ROBO CL4M VM DO NOT TOUCH", 128, 1, 1, 1),node2);
+        NetworkNode node3 = new ScriptedNetworkNode(new([], [new() { mineralProfile = ItemCrafter.MINERALS[0], weight = 1.0 }], [], [0,7], NodeType.VM, "robo-cl4m-vm", "ROBO CL4M VM DO NOT TOUCH", 128, 1, 1, 1, 2, SecLvl.LOSEC), node2);
         SurfaceNodes.Add(node0);
     }
 }
 public class TutorialNode : NetworkNode {
-    public TutorialNode(string hostName, string displayName, string IP, NodeType NodeType, NetworkNode parentNode, bool ownedByPlayer, LockType[] lockCode) : 
+    public TutorialNode(string hostName, string displayName, string IP, NodeType NodeType, NetworkNode parentNode, bool ownedByPlayer, LocT[] lockCode) : 
         base(hostName, displayName, IP, NodeType, parentNode, ownedByPlayer, lockCode) {
     }
     /// <summary>
@@ -44,6 +44,7 @@ public class TutorialNode : NetworkNode {
         _cm.Enqueue(message);
     }
 }
+
 public class FileSysTutorialNode : TutorialNode {
     public FileSysTutorialNode(NetworkNode parentNode)
         : base(
@@ -53,9 +54,9 @@ public class FileSysTutorialNode : TutorialNode {
             NodeType.VM,
             parentNode,
             false,
-            [LockType.I4X]
+            [LocT.I4X]
         ) {
-        Init(10, 10);
+        Init(10, SecLvl.NOSEC);
         cm = new("cl3ver-b0y");
         NodeConnected += TutorialNodeActivate;
     }
@@ -65,7 +66,7 @@ public class FileSysTutorialNode : TutorialNode {
         TutorialSpeak0();
     }
     async void TutorialSpeak0() {
-        await Task.Delay(10_000);
+        await Task.Delay(7_000);
         EnqueueTutorialDialouge("Hello! I'm one of your many guides on how to play this game.");
         EnqueueTutorialDialouge("I will help you learn the basic commands.");
         EnqueueTutorialDialouge($"Let's start with a simple task: type `{Util.Format("help", StrSty.CMD_FUL)}` to see what commands are available.");
@@ -75,9 +76,9 @@ public class FileSysTutorialNode : TutorialNode {
     async void TutorialSpeak1() {
         ShellCore.OnHelpCMDrun -= TutorialSpeak1;
         await Task.Delay(1000);
-        EnqueueTutorialDialouge("Oh...", 4);
-        EnqueueTutorialDialouge("So there's *quite* a lot of stuff here...");
-        EnqueueTutorialDialouge("Well, let's start with the basics.");
+        EnqueueTutorialDialouge("Hm.");
+        EnqueueTutorialDialouge("So there's *quite* a lot of stuff here.");
+        EnqueueTutorialDialouge("Well. Let's start with the basics.");
         EnqueueTutorialDialouge($"To begin, run `{Util.Format("ls", StrSty.CMD_FUL)}`");
         _ = cm.RunDialogueAsync();
         ShellCore.LSrunCMD += TutorialSpeak2;
@@ -95,9 +96,9 @@ public class FileSysTutorialNode : TutorialNode {
         if (finalPath != "/irc-log/") {
             await Task.Delay(1000);
             EnqueueTutorialDialouge("Hmm... not in the correct folder, but it'll do.");
-            EnqueueTutorialDialouge($"You can see a file's content with `{Util.Format("cat <file_name>", StrSty.CMD_FUL)}`");
+            EnqueueTutorialDialouge($"You can see a file's content with `{Util.Format("read <file_name>", StrSty.CMD_FUL)}`");
             EnqueueTutorialDialouge($"And you can edit it with `{Util.Format("edit <file_name>", StrSty.CMD_FUL)}`");
-            EnqueueTutorialDialouge($"Try running `{Util.Format("cat /irc-log/cl3ver-b0y.txt", StrSty.CMD_FUL)}` to see the log of our conversation.");
+            EnqueueTutorialDialouge($"Try running `{Util.Format("read /irc-log/cl3ver-b0y.txt", StrSty.CMD_FUL)}` to see the log of our conversation.");
             _ = cm.RunDialogueAsync();
             ShellCore.CATrunCMD += TutorialSpeak4;
             ShellCore.EDITrunCMD += TutorialSpeak4;
@@ -105,9 +106,8 @@ public class FileSysTutorialNode : TutorialNode {
         }
         await Task.Delay(1000);
         EnqueueTutorialDialouge("Good job! Now you know how to change directories.");
-        EnqueueTutorialDialouge($"You can see a file's content with `{Util.Format("cat <file_name>", StrSty.CMD_FUL)}`");
-        EnqueueTutorialDialouge($"And you can edit it with `{Util.Format("edit <file_name>", StrSty.CMD_FUL)}`");
-        EnqueueTutorialDialouge($"Try running `{Util.Format("cat cl3ver-b0y.txt", StrSty.CMD_FUL)}` to see the log of our conversation.");
+        EnqueueTutorialDialouge($"You can see a file's content with `{Util.Format("read <file_name>", StrSty.CMD_FUL)}`");
+        EnqueueTutorialDialouge($"Try running `{Util.Format("read cl3ver-b0y.txt", StrSty.CMD_FUL)}` to see the log of our conversation.");
         _ = cm.RunDialogueAsync();
         ShellCore.CATrunCMD += TutorialSpeak4;
         ShellCore.EDITrunCMD += TutorialSpeak4;
@@ -141,10 +141,10 @@ public class ScriptTutorialNode : TutorialNode {
             NodeType.VM,
             parentNode,
             false,
-            [LockType.I4X]
+            [LocT.I4X]
         ) {
         cm = new ("cthuwu");
-        Init(10, 10);
+        Init(10, SecLvl.NOSEC);
         NodeConnected += TutorialNodeActivate;
     }
     public void TutorialNodeActivate() {
@@ -153,22 +153,19 @@ public class ScriptTutorialNode : TutorialNode {
         TutorialSpeak0();
     }
     async void TutorialSpeak0() {
-        NodeFile fileSuprise = new("FunniFile.lua", @$"MainModule:Say(""Hi :)\n"")");
-        EnqueueTutorialDialouge("Hey! Catch this >:)", 0);
-        await cm.RunDialogueAsync();
-        PlayerFileManager.FileSystem.AddDir("Download"); PlayerFileManager.FileSystem.GetDir("Download").Add(fileSuprise);
+        NodeFile fileSuprise = new("FunniFile.lua", @$"MainModule:Say(""Hi, I'm a script that do stuff. (JS variant available)\n"")");
         ShellCore.Say($"{Util.Format("FunniFile.lua", StrSty.FILE)} {Util.Format("has been added to your file system", StrSty.DECOR)}");
-        await Task.Delay(1000);
-        EnqueueTutorialDialouge($"Try running it with `{Util.Format("run /Download/FunniFile.lua", StrSty.CMD_FUL)}`");
-        _ = cm.RunDialogueAsync();
-
+        PlayerFileManager.FileSystem.AddDir("Download"); PlayerFileManager.FileSystem.GetDir("Download").Add(fileSuprise);
+        
+        EnqueueTutorialDialouge($"Hey! `{Util.Format("run <that_file_path_i_gave_ya>", StrSty.CMD_FUL)}`", 0);
+        await cm.RunDialogueAsync(silentSave:true);
         ShellCore.RUNrunCMD += TutorialSpeak1;
     }
     async void TutorialSpeak1(string actedPath, string finalPath, CError cer) {
         if (cer != CError.OK) {
             await Task.Delay(500);
             EnqueueTutorialDialouge("Hmm... something went wrong.");
-            EnqueueTutorialDialouge($"Make sure the script is there and `{Util.Format("run <file_path>", StrSty.CMD_FUL)}`");
+            EnqueueTutorialDialouge($"Make sure the script is there and do `{Util.Format("run <file_path>", StrSty.CMD_FUL)}`");
             _ = cm.RunDialogueAsync();
             return;
         }
@@ -185,7 +182,7 @@ public class ScriptTutorialNode : TutorialNode {
         if (cer != CError.OK) {
             await Task.Delay(500);
             EnqueueTutorialDialouge("Hmm... something went wrong.");
-            EnqueueTutorialDialouge($"Try running `{Util.Format("edit /Download/FunniFile.lua", StrSty.CMD_FUL)}` to see the script you just ran.");
+            EnqueueTutorialDialouge($"Run `{Util.Format("edit <file_path>", StrSty.CMD_FUL)}` with a valid file to progress.");
             _ = cm.RunDialogueAsync();
             return;
         }
@@ -194,14 +191,14 @@ public class ScriptTutorialNode : TutorialNode {
         EnqueueTutorialDialouge($"You can also create new scripts with `{Util.Format("mkf <file_name>", StrSty.CMD_FUL)}`");
         EnqueueTutorialDialouge($"Scripting is quite complicated. So the {Util.Format("Documentation", StrSty.GAME_WINDOW)} will be very helpful.");
         EnqueueTutorialDialouge("Here's a little gift.");
-        await cm.RunDialogueAsync();
+        await cm.RunDialogueAsync(silentSave:true);
         NodeFile fileGift = new("Attack.lua",
 @"-- You will see the use for them soon :)
 
 -- DO NOT TOUCH THIS PART!!!
 local xtractors = {""fl1p"",""2bin"",""der3f"",""bl4nk""}
 local colors = {""red"",""cyan"",""green"",""yellow"",""blue"",""magenta"",""white"",""black""}
--- ""DO NOT TOUCH THIS PART!!!"" ends
+-- DO NOT TOUCH THIS PART!!! end
 
 -- Shortened name of the modules for convenience.
 local mai, net, fio, bot, kar = MainModule, NetworkModule, FileModule, BotNetModule, KaraxeModule");
@@ -228,10 +225,10 @@ public class KaraxeTutorialNode : TutorialNode {
             NodeType.VM,
             parentNode,
             false,
-            [LockType.I4X]
+            [LocT.I4X]
         ) {
         cm = new("Karaxe");
-        Init(10, 10);
+        Init(10, SecLvl.NOSEC);
         NodeConnected += TutorialNodeActivate;
     }
     public void TutorialNodeActivate() {
@@ -295,11 +292,11 @@ public class KaraxeTutorialNode : TutorialNode {
         EnqueueTutorialDialouge("Cool. There's number and a fancy word there.");
         EnqueueTutorialDialouge("Ignore everything");
         EnqueueTutorialDialouge("The only important thing now is the `Firewall rating` and `Security Level`");
-        EnqueueTutorialDialouge("`Security Level` is the approximated amount of locks you have to bypass to break a node.");
-        EnqueueTutorialDialouge("`Firewall rating` is the the amount of locks + traps a node security system might have.");
-        EnqueueTutorialDialouge("Until you are prepared, a good rule of thumb is to avoid node with Security Level and Firewall rating having different color");
-        EnqueueTutorialDialouge("Unless it's NOSEC, that is free food.");
-        EnqueueTutorialDialouge($"For now, let's try to break it, run `{Util.Format("karaxe --flare", StrSty.CMD_FUL)}` to begin.");
+        EnqueueTutorialDialouge("`Firewall rating` is the the amount of locks a node security system have.");
+        EnqueueTutorialDialouge("`Security Level` is how hard the lock is.");
+        EnqueueTutorialDialouge($"Until you are prepared, see the `Lock details` section in the {Util.Format("Documentation", StrSty.GAME_WINDOW)}.");
+        EnqueueTutorialDialouge($"Unless it's [color={Util.ColorMapperSecLvl("NOSEC")}]NOSEC[/color], that is free food.");
+        EnqueueTutorialDialouge($"For now, let's try to break it, run `{Util.Format("karaxe --flr", StrSty.CMD_FUL)}` to begin.");
         _ = cm.RunDialogueAsync();
         if (ShellCore.RemainingTime > 10) RushTutorialSpeak3();
         else ShellCore.KaraxeBegin += TutorialSpeak3;
@@ -320,7 +317,7 @@ public class KaraxeTutorialNode : TutorialNode {
         EnqueueTutorialDialouge($"Normally the sector will [color={Util.CC(Cc.R)}]BAN[/color] you after this period is over, but this is exempted for training purpose");
         EnqueueTutorialDialouge($"You can use {Util.Format("arrows key", StrSty.HEADER)} to cycle between old command.");
         EnqueueTutorialDialouge($"Or copy them from the terminal to save time typing.");
-        EnqueueTutorialDialouge($"Now run this `{Util.Format("karaxe --attack", StrSty.CMD_FUL)}`. Just do it.");
+        EnqueueTutorialDialouge($"Now run `{Util.Format("karaxe --atk", StrSty.CMD_FUL)}`. Just do it.");
         _ = cm.RunDialogueAsync();
         ShellCore.KaraxeAttack += TutorialSpeak4_Attack;
         ShellCore.KaraxeEnd += TutorialSpeak4_End;
@@ -329,7 +326,7 @@ public class KaraxeTutorialNode : TutorialNode {
         EnqueueTutorialDialouge("...", 2);
         EnqueueTutorialDialouge("You failed.");
         EnqueueTutorialDialouge("We go again.");
-        EnqueueTutorialDialouge($"Run `{Util.Format("karaxe --flare", StrSty.CMD_FUL)}`");
+        EnqueueTutorialDialouge($"Run `{Util.Format("karaxe --flr", StrSty.CMD_FUL)}`");
         _ = cm.RunDialogueAsync();
     }
     async void TutorialSpeak4_Attack((CError, string, string, string)[] result) {
@@ -342,9 +339,7 @@ public class KaraxeTutorialNode : TutorialNode {
             EnqueueTutorialDialouge("Good job buddy B)");
             EnqueueTutorialDialouge("Now get out there and enjoy the game.");
             EnqueueTutorialDialouge("Hacked node will give you materials over time, and help crafting stuff that sells money, erghh etc...");
-            EnqueueTutorialDialouge("Look, it's a lot. Read the doc, ja? -_-");
-            EnqueueTutorialDialouge("That's all now. If you have any problem, email me ^^");
-            EnqueueTutorialDialouge("Bye bye ( ´ ▽ `)ﾉシ");
+            EnqueueTutorialDialouge($"The game is complicated, so use the {Util.Format("help", StrSty.CMD_FUL)} command and the {Util.Format("Documentation", StrSty.GAME_WINDOW)} often.");
             PlayerDataManager.CompletedTutorial = true; // Mark the tutorial as completed
             _ = cm.RunDialogueAsync();
             return;
@@ -359,7 +354,7 @@ public class KaraxeTutorialNode : TutorialNode {
                 if (locF == "--i4") EnqueueTutorialDialouge("The answer is one of the first 4 positive natural number. Try each one.");
                 else if (locF == "--2xtract") EnqueueTutorialDialouge($"The answer is one of the 4 phrase `{Util.Format("fl1p", StrSty.CMD_ARG)}`, `{Util.Format("2bin", StrSty.CMD_ARG)}`, `{Util.Format("der3f", StrSty.CMD_ARG)}`, `{Util.Format("bl4nk", StrSty.CMD_ARG)}`. Try each one.");
             } else if (locN == "C0"){
-                if (locF == "--c0") EnqueueTutorialDialouge("The answer is the color name opposite to the one you see in the terminal.");
+                if (locF == "--c0") EnqueueTutorialDialouge($"The answer is the color name opposite to the one you see in the terminal. The full color list is: [color={Util.CC(Cc.R)}]red[/color], [color={Util.CC(Cc.G)}]green[/color], [color={Util.CC(Cc.B)}]blue[/color], [color={Util.CC(Cc.C)}]cyan[/color], [color={Util.CC(Cc.M)}]magenta[/color], [color={Util.CC(Cc.Y)}]yellow[/color], [color={Util.CC(Cc.W)}]white[/color] and [color={Util.CC(Cc.w)}]black[/color]");
             }
             _ = cm.RunDialogueAsync();
             return;
@@ -415,7 +410,7 @@ public class ChatManager {
     /// Run the dialogue processing asynchronously.
     /// </summary>
     /// <returns></returns>
-    public async Task RunDialogueAsync() {
+    public async Task RunDialogueAsync(bool silentSave=false) {
         _cts = new CancellationTokenSource();
         CancellationToken token = _cts.Token;
 
@@ -426,26 +421,26 @@ public class ChatManager {
             (string content, double delay) = _dialogueQueue.Dequeue();
             _pauseEvent.Wait(); // Check again before printing
             string timeHash = Util.GetFnv1aTimeHash();
-            ShellCore.Say($"[{Util.Format(timeHash, StrSty.DECOR)}] <{Util.Format(CharacterName, StrSty.USERNAME)}> {content}");
+            ShellCore.Say($"\n[color={Util.CC(Cc.w)}][[/color][color={Util.CC(Cc._)}]{timeHash}[/color][color={Util.CC(Cc.w)}]][/color] <{Util.Format(CharacterName, StrSty.USERNAME)}> {content}");
             await Task.Delay(Util.SkipDialogues ? 0 : delay >= 0 ? Mathf.CeilToInt(delay * 1000) : Mathf.CeilToInt(EstimateReadingTime(content) * 1000), token);
             cache += $"[{timeHash}] <{CharacterName}> {Util.RemoveBBCode(content)}\n";
         }
-        await Task.Delay(100);
-        LogToFileSys(CharacterName, cache);
+        await Task.Delay(20);
+        LogToFileSys(CharacterName, cache, silentSave);
     }
     /// <summary>
     /// Log the dialogue to the file system for player reference in the future.
     /// </summary>
     /// <param name="user">If this parameter is the same across multiple object, they will are write to same file.</param>
     /// <param name="msg">Content of the message, include all custom IRC-styled formatting, removed BBCode</param>
-    static void LogToFileSys(string user, string msg) {
+    static void LogToFileSys(string user, string msg, bool silentSave) {
         string folder = "/irc-log", file = StringExtensions.PathJoin(folder, $"{user}.txt");
         if (PlayerFileManager.FileSystem.GetDir(folder) == null)
             PlayerFileManager.FileSystem.AddDir(folder);
         if (PlayerFileManager.FileSystem.GetFile(file) == null)
             PlayerFileManager.FileSystem.AddFile(file);
         PlayerFileManager.FileSystem.GetFile(file).Content += msg;
-        ShellCore.Say($"[color={Util.CC(Cc.w)}]Communication log saved to {Util.Format(file, StrSty.FILE)}[/color]");
+        if (!silentSave) ShellCore.Say($"[color={Util.CC(Cc.w)}]Communication log saved to {Util.Format(file, StrSty.FILE)}[/color]");
     }
     /// <summary>
     /// Estimate the reading time for a message based on its length.
@@ -454,7 +449,7 @@ public class ChatManager {
     /// <returns></returns>
     static double EstimateReadingTime(string message) {
         const double baseTime = .333;          // seconds, for prompt comprehension
-        const double charsPerSecond = 31.0;   // customizable pace
+        const double charsPerSecond = 28.0;   // customizable pace
 
         string clean = Util.RemoveBBCode(message);
         return baseTime + (clean.Length / charsPerSecond);

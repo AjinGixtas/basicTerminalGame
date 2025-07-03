@@ -143,6 +143,7 @@ This program allows you to attack nodes and bypass their security systems.
 		
 		(CError, string, string, string)[] result = Attack(farg);
 		KARrunCMD?.Invoke(result);
+		Dictionary<string, string> inputs = [];
 		for (int i = 0; i < result.Length; ++i) {
 			(CError, string, string, string) res = result[i];
             if (res.Item1 == CError.OK) {
@@ -157,14 +158,14 @@ This program allows you to attack nodes and bypass their security systems.
             if (res.Item1 == CError.MISSING) {
 				ShellCore.Say($"[{Util.Format("N0VALUE", StrSty.ERROR)}] {Util.Format("Denied access by", StrSty.DECOR)} {Util.Format(res.Item2, StrSty.NODE_LOCK)}");
 				ShellCore.Say("-r", $"Missing key for {Util.Format(res.Item3, StrSty.CMD_FLAG)}");
-				ShellCore.Say($"[color={Util.CC(Cc.W)}]{res.Item4}[/color]");
-				continue;
+				inputs[res.Item2] = res.Item4;
+                continue;
 			} 
 			if (res.Item1 == CError.INCORRECT) {
 				ShellCore.Say($"[{Util.Format("WRON6KY", StrSty.ERROR)}] {Util.Format("Denied access by", StrSty.DECOR)} {Util.Format(res.Item2, StrSty.NODE_LOCK)}");
 				ShellCore.Say("-r", $"Incorrect key for {Util.Format(res.Item3, StrSty.CMD_FLAG)}");
-				ShellCore.Say($"[color={Util.CC(Cc.W)}]{res.Item4}[/color]");
-				continue;
+				inputs[res.Item2] = res.Item4;
+                continue;
 			} 
 			if (res.Item1 == CError.MISSING) {
 				ShellCore.Say($"[{Util.Format("MI55ING", StrSty.ERROR)}] {Util.Format("Denied access by", StrSty.DECOR)} {Util.Format(res.Item2, StrSty.NODE_LOCK)}");
@@ -179,7 +180,10 @@ This program allows you to attack nodes and bypass their security systems.
 			ShellCore.Say($"[{Util.Format("UNK??WN", StrSty.ERROR)}] {Util.Format("Denied access by", StrSty.DECOR)} {Util.Format(res.Item2, StrSty.NODE_LOCK)}");
 			ShellCore.Say("-r", $"Unknown error for {Util.Format(res.Item3, StrSty.CMD_FLAG)}");
 		}
-	}
+		foreach (string k in inputs.Keys) {
+			ShellCore.Say($"[color={Util.CC(Cc.W)}]{inputs[k]}[/color]");
+        }
+    }
 	public static event Action KaraxeEnd;
     public static void EndFlare() {
 		endEpoch = 0;
@@ -242,7 +246,7 @@ This program allows you to attack nodes and bypass their security systems.
 {Util.Format("Display name:", StrSty.DECOR),padLength}{Util.Format(analyzeNode.DisplayName, StrSty.DISPLAY_NAME)}
 {Util.Format("▶ Classification", StrSty.HEADER)}
 {Util.Format("Firewall rating:", StrSty.DECOR),padLength}{Util.Format($"{analyzeNode.DefLvl}", StrSty.DEF_LVL)}
-{Util.Format("Security Level:", StrSty.DECOR),padLength}{Util.Format($"{analyzeNode.SecType}", StrSty.SEC_TYPE)}
+{Util.Format("Security Level:", StrSty.DECOR),padLength}{Util.Format($"{analyzeNode.SecLvl}", StrSty.SEC_TYPE)}
 ");
 		ANALYZErunCMD?.Invoke(CError.OK, positionalArgs[0]);
 	}

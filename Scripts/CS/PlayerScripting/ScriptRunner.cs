@@ -51,7 +51,7 @@ public static class ScriptRunner {
         script.Globals["BotNetModule"] = new HackFarmModule();
         script.Globals["FileModule"] = new FileModule();
         script.Globals["CError"] = new CError();
-        script.Globals["SecurityType"] = new SecurityType();
+        script.Globals["SecurityType"] = new SecLvl();
         script.Globals["MainModule"] = new MainModule();
 
         Table flagArgsTable = new(script);
@@ -96,7 +96,7 @@ public static class ScriptRunner {
             { "BotNetModule", new HackFarmModule() },
             { "FileModule", new FileModule() },
             { "CError", new CError() },
-            { "SecurityType", new SecurityType() },
+            { "SecurityType", new SecLvl() },
             { "MainModule", new MainModule() },
             { "CraftModule", new CraftModule() },
         };
@@ -211,7 +211,7 @@ public static class ScriptRunner {
             await CSharpScript.EvaluateAsync(
                 scriptContent,
                 Microsoft.CodeAnalysis.Scripting.ScriptOptions.Default
-                    .WithImports("System", "System.Collections.Generic").AddReferences(typeof(NetworkModule).Assembly, typeof(CrackModule).Assembly, typeof(HackFarmModule).Assembly, typeof(FileModule).Assembly, typeof(CError).Assembly, typeof(SecurityType).Assembly, typeof(MainModule).Assembly).AddImports("BasicTerminalGame"),
+                    .WithImports("System", "System.Collections.Generic").AddReferences(typeof(NetworkModule).Assembly, typeof(CrackModule).Assembly, typeof(HackFarmModule).Assembly, typeof(FileModule).Assembly, typeof(CError).Assembly, typeof(SecLvl).Assembly, typeof(MainModule).Assembly).AddImports("BasicTerminalGame"),
                 globalsWrapper
             );
         } catch (CompilationErrorException ex) {
@@ -247,7 +247,7 @@ public static class ScriptRunner {
         public HackFarmModule HackFarmModule;
         public FileModule FileModule;
         public CError CError;
-        public SecurityType SecurityType;
+        public SecLvl SecurityType;
         public MainModule MainModule;
     }
     

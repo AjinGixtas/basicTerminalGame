@@ -5,8 +5,8 @@ public static partial class ShellCore {
     }
 
     public static void OnCommandFieldTextChanged() {
-        int pastCaretPos = terminalCommandField.GetCaretColumn();
-        terminalCommandField.Text = terminalCommandField.Text.Replace("\n", "").Replace("\r", "");
-        terminalCommandField.SetCaretColumn(pastCaretPos);
+        int pastCaretPos = TINP_Field.GetCaretColumn();
+        TINP_Field.Text = TINP_Field.Text.Replace("\n", "").Replace("\r", "");
+        TINP_Field.SetCaretColumn(pastCaretPos);
     }
 }

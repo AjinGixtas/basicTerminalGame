@@ -12,7 +12,7 @@ public static partial class ShellCore {
             _commandHistoryIndex = cmdHistory.Count;
         }
         string[] commands = Util.SplitCommands(newCMD);
-        Say("-n", $"{terminalCommandPrompt.Text.Replace("\r", "").Replace("\n", "")}{Util.Format(Util.EscapeBBCode(newCMD), StrSty.CMD_FUL)}");
+        Say("-n", $"{TCMD_Prompt.Text.Replace("\r", "").Replace("\n", "")}{Util.Format(Util.EscapeBBCode(newCMD), StrSty.CMD_FUL)}");
         queuedAction = ExecuteCommands;
         queuedCommands = commands;
         StartProcess(GD.Randf()*.5+.2);
@@ -53,8 +53,8 @@ public static partial class ShellCore {
             case "connect": Connect(farg, parg); break; // Connect to node
             case "analyze": Analyze(farg, parg); break; // Give data about a node
             case "setname": SetName(farg, parg); break; // Set name of user and node
-            
-            
+
+            case "sidebar": Sidebar(farg, parg); break; // Open sidebar menu
             case "karaxe": Karaxe(farg, parg); break; // karaxe.exe
             case "mifarm": MiFarm(farg, parg); break; // mifarm.exe
             case "bitrader": BiTrader(farg, parg); break; // bitrader.exe

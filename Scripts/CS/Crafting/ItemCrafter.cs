@@ -5,16 +5,16 @@ using System.Linq;
 public static class ItemCrafter {
     /*
      *  MineralAccessLevel                                                      HighestCraftableIDs
-                      0                                                                     [20]
-                      1                                                                     [21]
-                      2                                                             [21, 24, 25]
-                      3                                                     [21, 24, 25, 27, 40]
-                      4                                             [21, 24, 25, 27, 31, 40, 45]
-                      5                                         [21, 24, 25, 27, 31, 36, 40, 45]
-                      6                                     [21, 24, 25, 27, 31, 36, 40, 42, 45]
-                      7                             [21, 24, 25, 27, 31, 36, 40, 42, 45, 48, 50]
-                      8             [21, 24, 25, 27, 31, 36, 40, 42, 45, 48, 50, 54, 71, 73, 75]
-                      9 [21, 24, 25, 27, 31, 36, 40, 42, 45, 48, 50, 54, 60, 71, 72, 73, 74, 75]
+                      0                                                                     [10]
+                      1                                                                     [11]
+                      2                                                             [11, 14, 15]
+                      3                                                     [11, 14, 15, 17, 30]
+                      4                                             [11, 14, 15, 17, 21, 30, 35]
+                      5                                         [11, 14, 15, 17, 21, 26, 30, 35]
+                      6                                     [11, 14, 15, 17, 21, 26, 30, 32, 35]
+                      7                             [11, 14, 15, 17, 21, 26, 30, 32, 35, 38, 40]
+                      8             [11, 14, 15, 17, 21, 26, 30, 32, 35, 38, 40, 44, 61, 63, 65]
+                      9 [11, 14, 15, 17, 21, 26, 30, 32, 35, 38, 40, 44, 50, 61, 62, 63, 64, 65]
      */
     public static readonly ItemData[] MINERALS = [
         new ItemData("Datacite",  "DC!", 0, 1, Cc.r),
@@ -28,77 +28,66 @@ public static class ItemCrafter {
         new ItemData("Synthite",  "SY!", 8, 24, Cc.rB),
         new ItemData("Oblivium",  "OB!", 9, 32, Cc.gR),
     ];
-    public static readonly CraftableItemData[] REFINED_MATERIALS = new[] {
-        new CraftableItemData("RefinedDatacite"    , "DC&", 10, Cc.r , 1.000000,  10, [new(0, 5)]),
-        new CraftableItemData("RefinedBitron"      , "BT&", 11, Cc.g , 1.200000,  20, [new(1, 5)]),
-        new CraftableItemData("RefinedCachelium"   , "CH&", 12, Cc.b , 1.400000,  30, [new(2, 5)]),
-        new CraftableItemData("RefinedFerrosync"   , "FS&", 13, Cc.c , 1.600000,  40, [new(3, 5)]),
-        new CraftableItemData("RefinedNexium"      , "NX&", 14, Cc.m , 1.800000,  60, [new(4, 5)]),
-        new CraftableItemData("RefinedFractyl"     , "FT&", 15, Cc.y , 2.000000,  80, [new(5, 5)]),
-        new CraftableItemData("RefinedAlgorite"    , "AG&", 16, Cc.gB, 2.200000, 120, [new(6, 5)]),
-        new CraftableItemData("RefinedQuantar"     , "QT&", 17, Cc.bG, 2.400000, 160, [new(7, 5)]),
-        new CraftableItemData("RefinedSynthite"    , "SY&", 18, Cc.rB, 2.600000, 240, [new(8, 5)]),
-        new CraftableItemData("RefinedOblivium"    , "OB&", 19, Cc.gR, 2.800000, 320, [new(9, 5)]),
-    };
+    public static readonly CraftableItemData[] REFINED_MATERIALS = [];
 
-    public static readonly CraftableItemData[] COMPONENTS = new[] {
-        new CraftableItemData("ExploitTemplate"            , "XTP^", 20, Cc.r ,  3.015830,     140, [new(10, 1)]),
-        new CraftableItemData("BitCore"                    , "BIT^", 21, Cc.g ,  3.394329,     165, [new(11, 1)]),
-        new CraftableItemData("SynthBlock"                 , "SYN^", 22, Cc.LR,  4.100987,     395, [new(11, 1), new(10, 1), new(20, 1)]),
-        new CraftableItemData("PatchKernel"                , "PAT^", 23, Cc.LM,  2.893386,     190, [new(11, 1), new(10, 1)]),
-        new CraftableItemData("ChainFiber"                 , "CHA^", 24, Cc.b ,  2.942595,     195, [new(12, 1)]),
-        new CraftableItemData("HashAlloy"                  , "HAS^", 25, Cc.LY,  1.677259,     900, [new(11, 1), new(12, 1), new(22, 1)]),
-        new CraftableItemData("CryptoMesh"                 , "CRY^", 26, Cc.bG,  2.651109,     250, [new(11, 1), new(12, 1), new(10, 1)]),
-        new CraftableItemData("FirewallShell"              , "FIR^", 27, Cc.c ,  3.249908,     230, [new(13, 1)]),
-        new CraftableItemData("HashVeil"                   , "VEI^", 28, Cc.Y ,  2.633581,     275, [new(12, 1), new(13, 1)]),
-        new CraftableItemData("ForkedPatch"                , "FOK^", 29, Cc.LG,  5.502313,    1115, [new(23, 1), new(22, 1)]),
-        new CraftableItemData("ChainLattice"               , "LAT^", 30, Cc.LC,  5.083777,     630, [new(12, 1), new(26, 1)]),
-        new CraftableItemData("NeuroChip"                  , "NEU^", 31, Cc.m ,  2.608146,     280, [new(14, 1)]),
-        new CraftableItemData("EncryptedMatrix"            , "ENC^", 32, Cc.LB,  5.753381,    1050, [new(26, 1), new(28, 1)]),
-        new CraftableItemData("SecurityWeave"              , "SEC^", 33, Cc.m ,  5.531502,    1280, [new(13, 1), new(30, 1)]),
-        new CraftableItemData("BreachNet"                  , "BRE^", 34, Cc.LM, 10.720541,    3640, [new(13, 1), new(30, 1), new(29, 1)]),
-        new CraftableItemData("NeuralCloak"                , "NCL^", 35, Cc.g ,  5.627896,     760, [new(28, 1), new(14, 1)]),
-        new CraftableItemData("FluxThread"                 , "FLU^", 36, Cc.y ,  2.669393,     340, [new(15, 1)]),
-        new CraftableItemData("LatticeFork"                , "LFK^", 37, Cc.LB, 10.848897,    3600, [new(30, 1), new(29, 1)]),
-        new CraftableItemData("SchrodingerProcess"         , "SRP^", 38, Cc.G ,  7.807893,    1950, [new(15, 1), new(28, 1), new(30, 1)]),
-        new CraftableItemData("ProxyArmor"                 , "PRX^", 39, Cc.M ,  7.328460,    4010, [new(13, 1), new(32, 1), new(29, 1)]),
-        new CraftableItemData("IntrusionPlate"             , "INP^", 40, Cc.Y ,  9.802084,    8205, [new(30, 1), new(34, 1)]),
-        new CraftableItemData("ScriptKiddieKit"            , "SKK^", 41, Cc.C ,  4.187388,     795, [new(15, 1), new(28, 1)]),
-        new CraftableItemData("AugmentModule"              , "AUG^", 42, Cc.gB,  3.010945,     440, [new(16, 1)]),
-        new CraftableItemData("GuardianThread"             , "GUT^", 43, Cc.gR,  8.855684,    2795, [new(16, 1), new(33, 1)]),
-        new CraftableItemData("CanaryMimicry"              , "CMY^", 44, Cc.rB,  9.800926,    2995, [new(16, 1), new(33, 1), new(14, 1)]),
-        new CraftableItemData("StealthCradle"              , "SCR^", 45, Cc.LR,  8.721571,    8845, [new(39, 1), new(35, 1)]),
-        new CraftableItemData("NeuralPhantom"              , "NPH^", 46, Cc.B ,  8.183034,    1735, [new(35, 1), new(14, 1)]),
-        new CraftableItemData("ExoPhantom"                 , "EXP^", 47, Cc.c ,  9.000472,   12540, [new(39, 1), new(41, 1), new(38, 1)]),
-        new CraftableItemData("InhumanPretender"           , "IHP^", 48, Cc.rB,  2.681638,     530, [new(17, 1)]),
-        new CraftableItemData("PhantomFork"                , "PFK^", 49, Cc.LM, 13.199542,   11380, [new(37, 1), new(46, 1)]),
-        new CraftableItemData("ZalgoScript"                , "ZSC^", 50, Cc.m ,  6.617419,   10545, [new(16, 1), new(41, 1), new(17, 1)]),
-        new CraftableItemData("StealthBranch"              , "STB^", 51, Cc.rG, 14.948797,   35575, [new(37, 1), new(47, 1)]),
-        new CraftableItemData("SentinelMind"               , "SEM^", 52, Cc.gB, 10.315860,   14585, [new(43, 1), new(44, 1), new(46, 1)]),
-        new CraftableItemData("GuardianEcho"               , "GUE^", 53, Cc.LY, 15.567694,   34425, [new(43, 1), new(47, 1)]),
-        new CraftableItemData("SysCore"                    , "SYS^", 54, Cc.rB,  2.800820,     680, [new(18, 1)]),
-        new CraftableItemData("SeedScript"                 , "SEE^", 55, Cc.C , 10.273040,   28170, [new(16, 1), new(52, 1)]),
-        new CraftableItemData("GhostShard"                 , "GHS^", 56, Cc.bG, 10.947519,    9810, [new(44, 1), new(46, 1), new(17, 1)]),
-        new CraftableItemData("CyberWarden"                , "CYW^", 57, Cc.LR, 17.190877,  163625, [new(53, 1), new(51, 1), new(18, 1)]),
-        new CraftableItemData("TypoSquatter"               , "TSQ^", 58, Cc.LC, 12.537649,   49010, [new(47, 1), new(49, 1)]),
-        new CraftableItemData("PhantomPrism"               , "PHP^", 59, Cc.LM, 13.221346,  101695, [new(44, 1), new(53, 1), new(49, 1)]),
-        new CraftableItemData("ObsidianBit"                , "OBI^", 60, Cc.gR,  3.401000,     845, [new(19, 1)]),
-        new CraftableItemData("RegexUnderstander"          , "RUS^", 61, Cc.LM, 19.922977,  531345, [new(57, 1), new(58, 1), new(17, 1)]),
-        new CraftableItemData("MindConflux"                , "MCO^", 62, Cc.LG, 13.980728,  378870, [new(52, 1), new(57, 1)]),
-        new CraftableItemData("EncryptedEcho"              , "ENE^", 63, Cc.M , 15.205651,  302790, [new(59, 1), new(51, 1), new(17, 1)]),
-        new CraftableItemData("SysFork"                    , "SYF^", 64, Cc.B , 12.252784,   23825, [new(49, 1), new(18, 1)]),
-        new CraftableItemData("ShadowBranch"               , "SHB^", 65, Cc.LB, 15.944953,  136080, [new(49, 1), new(58, 1)]),
-        new CraftableItemData("NexusSentinel"              , "NES^", 66, Cc.g , 16.493059,  437865, [new(55, 1), new(57, 1)]),
-        new CraftableItemData("EchoEngine"                 , "ECE^", 67, Cc.c , 14.923621, 1010360, [new(63, 1), new(65, 1), new(64, 1)]),
-        new CraftableItemData("SuperEvilVirus.exe"         , "SEV^", 68, Cc.b , 20.065295, 1585610, [new(59, 1), new(61, 1)]),
-        new CraftableItemData("GhostCrucible"              , "GCR^", 69, Cc.C , 13.038487,  302345, [new(56, 1), new(65, 1), new(19, 1)]),
-        new CraftableItemData("CyberLink"                  , "CYL^", 70, Cc.y , 16.714432,  688160, [new(57, 1), new(65, 1)]),
-        new CraftableItemData("VulnerabilityReportScraper" , "VRS^", 71, Cc.m , 21.672533, 4918845, [new(63, 1), new(68, 1)]),
-        new CraftableItemData("SpectralTunnel"             , "SPT^", 72, Cc.LY, 21.550311, 1571925, [new(63, 1), new(69, 1)]),
-        new CraftableItemData("ReflectionCore"             , "RFC^", 73, Cc.LR, 18.227775, 6202845, [new(68, 1), new(67, 1)]),
-        new CraftableItemData("NexusAnchor"                , "NEA^", 74, Cc.LM, 20.348825, 3653410, [new(66, 1), new(67, 1), new(19, 1)]),
-        new CraftableItemData("WardenFrame"                , "WAF^", 75, Cc.B , 19.925959, 6619795, [new(62, 1), new(68, 1), new(69, 1)]),
-    };
+    public static readonly CraftableItemData[] COMPONENTS = [
+        new CraftableItemData("ExploitTemplate", "XTP^", 10, Cc.r, 3.015830, 140, [new(0, 1)]),
+        new CraftableItemData("BitCore", "BIT^", 11, Cc.g, 3.394329, 165, [new(1, 1)]),
+        new CraftableItemData("SynthBlock", "SYN^", 12, Cc.LR, 4.100987, 395, [new(1, 1), new(0, 1), new(10, 1)]),
+        new CraftableItemData("PatchKernel", "PAT^", 13, Cc.LM, 2.893386, 190, [new(1, 1), new(0, 1)]),
+        new CraftableItemData("ChainFiber", "CHA^", 14, Cc.b, 2.942595, 195, [new(2, 1)]),
+        new CraftableItemData("HashAlloy", "HAS^", 15, Cc.LY, 1.677259, 900, [new(1, 1), new(2, 1), new(12, 1)]),
+        new CraftableItemData("CryptoMesh", "CRY^", 16, Cc.bG, 2.651109, 250, [new(1, 1), new(2, 1), new(0, 1)]),
+        new CraftableItemData("FirewallShell", "FIR^", 17, Cc.c, 3.249908, 230, [new(3, 1)]),
+        new CraftableItemData("HashVeil", "VEI^", 18, Cc.Y, 2.633581, 275, [new(2, 1), new(3, 1)]),
+        new CraftableItemData("ForkedPatch", "FOK^", 19, Cc.LG, 5.502313, 1115, [new(13, 1), new(12, 1)]),
+        new CraftableItemData("ChainLattice", "LAT^", 20, Cc.LC, 5.083777, 630, [new(2, 1), new(16, 1)]),
+        new CraftableItemData("NeuroChip", "NEU^", 21, Cc.m, 2.608146, 280, [new(4, 1)]),
+        new CraftableItemData("EncryptedMatrix", "ENC^", 22, Cc.LB, 5.753381, 1050, [new(16, 1), new(18, 1)]),
+        new CraftableItemData("SecurityWeave", "SEC^", 23, Cc.m, 5.531502, 1280, [new(3, 1), new(20, 1)]),
+        new CraftableItemData("BreachNet", "BRE^", 24, Cc.LM, 10.720541, 3640, [new(3, 1), new(20, 1), new(19, 1)]),
+        new CraftableItemData("NeuralCloak", "NCL^", 25, Cc.g, 5.627896, 760, [new(18, 1), new(4, 1)]),
+        new CraftableItemData("FluxThread", "FLU^", 26, Cc.y, 2.669393, 340, [new(5, 1)]),
+        new CraftableItemData("LatticeFork", "LFK^", 27, Cc.LB, 10.848897, 3600, [new(20, 1), new(19, 1)]),
+        new CraftableItemData("SchrodingerProcess", "SRP^", 28, Cc.G, 7.807893, 1950, [new(5, 1), new(18, 1), new(20, 1)]),
+        new CraftableItemData("ProxyArmor", "PRX^", 29, Cc.M, 7.328460, 4010, [new(3, 1), new(22, 1), new(19, 1)]),
+        new CraftableItemData("IntrusionPlate", "INP^", 30, Cc.Y, 9.802084, 8205, [new(20, 1), new(24, 1)]),
+        new CraftableItemData("ScriptKiddieKit", "SKK^", 31, Cc.C, 4.187388, 795, [new(5, 1), new(18, 1)]),
+        new CraftableItemData("AugmentModule", "AUG^", 32, Cc.gB, 3.010945, 440, [new(6, 1)]),
+        new CraftableItemData("GuardianThread", "GUT^", 33, Cc.gR, 8.855684, 2795, [new(6, 1), new(23, 1)]),
+        new CraftableItemData("CanaryMimicry", "CMY^", 34, Cc.rB, 9.800926, 2995, [new(6, 1), new(23, 1), new(4, 1)]),
+        new CraftableItemData("StealthCradle", "SCR^", 35, Cc.LR, 8.721571, 8845, [new(29, 1), new(25, 1)]),
+        new CraftableItemData("NeuralPhantom", "NPH^", 36, Cc.B, 8.183034, 1735, [new(25, 1), new(4, 1)]),
+        new CraftableItemData("ExoPhantom", "EXP^", 37, Cc.c, 9.000472, 12540, [new(29, 1), new(31, 1), new(28, 1)]),
+        new CraftableItemData("InhumanPretender", "IHP^", 38, Cc.rB, 2.681638, 530, [new(7, 1)]),
+        new CraftableItemData("PhantomFork", "PFK^", 39, Cc.LM, 13.199542, 11380, [new(27, 1), new(36, 1)]),
+        new CraftableItemData("ZalgoScript", "ZSC^", 40, Cc.m, 6.617419, 10545, [new(6, 1), new(31, 1), new(7, 1)]),
+        new CraftableItemData("StealthBranch", "STB^", 41, Cc.rG, 14.948797, 35575, [new(27, 1), new(37, 1)]),
+        new CraftableItemData("SentinelMind", "SEM^", 42, Cc.gB, 10.315860, 14585, [new(33, 1), new(34, 1), new(36, 1)]),
+        new CraftableItemData("GuardianEcho", "GUE^", 43, Cc.LY, 15.567694, 34425, [new(33, 1), new(37, 1)]),
+        new CraftableItemData("SysCore", "SYS^", 44, Cc.rB, 2.800820, 680, [new(8, 1)]),
+        new CraftableItemData("SeedScript", "SEE^", 45, Cc.C, 10.273040, 28170, [new(6, 1), new(42, 1)]),
+        new CraftableItemData("GhostShard", "GHS^", 46, Cc.bG, 10.947519, 9810, [new(34, 1), new(36, 1), new(7, 1)]),
+        new CraftableItemData("CyberWarden", "CYW^", 47, Cc.LR, 17.190877, 163625, [new(43, 1), new(41, 1), new(8, 1)]),
+        new CraftableItemData("TypoSquatter", "TSQ^", 48, Cc.LC, 12.537649, 49010, [new(37, 1), new(39, 1)]),
+        new CraftableItemData("PhantomPrism", "PHP^", 49, Cc.LM, 13.221346, 101695, [new(34, 1), new(43, 1), new(39, 1)]),
+        new CraftableItemData("ObsidianBit", "OBI^", 50, Cc.gR, 3.401000, 845, [new(9, 1)]),
+        new CraftableItemData("RegexUnderstander", "RUS^", 51, Cc.LM, 19.922977, 531345, [new(47, 1), new(48, 1), new(7, 1)]),
+        new CraftableItemData("MindConflux", "MCO^", 52, Cc.LG, 13.980728, 378870, [new(42, 1), new(47, 1)]),
+        new CraftableItemData("EncryptedEcho", "ENE^", 53, Cc.M, 15.205651, 302790, [new(49, 1), new(41, 1), new(7, 1)]),
+        new CraftableItemData("SysFork", "SYF^", 54, Cc.B, 12.252784, 23825, [new(39, 1), new(8, 1)]),
+        new CraftableItemData("ShadowBranch", "SHB^", 55, Cc.LB, 15.944953, 136080, [new(39, 1), new(48, 1)]),
+        new CraftableItemData("NexusSentinel", "NES^", 56, Cc.g, 16.493059, 437865, [new(45, 1), new(47, 1)]),
+        new CraftableItemData("EchoEngine", "ECE^", 57, Cc.c, 14.923621, 1010360, [new(53, 1), new(55, 1), new(54, 1)]),
+        new CraftableItemData("SuperEvilVirus.exe", "SEV^", 58, Cc.b, 20.065295, 1585610, [new(49, 1), new(51, 1)]),
+        new CraftableItemData("GhostCrucible", "GCR^", 59, Cc.C, 13.038487, 302345, [new(46, 1), new(55, 1), new(9, 1)]),
+        new CraftableItemData("CyberLink", "CYL^", 60, Cc.y, 16.714432, 688160, [new(47, 1), new(55, 1)]),
+        new CraftableItemData("VulnerabilityReportScraper", "VRS^", 61, Cc.m, 21.672533, 4918845, [new(53, 1), new(58, 1)]),
+        new CraftableItemData("SpectralTunnel", "SPT^", 62, Cc.LY, 21.550311, 1571925, [new(53, 1), new(59, 1)]),
+        new CraftableItemData("ReflectionCore", "RFC^", 63, Cc.LR, 18.227775, 6202845, [new(58, 1), new(57, 1)]),
+        new CraftableItemData("NexusAnchor", "NEA^", 64, Cc.LM, 20.348825, 3653410, [new(56, 1), new(57, 1), new(9, 1)]),
+        new CraftableItemData("WardenFrame", "WAF^", 65, Cc.B, 19.925959, 6619795, [new(52, 1), new(58, 1), new(59, 1)])
+    ];
 
     public static readonly CraftableItemData[] ALL_RECIPES = [.. REFINED_MATERIALS, .. COMPONENTS];
     public static readonly ItemData[] ALL_ITEMS = [.. MINERALS, .. ALL_RECIPES];

@@ -2,16 +2,14 @@ using Godot;
 
 public partial class Terminal : MarginContainer {
 	[Export] public RuntimeDirector overseer;
-	[Export] RichTextLabel terminalOutputField; [Export] RichTextLabel terminalCommandPrompt;
-	[Export] TextEdit terminalCommandField;
-	[Export] Timer crackDurationTimer;
+	[Export] public TerminalSidebar sidebar;
+    [Export] public RichTextLabel terminalOutputField; [Export] public RichTextLabel terminalCommandPrompt;
+	[Export] public TextEdit terminalCommandField;
+	[Export] public Timer crackDurationTimer;
 
 	bool isProcessing = false;
 	public override void _Ready() {
-		ShellCore.IntializeInterface(
-			overseer,
-			terminalOutputField, terminalCommandPrompt, terminalCommandField, 
-			crackDurationTimer);
+		ShellCore.IntializeInterface(this);
 	}
 	public override void _Process(double delta) {
 		base._Process(delta);

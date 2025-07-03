@@ -14,7 +14,7 @@ content_margin_bottom = 3.0
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_bmejy"]
 content_margin_bottom = 3.0
 
-[node name="Terminal" type="MarginContainer" node_paths=PackedStringArray("terminalOutputField", "terminalCommandPrompt", "terminalCommandField", "crackDurationTimer")]
+[node name="Terminal" type="MarginContainer" node_paths=PackedStringArray("sidebar", "terminalOutputField", "terminalCommandPrompt", "terminalCommandField", "crackDurationTimer")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -25,6 +25,7 @@ size_flags_vertical = 3
 focus_mode = 2
 theme = ExtResource("2_tjxev")
 script = ExtResource("1_q6j3v")
+sidebar = NodePath("TerminalSplitPart/Sidebar")
 terminalOutputField = NodePath("TerminalSplitPart/TerminalZone/OutputArea")
 terminalCommandPrompt = NodePath("TerminalSplitPart/TerminalZone/CommandLine/CommandPrompt")
 terminalCommandField = NodePath("TerminalSplitPart/TerminalZone/CommandLine/CommandField")
@@ -139,7 +140,9 @@ selection_enabled = true
 self_modulate = Color(8, 8, 8, 0.2)
 layout_mode = 2
 size_flags_vertical = 3
-theme = ExtResource("4_oclfs")
+theme = ExtResource("2_tjxev")
+theme_override_colors/font_color = Color(1, 1, 1, 0.4)
+text = "Write stuff here! :D"
 caret_multiple = false
 
 [node name="TimersContainer" type="Node" parent="."]
@@ -148,7 +151,7 @@ caret_multiple = false
 one_shot = true
 
 [node name="StatSwitchTimer" type="Timer" parent="TimersContainer"]
-wait_time = 3000.0
+wait_time = 30.0
 autostart = true
 ignore_time_scale = true
 

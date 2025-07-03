@@ -4,8 +4,8 @@ using System.Linq;
 
 public static partial class ShellCore {
     static void SetCommandPrompt() {
-        if (terminalCommandPrompt == null || CurrNode == null || CurrDir == null) return;
-        terminalCommandPrompt.Text = $"{Util.Format(PlayerDataManager.Username, StrSty.USERNAME)}@{Util.Format(CurrNode.HostName, StrSty.HOSTNAME)}:{Util.Format(CurrDir.GetPath(), StrSty.DIR)}>";
+        if (TCMD_Prompt == null || CurrNode == null || CurrDir == null) return;
+        TCMD_Prompt.Text = $"{Util.Format(PlayerDataManager.Username, StrSty.USERNAME)}@{Util.Format(CurrNode.HostName, StrSty.HOSTNAME)}:{Util.Format(CurrDir.GetPath(), StrSty.DIR)}>";
     }
     const double TIME_TIL_NEXT_LINE = .1; 
     static double timeLeft = TIME_TIL_NEXT_LINE;
@@ -13,12 +13,12 @@ public static partial class ShellCore {
     static void ShowMoreChars(double delta) {
         const int INSTA_FILL_MARGIN = 5;
         // Get current number of visible characters
-        int curChar = terminalOutputField.VisibleCharacters;
-        int allChar = terminalOutputField.GetTotalCharacterCount();
+        int curChar = TOUT_Field.VisibleCharacters;
+        int allChar = TOUT_Field.GetTotalCharacterCount();
         if (curChar >= allChar) return;
 
         // Get full text and split into lines
-        string allText = terminalOutputField.GetParsedText();
+        string allText = TOUT_Field.GetParsedText();
         string[] lines = allText.Split('\n');
 
         // Get total and current visible lines
@@ -32,7 +32,7 @@ public static partial class ShellCore {
 
         // Update chars
         int charsToShow = GetCharacterIndexAtLine(lines, (int)Mathf.Floor(curLineFraction));
-        terminalOutputField.VisibleCharacters = Mathf.Clamp(charsToShow, 0, allText.Length);
+        TOUT_Field.VisibleCharacters = Mathf.Clamp(charsToShow, 0, allText.Length);
     }
     static int CountVisibleLines(string[] lines, int visibleCharCount) {
         int sum = 0, i = -1;

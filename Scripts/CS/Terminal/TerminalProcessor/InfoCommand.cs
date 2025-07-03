@@ -7,10 +7,10 @@ public static partial class ShellCore {
     const int MAX_HISTORY_CHAR_SIZE = 65536, RESET_HISTORY_CHAR_SIZE = 16384;
     static void Say(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
         if (positionalArgs.Length == 0) { Say(""); return; }
-        string c = terminalOutputField.Text;
+        string c = TOUT_Field.Text;
         if (c.Length >= MAX_HISTORY_CHAR_SIZE) {
-            terminalOutputField.Clear();
-            terminalOutputField.AppendText(GetLastLinesUnderLimit(c, RESET_HISTORY_CHAR_SIZE));
+            TOUT_Field.Clear();
+            TOUT_Field.AppendText(GetLastLinesUnderLimit(c, RESET_HISTORY_CHAR_SIZE));
         }
         string text = string.Join(" ", positionalArgs);
         if (parsedArgs.ContainsKey("-e")) text = Regex.Unescape(text); // handles \n, \t, etc.
@@ -20,26 +20,26 @@ public static partial class ShellCore {
         if (!parsedArgs.ContainsKey("-n")) text += "\n";
         //if (parsedArgs.ContainsKey("-r")) text = Util.Format(text, StrSty.ERROR);
         //if (parsedArgs.ContainsKey("-w")) text = Util.Format(text, StrSty.WARNING);
-        terminalOutputField.AppendText(text);
+        TOUT_Field.AppendText(text);
     }
     public static void SayM(string content) {
-        if (terminalOutputField == null) return;
-        string c = terminalOutputField.Text;
+        if (TOUT_Field == null) return;
+        string c = TOUT_Field.Text;
         if (c.Length >= MAX_HISTORY_CHAR_SIZE) {
-            terminalOutputField.Clear();
-            terminalOutputField.AppendText(GetLastLinesUnderLimit(c, RESET_HISTORY_CHAR_SIZE));
+            TOUT_Field.Clear();
+            TOUT_Field.AppendText(GetLastLinesUnderLimit(c, RESET_HISTORY_CHAR_SIZE));
         }
-        terminalOutputField.ScrollToLine(terminalOutputField.GetLineCount() - 1);
-        terminalOutputField.AppendText(content);
+        TOUT_Field.ScrollToLine(TOUT_Field.GetLineCount() - 1);
+        TOUT_Field.AppendText(content);
     }
     public static void Say(params string[] args) {
-        if (terminalOutputField == null) return;
+        if (TOUT_Field == null) return;
         if (args.Length == 0) { Say(""); return; }
 
-        string c = terminalOutputField.Text;
+        string c = TOUT_Field.Text;
         if (c.Length >= MAX_HISTORY_CHAR_SIZE) {
-            terminalOutputField.Clear();
-            terminalOutputField.AppendText(GetLastLinesUnderLimit(c, RESET_HISTORY_CHAR_SIZE));
+            TOUT_Field.Clear();
+            TOUT_Field.AppendText(GetLastLinesUnderLimit(c, RESET_HISTORY_CHAR_SIZE));
         }
 
         bool noNewline = false, interpretEscapes = false, escapeBBcode = false, makeRed = false, makeYellow = false;
@@ -67,8 +67,8 @@ public static partial class ShellCore {
         if (!noNewline) text += "\n";
         if (makeRed) text = Util.Format(text, StrSty.ERROR);
         if (makeYellow) text = Util.Format(text, StrSty.WARNING);
-        terminalOutputField.ScrollToLine(terminalOutputField.GetLineCount() - 1);
-        terminalOutputField.AppendText(text);
+        TOUT_Field.ScrollToLine(TOUT_Field.GetLineCount() - 1);
+        TOUT_Field.AppendText(text);
     }
     public static event Action OnHelpCMDrun;
     static void Help(Dictionary<string, string> parsedArgs, string[] positionalArgs) {
@@ -178,7 +178,7 @@ public static partial class ShellCore {
     }
 
     public static void Clear() {
-        terminalOutputField.Clear();
+        TOUT_Field.Clear();
     }
     public static void SetUsername(string newUsername) {
         PlayerDataManager.Username = newUsername;

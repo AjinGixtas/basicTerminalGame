@@ -2,11 +2,16 @@ using Godot;
 using System.Collections.Generic;
 
 public static partial class ShellCore {
-	static RuntimeDirector overseer; public static RuntimeDirector Overseer => overseer;
-	static RichTextLabel terminalOutputField; static RichTextLabel terminalCommandPrompt; 
-	static TextEdit terminalCommandField; 
-	static Timer crackDurationTimer;
-	static NetworkNode _currNode = null; static NodeDirectory _currDir = null;
+	static Terminal terminal; public static Terminal Terminal => terminal;
+	
+	public static RuntimeDirector Overseer => terminal.overseer;
+    static RichTextLabel TCMD_Prompt => terminal.terminalCommandPrompt;
+    static RichTextLabel TOUT_Field => terminal.terminalOutputField; 
+	static TextEdit      TINP_Field => terminal.terminalCommandField; 
+	static Timer crackDurationTimer => terminal.crackDurationTimer;
+	static TerminalSidebar T_Sidebar => terminal.sidebar;
+
+    static NetworkNode _currNode = null; static NodeDirectory _currDir = null;
 	public static NodeDirectory CurrDir { get { return _currDir; } private set { _currDir = value; SetCommandPrompt(); } }
 	public static NetworkNode CurrNode { 
 		get { return _currNode; }
@@ -25,29 +30,23 @@ public static partial class ShellCore {
 			value = Mathf.Clamp(value, 0, Mathf.Max(0, cmdHistory.Count - 1));
 			_commandHistoryIndex = value;
 			if (_commandHistoryIndex < cmdHistory.Count) {
-				terminalCommandField.Text = cmdHistory[_commandHistoryIndex];
-				terminalCommandField.SetCaretColumn(cmdHistory[_commandHistoryIndex].Length);
+				TINP_Field.Text = cmdHistory[_commandHistoryIndex];
+				TINP_Field.SetCaretColumn(cmdHistory[_commandHistoryIndex].Length);
 			}
 		}
 	}
 	public static void IntializeInterface(
-		RuntimeDirector overseer, RichTextLabel terminalOutputField, 
-		RichTextLabel terminalCommandPrompt, TextEdit terminalCommandField, 
-		Timer crackDurationTimer) {
+		Terminal terminal) {
 
 		// Assign provided parameters to static fields
-		ShellCore.overseer = overseer;
-		ShellCore.terminalOutputField = terminalOutputField;
-		ShellCore.terminalCommandPrompt = terminalCommandPrompt;
-		ShellCore.terminalCommandField = terminalCommandField;
-		ShellCore.crackDurationTimer = crackDurationTimer;
+		ShellCore.terminal = terminal;
 
 		// Set the username and command prompt
-		ShellCore.terminalCommandField.GrabFocus();
+		ShellCore.TINP_Field.GrabFocus();
 
         // Mark as initialized
-        ShellCore.terminalCommandField.ScrollFitContentHeight = true;
-		ShellCore.terminalCommandField.ScrollFitContentWidth = true;
+        ShellCore.TINP_Field.ScrollFitContentHeight = true;
+		ShellCore.TINP_Field.ScrollFitContentWidth = true;
 	}
 	public static void IntializeInternal() {
 		ShellCore._currNode = NetworkManager.PlayerNode;
@@ -62,13 +61,13 @@ public static partial class ShellCore {
 		UpdateProcessingGraphic(delta);
 	}
 	public static void HandleInput(double dela) {
-		if (terminalCommandField.HasFocus()) {
+		if (TINP_Field.HasFocus()) {
 			if (Input.IsActionJustPressed("moveDownHistory")) CommandHistoryIndex += 1;
 			if (Input.IsActionJustPressed("moveUpHistory")) CommandHistoryIndex -= 1;
 			if (Input.IsActionJustPressed("submitCommand")) {
-				if (terminalCommandField.Text.Length == 0) { return; }
-				terminalCommandField.Text = terminalCommandField.Text.Replace("\r", " ").Replace("\n", " ");
-				if(SubmitCommand(terminalCommandField.Text) == 0) terminalCommandField.Text = "";
+				if (TINP_Field.Text.Length == 0) { return; }
+				TINP_Field.Text = TINP_Field.Text.Replace("\r", " ").Replace("\n", " ");
+				if(SubmitCommand(TINP_Field.Text) == 0) TINP_Field.Text = "";
 			}
 		}
 	}

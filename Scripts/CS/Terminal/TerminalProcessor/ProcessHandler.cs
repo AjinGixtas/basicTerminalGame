@@ -21,7 +21,7 @@ public static partial class ShellCore {
         if (timeRemain <= 0) { ProcessFinished(); return; }
     }
     static void ProcessFinished() {
-        IsShellBusy = false; terminalCommandField.Editable = true; terminalCommandField.GrabFocus();
+        IsShellBusy = false; TINP_Field.Editable = true; TINP_Field.GrabFocus();
         tick = 0; Say("-n", $"\n");
         queuedAction(queuedCommands);
     }

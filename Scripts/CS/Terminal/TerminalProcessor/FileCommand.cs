@@ -80,7 +80,7 @@ public static partial class ShellCore {
             if (file == null) {
                 Say("-r", $"File not found: {Util.Format(parg[i], StrSty.FILE)}");
                 EDITrunCMD?.Invoke(parg[i], "", CError.NOT_FOUND);
-            } else { overseer.textEditor.OpenNewFile(CurrNode.HostName, file); ++fileOpened; EDITrunCMD?.Invoke(parg[i], CurrDir.GetFile(parg[i]).GetPath(), CError.OK); }
+            } else { Overseer.textEditor.OpenNewFile(CurrNode.HostName, file); ++fileOpened; EDITrunCMD?.Invoke(parg[i], CurrDir.GetFile(parg[i]).GetPath(), CError.OK); }
         }
         Say($"{fileOpened} file(s) opened. See the editor.");
     }

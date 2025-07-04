@@ -1,3 +1,4 @@
+using Godot;
 using MoonSharp.Interpreter;
 using System.Collections.Generic;
 
@@ -15,7 +16,13 @@ public class CrackModule {
             output.Add(new object[]
             { err, s1, s2, s3 });
         }
-        return output.ToArray();
+        object[][] fres= output.ToArray();
+        for (int i = 0; i < fres.Length; ++i) {
+            for (int j = 0; j < fres[i].Length; ++j) {
+                GD.Print(fres[i][j]);
+            }
+        }
+        return fres;
     }
     public void End() {
         ShellCore.EndFlare();

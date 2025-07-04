@@ -85,9 +85,9 @@ public class BotFarm {
 		MineSpeedValuCurve = (0, 0, GD.RandRange(.8, 1.2), GD.RandRange(.8, 1.2));
 		// This one essentially a speed increase algorithm, with v = d*(b^level)+c*level
 		// a being the distance
-		XferDelayValuCurve = (GD.RandRange(1.0, 8.0), 1.0 + GD.RandRange(.01, .05), GD.RandRange(.1, 1.0), 1.0);
+		XferDelayValuCurve = (GD.RandRange(16.0, 24.0), 1.0 + GD.RandRange(.01, .05), GD.RandRange(.1, 1.0), 1.0);
 		BatchSizeLVL = MineSpeedLVL = XferDelayLVL = 1;
-
+		CycleTimeRemain = 2.0;
     }
 	~BotFarm() {
 		if (Util.HaveFinalWord)

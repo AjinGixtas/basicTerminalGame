@@ -18,9 +18,6 @@ public class LockSystem {
 		{ SecLvl.MASEC, [LocT.I4X, LocT.F8X, LocT.I16, LocT.P16X, LocT.P90, LocT.M2, LocT.M3, LocT.C0, LocT.C1, LocT.C3]},
 	};
     public int LockIntialization(SecLvl secLvl, int defLvl) {
-
-        defLvl = 5;
-
 		if (secLvl == SecLvl.NOSEC) { activeLocks = []; return 0; }
 		List<LocT> locksPossible = [.. LocMap[secLvl]];
         if (activeLocks.Count > 0) { // Prevent duplicate locks

@@ -5,7 +5,9 @@ public abstract class Lock {
     protected string clue = "<Empty>", err = "<Empty>", help = "<Empty>", inp = "<Empty>", name = "<Empty>";
     public virtual int Cost => 1;
     public abstract LocT LocT { get; }
-    public virtual void Initialize() { GD.Print(inp); GD.Print(string.Join(" ", Flag.Zip(ans, (a, b) => new[] { a, b }).SelectMany(x => x)) + " "); }
+    public virtual void Initialize() { 
+        //GD.Print(inp); GD.Print(string.Join(" ", Flag.Zip(ans, (a, b) => new[] { a, b }).SelectMany(x => x)) + " ");
+    }
     public virtual bool[] UnlockAttempt(string[] keys) { 
         if (keys.Length != Flag.Length) { throw new System.Exception("This never supposes to happen"); }
         bool[] result = new bool[Flag.Length];

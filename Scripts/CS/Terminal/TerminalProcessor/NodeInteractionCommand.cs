@@ -186,15 +186,16 @@ This program allows you to attack nodes and bypass their security systems.
     }
 	public static event Action KaraxeEnd;
     public static void EndFlare() {
+		KaraxeEnd?.Invoke();
 		endEpoch = 0;
-		crackDurationTimer.Stop();
-		foreach (WeakReference<DriftSector> sectorRef in sectorAttacked) {
+        crackDurationTimer.Stop();
+		sectorAttacked.Clear();
+		return;
+        foreach (WeakReference<DriftSector> sectorRef in sectorAttacked) {
 			if (!sectorRef.TryGetTarget(out DriftSector sector)) continue;
 			NetworkManager.DisconnectFromSector(sector);
 			NetworkManager.RemoveSector(sector);
 		}
-		sectorAttacked.Clear();
-		KaraxeEnd?.Invoke();
     }
 	public static event Action<(CError, string, string, string)[]> KaraxeAttack;
     /// <summary>
@@ -203,6 +204,9 @@ This program allows you to attack nodes and bypass their security systems.
     /// <param name="flagKeyPairs"></param>
     /// <returns><code>result[i] = (CrackStatus, LockName, LockFlag, LockInput)</code></returns>
     public static (CError, string, string, string)[] Attack(Dictionary<string, string> flagKeyPairs) {
+		if (Time.GetUnixTimeFromSystem() > endEpoch) {
+			return [(CError.NO_PERMISSION, "", "", "")];
+		}
 		(CError, string, string, string)[] result = CurrNode.AttemptCrackNode(flagKeyPairs, endEpoch);
 		if (CurrNode.GetType() == typeof(DriftNode)) {
 			// No idea why, but hard reference to DriftSector is not working here.

@@ -10,7 +10,7 @@ public class TutorialSector : StaticSector {
         NetworkNode node0 = new FileSysTutorialNode(null);
         NetworkNode node1 = new ScriptTutorialNode(node0);
         NetworkNode node2 = new KaraxeTutorialNode(node1);
-        NetworkNode node3 = new ScriptedNetworkNode(new([], [new() { mineralProfile = ItemCrafter.MINERALS[0], weight = 1.0 }], [], [0,7], NodeType.VM, "robo-cl4m-vm", "ROBO CL4M VM DO NOT TOUCH", 128, 1, 1, 1, 2, SecLvl.LOSEC), node2);
+        NetworkNode node3 = new ScriptedNetworkNode(new([], [new() { mineralProfile = ItemCrafter.MINERALS[0], weight = 1.0 }], [], [(int)LocT.C0,(int)LocT.I4X], NodeType.VM, "robo-cl4m-vm", "ROBO CL4M VM DO NOT TOUCH", 128, 1, 1, 1, 2, SecLvl.LOSEC), node2);
         SurfaceNodes.Add(node0);
     }
 }

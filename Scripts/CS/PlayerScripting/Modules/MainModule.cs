@@ -7,6 +7,7 @@ public class MainModule {
     /// </summary>
     /// <param name="content">The string to be said.</param>
     public void Say(string content) {
+        GD.Print(content);
         ShellCore.Say(content);
     }
     /// <summary>

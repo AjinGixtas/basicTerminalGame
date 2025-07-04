@@ -96,49 +96,49 @@ public static class ScriptRunner {
             { "BotNetModule", new HackFarmModule() },
             { "FileModule", new FileModule() },
             { "CError", new CError() },
-            { "SecurityType", new SecLvl() },
+            { "SecLvl", new SecLvl() },
             { "MainModule", new MainModule() },
             { "CraftModule", new CraftModule() },
         };
     }
 
-    private static void RunLua(string scriptContent, Dictionary<string, string> farg, string[] parg) {
-        var script = new MoonSharp.Interpreter.Script();
+        private static void RunLua(string scriptContent, Dictionary<string, string> farg, string[] parg) {
+            var script = new MoonSharp.Interpreter.Script();
 
-        // Inject modules
-        foreach (var kvp in GetCoreModules())
-            script.Globals[kvp.Key] = kvp.Value;
+            // Inject modules
+            foreach (var kvp in GetCoreModules())
+                script.Globals[kvp.Key] = kvp.Value;
 
-        // Inject args
-        Table flagArgsTable = new(script);
-        foreach (var kvp in farg)
-            flagArgsTable[kvp.Key] = string.IsNullOrEmpty(kvp.Value) ? DynValue.True : DynValue.NewString(kvp.Value);
+            // Inject args
+            Table flagArgsTable = new(script);
+            foreach (var kvp in farg)
+                flagArgsTable[kvp.Key] = string.IsNullOrEmpty(kvp.Value) ? DynValue.True : DynValue.NewString(kvp.Value);
 
-        Table posArgsTable = new(script);
-        for (int i = 0; i < parg.Length; i++)
-            posArgsTable[i] = DynValue.NewString(parg[i]);
+            Table posArgsTable = new(script);
+            for (int i = 0; i < parg.Length; i++)
+                posArgsTable[i] = DynValue.NewString(parg[i]);
 
-        script.Globals["arf"] = flagArgsTable;
-        script.Globals["arp"] = posArgsTable;
+            script.Globals["arf"] = flagArgsTable;
+            script.Globals["arp"] = posArgsTable;
 
-        // Override print
-        script.Globals["print"] = DynValue.NewCallback((context, args) => {
-            ShellCore.Say(Util.Format("Use mai:Say() (or the fitting obj name in the script context) instead of print()", StrSty.WARNING));
-            return DynValue.Nil;
-        });
+            // Override print
+            script.Globals["print"] = DynValue.NewCallback((context, args) => {
+                ShellCore.Say(Util.Format("Use mai:Say() (or the fitting obj name in the script context) instead of print()", StrSty.WARNING));
+                return DynValue.Nil;
+            });
 
-        try {
-            script.DoString(scriptContent);
-        } catch (SyntaxErrorException ex) {
-            ShellCore.Say("-r", ex.DecoratedMessage);
-        } catch (ScriptRuntimeException ex) {
-            ShellCore.Say("-r", ex.DecoratedMessage);
-        } catch (InterpreterException ex) {
-            ShellCore.Say("-r", ex.DecoratedMessage);
-        } catch (Exception ex) {
-            ShellCore.Say("-r", "Internal error, please report this: " + ex.Message);
+            try {
+                script.DoString(scriptContent);
+            } catch (SyntaxErrorException ex) {
+                ShellCore.Say("-r", ex.DecoratedMessage);
+            } catch (ScriptRuntimeException ex) {
+                ShellCore.Say("-r", ex.DecoratedMessage);
+            } catch (InterpreterException ex) {
+                ShellCore.Say("-r", ex.DecoratedMessage);
+            } catch (Exception ex) {
+                ShellCore.Say("-r", "Internal error, please report this: " + ex.Message);
+            }
         }
-    }
     private static void RunJS(string scriptContent, Dictionary<string, string> farg, string[] parg) {
         var engine = new Jint.Engine(cfg => cfg
             .AllowClr()
@@ -150,8 +150,22 @@ public static class ScriptRunner {
         foreach (var kvp in GetCoreModules())
             engine.SetValue(kvp.Key, kvp.Value);
 
+        // Inject args
         engine.SetValue("arf", farg);
         engine.SetValue("arp", parg);
+
+        // Inject enums
+        engine.SetValue("CError", Enum.GetValues(typeof(CError))
+            .Cast<CError>()
+            .ToDictionary(e => e.ToString(), e => (int)e)
+        );
+
+        engine.SetValue("SecLvl", Enum.GetValues(typeof(SecLvl))
+            .Cast<SecLvl>()
+            .ToDictionary(e => e.ToString(), e => (int)e)
+        );
+
+        // Override print
         engine.SetValue("print", new Action<string>((msg) => {
             ShellCore.Say("-r", "Use mai:Say() (or the fitting obj name) instead of print()");
         }));
@@ -162,6 +176,7 @@ public static class ScriptRunner {
             ShellCore.Say("-r", $"JS Error: {ex.Message}");
         }
     }
+
     private static void RunPy(string scriptContent, Dictionary<string, string> farg, string[] parg) {
         ShellCore.Say("-r", "Python support has been put off indefinitely"); return;
         var engine = IronPython.Hosting.Python.CreateEngine();

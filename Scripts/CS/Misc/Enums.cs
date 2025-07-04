@@ -15,7 +15,6 @@ public enum NodeType {
 // MASEC = [10, inf)
 // security_point is dressed in these enum to introduce ambugitiy
 // 10-security_point = retaliation level.
-[Flags]
 public enum SecLvl {
     NOSEC = 0, LOSEC = 1, MISEC = 2, HISEC = 3, MASEC = 4
 }

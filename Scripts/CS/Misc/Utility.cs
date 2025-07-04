@@ -456,9 +456,9 @@ public static partial class Util {
         return $"Aprox.{Util.Format($"{min}", StrSty.UNIT, "min")} remaining";
     }
 
-    public static readonly NodeData PLAYER_NODE_DATA_DEFAULT = new([], [], [],
+    public static readonly NodeData PLAYER_NODE_DATA_DEFAULT = new([], [], [(int)LocT.C3],
         [.. System.Enum.GetValues(typeof(LocT)).Cast<int>()], NodeType.PLAYER, "home",
-            "Home", 1, 1, 1, 1);
+            "Home", 1, 1, 1, 1, 1, SecLvl.LOSEC);
     public static string GetArg(Dictionary<string, string> dict, params string[] aliases) => aliases.FirstOrDefault(flag => dict.ContainsKey(flag)) is string found ? dict[found] : null;
     public static bool ContainKeys(Dictionary<string, string> dict, params string[] aliases) => aliases.Any(flag => dict.ContainsKey(flag));
     public static string GenerateRandomString(int length, string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789") {
